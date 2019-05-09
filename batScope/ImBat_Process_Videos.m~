@@ -1,0 +1,16 @@
+function ImBat_Process_Videos()
+
+% Load in all Tiffs, and concatonate them 
+
+
+% remove global and local artifacts
+disp('remove artifacts');
+Vid =  ImBat_denoise(Vid);
+
+
+% Save and remove video f
+
+
+
+
+
