@@ -1,7 +1,13 @@
-function ImBat_Process_Videos(varargin)
+function ImBat_processVideos(varargin)
 % ImBat_Process_Videos
 
+% % concatonate tiffs in directory, denoise, and get video timestamps
+
 % run in extracted folder with videos and .mat files
+
+% WAL3
+% d05/10/2019
+
 
 % Default params
 video = 1;
@@ -13,7 +19,7 @@ mkdir('processed');
 for i=1:2:nparams
 	switch lower(varargin{i})
 		case 'video'
-			video=varargin{i+1};           
+			video=varargin{i+1};
         case 'audio'
             audio=varargin{i+1};
 %         case 't_smooth'
@@ -27,9 +33,9 @@ end
 
 
 
-% Load in all Tiffs, and concatonate them 
-if video ==1; 
-   
+% Load in all Tiffs, and concatonate them
+if video ==1;
+
 mov_listing=dir(fullfile(pwd,'*.tiff'));
 mov_listing={mov_listing(:).name};
 
@@ -67,7 +73,7 @@ end
 if audio == 1;
 
 % Get the audio data:
-% Load in all Tiffs, and concatonate them 
+% Load in all Tiffs, and concatonate them
 mov_listing=dir(fullfile(pwd,'*.mat'));
 filenames={mov_listing(:).name};
 
@@ -83,7 +89,7 @@ if i ==1;
     D = load(filenames{i}, 'audio', 'video');
 else
     D_temp = load(filenames{i}, 'audio', 'video');
-    
+
     % Analog Stuff
     D.audio.nrFrames = D.audio.nrFrames+D_temp.audio.nrFrames;
     D.audio.data = cat(1,D.audio.data,D_temp.audio.data);
@@ -92,8 +98,8 @@ else
     % video stuff
     D.video.times = cat(1,D.video.times,D_temp.video.times);
     D.video.nrFramesTotal = D.video.nrFramesTotal+D_temp.video.nrFramesTotal;
-    
-    clear D_temp 
+
+    clear D_temp
 end
 end
 

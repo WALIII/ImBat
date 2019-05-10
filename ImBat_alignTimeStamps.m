@@ -1,5 +1,13 @@
+function [out] = ImBat_alignTimeStamps(audioIn,TS,Markers);
+% ImBat_alignTimeStamps
 
-function [out] = Bats_Align_TS(audioIn,TS,Markers);
+% Align the Freedomscope analog input with 'Cortex' timestamps,
+% outputs flight data [x,y,t] where 't' is timewarped to fit the FreedomScope data
+
+% WAL3
+% d05/10/2019
+
+
 
 TS = TS(:,2);
 audio = audioIn(:,1);
@@ -30,7 +38,7 @@ offsetB = Blocs(1);
 %ur = resample(u,3,2);
 
 % Align to first peak
-figure(); 
+figure();
 hold on;
 plot((1:length(HH))-offsetA,HH,'r');
 plot((1:length(HH2))-offsetB,HH2,'b');
@@ -48,5 +56,3 @@ plot((1:length(HH))-offsetA,HH1b,'r');
 %plot((1:length(HH2))-ones(length(Alocs),1),'r*');
 plot((1:length(HH2))-offsetB,HH2b,'b');
 % plot(Blocs-offsetB,ones(length(Blocs),1),'b*');
-
-

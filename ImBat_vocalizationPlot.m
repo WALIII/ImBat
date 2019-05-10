@@ -1,3 +1,12 @@
+function ImBat_vocalizationPlot
+% ImBat_vocalizationPlot
+
+% Plot and align vocalizations from the Bats
+
+% WAL3
+% d01052019
+
+
 clear all
 
 
@@ -7,10 +16,10 @@ mov_listing={mov_listing(:).name};
 
 figure();
 for i = 1:size(mov_listing,2); %size(mov_listing,2)
-    
-    
+
+
     load(mov_listing{i},'recbuf','fs'),
-    WAV{i} = recbuf; 
+    WAV{i} = recbuf;
 %     FS_Spectrogram(recbuf,fs);
 %      pause(0.1)
 
@@ -55,7 +64,7 @@ for ii = 1:size(WARPED_audio{iii},2)
 fOut = WARPED_audio{iii}(:,ii);
 audioVect(:,counter) = downsample(tsmovavg(rms(abs(fOut),2),'s',500,1),100);
 audioVectT(:,counter) = fOut;
-audioVect_UW(:,counter) = downsample(tsmovavg(rms(abs(WARPED_audio_true{1}(:,ii)),2),'s',500,1),100); 
+audioVect_UW(:,counter) = downsample(tsmovavg(rms(abs(WARPED_audio_true{1}(:,ii)),2),'s',500,1),100);
 audioVect_UWT(:,counter) = WARPED_audio_true{1}(:,ii);
 
 counter = counter+1;
