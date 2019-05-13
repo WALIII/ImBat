@@ -36,7 +36,7 @@ end
 % Load in all Tiffs, and concatonate them
 if video ==1;
 
-mov_listing=dir(fullfile(pwd,'*.tiff'));
+mov_listing=dir(fullfile(pwd,'*.tif'));
 mov_listing={mov_listing(:).name};
 
 filenames=mov_listing;
@@ -66,7 +66,7 @@ disp('remove artifacts');
 Yf =  ImBat_denoise(Yf);
 
 % Save and remove video from ram
-FS_tiff(Yf,'fname','processed/RAW_Video');
+FS_tiff(Yf,'fname','processed/RAW_Video.tif');
 clear Yf;
 end
 
