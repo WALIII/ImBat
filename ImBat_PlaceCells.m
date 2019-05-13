@@ -2,6 +2,12 @@ function ImBat_PlaceCells(neuron, out);
 
 % get general data on ROI traces
 
+
+% optional: add jitter to location:
+for i = 1:3;
+out.Location(:,i) = smooth(out.Location(:,i)+ randi(100,length(out.Location),1)/1,10);
+end
+
 figure(); 
 hold on;
 a1 = subplot(10,1,1:2); 
@@ -17,7 +23,7 @@ plot(out.video_times(1:end-1),smooth(mean((neuron.S(1:50,1:end-1)),1),100));
 a3 = subplot(10,1,5:10);
 hold on;
 for i = 1: 40; 
-plot(out.video_times,zscore(neuron.C_raw(i,:))+i*3);
+plot(out.video_times,neuron.C(i,:)+i*10);
 end
   linkaxes([a1, a2, a3], 'x');
  
@@ -47,13 +53,13 @@ end
   
   % Plot 3d Scatter
   
-  col = hsv(10);
+  col = hsv(15);
   
 figure(); 
 hold on;
 plot3(out.Location(:,1),out.Location(:,2),out.Location(:,3),'k');
   
-  for ii = 1:10 
+  for ii = 1:15; 
 [~,xy] = find(neuron.S(ii,:)>0.1);  % get time
 Spike_times = out.video_times(xy);
 
