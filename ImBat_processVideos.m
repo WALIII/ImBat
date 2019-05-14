@@ -66,7 +66,10 @@ disp('remove artifacts');
 Yf =  ImBat_denoise(Yf);
 
 % Save and remove video from ram
-FS_tiff(Yf,'fname','processed/RAW_Video.tif');
+
+CNMFe_align(Yf);
+
+%FS_tiff(Yf,'fname','processed/RAW_Video.tif');
 clear Yf;
 end
 
