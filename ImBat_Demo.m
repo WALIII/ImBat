@@ -1,5 +1,7 @@
 function [out] = ImBat_Demo
 
+% Run in extracted folder w/ tifs
+
 
 % Align Video and save flight trajectories
 

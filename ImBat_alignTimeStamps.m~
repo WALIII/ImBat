@@ -1,4 +1,4 @@
-function [out] = ImBat_alignTimeStamps(audio,TS,Markers);
+function [out] = ImBat_alignTimeStamps(audio,video,TS,Markers);
 % ImBat_alignTimeStamps
 
 % Align the Freedomscope analog input with 'Cortex' software timestamps,
@@ -9,37 +9,30 @@ function [out] = ImBat_alignTimeStamps(audio,TS,Markers);
 
 
 
-%params
+%paramss
 fs = audio.rate;% audio framerate
 Tsfs = 120; % frame rate of the tracking/syncing software
 
-DS_factor = round(fs/TsFs); % 
+DS_factor = round(fs/Tsfs); % should be '400'
 
 
 % get tracking data
 disp('extracting tracking data');
-[Location] = ImBat_formatTracking(Markers);
+[Location] = ImBat_formatTracking(Markers); % formated location data
 
 TS = TS(:,2);
 audio_data =audio.data;
-audio_data = downsample(audio_data,400);
-audio_tv = downsample(audio.times,400);
+audio_data = downsample(audio_data,DS_factor);
+audio_tv = downsample(audio.times,DS_factor);
 
 % Make time vector for TS
 a = 1:length(TS);
-a = a/120;
+a = a/Tsfs;
 max(a);
 
 
 TS_tv = a;
-% resample timestamps:
-% TS = resample(TS,round(48000/120),1);
-% TS_tv = resample(TS_tv,round(48000/120),1);
 TS2 = TS;
-
-% Same procedure with the Markers ( same timestamps as above):
-% Location= resample(Location,round(48000/120),1);
-% Location = downsample(Location,100);
 
 
 
@@ -98,5 +91,22 @@ out.Location = Location;
 out.Location_time = TS_tv_offset';
 % out.markers_resampled % to the frame rate of the video
 % out.markers_resampled_time
+out.video_times = video.times;
+save('Location_data','out','-v7.3');% play the video
 
-
+% Smooth Location data
+for i = 1:3
+    out.Location(i,1)
+% getting location data:
+disp('finalizing cursor')
+for i = 1:(size(out.Location,1)-1)
+    if out.Location(i,1) == out.Location(i+1,1) && out.Location(i,2) == out.Location(i+1,2);
+        for ii = 1:3
+        out.Location2(i,ii) = NaN;
+        end
+    else
+         for ii = 1:3
+        out.Location2(i,ii) = out.Location(i,ii);
+         end
+    end
+end

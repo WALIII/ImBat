@@ -55,13 +55,14 @@ disp('Parsing Audio and Video files');
 fprintf(1,['Progress:  ' blanks(nblanks)]);
 
 for i=1:length(mov_listing)
-
+clear file
     [path,file,ext]=fileparts(filenames{i});
-
-
 	fprintf(1,formatstring,round((i/length(mov_listing))*100));
     FILE = fullfile(DIR,mov_listing{i})
 
+    mkdir([file,'_extraction']);
+    file = [file,'_extraction/',file];
+    
 % Break into many smaller filles:
     file_info = VideoReader(FILE);
 
@@ -117,7 +118,7 @@ end
 % disp('remove artifacts');
 % video.frames =  ImBat_denoise(video.frames);
 
-fname = [mat_dir,'/',file,'_',num2str(iii), '.tif'];
+fname = [mat_dir,'/',file,'_',sprintf('%03d', iii), '.tif'];
 FS_tiff(video.frames,'fname',fname);
 
 %dont save video.frames ( its already a tif...
