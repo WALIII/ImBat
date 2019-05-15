@@ -6,7 +6,7 @@ gcp;
 %% read data and convert to double
 
 %addpath(genpath('../../NoRMCorre'));
-type = 1; % non-rigid
+type = 2; % non-rigid
 [d1,d2,T] = size(Yf);
 
 %% perform some sort of deblurring/high pass filtering
@@ -72,7 +72,7 @@ options_nr = NoRMCorreSetParms('d1',d1-bound,'d2',d2-bound,'bin_width',50, ...
     'grid_size',[128,128]*2,'mot_uf',4,'correct_bidir',false, ...
     'overlap_pre',32,'overlap_post',32,'max_shift',20);
 
-tic; [M2,shifts2,template2] = normcorre_batch(Y(bound/2+1:end-bound/2,bound/2+1:end-bound/2,:),options_nr,template1); toc % register filtered data
+tic; [M2,shifts2,template2] = normcorre_batch(Y(bound/2+1:end-bound/2,bound/2+1:end-bound/2,:),options_nr); toc % register filtered data
 tic; Mpr = apply_shifts(Yf,shifts2,options_nr,bound/2,bound/2); toc % apply the shifts to the removed percentile
 
 %% compute metrics
@@ -183,6 +183,10 @@ disp('Smoothing corrected data...');
 % smooth motion corrected data...
 [Y] = ImBat_Filter(Y);
 disp('Saving corrected data...');
-save('processed/Motion_corrected_Data.mat','all_shifts,','Y','Ysiz','Mr','-v7.3');
+save('processed/Motion_corrected_Data.mat','all_shifts','Y','Ysiz','-v7.3');
+clear Y
+% saving Downsampled video
+disp('Saving corrected data...');
+save('processed/Motion_corrected_Data.mat','all_shifts','Y','Ysiz','-v7.3');
 
 
