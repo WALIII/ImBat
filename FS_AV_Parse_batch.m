@@ -60,7 +60,7 @@ clear file
 	fprintf(1,formatstring,round((i/length(mov_listing))*100));
     FILE = fullfile(DIR,mov_listing{i})
 
-    mkdir([file,'_extraction']);
+    mkdir([mat_dir,'/',file,'_extraction']);
     file = [file,'_extraction/',file];
     
 % Break into many smaller filles:
@@ -71,20 +71,25 @@ clear file
         
 
 for iii = 1:size(vtimes,2)-1;
+    
+    try
 [a_ts, a, v_ts, v] = extractmedia(FILE,vtimes(iii),vtimes(iii+1));
 
-%    v1 = VideoReader(FILE);
-%    k = 1;
-%     while hasFrame(v1)
-%     v{k} = readFrame(v1);
-%     k = k+1;
-%     end
-%     v = v';
-%     a = 0;
-%     a_ts = 0;
-%     v_ts = 0;
-% end
-%     clear k V1;
+    catch
+        disp(' No audio found in file');
+   v1 = VideoReader(FILE);
+   k = 1;
+    while hasFrame(v1)
+    v{k} = readFrame(v1);
+    k = k+1;
+    end
+    v = v';
+    a = 0;
+    a_ts = 0;
+    v_ts = 0;
+     clear k V1;
+    end
+   
 
 % else
 %   disp('moving file- to large for batch processing... use FS_AV_Parse(pwd,large)');
@@ -109,7 +114,11 @@ for ii = 1: size(v,1)
      %video.frames(:,:,:,ii) = v{ii}-(noise(ii,:)-min(noise(30:end,:)));
       temp = v{ii}; %-(noise(ii,:)-min(noise(30:end)));
       temp = squeeze(mean(temp,3));
+      try
       video.frames(:,:,ii) = imresize(temp,resize_factor);
+      catch
+          disp('test');
+      end
       v{ii} = []; % empty the buffer
       temp = [];
 end
@@ -167,7 +176,7 @@ if plot_spectrogram ==1;
             disp('no audio... skipping spectrogram');
         end
 end
-        save(fullfile(mat_dir,[file,'_',num2str(iii), '.mat']),'audio','video','-v7.3');
+        save(fullfile(mat_dir,[file,'_',sprintf('%03d', iii), '.mat']),'audio','video','-v7.3');
 
         % clear the buffer
 clear video  audio a_ts a v_ts v;
