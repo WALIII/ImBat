@@ -8,10 +8,11 @@ function ImBat_START
 % d05/16/2019
 
 
-ROI_flag = 0; % run ROI extraction
-Analysis_flag = 0; % run basic ROI analysis...
+ROI_flag = 1;
+
 
 % Get all folders in directory
+
 files = dir(pwd);
 files(ismember( {files.name}, {'.', '..','Processed'})) = [];  %remove . and .. and Processed
 
@@ -25,9 +26,9 @@ for k = 1 : length(subFolders)
 end
 
 
-%% Extraction, Motion Correction, ROI extraction
-
-% For each folder ( extraction, and motion correction step)
+%% Extraction, Motion Correction
+% For each folder ( extraction, and motion correction step
+ %Run through all folder...
 for i = 1:length(subFolders);
 disp(['entering folder', char(subFolders(i).name)])
 
@@ -35,7 +36,7 @@ cd(subFolders(i).name)
 
 % index every subfolder...
 flight_files = dir(pwd);
-%flight_files(ismember( {flight_files.name}, {'.', '..','Processed'})) = [];  %remove . and .. and Processed
+flight_files(ismember( {flight_files.name}, {'.', '..','Processed'})) = [];  %remove . and .. and Processed
 % Get a logical vector that tells which is a directory.
 flight_dirFlags = [flight_files.isdir];
 % Extract only those that are directories.
@@ -43,28 +44,11 @@ flight_subFolders = files(flight_dirFlags);
 
 for ii = 1:length(flight_subFolders);
     % load tracking data 
-    track_fname = subFolders(ii).name;
-    track_fname = track_fname(1:end-11);
-    track_fname = [track_fname,'_track.mat'];
-    load(track_fname);
-    % gindex into the flight_subfolder
-cd(flight_subFolders(ii).name)
+    X = subFolders(i).name
+    X = X(1:end-11)
+    X = [
+cd(subFolders(i).name)
 
-% Run processing script 
-ImBat_processVideos;
-cd('processed')
-if ROI_flag ==1;
-    disp('extracting ROIs...')
-end
-
-disp('Aligning Timestamps...');
-load('AV_data.mat');
-[out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
-% Clear vars from RAM
-clear video audio Markers AnalogSignals out
-end
-
-end
 
 
 
