@@ -42,19 +42,18 @@ flight_dirFlags = [flight_files.isdir];
 flight_subFolders = flight_files(flight_dirFlags);
 
 for ii = 1:length(flight_subFolders);
-cd([subFolders(i).folder,'/',subFolders(i).name]);
-
     % load tracking data 
     track_fname = flight_subFolders(ii).name;
-    track_fname = extractBefore( track_fname,'_extraction');
+    newStr = extractBefore( track_fname,'_extraction')
+
     track_fname = [track_fname,'_track.mat'];
     load(track_fname);
     % gindex into the flight_subfolder
-cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])
+cd(flight_subFolders(ii).name)
 
 % Run processing script 
 mkdir('processed');
-ImBat_processVideos;
+%ImBat_processVideos;
 disp('processing!!');
 cd('processed')
 if ROI_flag ==1;
@@ -62,9 +61,9 @@ if ROI_flag ==1;
 end
 
 
-disp('Aligning Timestamps...');
-load('AV_data.mat');
-[out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
+%disp('Aligning Timestamps...');
+%load('AV_data.mat');
+%[out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
 % Clear vars from RAM
 clear video audio Markers AnalogSignals out
 end
