@@ -184,7 +184,7 @@ disp('Smoothing corrected data...');
 [Y] = ImBat_Filter(Y);
 disp('Saving corrected data...');
 save('processed/Motion_corrected_Data.mat','all_shifts','Y','Ysiz','-v7.3');
-clear Y Ysiz
+%clear Y Ysiz
 % saving Downsampled video
 
  Y = imresize(Y,0.5);
