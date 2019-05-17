@@ -112,3 +112,6 @@ for i = 1:(size(out.Location,1))-2
          end
     end
 end
+
+
+save('Alignment.mat','out');

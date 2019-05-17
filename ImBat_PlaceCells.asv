@@ -115,8 +115,6 @@ catch
     continue
 end
 saveas(gcf,['PlaceCells/fig/','Cell_',num2str(ii)]);
-saveas(gcf,['PlaceCells/jpg/','Cell_',num2str(ii),'.jpg']);
-
 clf
 
 clear LX LY LZ closestIndex Spike_times
