@@ -105,14 +105,15 @@ continue
 end
 end
 
-disp([num2str(size(LX)),' Cells'])
+disp([num2str(size(LX)),' Bursts in flight'])
 scatter3(LX,LY,LZ,100,'or','filled');
+title(['Cell no ',num2str(ii)]);
 catch
     disp('cell not active');
     
     continue
 end
-pause();
+   pause();
 clf
 
 clear LX LY LZ closestIndex Spike_times
