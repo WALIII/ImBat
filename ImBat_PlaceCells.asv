@@ -11,6 +11,8 @@ out.Location_jitter(:,i) = smooth(out.Location(:,i)+ randi(100,length(out.Locati
 out.Location(:,i) = smooth(out.Location(:,i),10);
 end
 
+% Smooth Neurons
+
 
 % for i = 1:(size(out.Location,1)-1)
 %     if out.Location(i,1) == out.Location(i+1,1) && out.Location(i,2) == out.Location(i+1,2);
@@ -37,16 +39,17 @@ hold on;
 
 D = diff(nanmean(out.Location2(:,1:3),2));
 
-plot(out.Location_time,(abs(D)))
+plot(out.Location_time(1:end-1),(abs(D)))
 
 a2 = subplot(10,1,2); 
 hold on;
 plot(out.video_times(1:end-1),zscore(smooth(mean((full(neuron.S(1:50,1:end-1))),1),100)));
-
+ylim([0 5]);
 a3 = subplot(10,1,3:10);
 hold on;
 for i = 1: 40; 
-plot(out.video_times,zscore(neuron.C_raw(i,:))+i*4);
+    hh = movmean(neuron.C_raw(i,:),4);
+plot(out.video_times,zscore(hh)+i*4);
 end
   linkaxes([a1, a2, a3], 'x');
  
@@ -76,7 +79,8 @@ end
   
   % Plot 3d Scatter
   
-  
+  mkdir('PlaceCells/fig');
+   mkdir('PlaceCells/jpg');
   figure(); 
 
   for ii = 1:93; 
@@ -102,14 +106,15 @@ continue
 end
 end
 
-disp([num2str(size(LX)),' Cells'])
+disp([num2str(size(LX)),' Bursts in flight'])
 scatter3(LX,LY,LZ,100,'or','filled');
+title(['Cell no ',num2str(ii),'  ',num2str(size(LX)),' Bursts in flight']);
 catch
     disp('cell not active');
     
     continue
 end
-pause();
+saveas(gcf,['PlaceCells/fig/','Cell_',num2str(ii)]);
 clf
 
 clear LX LY LZ closestIndex Spike_times

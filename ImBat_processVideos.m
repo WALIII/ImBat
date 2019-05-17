@@ -44,8 +44,8 @@ filenames=mov_listing;
 
 disp('Parsing Video files');
 
-[nblanks formatstring]=fb_progressbar(100);
-fprintf(1,['Progress:  ' blanks(nblanks)]);
+%[nblanks formatstring]=fb_progressbar(100);
+%fprintf(1,['Progress:  ' blanks(nblanks)]);
 
 for i=1:length(mov_listing)
     [path,file,ext]=fileparts(filenames{i});

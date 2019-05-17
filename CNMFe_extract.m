@@ -210,10 +210,10 @@ neuron.save_neurons(dir_neurons);
 [Cn, pnr] = neuron.correlation_pnr(Y(:, round(linspace(1, T, min(T, 1000)))));
 figure;
 Cn = imresize(Cn, [d1, d2]); 
-neuron.show_contours(0.6); 
-colormap gray;
-title('contours of estimated neurons');
-
+%neuron.show_contours(0.6); 
+%colormap gray;
+%title('contours of estimated neurons');
+close all
 %% check spatial and temporal components by playing movies
 % save_avi = false;
 % avi_name = 'play_movie.avi';

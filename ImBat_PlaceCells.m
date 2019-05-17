@@ -79,7 +79,8 @@ end
   
   % Plot 3d Scatter
   
-  
+  mkdir('PlaceCells/fig');
+   mkdir('PlaceCells/jpg');
   figure(); 
 
   for ii = 1:93; 
@@ -105,14 +106,17 @@ continue
 end
 end
 
-disp([num2str(size(LX)),' Cells'])
+disp([num2str(size(LX)),' Bursts in flight'])
 scatter3(LX,LY,LZ,100,'or','filled');
+title(['Cell no ',num2str(ii),'  ',num2str(size(LX)),' Bursts in flight']);
 catch
     disp('cell not active');
     
     continue
 end
-pause();
+saveas(gcf,['PlaceCells/fig/','Cell_',num2str(ii)]);
+saveas(gcf,['PlaceCells/jpg/','Cell_',num2str(ii),'.jpg']);
+
 clf
 
 clear LX LY LZ closestIndex Spike_times
