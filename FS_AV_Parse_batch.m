@@ -25,7 +25,8 @@ mat_dir=[pwd,'/mat'];
 gif_dir=[pwd,'/gif'];
 error_dir =[pwd,'/error'];
 plot_spectrogram =0;
-resize_factor = 0.25;
+% resize_factor = 0.25;
+frames_per_file = 200;
 
 if exist(mat_dir,'dir') rmdir(mat_dir,'s'); end
 if exist(gif_dir,'dir') rmdir(gif_dir,'s'); end
@@ -66,7 +67,7 @@ clear file
 % Break into many smaller filles:
     file_info = VideoReader(FILE);
 
-   vtimes = 0:500:file_info.Duration;
+   vtimes = 0:frames_per_file:file_info.Duration;
    vtimes = cat(2,vtimes,file_info.Duration); 
         
 
@@ -104,6 +105,12 @@ for iii = 1:size(vtimes,2)-1;
 
 % Format VIDEO DATA
 [video.width, video.height, video.channels] = size(v{1});
+
+% calculate resize factor
+resize_factor = video.height/80;
+resize_factor = 1/resize_factor;
+video.resize_factor = resize_factor;
+
 video.times = v_ts;% 0.1703*(day-1);
 
 video.nrFramesTotal = size(v,1);
