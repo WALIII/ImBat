@@ -1,7 +1,8 @@
-function CNMFe_extract
+function CNMFe_extract(nam)
 
+nam = nam;
 %% clear workspace
-clear; clc; close all;  
+clc; close all;  
 global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
     neuron_full Ybg_weights; %#ok<NUSED> % global variables, don't change them manually
 
