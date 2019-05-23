@@ -1,4 +1,4 @@
-function ImBat_START
+function ImBat_START(varargin)
 % ImBat_START
 
 % Main wrapper for all ImBat functions. Will Motion correct, and basic ROI
@@ -8,11 +8,21 @@ function ImBat_START
 % d05/16/2019
 
 
-ROI_flag = 1;
+ROI_flag = 0; % run ROI extraction
+Analysis_flag = 0; % run basic ROI analysis...
+extract  = 1;
+% Manual inputs
+vin=varargin;
+for i=1:length(vin)
+  if isequal(vin{i},'ROI') % manually inputing a sort order
+    ROI_flag=vin{i+1};
+  elseif isequal(vin{i},'Place')
+      Analysis_flag = vin{i+1};
+end
+end
 
 
 % Get all folders in directory
-
 files = dir(pwd);
 files(ismember( {files.name}, {'.', '..','Processed'})) = [];  %remove . and .. and Processed
 
@@ -26,13 +36,13 @@ for k = 1 : length(subFolders)
 end
 
 
-%% Extraction, Motion Correction
-% For each folder ( extraction, and motion correction step
- %Run through all folder...
+%% Extraction, Motion Correction, ROI extraction
+
+% For each folder ( extraction, and motion correction step)
 for i = 1:length(subFolders);
 disp(['entering folder', char(subFolders(i).name)])
 
-cd(subFolders(i).name)
+cd([subFolders(i).folder,'/',subFolders(i).name]);
 
 % index every subfolder...
 flight_files = dir(pwd);
@@ -40,15 +50,53 @@ flight_files(ismember( {flight_files.name}, {'.', '..','Processed'})) = [];  %re
 % Get a logical vector that tells which is a directory.
 flight_dirFlags = [flight_files.isdir];
 % Extract only those that are directories.
-flight_subFolders = files(flight_dirFlags);
+flight_subFolders = flight_files(flight_dirFlags);
 
 for ii = 1:length(flight_subFolders);
-    % load tracking data 
-    X = subFolders(i).name
-    X = X(1:end-11)
-    X = [
-cd(subFolders(i).name)
+cd([subFolders(i).folder,'/',subFolders(i).name]);
 
+% Check if folder exists 
+if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed'])>0;
+    disp('Folder already extracted..');
+    
+    if re-extract ==1
+        disp('Re-Extracting...');
+        
+    else
+        disp('Moving to the next folder...');
+        extract = 0 ;
+    end
+end
+    
+if extract ==1;
+    % load tracking data 
+    track_fname = flight_subFolders(ii).name;
+    track_fname = extractBefore( track_fname,'_extraction');
+    track_fname = [track_fname,'_track.mat'];
+    load(track_fname);
+    % gindex into the flight_subfolder
+cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])
+
+% Run processing script 
+mkdir('processed');
+ImBat_processVideos;
+disp('processing!!');
+cd('processed')
+
+end
+if ROI_flag ==1;
+    disp('extracting ROIs...')
+end
+
+
+disp('Aligning Timestamps...');
+load('AV_data.mat');
+[out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
+% Clear vars from RAM
+clear video audio Markers AnalogSignals out
+end
+
+end
 
 
 
