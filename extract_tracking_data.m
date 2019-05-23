@@ -5,14 +5,19 @@ processed_dir = [wd filesep 'processed' filesep];
 if ~isdir(processed_dir)
     mkdir(processed_dir);
 end
+  
 
 %run through list of c3d files in that directory, convert to mat, and save
 %to processed directory
 for i = 1:length(c3dList)
- fileName = c3dList(i).name;
+ fileName = extractBefore(c3dList(i).name,'-Bat');
  batName = extractBefore(fileName,'_');
- sessionNum = extractBefore(fileName,'-');
  dateSesh = datestr(datetime(c3dList(i).date),'yymmdd');
+ sessionNum = fileName(end);
+ copy_dir = [extractBefore(wd,batName) 'processed' filesep batName filesep dateSesh filesep];
+ if ~isdir(copy_dir)
+    mkdir(copy_dir);
+ end
 [Markers,VideoFrameRate,AnalogSignals,AnalogFrameRate,Event,ParameterGroup,CameraInfo,ResidualError]=readC3D_analog([wd filesep fileName]); %convert file
 %plot ttl impulses to check they are linear and not missing ttl
 event_ttls = AnalogSignals(:,2);
@@ -20,6 +25,7 @@ event_ttls = AnalogSignals(:,2);
 figure
 plot(LT)
 title(fileName)
-%save new mat file
-save([processed_dir batName '_' dateSesh '_track_' sessionsNum '.mat'],'AnalogFrameRate','AnalogSignals','Markers','VideoFrameRate')
+%save new mat file in both original directory and copied directory for processing
+save([processed_dir fileName '_track' '.mat'],'AnalogFrameRate','AnalogSignals','Markers','VideoFrameRate');
+save([copy_dir fileName '_track' '.mat'],'AnalogFrameRate','AnalogSignals','Markers','VideoFrameRate');
 end
