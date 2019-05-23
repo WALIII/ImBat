@@ -1,7 +1,9 @@
 function ImBat_PlaceCells(neuron, out);
 % ImBat_PlaceCells
 
-% Basic plotting of the location and spiking data
+% Basic plotting of the location that certian cells are active...
+
+
 
 
 

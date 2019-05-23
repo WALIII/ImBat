@@ -1,8 +1,15 @@
 function ImBat_PlaceCells(neuron, out);
-% ImB
+% ImBat_PlaceCells
+
+% Basic plotting of the location that certian cells a
+
+
+
 % get general data on ROI traces
 
-offset = 0.1; % account for slow calcium
+offset = 0.1; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
+
+
 
 
 % optional: add jitter to location:
@@ -43,21 +50,10 @@ end
  
   
   
-  
-  
-  % plot an example trial
-  
-  % get min of location time
-  [e e2] = min(out.Location_time);
-  %
-  
-  
-  
-  
-% 
-  
-% Plot the location in space that each cell is active
 
+  
+ 
+% Plot the location in space that each cell is active
 
   mkdir('PlaceCells/fig'); % save as a figure file in local dir
    mkdir('PlaceCells/jpg'); % Save as .jpg in local dir
@@ -102,39 +98,5 @@ clf
 % Clear the buffer for the next cell:
 clear LX LY LZ closestIndex Spike_times
   end
-  
-  
-  
-%   col = hsv(150);
-%   
-% figure(); 
-% 
-%   for ii = 1:40; 
-%       hold on;
-% plot3(out.Location(:,1),out.Location(:,2),out.Location(:,3),'k');
-%   
-% [~,xy] = find(neuron.S(ii,:)>0.1);  % get time
-% Spike_times = out.video_times(xy);
-% 
-% % find closeset location
-% % Spike_times
-% 
-% for i = 1:size(Spike_times,1)
-% [minValue(:,i),closestIndex(:,i)] = min(abs(out.Location_time-Spike_times(i)));
-% LX(i) = out.Location(closestIndex(:,i),1);
-% LY(i) = out.Location(closestIndex(:,i),2);
-% LZ(i) = out.Location(closestIndex(:,i),3);
-% end
-% 
-% try
-%     scatter3(LX,LY,LZ,20,col(ii,:));
-% catch
-%     disp('cell not active');
-% end
-% pause();
-% clf
-% 
-% clear LX LY LZ closestIndex Spike_times
-%   end
   
   
