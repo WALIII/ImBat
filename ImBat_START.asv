@@ -20,7 +20,8 @@ for i=1:length(vin)
     ROI_flag=vin{i+1};
   elseif isequal(vin{i},'Place')
       Analysis_flag = vin{i+1};
-  elseif re
+  elseif isequal(vin{i},'reExtract');
+      reExtract=vin{i+1};
 end
 end
 
@@ -68,6 +69,9 @@ if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','proce
     else
         disp('Moving to the next folder...');
         extract = 0 ;
+        cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])
+        cd('processed') % move to processed folder...
+
     end
 end
     
@@ -84,15 +88,16 @@ cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])
 mkdir('processed');
 ImBat_processVideos;
 disp('processing!!');
+cd('processed') % move to processed folder...
 
 end
 
-cd('processed') % move to processed folder...
 
 
 if ROI_flag ==1;
     disp('extracting ROIs...')
-    CNMFe_extract;
+    nam = './Motion_corrected_Data_DS.mat'
+    CNMFe_extract(nam);
 end
 
 
@@ -101,6 +106,7 @@ load('AV_data.mat');
 [out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
 % Clear vars from RAM
 clear video audio Markers AnalogSignals out
+extract =1;
 end
 
 end
@@ -125,7 +131,6 @@ end
  
         
 %% Align Timestamps:
-
 
     
     

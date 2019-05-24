@@ -69,28 +69,28 @@ if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','proce
     else
         disp('Moving to the next folder...');
         extract = 0 ;
-        cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])
-        cd('processed') % move to processed folder...
-
     end
 end
     
-if extract ==1;
+
     % load tracking data 
     track_fname = flight_subFolders(ii).name;
     track_fname = extractBefore( track_fname,'_extraction');
     track_fname = [track_fname,'_track.mat'];
     load(track_fname);
+    
+
     % gindex into the flight_subfolder
 cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])
-
+if extract ==1;    
 % Run processing script 
 mkdir('processed');
 ImBat_processVideos;
 disp('processing!!');
+end
+
 cd('processed') % move to processed folder...
 
-end
 
 
 
@@ -131,7 +131,6 @@ end
  
         
 %% Align Timestamps:
-
 
     
     

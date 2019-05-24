@@ -172,7 +172,7 @@ end
 
 %% delete some neurons and run CNMF-E iteration 
 neuron.orderROIs('decay_time');  % you can also use {'snr', 'mean', 'decay_time'} 
-neuron.viewNeurons([], neuron.C_raw); 
+%neuron.viewNeurons([], neuron.C_raw); 
 tic;
 cnmfe_update_BG;
 fprintf('Time cost in estimating the background:        %.2f seconds\n', toc);
