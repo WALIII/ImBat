@@ -22,7 +22,7 @@ disp('extracting tracking data');
 
 TS = TS(:,2);
 
-% check which channel the audio is:
+% TO DO: check which channel the audio is. Currenlty hard coded at ch2:
 if size(audio.data,2)>1
 audio_data = audio.data(:,2);
 else
