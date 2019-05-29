@@ -288,10 +288,20 @@ if Scale < 0
     for i=1:NvideoFrames
         NvideoFrames-i
         for j=1:Nmarkers
-            %Markers(i,j,1:3)=fread(fid,3,'float32')'; 
+            Markers(i,j,1:3)=fread(fid,3,'float32')'; 
             
-            %store this as a single to save space
-            Markers(i,j,1:3)= single(fread(fid,3,'float32')'); 
+%             if NvideoFrames-i == 5327
+%                 i
+%             end
+%             
+%             mdata = single(fread(fid,3,'float32')')
+%             %store this as a single to save space
+%             if size(mdata,2) < 3 || isempty(mdata)
+%                 Markers(i,j,1:3)= [0 0 0];
+%             else
+% %                 Markers(i,j,1:3)= single(fread(fid,3,'float32')');
+%                 Markers(i,j,1:3)= mdata;
+%             end
             
             a=fix(fread(fid,1,'float32'));  
             highbyte=fix(a/256);

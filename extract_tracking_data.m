@@ -18,7 +18,7 @@ for i = 1:length(c3dList)
  if ~isdir(copy_dir)
     mkdir(copy_dir);
  end
-[Markers,VideoFrameRate,AnalogSignals,AnalogFrameRate,Event,ParameterGroup,CameraInfo,ResidualError]=readC3D_analog([wd filesep fileName]); %convert file
+[Markers,VideoFrameRate,AnalogSignals,AnalogFrameRate,Event,ParameterGroup,CameraInfo,ResidualError]=readC3D_analog([wd filesep c3dList(i).name]); %convert file
 %plot ttl impulses to check they are linear and not missing ttl
 event_ttls = AnalogSignals(:,2);
 [R,LT,UT,LL,UL] = risetime(event_ttls,VideoFrameRate);
