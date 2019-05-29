@@ -33,4 +33,4 @@ end
 
 
 % Plot the results:
-comet3(Location(:,1),Location(:,2),Location(:,3));
+% comet3(Location(:,1),Location(:,2),Location(:,3));

@@ -1,4 +1,4 @@
-function ImBat_START
+function ImBat_START(varargin)
 % ImBat_START
 
 % Main wrapper for all ImBat functions. Will Motion correct, and basic ROI
@@ -8,8 +8,23 @@ function ImBat_START
 % d05/16/2019
 
 
-ROI_flag = 0; % run ROI extraction
+ROI_flag = 1; % run ROI extraction
 Analysis_flag = 0; % run basic ROI analysis...
+extract  = 1;
+reExtract =0;
+
+% Manual inputs
+vin=varargin;
+for i=1:length(vin)
+  if isequal(vin{i},'ROI') % manually inputing a sort order
+    ROI_flag=vin{i+1};
+  elseif isequal(vin{i},'Place')
+      Analysis_flag = vin{i+1};
+  elseif isequal(vin{i},'reExtract');
+      reExtract=vin{i+1};
+end
+end
+
 
 % Get all folders in directory
 files = dir(pwd);
@@ -44,21 +59,45 @@ flight_subFolders = flight_files(flight_dirFlags);
 for ii = 1:length(flight_subFolders);
 cd([subFolders(i).folder,'/',subFolders(i).name]);
 
+% Check if folder exists 
+if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed'])>0;
+    disp('Folder already extracted..');
+    
+    if reExtract ==1
+        disp('Re-Extracting...');
+        
+    else
+        disp('Moving to the next folder...');
+        extract = 0 ;
+    end
+end
+    
+
     % load tracking data 
     track_fname = flight_subFolders(ii).name;
     track_fname = extractBefore( track_fname,'_extraction');
     track_fname = [track_fname,'_track.mat'];
     load(track_fname);
+    
+
     % gindex into the flight_subfolder
 cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])
-
+if extract ==1;    
 % Run processing script 
 mkdir('processed');
 ImBat_processVideos;
 disp('processing!!');
-cd('processed')
+end
+
+cd('processed') % move to processed folder...
+
+
+
+
 if ROI_flag ==1;
     disp('extracting ROIs...')
+    nam = './Motion_corrected_Data_DS.mat'
+    CNMFe_extract(nam);
 end
 
 
@@ -67,6 +106,7 @@ load('AV_data.mat');
 [out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
 % Clear vars from RAM
 clear video audio Markers AnalogSignals out
+extract =1;
 end
 
 end
@@ -91,7 +131,6 @@ end
  
         
 %% Align Timestamps:
-
 
     
     

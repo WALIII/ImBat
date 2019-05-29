@@ -29,7 +29,7 @@ for i = closestIndex-300:closestIndex+1000;%size(Y,3);
     fC(counter,:) = out.Location(closestIndex2,:);
     
     subplot(1,6,1:3)
-    imagesc(Y(:,:,i),[-5 20]);
+    imagesc(imresize(Y(:,:,i),4),[-5 20]);
     colormap(gray);
     subplot(1,6,5:6);
     plot3(fC(:,1),fC(:,2),fC(:,3));

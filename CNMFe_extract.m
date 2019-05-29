@@ -1,7 +1,8 @@
-function CNMFe_extract
+function CNMFe_extract(nam)
 
+nam = nam;
 %% clear workspace
-clear; clc; close all;  
+clc; close all;  
 global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
     neuron_full Ybg_weights; %#ok<NUSED> % global variables, don't change them manually
 
@@ -11,7 +12,7 @@ cnmfe_choose_data;
 %% create Source2D class object for storing results and parameters
 Fs = 30;             % frame rate
 ssub = 1;           % spatial downsampling factor
-tsub = 30;           % temporal downsampling factor
+tsub = 20;           % temporal downsampling factor
 gSig = 3;           % width of the gaussian kernel, which can approximates the average neuron shape
 gSiz = 13;          % maximum diameter of neurons in the image plane. larger values are preferred.
 neuron_full = Sources2D('d1',d1,'d2',d2, ... % dimensions of datasets
@@ -59,7 +60,7 @@ cnmfe_show_corr_pnr;    % this step is not necessary, but it can give you some..
 
 %% initialization of A, C
 % parameters
-debug_on = true;   % visualize the initialization procedue. 
+debug_on = false;   % visualize the initialization procedue. 
 save_avi = false;   %save the initialization procedure as an avi movie. 
 patch_par = [1,1]*1; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large 
 K = []; % maximum number of neurons to search within each patch. you can use [] to search the number automatically
@@ -171,7 +172,7 @@ end
 
 %% delete some neurons and run CNMF-E iteration 
 neuron.orderROIs('decay_time');  % you can also use {'snr', 'mean', 'decay_time'} 
-neuron.viewNeurons([], neuron.C_raw); 
+%neuron.viewNeurons([], neuron.C_raw); 
 tic;
 cnmfe_update_BG;
 fprintf('Time cost in estimating the background:        %.2f seconds\n', toc);
