@@ -76,45 +76,13 @@ for iii = 1:size(vtimes,2)-1;
     try
 [a_ts, a, v_ts, v] = extractmedia(FILE,vtimes(iii),vtimes(iii+1));
 
-    catch
-        disp(' No audio found in file');
-   v1 = VideoReader(FILE);
-   k = 1;
-    while hasFrame(v1)
-    v{k} = readFrame(v1);
-    k = k+1;
-    end
-    v = v';
-    a = 0;
-    a_ts = 0;
-    v_ts = 0;
-     clear k V1;
-    end
-   
-
-% else
-%   disp('moving file- to large for batch processing... use FS_AV_Parse(pwd,large)');
-%   %LargeDir = strcat(path,'/','LargeFiles');
-%   movefile(FILE, error_dir)
-%   continue;
-% end
-
-
-
-
-
 % Format VIDEO DATA
 [video.width, video.height, video.channels] = size(v{1});
 
 % calculate resize factor
-resize_factor = video.height/80;
+resize_factor = video.height/100;
 resize_factor = 1/resize_factor;
 video.resize_factor = resize_factor;
-
-video.times = v_ts;% 0.1703*(day-1);
-
-video.nrFramesTotal = size(v,1);
-video.FrameRate = 1/mean(diff(v_ts));
 
 
 for ii = 1: size(v,1)
@@ -129,6 +97,40 @@ for ii = 1: size(v,1)
       v{ii} = []; % empty the buffer
       temp = [];
 end
+
+ catch
+        disp(' No audio found in file');
+   v1 = VideoReader(FILE);
+   k = 1;
+    while hasFrame(v1)
+    temp  = readFrame(v1);
+    if k ==1;
+        % Format VIDEO DATA
+        [video.width, video.height, video.channels] = size(temp);
+        % calculate resize factor
+        %resize_factor = video.height/100;
+        %resize_factor = 1/resize_factor;
+        video.resize_factor = 1;%resize_factor;
+    end
+    temp = squeeze(mean(temp,3));
+    temp = imresize(temp,resize_factor);
+    video.frames(:,:,k) = temp;
+    k = k+1;
+    end
+    a = 0;
+    a_ts = 0;
+    v_ts = 0;
+     clear k V1;
+    end
+
+
+
+video.times = v_ts;% 0.1703*(day-1);
+
+video.nrFramesTotal = size(video.frames,3);
+video.FrameRate = 1/mean(diff(v_ts));
+
+
 
 % filtering video:
 % disp('remove artifacts');
