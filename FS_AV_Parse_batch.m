@@ -28,6 +28,7 @@ plot_spectrogram =0;
 % resize_factor = 0.25;
 frames_per_file = 200;
 
+
 if exist(mat_dir,'dir') rmdir(mat_dir,'s'); end
 if exist(gif_dir,'dir') rmdir(gif_dir,'s'); end
 % if exist(error_dir,'dir') rmdir(error_dir,'s'); end
