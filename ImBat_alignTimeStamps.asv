@@ -22,12 +22,8 @@ disp('extracting tracking data');
 
 TS = TS(:,2);
 
-% TO DO: check which channel the audio is. Currenlty hard coded at ch2:
-if size(audio.data,2)>1
-audio_data = audio.data(:,2);
-else
+% check
 audio_data =audio.data;
-end
 audio_data = downsample(audio_data,DS_factor);
 audio_tv = downsample(audio.times,DS_factor);
 
