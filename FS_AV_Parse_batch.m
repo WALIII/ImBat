@@ -114,7 +114,7 @@ end
         video.resize_factor = 1;%resize_factor;
     end
     temp = squeeze(mean(temp,3));
-    temp = imresize(temp,resize_factor);
+    temp = imresize(temp,video.resize_factor);
     video.frames(:,:,k) = temp;
     k = k+1;
     end
