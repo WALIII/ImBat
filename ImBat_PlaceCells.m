@@ -3,7 +3,7 @@ function ImBat_PlaceCells(neuron, out);
 
 % Basic plotting of the location that certian cells are active...
 
-
+plotting =0;
 
 
 
@@ -54,7 +54,7 @@ end
   
 
   
- 
+ if plotting ==1;
 % Plot the location in space that each cell is active
 
   mkdir('PlaceCells/fig'); % save as a figure file in local dir
@@ -101,4 +101,5 @@ clf
 clear LX LY LZ closestIndex Spike_times
   end
   
+ end
   

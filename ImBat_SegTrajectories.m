@@ -152,7 +152,7 @@ for ks = 1 : nclusters
     for ke = 1 : nclusters
         ncounter = ncounter + 1;
         npair(ncounter,:) = [ks ke];
-        nflights(ncounter) = size(intersect(find(kstart == ks),find(kend == ke)),1)
+        nflights(ncounter) = size(intersect(find(kstart == ks),find(kend == ke)),1);
         allflights{ncounter} = intersect(find(kstart == ks),find(kend == ke))';
     end
 end
@@ -168,8 +168,9 @@ for traj = 1 : 5
         scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),100,'r','filled')
         hold on
         scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),100,'k','filled')
-        hold on
+        hold on 
     end
+    out.ClusterIndex{traj}(:) = allflights{ssf(traj)};
 end
  
 figure
@@ -184,3 +185,4 @@ for traj = 1 : 5
         hold on
     end
 end
+
