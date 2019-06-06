@@ -44,9 +44,16 @@ TS2 = TS;
 
 audio_z = zscore(smooth(abs(audio_data)))-min(zscore(smooth(abs(audio_data))));
 TS_z = zscore(smooth(TS2,10));
-
+try 
 [Apks,Alocs] = findpeaks(audio_z,'MinPeakProminence',4,'MinPeakDistance',60);
 [Bpks,Blocs] = findpeaks(TS_z,'MinPeakProminence',1,'MinPeakDistance',6);
+catch 
+Apks = 1;
+Alocs = 1;
+Bpks = 1;
+Blocs = 1;
+end
+
 
 % make better sigfor vizualizations...
 audio_infer = zeros(1,length(audio_z))';
