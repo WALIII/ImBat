@@ -1,4 +1,4 @@
-function  [out] =  ImBat_SegTrajectories(Location,Location_times)
+function  [out] =  ImBat_SegTrajectories(AnalogSignals,Markers)
 % ImBat_SegTrajectories
 
 % Nick Dotson
@@ -11,20 +11,20 @@ function  [out] =  ImBat_SegTrajectories(Location,Location_times)
 FS = 120;
 
  
-% event_ttls = AnalogSignals(:,2); %from motion data
-% [R,LT,UT,LL,UL] = risetime(event_ttls,FS); %find times of ttl pulses in SECONDS
+event_ttls = AnalogSignals(:,2); %from motion data
+[R,LT,UT,LL,UL] = risetime(event_ttls,FS); %find times of ttl pulses in SECONDS
 %for now, clip event ttls after the number of trials
  
 %might want to use raw c3d to keep track of each marker (this could be
 %useful for when not all 3 markers are present, which is often the case
 %when the animal is at a wall)
-% mx = Markers(:,1,1);
-% my = Markers(:,1,2);
-% mz = Markers(:,1,3);
+mx = Markers(:,1,1);
+my = Markers(:,1,2);
+mz = Markers(:,1,3);
   
-mx = Location(:,1);
-my = Location(:,2);
-mz = Location(:,3);
+% mx = Location(:,1);
+% my = Location(:,2);
+% mz = Location(:,3);
 
  
 mxi = []; myi = []; mzi = [];
@@ -105,10 +105,9 @@ end
 %determine the xyz start and stop positions
 out.trajectories_continuous = trajectories_continuous;
 out.trajectories_continuous = trajectories_continuous;
-out.flight_starts_indx = flight_starts; 
-out.flight_ends_indx = flight_ends; 
-out.flight_starts_times = Location_times(flight_starts); 
-out.flight_ends_times = Location_times(flight_ends); 
+out.AnalogSignals = AnalogSignals; 
+out.flight_starts = flight_starts; 
+out.flight_ends = flight_ends; 
 out.fstartxyz = fstartxyz; 
 out.fendxyz = fendxyz;
 % cd(daydir)
