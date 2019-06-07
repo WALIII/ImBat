@@ -13,7 +13,7 @@ for i = 1:length(c3dList)
  fileName = extractBefore(c3dList(i).name,'-Bat');
  batName = extractBefore(fileName,'_');
  dateSesh = datestr(datetime(c3dList(i).date),'yymmdd');
- sessionNum = fileName(end);
+ %sessionNum = fileName(end);
  copy_dir = [extractBefore(wd,batName) 'processed' filesep batName filesep dateSesh filesep];
  if ~isdir(copy_dir)
     mkdir(copy_dir);

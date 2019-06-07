@@ -286,10 +286,14 @@ NvideoFrames=EndFrame - StartFrame + 1;
 
 if Scale < 0
     for i=1:NvideoFrames
-        NvideoFrames-i;
+        NvideoFrames-i
         for j=1:Nmarkers
-            Markers(i,j,1:3)=fread(fid,3,'float32')'; 
-            
+%              mdata = single(fread(fid,3,'float32')')
+%             if isempty(mdata)    
+%                 Markers(i,j,1:3) = 0
+%             else
+%                 Markers(i,j,1:3)= mdata; 
+%             end
 %             if NvideoFrames-i == 5327
 %                 i
 %             end
@@ -299,7 +303,7 @@ if Scale < 0
 %             if size(mdata,2) < 3 || isempty(mdata)
 %                 Markers(i,j,1:3)= [0 0 0];
 %             else
-% %                 Markers(i,j,1:3)= single(fread(fid,3,'float32')');
+                 Markers(i,j,1:3)= single(fread(fid,3,'float32')');
 %                 Markers(i,j,1:3)= mdata;
 %             end
             
@@ -315,8 +319,14 @@ if Scale < 0
             %AnalogSignals(j+NanalogFramesPerVideoFrame*(i-1),1:NanalogChannels) = fread(fid,NanalogChannels,'float32')'; %THIS WAS UPDATED TO FLOAT32!!!
             
             %store as a single to save space
+%             adata = single(fread(fid,NanalogChannels,'float32')');
+%             if isempty(adata)
+%                 AnalogSignals(j+NanalogFramesPerVideoFrame*(i-1),1:NanalogChannels) = 0 %THIS WAS UPDATED TO FLOAT32!!!
+%             else
+%                 AnalogSignals(j+NanalogFramesPerVideoFrame*(i-1),1:NanalogChannels) = adata;
+%             end
             AnalogSignals(j+NanalogFramesPerVideoFrame*(i-1),1:NanalogChannels) = single(fread(fid,NanalogChannels,'float32')'); %THIS WAS UPDATED TO FLOAT32!!!
-            
+
         end
     end
 else

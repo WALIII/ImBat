@@ -78,7 +78,7 @@ for iii = 1:size(vtimes,2)-1;
 [a_ts, a, v_ts, v] = extractmedia(FILE,vtimes(iii),vtimes(iii+1));
 
 % Format VIDEO DATA
-[video.width, video.height, video.channels] = size(v{1});
+[video.height, video.width, video.channels] = size(v{1});
 
 % calculate resize factor
 resize_factor = video.height/100;
