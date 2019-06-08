@@ -26,7 +26,8 @@ gif_dir=[pwd,'/gif'];
 error_dir =[pwd,'/error'];
 plot_spectrogram =0;
 % resize_factor = 0.25;
-frames_per_file = 200;
+frames_per_file = 100;
+aspect_update =0;
 
 
 if exist(mat_dir,'dir') rmdir(mat_dir,'s'); end
@@ -80,21 +81,32 @@ for iii = 1:size(vtimes,2)-1;
 % Format VIDEO DATA
 [video.height, video.width, video.channels] = size(v{1});
 
-% calculate resize factor
-resize_factor = video.height/100;
+if video.height/video.width == 9/16;
+   aspect_update =1;
+   % calculate resize factor
+resize_factor = video.height/240;
 resize_factor = 1/resize_factor;
 video.resize_factor = resize_factor;
+resize_factor = 0.5; % this is the true resize
 
+else
+
+% calculate resize factor
+resize_factor = video.height/240;
+resize_factor = 1/resize_factor;
+video.resize_factor = resize_factor;
+end
 
 for ii = 1: size(v,1)
      %video.frames(:,:,:,ii) = v{ii}-(noise(ii,:)-min(noise(30:end,:)));
       temp = v{ii}; %-(noise(ii,:)-min(noise(30:end)));
       temp = squeeze(mean(temp,3));
-      try
+      
+     if aspect_update == 1; % update to the proper 
+      temp =  imresize(temp,[480 640]);
+     end
       video.frames(:,:,ii) = imresize(temp,resize_factor);
-      catch
-          disp('test');
-      end
+   
       v{ii} = []; % empty the buffer
       temp = [];
 end
