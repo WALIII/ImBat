@@ -13,12 +13,12 @@ for i = 1:length(c3dList)
  fileName = extractBefore(c3dList(i).name,'-Bat');
  batName = extractBefore(fileName,'_');
  dateSesh = datestr(datetime(c3dList(i).date),'yymmdd');
- sessionNum = fileName(end);
+ %sessionNum = fileName(end);
  copy_dir = [extractBefore(wd,batName) 'processed' filesep batName filesep dateSesh filesep];
  if ~isdir(copy_dir)
     mkdir(copy_dir);
  end
-[Markers,VideoFrameRate,AnalogSignals,AnalogFrameRate,Event,ParameterGroup,CameraInfo,ResidualError]=readC3D_analog([wd filesep fileName]); %convert file
+[Markers,VideoFrameRate,AnalogSignals,AnalogFrameRate,Event,ParameterGroup,CameraInfo,ResidualError]=readC3D_analog([wd filesep c3dList(i).name]); %convert file
 %plot ttl impulses to check they are linear and not missing ttl
 event_ttls = AnalogSignals(:,2);
 [R,LT,UT,LL,UL] = risetime(event_ttls,VideoFrameRate);
