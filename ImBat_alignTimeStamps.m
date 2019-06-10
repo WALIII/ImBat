@@ -105,7 +105,6 @@ out.Location_time = TS_tv_offset';
 % out.markers_resampled % to the frame rate of the video
 % out.markers_resampled_time
 out.video_times = video.times;
-save('Location_data','out','-v7.3');% play the video
 
 % Smooth Location data
 for i = 1:3
@@ -127,4 +126,4 @@ for i = 1:(size(out.Location,1))-2
 end
 
 
-save('Alignment.mat','out');
+save('Alignment.mat','out','-v7.3');
