@@ -90,7 +90,7 @@ video.resize_factor = resize_factor;
 resize_factor = 0.5; % this is the true resize
 
 else
-
+aspect_update =0;
 % calculate resize factor
 resize_factor = video.height/240;
 resize_factor = 1/resize_factor;
@@ -202,6 +202,7 @@ end
 
         % clear the buffer
 clear video  audio a_ts a v_ts v;
+aspect_update = 0;
 end
 end
 fprintf(1,'\n');
