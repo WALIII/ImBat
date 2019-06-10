@@ -19,8 +19,8 @@ end
 
 for i = 1:length(subFolders);
     try
-    cd([subFolders(i).name,'scope');
-    FS_AV_parse_batch
+    cd([subFolders(i).name,'/scope']);
+    FS_AV_Parse_batch
     catch
        disp([' no scope subfolder for ',subFolders(i).name]);
     end
