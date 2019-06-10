@@ -44,18 +44,20 @@ for i = 1: size(days,2)
 
     % Make Max projections ( Flights )
     disp( 'Getting Max Projection for Flights...');
-    load('Motion_corrected_Data','Y');
+    load('Motion_corrected_Data','Y','Ysiz');
     [MaxProj_flights, ~] = ImBat_Dff(Y);
     ROI_Data{i}.MaxProj_flights = MaxProj_flights;
-    clear Y MaxProj_flights;
+    ROI_Data{i}.Ysiz_full = 'Ysiz';
+    clear Y Ysiz MaxProj_flights;
     
     % Make Max projections ( Rest )
     cd(DIR); cd(folder_rest);
-    load('Motion_corrected_Data', 'Y');
+    load('Motion_corrected_Data', 'Y','Ysiz');
     disp( 'Getting Max Projection for rest...');
     [MaxProj_rest, ~] = ImBat_Dff(Y);
     ROI_Data{i}.MaxProj_rest = MaxProj_rest;
-    clear Y MaxProj_rest;
+    ROI_Data{i}.Ysiz_DS = 'Ysiz';
+    clear Y 'Ysiz' MaxProj_rest;
 
         cd(DIR)
 end
@@ -95,6 +97,34 @@ A = imregister(A, B, 'rigid', optimizer, metric);
 [RGB1 RGB2] = CaBMI_XMASS(A,B,A);
 figure(); imagesc(squeeze(RGB1))
  
+
+% Condition Registration by saving data in the proper format
+mkdir('CellReg_files');
+cd('CellReg_files')
+
+for i = 1:size(days,2)
+    
+    % get size of ROI field
+    A2 = full(ROI_Data{i}.ROIs.results);
+    for ii = 1:size(A2,2);
+        A3(ii,:,:) = reshape(A2(:,ii),ROI_Data{i}.Ysiz_DS(1),ROI_Data{i}.Ysiz_DS(2)); 
+    end
+         A2 = A3(1:40,:,:); % ROI masks in CellReg format...
+
+    % save data:
+    save([ROI_Data{i}.date,'.mat'],A2);
+    clea A2 A3
+    
+end
+
+% Register Cells by ROI masks:
+CellReg
+
+% Save indexes for similar ROIs, and load into ROI_Data ( for across-day
+% indexing)
+
+
+
 end
 
 
