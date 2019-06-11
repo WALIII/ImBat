@@ -22,9 +22,9 @@ for i=1:2:nparams
 			video=varargin{i+1};
         case 'audio'
             audio=varargin{i+1};
-        case 'downsample'
- 			DS=varargin{i+1};
-                 %files = convn(files, single(reshape([1 1 1] / b, 1, 1, [])), 'same');
+        case 't_smooth'
+ 			b=varargin{i+1};
+%                 files = convn(files, single(reshape([1 1 1] / b, 1, 1, [])), 'same');
         case 'fname'
             filename=varargin{i+1};
     end
@@ -52,12 +52,10 @@ for i=1:length(mov_listing)
 if i ==1;
     Yf = read_file(filenames{i});
     Yf = single(Yf);
-    Yf = imresize(Yf,DS);
     [d1,d2,T] = size(Yf);
 else
     Yf_temp = read_file(filenames{i});
     Yf_temp = single(Yf_temp);
-    Yf_temp = imresize(Yf_temp,DS);
     Yf = cat(3,Yf,Yf_temp);
     clear Yf_temp
 end

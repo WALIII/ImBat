@@ -85,7 +85,7 @@ cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])
 if extract ==1;    
 % Run processing script 
 mkdir('processed');
-ImBat_processVideos;
+ImBat_processVideos('downsample',0.5);
 disp('processing!!');
 end
 
