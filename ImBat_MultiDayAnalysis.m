@@ -17,7 +17,7 @@ ST3 = 1; % Across day analysis
 LD = '/Users/ARGO/Documents/DATA/Bat_Data';
 
 % Cell array containing strings of the days you want to look at
-days = {'190529','190530','190604'};
+days = {'190528','190529','190530'};
 
 % Run in the 'processed' folder containing the days
 DIR = pwd;
@@ -44,7 +44,7 @@ for i = 1: size(days,2)
 
     % Make Max projections ( Flights )
     disp( 'Getting Max Projection for Flights...');
-    load('Motion_corrected_Data','Y','Ysiz');
+    load('Motion_corrected_Data_DS','Y','Ysiz');
     [MaxProj_flights, ~] = ImBat_Dff(Y);
     ROI_Data{i}.MaxProj_flights = MaxProj_flights;
     ROI_Data{i}.Ysiz_full = 'Ysiz';
@@ -52,7 +52,7 @@ for i = 1: size(days,2)
     
     % Make Max projections ( Rest )
     cd(DIR); cd(folder_rest);
-    load('Motion_corrected_Data', 'Y','Ysiz');
+    load('Motion_corrected_Data_DS', 'Y','Ysiz');
     disp( 'Getting Max Projection for rest...');
     [MaxProj_rest, ~] = ImBat_Dff(Y);
     ROI_Data{i}.MaxProj_rest = MaxProj_rest;
