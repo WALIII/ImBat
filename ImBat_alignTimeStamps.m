@@ -18,7 +18,7 @@ DS_factor = round(fs/Tsfs); % should be '400'
 
 % get tracking data
 disp('extracting tracking data');
-[Location] = ImBat_formatTracking(Markers); % formated location data
+[Location, ~, Location2] = ImBat_formatTracking(Markers); % formated location data
 
 TS = TS(:,2);
 
@@ -105,11 +105,12 @@ out.Location_time = TS_tv_offset';
 % out.markers_resampled % to the frame rate of the video
 % out.markers_resampled_time
 out.video_times = video.times;
+out.Location2 = Location2;
 
 % Smooth Location data
-for i = 1:3
-    out.Location2(:,i) = movmean(out.Location(:,i),100);
-end
+% for i = 1:3
+%     out.Location2(:,i) = movmean(out.Location(:,i),30);
+% end
 
 % getting location data:
 disp('finalizing cursor')
