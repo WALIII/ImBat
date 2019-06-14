@@ -3,7 +3,7 @@ function ImBat_PlaceCells(neuron, out);
 
 % Basic plotting of the location that certian cells are active...
 
-plotting =0;
+plotting =1;
 
 
 
