@@ -12,6 +12,7 @@ function ImBat_processVideos(varargin)
 % Default params
 video = 1;
 audio = 1;
+DS = 0.5;
 
 mkdir('processed');
 % User pram:
