@@ -1,4 +1,4 @@
-function [Location, Location_interp_near,  Location_interp_mov_mean] = ImBat_formatTracking(Markers);
+function [Location, Location_interp] = ImBat_formatTracking(Markers);
 % ImBat_format_tracking.m
 
 % Take in marker data from 'cortex' software, and conver it to a 3D position in space.
@@ -25,11 +25,14 @@ if max(max(max(Markers))) ==0
     disp(' no valid tracking data...');
 reform_tracking =1; 
 else
+    st = min(find(Location(:,1)>1));
 for ii = 1:3;
-    Location_interp_near(:,ii) = fillmissing(Location(:,ii)','nearest');
-    Location_interp_mov_mean(:,ii) = fillmissing(Location(:,ii),'movmedian',40);
+    Location_interp(:,ii) = fillmissing(Location(:,ii)','linear');
 end
+    % remove early vals
+    Location_interp(1:st,:) = ones(size(Location_interp(1:st,:))).*Location_interp(st+1,:);
 end
+
 
 % Exclude the NaNs
 for i = 1:range
@@ -46,6 +49,5 @@ end
 % Plot the results:
 % comet3(Location(:,1),Location(:,2),Location(:,3));
 if reform_tracking ==1;
-        Location_interp_near = Location;
-    Location_interp_mov_mean = Location;
+        Location_interp = Location;
 end

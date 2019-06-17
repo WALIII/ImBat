@@ -14,8 +14,9 @@ ST3 = 1; % Across day analysis
     ST3_5 = 1;
 
 % local Directory:
-LD =  'F:\Bat_search';
-%'/Users/ARGO/Documents/DATA/Bat_Data';
+%LD =  'F:\Bat_search';
+LD = '/Users/ARGO/Documents/DATA/Bat_Data';
+mkdir(LD);
 
 % Cell array containing strings of the days you want to look at
 days = {'190528','190529','190530'};
