@@ -26,13 +26,13 @@ saveas(fig,[fileName '.tif']);
 
 df = mat2gray(df)*100;
 mov = figure();
-v = VideoWriter([fileName '_' num2str(vidLimits) '.avi']);
+v = VideoWriter([fileName '_' '4565' '.avi']);
 open(v);    
 
 
 for i=1:4:(length(df)/4)
     
-    imagesc(mean(df(:,:,i:i+3),3),vidLimits);
+    imagesc(mean(df(:,:,i:i+3),3),[45 65]);
     axis off;
         colormap(gray);
         frame = getframe(mov);
