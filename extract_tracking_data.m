@@ -10,9 +10,9 @@ end
 %run through list of c3d files in that directory, convert to mat, and save
 %to processed directory
 for i = 1:length(c3dList)
- fileName = extractBefore(c3dList(i).name,'-Bat');
- batName = extractBefore(fileName,'_');
- dateSesh = datestr(datetime(c3dList(i).date),'yymmdd');
+ fileName = extractBefore(c3dList(i).name,'-Bat_Cluster.c3d'); %Bat
+  dateSesh = datestr(datetime(c3dList(i).date),'yymmdd');
+ batName = extractBefore(fileName,['_' dateSesh]);
  %sessionNum = fileName(end);
  copy_dir = [extractBefore(wd,batName) 'processed' filesep batName filesep dateSesh filesep];
  if ~isdir(copy_dir)

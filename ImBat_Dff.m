@@ -4,6 +4,7 @@ function [Ymax, Y] = ImBat_Dff(Y);
 % Make df/f image
 
 % Filter movie
+
 Y = (convn(Y, single(reshape([1 1 1] /10, 1, 1, [])), 'same'));
 
 % Take median of movie
@@ -16,8 +17,9 @@ Y = Y-Y_med;
 Ymax = max(Y,[],3);
 Ymax = imresize(Ymax,4);
 figure();
-colormap(gray);
+%colormap(gray);
 imagesc(Ymax);
+hold on;
 
 
 
