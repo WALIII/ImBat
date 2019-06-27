@@ -10,7 +10,7 @@ function ImBat_START(varargin)
 
 ROI_flag = 0; % run ROI extraction
 Analysis_flag = 0; % run basic ROI analysis...
-extract  = 0;
+extract  = 1;
 reExtract =0;
 
 % Manual inputs
@@ -60,7 +60,7 @@ for ii = 1:length(flight_subFolders);
 cd([subFolders(i).folder,'/',subFolders(i).name]);
 
 % Check if folder exists 
-if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed'])>0;
+if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed','/','Alignment.mat'])>0;
     disp('Folder already extracted..');
     
     if reExtract ==1
