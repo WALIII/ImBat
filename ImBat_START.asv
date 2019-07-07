@@ -61,7 +61,7 @@ for ii = 1:length(flight_subFolders);
 cd([subFolders(i).folder,'/',subFolders(i).name]);
 
 % Check if folder exists 
-if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed','/','Motion_corrected_Data_DS.mat'])>0;
+if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed','/','Alignment.mat'])>0;
     disp('Folder already extracted..');
     
     if reExtract ==1
@@ -96,12 +96,12 @@ cd('processed') % move to processed folder...
 if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed','/','Motio_corrected_Data_DS_neurons'])>0;
     disp('ROIs already extracted..');
     
-    if reROI_extract ==1
-        disp('Re-Extracting ROIs...');
+    if reExtract ==1
+        disp('Re-Extracting...');
         
     else
         disp('Moving to the next folder...');
-        ROI_flag = 0 ;
+        extract = 0 ;
     end
 end
 
