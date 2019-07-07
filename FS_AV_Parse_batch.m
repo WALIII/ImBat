@@ -119,11 +119,29 @@ end
     temp  = readFrame(v1);
     if k ==1;
         % Format VIDEO DATA
-        [video.width, video.height, video.channels] = size(temp);
-        % calculate resize factor
-        %resize_factor = video.height/100;
-        %resize_factor = 1/resize_factor;
-        video.resize_factor = 1;%resize_factor;
+        [video.height, video.width, video.channels] = size(temp);
+        
+        
+     
+        
+if video.height/video.width == 9/16;
+   aspect_update =1;
+   % calculate resize factor
+resize_factor = video.height/240;
+resize_factor = 1/resize_factor;
+video.resize_factor = resize_factor;
+resize_factor = 0.5; % this is the true resize
+
+else
+aspect_update =0;
+% calculate resize factor
+resize_factor = video.height/240;
+resize_factor = 1/resize_factor;
+video.resize_factor = resize_factor;
+end
+
+
+      
     end
     temp = squeeze(mean(temp,3));
     temp = imresize(temp,video.resize_factor);
