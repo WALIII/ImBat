@@ -20,8 +20,8 @@ end
 u = regexp(folds,string);
 
 
-    if size(find([u{:}]>1),2) >0;
-         flys = find([u{:}]>1); % these are the 'flight folders'
+    if size(find([u{:}]>0),2) >0;
+         flys = find([u{:}]>0); % these are the 'flight folders'
     else
         flys = 1:length(subFolders2); % Take all flights
     end
@@ -34,7 +34,7 @@ u = regexp(folds,string);
     
     [a b] = sort(indX,'descend');
     
-    out = subFolders2(flys(ii)).name;
+    out = subFolders2(flys(b)).name;
     
     % get size of each directry 
     

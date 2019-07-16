@@ -59,6 +59,7 @@ for i = 1: size(days,2)
 
    
     folder = [out,'/processed'];
+    ROI_Data{i}.folder = folder; % save this for indexing later...
     
     disp(['entering into folder for day:  ', days{i}]);
     cd(folder) % index into folder 
@@ -75,7 +76,7 @@ for i = 1: size(days,2)
     load('Motion_corrected_Data_DS','Y','Ysiz');
     [MaxProj_flights, ~] = ImBat_Dff(Y);
     ROI_Data{i}.MaxProj_flights = MaxProj_flights;
-    ROI_Data{i}.Ysiz_full = Ysiz;
+    ROI_Data{i}.Ysiz_DS = Ysiz;
     clear Y Ysiz MaxProj_flights;
     
     
@@ -156,7 +157,7 @@ for i = 1:size(days,2)
     for ii = 1:size(A2,2);
         A3(ii,:,:) = reshape(A2(:,ii),ROI_Data{i}.Ysiz_DS(1),ROI_Data{i}.Ysiz_DS(2)); 
     end
-         A2 = A3(1:100,:,:); % ROI masks in CellReg format...
+         A2 = A3(1:ii,:,:); % ROI masks in CellReg format...
 
     % save data:
     save([ROI_Data{i}.date,'.mat'],'A2');
