@@ -17,7 +17,7 @@ Y = Y-Y_med;
 Ymax = max(Y,[],3);
 Ymax = imresize(Ymax,4);
 figure();
-%colormap(gray);
+colormap(gray);
 imagesc(Ymax);
 hold on;
 

@@ -9,7 +9,7 @@ figure
 for i = 1:15
 scatter3(Markers(:,i,1),Markers(:,i,2),Markers(:,i,3))
 hold on
-pause
+pause 
 end
 
 %%
@@ -17,6 +17,7 @@ event_ttls = AnalogSignals(:,1); %trial data
 [R,LT,UT,LL,UL] = risetime(event_ttls,VideoFrameRate);
 markerSet = Markers;
 figure
+
 for i = 1:length(LT)
     flightEnd = round(LT(i) * 120);
     flightStart = flightEnd - 240;
