@@ -1,4 +1,4 @@
-function [Ymax, Y] = ImBat_Dff(Y);
+function [Ymax, Y, maxFig] = ImBat_Dff(Y);
 % ImBat_Dff
 
 % Make df/f image
@@ -15,8 +15,8 @@ Y = Y-Y_med;
 
 % take max
 Ymax = max(Y,[],3);
-Ymax = imresize(Ymax,4);
-figure();
+Ymax = imresize(Ymax,8);
+maxFig = figure();
 colormap(gray);
 imagesc(Ymax);
 hold on;

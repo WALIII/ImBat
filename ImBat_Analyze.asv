@@ -81,9 +81,8 @@ for i = 1:length(subFolders)
             scaling  = 1.1; %1.1um per pixel
             format short
             newlabelsX = arrayfun(@(ax) sprintf('%g', scaling * ax), xticks, 'un', 0);
-            newlabelsY = arrayfun(@(ay) sprintf('%g', scaling * ay), yticks, 'un', 0);
-            set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
-            title('Max Projection: Bat ')
+            newlabelsX = arrayfun(@(ay) sprintf('%g', scaling * ay), yticks, 'un', 0);
+            set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);  
             
             % max projection with ROI overlay
             
