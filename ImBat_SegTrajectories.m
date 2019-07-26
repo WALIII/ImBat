@@ -1,4 +1,4 @@
-function  [out] =  ImBat_SegTrajectories(Location,Location_times)
+function  [out] =  ImBat_SegTrajectories(Location,Location_times,varargin)
 % ImBat_SegTrajectories
 
 % Nick Dotson
@@ -9,8 +9,20 @@ function  [out] =  ImBat_SegTrajectories(Location,Location_times)
 
 
 FS = 120;
-
+nclusters = 4;
  
+
+% Manual inputs
+    vin=varargin;
+    for i=1:length(vin)
+        if isequal(vin{i},'FS') % manually inputing a sort order
+            FS=vin{i+1};
+        elseif isequal(vin{i},'nclusters')
+            nclusters=vin{i+1};
+        end  
+    end
+    
+    
 % event_ttls = AnalogSignals(:,2); %from motion data
 % [R,LT,UT,LL,UL] = risetime(event_ttls,FS); %find times of ttl pulses in SECONDS
 %for now, clip event ttls after the number of trials
@@ -113,7 +125,7 @@ out.fstartxyz = fstartxyz;
 out.fendxyz = fendxyz;
 % cd(daydir)
  
-nclusters = 4;
+
  
 jj = jet;
 figure
