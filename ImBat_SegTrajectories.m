@@ -10,7 +10,7 @@ function  [out] =  ImBat_SegTrajectories(Location,Location_times,varargin)
 
 FS = 120;
 nclusters = 4;
- 
+day_index = ones(size(Location_times));
 
 % Manual inputs
     vin=varargin;
@@ -19,6 +19,8 @@ nclusters = 4;
             FS=vin{i+1};
         elseif isequal(vin{i},'nclusters')
             nclusters=vin{i+1};
+        elseif isequal(vin{i},'day_index') % if clustering from multiple days...
+            day_index=vin{i+1};
         end  
     end
     
@@ -124,10 +126,11 @@ out.flight_ends_times = Location_times(flight_ends);
 out.fstartxyz = fstartxyz; 
 out.fendxyz = fendxyz;
 % cd(daydir)
+out.day = day_index(flight_starts);% this is the day index...
  
 
  
-jj = jet;
+jj = jet(200);
 figure
 rng(2)
 kstart = kmeans(fstartxyz,nclusters);
@@ -138,7 +141,7 @@ for nf = 1 : size(R,2)
     hold on
 end
  
-jj = jet;
+
 figure
 rng(2)
 kend = kmeans(fendxyz,nclusters);
@@ -172,7 +175,9 @@ end
 [~, ssf] = sort(nflights,'descend');
 figure
 jj = jet;
-for traj = 1 : 5
+for traj = 1 : 10;
+    try
+    if traj<6; % Only plot the first 5 trajectories...
     subplot(1,5,traj)
     for nf = allflights{ssf(traj)}
         plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
@@ -182,7 +187,12 @@ for traj = 1 : 5
         scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),100,'k','filled')
         hold on 
     end
-    out.ClusterIndex{traj}(:) = allflights{ssf(traj)};
+    end
+        out.ClusterIndex{traj}(:) = allflights{ssf(traj)};
+
+    catch
+        disp(' no more flights...');
+    end
 end
  
 figure
