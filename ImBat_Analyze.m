@@ -64,7 +64,10 @@ for i = 1:length(subFolders)
             trackData = load([trackFiles(kk).folder,'/',trackFiles(kk).name]);
             cellData = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','processed','/','Motion_corrected_Data_DS_results.mat']);
             videoData = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','processed','/','Motion_corrected_Data_DS.mat']);
-            
+            fileName = extractBefore(imageFolders(kk).name,'_extraction'); %get filename for titles
+            dateSesh = imageFolders(kk).folder(end-5:end);
+            batName = extractBefore(fileName,['_' dateSesh]);
+            sessionType = extractAfter(fileName,[dateSesh '_']);
             % make new analysis directory for .fig and .tif files
             cd([imageFolders(kk).folder,'/',imageFolders(kk).name]);
             mkdir('analysis');
@@ -74,16 +77,18 @@ for i = 1:length(subFolders)
         %perform basic sanity checks on imaging and flight data
         if sanityCheckFlag == 1
             % max projection from each session without ROI overlay
-           [Ymax, Y, maxFig] = ImBat_Dff(videoData.Y);
+            [Ymax, Y, maxFig] = ImBat_Dff(videoData.Y);
             % modify labels for tick marks
             xticks = get(gca,'xtick');
             yticks = get(gca,'ytick');
             scaling  = 1.1; %1.1um per pixel
-            format short
             newlabelsX = arrayfun(@(ax) sprintf('%g', scaling * ax), xticks, 'un', 0);
             newlabelsY = arrayfun(@(ay) sprintf('%g', scaling * ay), yticks, 'un', 0);
             set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
-            title('Max Projection: Bat ')
+            title(['Max Projection: ' batName ' ' dateSesh ' ' sessionType]);
+            xlabel('um'); ylabel('um');
+            savefig([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_maxProject.fig']);
+            saveas(maxFig, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_maxProject.tif']);
             
             % max projection with ROI overlay
             
