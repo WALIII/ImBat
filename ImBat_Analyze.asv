@@ -95,10 +95,10 @@ for i = 1:length(subFolders)
             hold on
             % max projection with ROI overlay
             [ROIoverlay] = ImBat_ROIoverlay(cellData.results,videoData.Ysiz,centroidFlag,binaryMaskFlag,roiHeatFlag);
-            savefig(maxFig,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_maxProject.fig']);
+            savefig([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_maxProject.fig']);
             saveas(maxFig, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_maxProject.tif']);
             if roiHeatFlag == 1
-                %set(gca,'YDir','normal');
+                set(gca,'YDir','normal');
                 xticks = get(gca,'xtick');
                 yticks = get(gca,'ytick');
                 scaling  = 1.1; %1.1um per pixel
@@ -107,7 +107,7 @@ for i = 1:length(subFolders)
                 set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
                 title(['Max Projection ROI Overlay: ' batName ' ' dateSesh ' ' sessionType]);
                 xlabel('um'); ylabel('um');
-                savefig(ROIoverlay,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_maxProjectROIover.fig']);
+                savefig([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_maxProjectROIover.fig']);
                 saveas(ROIoverlay, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_maxProjectROIover.tif']);
             end
             hold off
