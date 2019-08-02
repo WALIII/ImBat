@@ -15,7 +15,7 @@ ST3 = 1; % Across day analysis
 
 % local Directory:
 %LD =  'F:\Bat_search';
-LD = '/Users/ARGO/Documents/DATA/Bat_Data_new';
+LD = '/Users/ARGO/Documents/DATA/Bat_Data_ZuZu';
 mkdir(LD);
 
 % Cell array containing strings of the days you want to look at ( MANUAL)
