@@ -2,7 +2,7 @@ function [flightVsVelocity,smoothVelocity,smoothAvgSpiking] = ImBat_plotFlightsV
 
 global batName dateSesh sessionType topROI
 
-topROILocal = round(topROI * 0.01 * length(cellData.results.S(:,2)))/2; %top # of cells you want to look at divided by 2 for easier viewing 
+topROILocal = round((topROI * 0.01 * length(cellData.results.S(:,2)))/2); %top # of cells you want to look at divided by 2 for easier viewing 
 %smooth and zscore the velocity
 smoothVelocity = zscore(smooth(flightPathsAll.batSpeed,100));
 

@@ -50,10 +50,7 @@ flightPathsFromFeeder = figure();
 for i = 1:length(LT)
     flightFromFeederStart(i) = round(LT(i) * trackData.VideoFrameRate);
     flightFromFeederEnd(i) = flightFromFeederStart(i) + delay + (trackData.VideoFrameRate*preflightTime);
-    %check that the end of the flight does not occur after session finishes
-    if flightFromFeederEnd(i) > length(mx)
-        flightFromFeederEnd(i) = length(mx)
-    end
+    if flightFromFeederEnd(i) > length(
     plot3(mx(flightFromFeederStart(i):flightFromFeederEnd(i)),my(flightFromFeederStart(i):flightFromFeederEnd(i)),mz(flightFromFeederStart(i):flightFromFeederEnd(i)),'LineWidth',2,'color',CM(i,:))
     hold on
     %pause(0.1)

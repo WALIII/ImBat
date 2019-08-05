@@ -77,16 +77,8 @@ flight_ends = round(fLT);
 
 %cut out flights and save
 flightPathsStartStop = figure();
-CM = jet(size(R,2));
-if size(R,2) < 1
-    fstartxyz = [];
-    fstartxyz = [];
-    fstartxyz = [];
-    
-    fendxyz = [];
-    fendxyz = [];
-    fendxyz = [];
-elseif size(R,2) > 0
+if size(R,2) > 0
+    CM = jet(size(R,2));
     for nf = 1 : size(R,2)
         hold on
         plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',CM(nf,:))
@@ -105,7 +97,16 @@ elseif size(R,2) > 0
         scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),300,'b','filled')
         %pause
     end
+else
+    fstartxyz(1,1) = (0);
+    fstartxyz(1,2) = (0);
+    fstartxyz(1,3) = (0);
+    
+    fendxyz(1,1) = (0);
+    fendxyz(1,2) = (0);
+    fendxyz(1,3) = (0);    
 end
 title(['All flights start(g)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
+
