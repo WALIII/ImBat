@@ -3,7 +3,7 @@ function [CutCells, Ydata, ClustFlight] = ImBat_Analysis_070119(ROI_Data,varargi
 %% align ROI data to the cut out flight data...
 
 % Which day
-day = 3;
+day = 12;
 clust = 1;
 
 % Manual inputs
@@ -31,8 +31,8 @@ clust = 1;
 figure();
 a(1) = subplot(2,1,1);
 hold on
-plot(ROI_Data{1,day}.Alignment.out.Location_time,(ROI_Data{1,day}.Alignment.out.flights)./500)
-plot(ROI_Data{1,day}.Alignment.out.video_times(1:end-1),zscore(smooth(mean(full(ROI_Data{1,day}.ROIs.results.S(1:20,1:end-1)),1),100)));
+plot(ROI_Data{1,day}.Alignment.out.Location_time,(ROI_Data{1,day}.Alignment.out.flights)/60)
+plot(ROI_Data{1,day}.Alignment.out.video_times,smooth(mean(full(ROI_Data{1,day}.ROIs.results.S(1:20,:)),1))*10,20);
 a(2) = subplot(2,1,2);
 hold on;
 % C = mean(full(ROI_Data{1,day}.ROIs.results.C(1:50,:)));

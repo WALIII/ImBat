@@ -132,7 +132,7 @@ out.day = day_index(flight_starts);% this is the day index...
  
 jj = jet(200);
 figure
-rng(2)
+% rng(2)
 kstart = kmeans(fstartxyz,nclusters);
 for nf = 1 : size(R,2)
     plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(kstart(nf)*4,:))
