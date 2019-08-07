@@ -1,10 +1,10 @@
-function [flightVsVelocity,smoothVelocity,smoothAvgSpiking] = ImBat_plotFlightsVsCells(cellData,alignment,flightPathsAll)
+function [flightVsVelocity,smoothVelocity,smoothAvgSpiking] = ImBat_plotFlightsVsCells(cellData,alignment,flightPaths)
 
 global batName dateSesh sessionType topROI
 
 topROILocal = round((topROI * 0.01 * length(cellData.results.S(:,2)))/2); %top # of cells you want to look at divided by 2 for easier viewing 
 %smooth and zscore the velocity
-smoothVelocity = zscore(smooth(flightPathsAll.batSpeed,100));
+smoothVelocity = zscore(smooth(flightPaths.batSpeed,100));
 
 %image_preprocessing, smooth and average #cells spike responses
 smoothAvgSpiking = zscore(smooth(mean((full(cellData.results.S(1:topROILocal,:))),1),50));%-min(data(p).image_data.S(1:numCells,:));

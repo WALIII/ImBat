@@ -1,9 +1,9 @@
-function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData)
+function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach] = ImBat_plotFlights(trackData)
 
 global batName dateSesh sessionType
 
 nclusters = 4; %number of clusters for kmeans clustering of flight trajectories
-ntrajectories = 6; %number of output trajectories from kmeans that you want to look at 
+
 
 %find ttl pulses for synching
 %event_ttls = trackData.AnalogSignals(:,2); %from motion data
@@ -139,7 +139,7 @@ flightPathsClusterEach = figure();
 jj = jet;
 for traj = 1 : 10
     try
-    if traj<ntrajectories + 1 % Only plot the first ntrajectories...
+    if traj<7 % Only plot the first 5 trajectories...
     subplot(3,2,traj)
     for nf = allflights{ssf(traj)}
         plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
@@ -163,10 +163,9 @@ sgtitle(['Flight Clusters start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionTy
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
 
-%plot all the clusters in 1 figure in different colors
-flightPathsClusterAll = figure();
+flightPathfigure
 jj = jet;
-for traj = 1 : ntrajectories
+for traj = 1 : 6
     for nf = allflights{ssf(traj)}
         plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
         hold on
@@ -176,11 +175,6 @@ for traj = 1 : ntrajectories
         hold on
     end
 end
-title(['Flight Clusters start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
-%axis equal
-view(0,90)
-xlabel('mm'); ylabel('mm'); zlabel('mm');
-hold off
 
 
 flightPaths.flight_starts_idx = flight_starts;
