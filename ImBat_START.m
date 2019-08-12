@@ -8,7 +8,8 @@ function ImBat_START(varargin)
 % d05/16/2019
 
 
-ROI_flag = 0; % run ROI extraction
+ROI_flag = 1; % run ROI extraction
+reROI_extract = 0; %rerun ROI extraction
 Analysis_flag = 0; % run basic ROI analysis...
 extract  = 1;
 reExtract =0;
@@ -60,7 +61,7 @@ for ii = 1:length(flight_subFolders);
 cd([subFolders(i).folder,'/',subFolders(i).name]);
 
 % Check if folder exists 
-if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed','/','Alignment.mat'])>0;
+if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed','/','Motion_corrected_Data_DS.mat'])>0;
     disp('Folder already extracted..');
     
     if reExtract ==1
@@ -91,7 +92,18 @@ end
 
 cd('processed') % move to processed folder...
 
-
+% Check if roi extraction folder exists 
+if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed','/','Motio_corrected_Data_DS_neurons'])>0;
+    disp('ROIs already extracted..');
+    
+    if reROI_extract ==1
+        disp('Re-Extracting ROIs...');
+        
+    else
+        disp('Moving to the next folder...');
+        ROI_flag = 0 ;
+    end
+end
 
 
 if ROI_flag ==1;

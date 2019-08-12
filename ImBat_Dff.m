@@ -1,6 +1,6 @@
-function [Ymax, Y] = ImBat_Dff(Y);
+function [Ymax, Y, maxFig] = ImBat_Dff(Y);
 % ImBat_Dff
-
+scaling = 8;
 % Make df/f image
 
 % Filter movie
@@ -15,9 +15,9 @@ Y = Y-Y_med;
 
 % take max
 Ymax = max(Y,[],3);
-Ymax = imresize(Ymax,4);
-figure();
-%colormap(gray);
+Ymax = imresize(Ymax,scaling);
+maxFig = figure();
+colormap(gray);
 imagesc(Ymax);
 hold on;
 
