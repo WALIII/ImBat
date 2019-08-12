@@ -152,4 +152,5 @@ flightFeedersStartStop.flightToFeederStart = flightToFeederStart;
 flightFeedersStartStop.flightFromFeederEnd = flightFromFeederEnd; 
 flightFeedersStartStop.flightFromFeederStart = flightFromFeederStart;
 flightFeedersStartStop.fFeedStartxyz = fFeedStartxyz;
-flightFeedersStartStop.fFeedEndxyz = fFeedEndxyz;
+flightFeedersStartStop.fFeedEndxyz = fFeedEndxyz
+flightFeedersStartStop.clusterIndex = clusterIndex;

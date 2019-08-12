@@ -110,16 +110,21 @@ for i = 1:length(subFolders)
             hold off
         end
         
+        %plot flights in 3d and their clusters
         if plotFlightsFlag == 1
             mkdir('analysis/flights')
             %plot all flights in 3D
             if flightPathsAllFlag == 1
-                [flightPathsAll,flightPathsStartStop, flightPaths] = ImBat_plotFlights(trackData);
+                [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData);
                 save([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_flightPaths.mat'],'flightPaths');
                 savefig(flightPathsAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAll.fig']);
                 saveas(flightPathsAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAll.tif']);
                 savefig(flightPathsStartStop,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAllStartStop.fig']);
                 saveas(flightPathsStartStop, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAllStartStop.tif']);
+                savefig(flightPathsClusterEach,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterEach.fig']);
+                saveas(flightPathsClusterEach, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterEach.tif']);
+                savefig(flightPathsClusterAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterAll.fig']);
+                saveas(flightPathsClusterAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterAll.tif']);
             end
             %plot flights to/from feeder in 3D
             if flightPathsFeederFlag == 1
@@ -128,10 +133,10 @@ for i = 1:length(subFolders)
                 saveas(flightPathsToFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.tif']);
                 savefig(flightPathsFromFeeder,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsFromFeeder.fig']);
                 saveas(flightPathsFromFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsFromFeeder.tif']);
-                savefig(flightPathsFromFeeder,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederEach.fig']);
-                saveas(flightPathsFromFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederEach.tif']);
-                savefig(flightPathsFromFeeder,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederAll.fig']);
-                saveas(flightPathsFromFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederAll.tif']);
+                savefig(flightPathsClusterToFeederEach,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederEach.fig']);
+                saveas(flightPathsClusterToFeederEach, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederEach.tif']);
+                savefig(flightPathsClusterToFeederAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederAll.fig']);
+                saveas(flightPathsClusterToFeederAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederAll.tif']);
                 save([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_flightsToFromFeeders.mat'],...
                     'flightFeedersStartStop');
             end
@@ -144,12 +149,22 @@ for i = 1:length(subFolders)
         end
     
     %number of total flights and rewarded flights
-    numTotalFlights = length(flightPaths.flight_starts);
+    numTotalFlights = length(flightPaths.flight_starts_idx);
     numRewardedFlights = length(flightFeedersStartStop.flightToFeederStart);
     
     %variability of flights
     %covariance matrix
 
+    %place cells
+    %spike activity over flight trajectories
+    if plotPlaceCellsFlag == 1
+       mkdir('analysis/placeCells')
+       cd([subFolders(i).folder,'/',subFolders(i).name,'/analysis/placeCells'])
+       ImBat_PlaceCells_Tobias(flightPaths, cellData, out)
+       savefig(flightPathsToFeeder,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.fig']);
+       saveas(flightPathsToFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.tif']);
+ 
+    end
 
     
         

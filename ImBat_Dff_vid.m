@@ -1,6 +1,6 @@
 function [Ymax, df] = ImBat_Dff_vid(Y,fileName);
 % ImBat_Dff
-vidLimits = [45 80];
+vidLimits = [55 75];
 % Make df/f image
 
 % Filter movie
