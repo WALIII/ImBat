@@ -3,6 +3,7 @@ function [plotFiringTrajectory] = ImBat_PlaceCells_Tobias(flightPaths, cellData,
 global batName dateSesh sessionType topROI
 
 offset = 0.1; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
+spikeThresh = 8; %threshold for eliminating noise from the S matrix
 topROI = 30;
 
 % Plot the location in space that each cell is active
@@ -12,7 +13,7 @@ for ii = 1:topROI; % for each cell
     hold on;
     plot3(out.flights(:,1),out.flights(:,2),out.flights(:,3),'k','LineWidth',2);% plot the flight trajectory in space
     
-    [~,xy] = find(cellData.S(ii,:)>8);  % get time neuron is active
+    [~,xy] = find(cellData.S(ii,:)>spikeThresh);  % get time neuron is active
     Spike_times = out.video_times(xy)-offset; % convert this to 'spike time'
     
      
