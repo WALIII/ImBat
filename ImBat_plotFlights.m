@@ -117,6 +117,7 @@ hold off
 %k means cluster of flight trajectories into nclusters
 %find pairs of start and endpoints with a high number of flights
 rng(2) %control random number generation
+try
 kstart = kmeans(fstartxyz,nclusters);
 rng(2)
 kend = kmeans(fendxyz,nclusters);
@@ -182,12 +183,16 @@ view(0,90)
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
 
-
+flightPaths.clusterIndex = clusterIndex;
+catch
+flightPathsClusterEach = figure();
+flightPathsClusterAll = figure();
+flightPaths.clusterIndex = [];
+end
 flightPaths.flight_starts_idx = flight_starts;
 flightPaths.flight_ends_idx = flight_ends;
 flightPaths.flight_ends_xyz = fendxyz;
 flightPaths.flight_starts_xyz = fstartxyz;
 flightPaths.trajectories_continuous = trajectories_continuous; 
 flightPaths.batSpeed = batSpeed; 
-flightPaths.clusterIndex = clusterIndex;
 

@@ -1,29 +1,29 @@
-function [plotFiringTrajectory] = ImBat_PlaceCells_Tobias(flightPaths, cellData, out)
+function [plotFiringTrajectory] = ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment)
 
 global batName dateSesh sessionType topROI
 
 offset = 0.1; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
-topROI = 30;
+topROI = 60;
 
 % Plot the location in space that each cell is active
 plotFiringTrajectory =  figure();
 
 for ii = 1:topROI; % for each cell
     hold on;
-    plot3(out.flights(:,1),out.flights(:,2),out.flights(:,3),'k','LineWidth',2);% plot the flight trajectory in space
+    plot3(alignment.out.flights(:,1),alignment.out.flights(:,2),alignment.out.flights(:,3),'k','LineWidth',2);% plot the flight trajectory in space
     
-    [~,xy] = find(cellData.S(ii,:)>8);  % get time neuron is active
-    Spike_times = out.video_times(xy)-offset; % convert this to 'spike time'
+    [~,xy] = find(cellData.results.S(ii,:)>9);  % get time neuron is active
+    Spike_times = alignment.out.video_times(xy)-offset; % convert this to 'spike time'
     
      
     try % this 'try/catch' is to avoid crashing if cells are not active in plotting window...
         for i = 1:size(Spike_times,1)
             try
                 % Find the closest 'Location time' to the 'Spike time'
-                [minValue(:,i),closestIndex(:,i)] = min(abs(out.Location_time-Spike_times(i)));
-                LX(i) = out.flights(closestIndex(:,i),1);   
-                LY(i) = out.flights(closestIndex(:,i),2);
-                LZ(i) = out.flights(closestIndex(:,i),3);
+                [minValue(:,i),closestIndex(:,i)] = min(abs(alignment.out.Location_time-Spike_times(i)));
+                LX(i) = alignment.out.flights(closestIndex(:,i),1);   
+                LY(i) = alignment.out.flights(closestIndex(:,i),2);
+                LZ(i) = alignment.out.flights(closestIndex(:,i),3);
             catch % we need this if Spiketime occurs before/after the location tracking was on..
                 continue
             end
@@ -35,15 +35,17 @@ for ii = 1:topROI; % for each cell
         disp([num2str(size(LX_s)),' Bursts in flight'])
         hold on
         scatter3(LX,LY,LZ,100,'or','filled');
-        title(['Cell no ',num2str(ii),'  ',num2str(size(LX)),' Bursts in flight']);
+        title(['Cell no ',num2str(ii),'- ',num2str(size(LX_s)),' Bursts in flight: ' batName ' ' dateSesh ' ' sessionType]);
+        xlabel('mm'); ylabel('mm');
     catch % if cell was not active...
         disp('cell not active');
         continue
     end
     
     % Save 'place cells' as jpg and fig files..
-    %saveas(gcf,['PlaceCells/fig/','Cell_',num2str(ii)]);
-    %saveas(gcf,['PlaceCells/jpg/','Cell_',num2str(ii),'.jpg']);
+    set(findall(gcf,'-property','FontSize'),'FontSize',20); 
+    saveas(gcf,[batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.tif']);
+    savefig(gcf,[batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.fig']);
     
 
     
