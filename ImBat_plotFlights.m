@@ -1,6 +1,9 @@
-function [flightPathsAll,flightPathsStartStop, trajectories_continuous, flight_starts, flight_ends, fstartxyz, fendxyz, batSpeed] = ImBat_plotFlights(trackData)
+function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData)
 
 global batName dateSesh sessionType
+
+nclusters = 4; %number of clusters for kmeans clustering of flight trajectories
+ntrajectories = 6; %number of output trajectories from kmeans that you want to look at 
 
 %find ttl pulses for synching
 %event_ttls = trackData.AnalogSignals(:,2); %from motion data
@@ -55,6 +58,7 @@ hold on
 % set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY,'zticklabel',newlabelsZ);
 title(['All flights: ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('mm'); ylabel('mm'); zlabel('mm');
+view(0,90)
 hold off
 
 %splice out individual flights
@@ -92,9 +96,9 @@ if size(R,2) > 0
         fendxyz(nf,2) = round(nanmean(my(flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
         fendxyz(nf,3) = round(nanmean(mz(flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
         
-        scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),300,'g','filled')
+        scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),100,'r','filled')
         hold on
-        scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),300,'b','filled')
+        scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),100,'k','filled')
         %pause
     end
 else
@@ -106,7 +110,89 @@ else
     fendxyz(1,2) = (0);
     fendxyz(1,3) = (0);    
 end
-title(['All flights start(g)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
+title(['All flights start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
+
+%k means cluster of flight trajectories into nclusters
+%find pairs of start and endpoints with a high number of flights
+rng(2) %control random number generation
+try
+kstart = kmeans(fstartxyz,nclusters);
+rng(2)
+kend = kmeans(fendxyz,nclusters);
+nflights = [];
+allflights = [];
+npair = [];
+ncounter = 0;
+for ks = 1 : nclusters
+    for ke = 1 : nclusters
+        ncounter = ncounter + 1;
+        npair(ncounter,:) = [ks ke];
+        nflights(ncounter) = size(intersect(find(kstart == ks),find(kend == ke)),1);
+        allflights{ncounter} = intersect(find(kstart == ks),find(kend == ke))';
+    end
+end
+ 
+[~, ssf] = sort(nflights,'descend'); %sort clustered flights
+%plot clustered flights
+flightPathsClusterEach = figure();
+jj = jet;
+for traj = 1 : 10
+    try
+    if traj<ntrajectories + 1 % Only plot the first ntrajectories...
+    subplot(3,2,traj)
+    for nf = allflights{ssf(traj)}
+        plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+        hold on
+        scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),100,'r','filled')
+        hold on
+        scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),100,'k','filled')
+        hold on
+        %axis equal
+        view(0,90)
+        xlabel('mm'); ylabel('mm');
+    end
+    end
+        clusterIndex{traj}(:) = allflights{ssf(traj)};
+
+    catch
+        disp(' no more flights...');
+    end
+end
+sgtitle(['Flight Clusters start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
+xlabel('mm'); ylabel('mm'); zlabel('mm');
+hold off
+
+%plot all the clusters in 1 figure in different colors
+flightPathsClusterAll = figure();
+jj = jet;
+for traj = 1 : ntrajectories
+    for nf = allflights{ssf(traj)}
+        plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+        hold on
+        scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),100,'r','filled')
+        hold on
+        scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),100,'k','filled')
+        hold on
+    end
+end
+title(['Flight Clusters start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
+%axis equal
+view(0,90)
+xlabel('mm'); ylabel('mm'); zlabel('mm');
+hold off
+
+flightPaths.clusterIndex = clusterIndex;
+catch
+flightPathsClusterEach = figure();
+flightPathsClusterAll = figure();
+flightPaths.clusterIndex = [];
+end
+flightPaths.flight_starts_idx = flight_starts;
+flightPaths.flight_ends_idx = flight_ends;
+flightPaths.flight_ends_xyz = fendxyz;
+flightPaths.flight_starts_xyz = fstartxyz;
+flightPaths.trajectories_continuous = trajectories_continuous; 
+flightPaths.batSpeed = batSpeed; 
 
