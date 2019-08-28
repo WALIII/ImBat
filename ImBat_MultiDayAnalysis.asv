@@ -14,7 +14,7 @@ ST3 = 1; % Across day analysis
     ST3_5 = 1;
 
 % local Directory:
-LD =  'D:\Bat_Data2\Zack\Processed\'
+LD =  'D:\Bat_Data2\Zack\Processed\'S
 %LD = '/Users/ARGO/Documents/DATA/Bat_Data_ZuZu';
 mkdir(LD);
 

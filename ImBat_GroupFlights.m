@@ -1,6 +1,8 @@
 function out = ImBat_GroupFlights(ROI_Data);
 
 clear allFlightTime allFlights
+nClust = 10;
+
 
 % plot all flights
 col = jet(size(ROI_Data,2)); 
@@ -35,7 +37,7 @@ colorbar;
 
 % Segregate flights:
 
-[out] =  ImBat_SegTrajectories(AllFlights,AllFlightsTime,'nclusters',5,'day_index',DayIndex);
+[out] =  ImBat_SegTrajectories(AllFlights,AllFlightsTime,'nclusters',nClust,'day_index',DayIndex);
 
 
 
