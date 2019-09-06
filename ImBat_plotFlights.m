@@ -117,7 +117,6 @@ try
 %k means cluster of flight trajectories into nclusters
 %find pairs of start and endpoints with a high number of flights
 rng(2) %control random number generation
-try
 kstart = kmeans(fstartxyz,nclusters);
 rng(2)
 kend = kmeans(fendxyz,nclusters);
