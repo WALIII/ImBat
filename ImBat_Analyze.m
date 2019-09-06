@@ -88,7 +88,17 @@ for i = 1:length(subFolders)
             mkdir('analysis');
             disp('Analyzing!!');
         end
-        
+        if strcmp(extractBefore(sessionType,'-'),'fly')
+            plotFlightsFlag = 1;
+            flightPathsAllFlag = 1;
+            flightPathsFeederFlag = 1;
+            plotPlaceCellsFlag = 1;
+        else
+            plotFlightsFlag = 0;
+            flightPathsAllFlag = 0;
+            flightPathsFeederFlag = 0;
+            plotPlaceCellsFlag = 0;
+        end
         %%perform basic sanity checks on imaging and flight data
         if plotROIFlag == 1
             mkdir('analysis/ROI');
@@ -96,16 +106,19 @@ for i = 1:length(subFolders)
             [Ymax, Y, maxFig] = ImBat_Dff(videoData.Y);
             hold on
             %save fig and tif of max projection
+            set(findall(maxFig,'-property','FontSize'),'FontSize',20);
             savefig(maxFig,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/ROI/' fileName '_maxProject.fig']);
             saveas(maxFig, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/ROI/' fileName '_maxProject.tif']);
             % max projection with ROI overlay
             [ROIoverlay] = ImBat_ROIoverlay(cellData.results,videoData.Ysiz,centroidFlag,binaryMaskFlag,roiHeatFlag);
             if centroidFlag == 1 || binaryMaskFlag == 1
                 %save fig and tif of max projection
+                set(findall(maxFig,'-property','FontSize'),'FontSize',20);
                 savefig(maxFig,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/ROI/' fileName '_maxProjectROI.fig']);
                 saveas(maxFig, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/ROI/' fileName '_maxProjectROI.tif']);
             end
             if roiHeatFlag == 1
+                set(findall(ROIoverlay,'-property','FontSize'),'FontSize',20);
                 savefig(ROIoverlay,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/ROI/' fileName '_maxProjectROIheatMap.fig']);
                 saveas(ROIoverlay, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/ROI/' fileName '_maxProjectROIheatMap.tif']);
             end
@@ -119,24 +132,32 @@ for i = 1:length(subFolders)
             if flightPathsAllFlag == 1
                 [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData);
                 save([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_flightPaths.mat'],'flightPaths');
+                set(findall(flightPathsAll,'-property','FontSize'),'FontSize',20);
                 savefig(flightPathsAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAll.fig']);
                 saveas(flightPathsAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAll.tif']);
+                set(findall(flightPathsStartStop,'-property','FontSize'),'FontSize',20);
                 savefig(flightPathsStartStop,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAllStartStop.fig']);
                 saveas(flightPathsStartStop, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAllStartStop.tif']);
+                set(findall(flightPathsClusterEach,'-property','FontSize'),'FontSize',20);
                 savefig(flightPathsClusterEach,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterEach.fig']);
                 saveas(flightPathsClusterEach, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterEach.tif']);
+                set(findall(flightPathsClusterAll,'-property','FontSize'),'FontSize',20);
                 savefig(flightPathsClusterAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterAll.fig']);
                 saveas(flightPathsClusterAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterAll.tif']);
             end
             %plot flights to/from feeder in 3D
             if flightPathsFeederFlag == 1
                 [flightPathsToFeeder, flightPathsFromFeeder,flightPathsClusterToFeederEach, flightPathsClusterToFeederAll, flightFeedersStartStop] = ImBat_plotFlightsToFeeder(trackData);
+                set(findall(flightPathsToFeeder,'-property','FontSize'),'FontSize',20);                
                 savefig(flightPathsToFeeder,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.fig']);
                 saveas(flightPathsToFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.tif']);
+                set(findall(flightPathsFromFeeder,'-property','FontSize'),'FontSize',20); 
                 savefig(flightPathsFromFeeder,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsFromFeeder.fig']);
                 saveas(flightPathsFromFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsFromFeeder.tif']);
+                set(findall(flightPathsClusterToFeederEach,'-property','FontSize'),'FontSize',20); 
                 savefig(flightPathsClusterToFeederEach,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederEach.fig']);
                 saveas(flightPathsClusterToFeederEach, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederEach.tif']);
+                set(findall(flightPathsClusterToFeederAll,'-property','FontSize'),'FontSize',20); 
                 savefig(flightPathsClusterToFeederAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederAll.fig']);
                 saveas(flightPathsClusterToFeederAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterToFeederAll.tif']);
                 save([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_flightsToFromFeeders.mat'],...
@@ -146,13 +167,14 @@ for i = 1:length(subFolders)
             load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','analysis','/',fileName '_flightPaths.mat']);
             [flightVsVelocity,smoothAvgSpiking,smoothVelocity] = ImBat_plotFlightsVsCells(cellData,alignment,flightPaths);
             save([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_flightPaths.mat'],'smoothVelocity','smoothAvgSpiking','-append');
+            set(findall(flightVsVelocity,'-property','FontSize'),'FontSize',20); 
             savefig(flightVsVelocity,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightVsVelocity.fig']);
             saveas(flightVsVelocity, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightVsVelocity.tif']);
         end
     
     %number of total flights and rewarded flights
-    numTotalFlights = length(flightPaths.flight_starts_idx);
-    numRewardedFlights = length(flightFeedersStartStop.flightToFeederStart);
+    %numTotalFlights = length(flightPaths.flight_starts_idx);
+    %numRewardedFlights = length(flightFeedersStartStop.flightToFeederStart);
     
     %variability of flights
     %covariance matrix
@@ -174,5 +196,6 @@ for i = 1:length(subFolders)
     end
     
     
-    
+pause
+close all;
 end

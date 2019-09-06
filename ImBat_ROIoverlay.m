@@ -2,6 +2,10 @@ function [ROIoverlay] = ImBat_ROIoverlay(results,Ysiz,centroidFlag,binaryMaskFla
 
 global batName dateSesh sessionType topROI
 
+batName = 'Zack';
+dateSesh = '190529';
+sessionType = 'fly-1';
+topROI = 55;
 %manual inputs
 %centroidFlag = 1;
 %binaryMaskFlag = 1;

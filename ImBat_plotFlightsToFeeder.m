@@ -81,6 +81,7 @@ hold off
 
 %k means cluster of flight trajectories into nclusters
 %find pairs of start and endpoints with a high number of flights
+try
 rng(2) %control random number generation
 kstart = kmeans(fFeedStartxyz,nclusters);
 rng(2)
@@ -169,5 +170,4 @@ catch
     flightFeedersStartStop.fFeedEndxyz = [];
     
 end
-
 
