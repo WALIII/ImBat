@@ -16,7 +16,7 @@ global batName dateSesh sessionType topROI
 % d07/24/2019
 
 %topROI is top% of cells you want to look at
-topROI = 30;
+topROI = 60;
 % Manual inputs
 analysisFlag = 1;
 reAnalyze = 1;
@@ -29,6 +29,8 @@ binaryMaskFlag = 1;
 plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
 flightPathsFeederFlag = 1;
+%place cells plot flags
+plotPlaceCellsFlag = 1;
 
 % Get all folders in directory
 files = dir(pwd);
@@ -159,8 +161,8 @@ for i = 1:length(subFolders)
     %spike activity over flight trajectories
     if plotPlaceCellsFlag == 1
        mkdir('analysis/placeCells')
-       cd([subFolders(i).folder,'/',subFolders(i).name,'/analysis/placeCells'])
-       ImBat_PlaceCells_Tobias(flightPaths, cellData, out)
+       cd([subFolders(i).folder,'/',subFolders(i).name,'/',imageFolders(kk).name,'/analysis/placeCells'])
+       ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment)
        savefig(flightPathsToFeeder,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.fig']);
        saveas(flightPathsToFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.tif']);
  
@@ -168,7 +170,7 @@ for i = 1:length(subFolders)
 
     
         
-        
+    close all;    
     end
     
     
