@@ -22,6 +22,7 @@ for i=1:2:nparams
           maxItter = varargin{i+1};
     end
   end
+end
 
 
   % Additional artifact rejection:
