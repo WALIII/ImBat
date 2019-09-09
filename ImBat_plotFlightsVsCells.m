@@ -14,7 +14,11 @@ flightVsVelocity = figure('units','normalized','outerposition',[0 0 1 1]);
 a1 = subplot(topROILocal+11,1,1:topROILocal);
 hold on
 for i= 1:topROILocal
+    try
     plot(alignment.out.video_times,(zscore(cellData.results.S(i,:))/4)+i*6) %may have to tweak the +i*6 at the end
+    catch
+        plot(1:length(cellData.results.S(i,:)),(zscore(cellData.results.S(i,:))/4)+i*6)
+    end
 end
 title(['Velocity vs Cell Activity: ' batName ' ' dateSesh ' ' sessionType])
 ylabel('z-score dff')
@@ -22,7 +26,11 @@ xlim([0 alignment.out.video_times(end)])
 %plot smoothed z-scored average firing rate of #cells
 a2 = subplot(topROILocal+11,1,topROILocal+3:topROILocal+6);
 hold on
+try
 plot(alignment.out.video_times,smoothAvgSpiking)
+catch
+    plot(1:length(smoothAvgSpiking),smoothAvgSpiking)
+end
 ylim([-1 8])
 xlim([0 alignment.out.video_times(end)])
 title('Avg Cell Response')

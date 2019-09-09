@@ -1,16 +1,31 @@
 function ImBat_spatialInfo
 
-prob_i = []; lambd_i = []; lambd = [];
-prob_i = tt ./ nansum(tt); %occupancy probability for each bin id tt=time per bin
-prob_i = prob_i + eps; %add a tiny number to avoid /0
-lambd_i = hfr * 1000; %mean firing rate for bin i hfr= spikes/sec (in Hz)
-lambd_i = lambd_i + eps; %add a tiny number to avoid /0
-%         lambd = mean(lambd_i);%mean firing rate across bins, this is subject to being skewed by really high fr bins
-lambd = sum( lambd_i .* prob_i ); %mean fr, this is the same as what michael used in his code: sum( lambd_i . prob_i ) see hippo_analyze_place_fields_Gaussian_smoothing_Michael.m
-dist_tuning(ncounter,:) = lambd_i .* prob_i;
-all_avgfr = [];
-all_avgfr = lambd;
-mi(ncounter) = nansum( (prob_i .* (lambd_i / lambd)) .* log2(lambd_i / lambd) ); %same as Nachum paper
+%for each cluster
+for cn = 1:6
+%     prob_i = rateMap1D.probOccupancy{cn}; %occupancy probability for each bin
+%     lambd_i = rateMap1D.firingRateSmooth{cn};
+%     lambd = rateMap1D.firingRateSumMean{cn};
+%     spatialInfo{cn} = sum(prob_i .* (lambd_i/lambd) .* log2(lambd_i/lambd))
+    %for each neuron in the cluster
+    for n = 1:length(rateMap1D.firingRateSmooth{cn})
+        prob_i = rateMap1D.probOccupancy{cn}(n,:); %occupancy probability for each bin
+        lambd_i = rateMap1D.firingRateSmooth{cn}(n,:);
+        lambd = rateMap1D.firingRateSumMean{cn}(n);
+        spatialInfo(cn,n) = nansum(prob_i .* (lambd_i/lambd) .* log2(lambd_i/lambd));
+    end
+end
+
+
+% prob_i = tt ./ nansum(tt); %occupancy probability for each bin id tt=time per bin
+% prob_i = prob_i + eps; %add a tiny number to avoid /0
+% lambd_i = hfr * 1000; %mean firing rate for bin i hfr= spikes/sec (in Hz)
+% lambd_i = lambd_i + eps; %add a tiny number to avoid /0
+% %         lambd = mean(lambd_i);%mean firing rate across bins, this is subject to being skewed by really high fr bins
+% lambd = sum( lambd_i .* prob_i ); %mean fr, this is the same as what michael used in his code: sum( lambd_i . prob_i ) see hippo_analyze_place_fields_Gaussian_smoothing_Michael.m
+% dist_tuning(ncounter,:) = lambd_i .* prob_i;
+% all_avgfr = [];
+% all_avgfr = lambd;
+% mi(ncounter) = nansum( (prob_i .* (lambd_i / lambd)) .* log2(lambd_i / lambd) ); %same as Nachum paper
 
 %randomize to determine if selectivity is sig
 rand_mi = [];
