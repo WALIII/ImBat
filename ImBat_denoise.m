@@ -23,8 +23,8 @@ for i = 1:10; % 100 itterations...
 thresh = 3;
 % remove large offsets
 
-siga = squeeze(mean(mean(video(:,1:20,:),1),2));
-sigb = squeeze(mean(mean(video(1:20,:,:),1),2));
+siga = squeeze(mean(mean(video(:,[1:20 (end-20):end],:),1),2));
+sigb = squeeze(mean(mean(video([1:20 (end-20):end],:,:),1),2));
 sig = (siga+sigb)/2;
 % sig_base = smooth(sig,50);
 % sig_base = sig_base-mean(sig_base);
