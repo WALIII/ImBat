@@ -47,8 +47,12 @@ col = jet(length(ROI_coords));
 %plot centroid over top of max projection
 if centroidFlag == 1
     for i = 1:length(ROI_coords)
-    p = plot(centroid(i,1),centroid(i,2),'o');
-    p.Color(1:3) = col(i,:); 
+        try
+            p = plot(centroid(i,1),centroid(i,2),'o');
+            p.Color(1:3) = col(i,:);
+            
+        catch
+        end
     end
     hold off
 end
@@ -56,8 +60,11 @@ end
 if binaryMaskFlag == 1
     hold on
     for i = 1:length(ROI_coords)
-        p = plot(ROI_coords{i,1},ROI_coords{i,2},'LineWidth',8);
-        p.Color(4) = 0.1;
+       try
+           p = plot(ROI_coords{i,1},ROI_coords{i,2},'LineWidth',8);
+           p.Color(4) = 0.1;
+       catch
+       end
     end
     hold off
 end

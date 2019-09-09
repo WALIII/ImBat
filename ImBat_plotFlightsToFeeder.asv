@@ -81,6 +81,7 @@ hold off
 
 %k means cluster of flight trajectories into nclusters
 %find pairs of start and endpoints with a high number of flights
+
 rng(2) %control random number generation
 kstart = kmeans(fFeedStartxyz,nclusters);
 rng(2)
@@ -149,25 +150,24 @@ xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
 
 flightFeedersStartStop.clusterIndex = clusterIndex;
+flightFeedersStartStop.flightToFeederEnd = flightToFeederEnd;
+flightFeedersStartStop.flightToFeederStart = flightToFeederStart;
+flightFeedersStartStop.flightFromFeederEnd = flightFromFeederEnd;
+flightFeedersStartStop.flightFromFeederStart = flightFromFeederStart;
+flightFeedersStartStop.fFeedStartxyz = fFeedStartxyz;
+flightFeedersStartStop.fFeedEndxyz = fFeedEndxyz;
 catch
-
+    
     flightFeedersStartStop.clusterIndex = [];
     flightPathsFromFeeder = figure();
     flightPathsClusterToFeederEach = figure();
     flightPathsClusterToFeederAll = figure();
-        flightFeedersStartStop.flightToFeederEnd = flightToFeederEnd;
-    flightFeedersStartStop.flightToFeederStart = flightToFeederStart;
-    flightFeedersStartStop.flightFromFeederEnd = flightFromFeederEnd;
-    flightFeedersStartStop.flightFromFeederStart = flightFromFeederStart;
-    flightFeedersStartStop.fFeedStartxyz = fFeedStartxyz;
-    flightFeedersStartStop.fFeedEndxyz = fFeedEndxyz;
+    flightFeedersStartStop.flightToFeederEnd = [];
+    flightFeedersStartStop.flightToFeederStart = [];
+    flightFeedersStartStop.flightFromFeederEnd = [];
+    flightFeedersStartStop.flightFromFeederStart = [];
+    flightFeedersStartStop.fFeedStartxyz = [];
+    flightFeedersStartStop.fFeedEndxyz = [];
     
 end
 
-
-    flightFeedersStartStop.flightToFeederEnd = flightToFeederEnd;
-    flightFeedersStartStop.flightToFeederStart = flightToFeederStart;
-    flightFeedersStartStop.flightFromFeederEnd = flightFromFeederEnd;
-    flightFeedersStartStop.flightFromFeederStart = flightFromFeederStart;
-    flightFeedersStartStop.fFeedStartxyz = fFeedStartxyz;
-    flightFeedersStartStop.fFeedEndxyz = fFeedEndxyz;

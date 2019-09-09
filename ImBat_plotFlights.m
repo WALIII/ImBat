@@ -113,11 +113,10 @@ end
 title(['All flights start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
-try
+%try
 %k means cluster of flight trajectories into nclusters
 %find pairs of start and endpoints with a high number of flights
 rng(2) %control random number generation
-try
 kstart = kmeans(fstartxyz,nclusters);
 rng(2)
 kend = kmeans(fendxyz,nclusters);
@@ -184,11 +183,11 @@ xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
 
 flightPaths.clusterIndex = clusterIndex;
-catch
-flightPathsClusterEach = figure();
-flightPathsClusterAll = figure();
-flightPaths.clusterIndex = [];
-end
+% catch
+% flightPathsClusterEach = figure();
+% flightPathsClusterAll = figure();
+% flightPaths.clusterIndex = [];
+% end
 flightPaths.flight_starts_idx = flight_starts;
 flightPaths.flight_ends_idx = flight_ends;
 flightPaths.flight_ends_xyz = fendxyz;

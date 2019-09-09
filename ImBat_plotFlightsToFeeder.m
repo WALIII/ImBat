@@ -36,7 +36,7 @@ flightPathsToFeeder = figure();
 CM = jet(length(LT));
 flightToFeederEnd = zeros(length(LT));
 flightToFeederStart = zeros(length(LT));
-try
+%try
 for i = 1:length(LT)
     flightToFeederEnd(i) = round(LT(i) * trackData.VideoFrameRate);
     flightToFeederStart(i) = flightToFeederEnd(i) - (trackData.VideoFrameRate*preflightTime); %minus the preflight # of seconds
@@ -81,7 +81,7 @@ hold off
 
 %k means cluster of flight trajectories into nclusters
 %find pairs of start and endpoints with a high number of flights
-try
+
 rng(2) %control random number generation
 kstart = kmeans(fFeedStartxyz,nclusters);
 rng(2)
@@ -156,18 +156,18 @@ flightFeedersStartStop.flightFromFeederEnd = flightFromFeederEnd;
 flightFeedersStartStop.flightFromFeederStart = flightFromFeederStart;
 flightFeedersStartStop.fFeedStartxyz = fFeedStartxyz;
 flightFeedersStartStop.fFeedEndxyz = fFeedEndxyz;
-catch
-    
-    flightFeedersStartStop.clusterIndex = [];
-    flightPathsFromFeeder = figure();
-    flightPathsClusterToFeederEach = figure();
-    flightPathsClusterToFeederAll = figure();
-    flightFeedersStartStop.flightToFeederEnd = [];
-    flightFeedersStartStop.flightToFeederStart = [];
-    flightFeedersStartStop.flightFromFeederEnd = [];
-    flightFeedersStartStop.flightFromFeederStart = [];
-    flightFeedersStartStop.fFeedStartxyz = [];
-    flightFeedersStartStop.fFeedEndxyz = [];
-    
-end
+% catch
+%     
+%     flightFeedersStartStop.clusterIndex = [];
+%     flightPathsFromFeeder = figure();
+%     flightPathsClusterToFeederEach = figure();
+%     flightPathsClusterToFeederAll = figure();
+%     flightFeedersStartStop.flightToFeederEnd = [];
+%     flightFeedersStartStop.flightToFeederStart = [];
+%     flightFeedersStartStop.flightFromFeederEnd = [];
+%     flightFeedersStartStop.flightFromFeederStart = [];
+%     flightFeedersStartStop.fFeedStartxyz = [];
+%     flightFeedersStartStop.fFeedEndxyz = [];
+%     
+% end
 
