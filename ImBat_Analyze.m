@@ -198,7 +198,7 @@ for i = 1:length(subFolders)
         mkdir('analysis/snakePlots')
         cd([subFolders(i).folder,'/',subFolders(i).name,'/',imageFolders(kk).name,'/analysis/snakePlots'])
         load([subFolders(i).folder,'/',subFolders(i).name,'/',imageFolders(kk).name,'/analysis/',batName,'_',dateSesh,'_',sessionType,'_flightPaths.mat']);
-        [snakeTrace, snakePlot_fig1, snakePlot_fig2, snakePlot_fig3, snakePlot_fig4] = ImBat_plotSnake(cellData,flightPaths,alignment,'batName',batName,'dateSesh',dateSesh,'sessionType',sessionType)
+        [snakeTrace] = ImBat_plotSnake(cellData,flightPaths,alignment,'batName',batName,'dateSesh',dateSesh,'sessionType',sessionType)
         saveas(snakeTrace.snakePlot_fig1,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_clust1.fig']);
         saveas(snakeTrace.snakePlot_fig1, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_clust1.svg']);
         saveas(snakeTrace.snakePlot_fig2,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_clust2.fig']);
