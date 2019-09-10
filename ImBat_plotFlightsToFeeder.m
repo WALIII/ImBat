@@ -99,9 +99,15 @@ hold off
 %find pairs of start and endpoints with a high number of flights
 
 rng(2) %control random number generation
+try
 kstart = kmeans(fFeedStartxyz,nclusters);
 rng(2)
 kend = kmeans(fFeedEndxyz,nclusters);
+catch
+kstart = kmeans(fFeedStartxyz,nclusters/2);
+rng(2)
+kend = kmeans(fFeedEndxyz,nclusters/2);
+end
 nflights = [];
 allflights = [];
 npair = [];
