@@ -1,6 +1,23 @@
-function [Ymax, Y, maxFig] = ImBat_Dff(Y);
+function [Ymax, Y, maxFig] = ImBat_Dff(Y,varargin);
 
-global batName dateSesh sessionType;
+batName = [];
+dateSesh = [];
+sessionType = [];
+
+% User inputs overrides
+nparams=length(varargin);
+for i=1:2:nparams
+    switch lower(varargin{i})
+        case 'batName'
+            batName=varargin{i+1};
+        case 'dateSesh'
+            dateSesh = varargin{i+1};
+        case 'sessionType'
+            sessionType = varargin{i+1};
+    end
+end
+
+
 
 % ImBat_Dff
 scaling = 8;
