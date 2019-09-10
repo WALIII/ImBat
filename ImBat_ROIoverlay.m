@@ -1,11 +1,7 @@
-function [ROIoverlay] = ImBat_ROIoverlay(results,Ysiz,centroidFlag,binaryMaskFlag,roiHeatFlag)
+function [ROIoverlay] = ImBat_ROIoverlay(results,Ysiz,centroidFlag,binaryMaskFlag,roiHeatFlag,varargin)
 
-global batName dateSesh sessionType topROI
+global topROI
 
-batName = 'Zack';
-dateSesh = '190529';
-sessionType = 'fly-1';
-topROI = 55;
 %manual inputs
 %centroidFlag = 1;
 %binaryMaskFlag = 1;
@@ -13,6 +9,22 @@ topROI = 55;
 scaling = 8; %depends on size of frame and downsizing from extraction step
 topROILocal = topROI * 0.01; %look at first x% of ROIs
 
+batName = [];
+dateSesh = [];
+sessionType = [];
+
+% User inputs overrides
+nparams=length(varargin);
+for i=1:2:nparams
+    switch lower(varargin{i})
+        case 'batName'
+            batName=varargin{i+1};
+        case 'dateSesh'
+            dateSesh = varargin{i+1};
+        case 'sessionType'
+            sessionType = varargin{i+1};
+    end
+end
 
 % Plot binary mask of all neurons in the A matrix
 %convert A matrix into full matrix

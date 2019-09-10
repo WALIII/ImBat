@@ -1,7 +1,5 @@
 function [flightPathsToFeeder, flightPathsFromFeeder, flightPathsClusterToFeederEach, flightPathsClusterToFeederAll, flightFeedersStartStop]...
-    = ImBat_plotFlightsToFeeder(trackData)
-
-global batName dateSesh sessionType
+    = ImBat_plotFlightsToFeeder(trackData,varargin)
 
 %length of time for flight up until reaching feeder (s)
 preflightTime = 2;
@@ -9,7 +7,25 @@ preflightTime = 2;
 delay = 3;
 %number of clusters for kmeans clustering of flight trajectories
 nclusters = 4;
-ntrajectories = 6; %number of output trajectories from kmeans that you want to look at 
+ntrajectories = 6; %number of output trajectories from kmeans that you want to look at
+
+batName = [];
+dateSesh = [];
+sessionType = [];
+
+% User inputs overrides
+nparams=length(varargin);
+for i=1:2:nparams
+    switch lower(varargin{i})
+        case 'batName'
+            batName=varargin{i+1};
+        case 'dateSesh'
+            dateSesh = varargin{i+1};
+        case 'sessionType'
+            sessionType = varargin{i+1};
+    end
+end
+ 
 
 
 
@@ -126,7 +142,7 @@ for traj = 1 : 10
         disp(' no more flights...');
     end
 end
-sgtitle(['Flight Clusters to Feeder start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
+mtit(['Flight Clusters to Feeder start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
 

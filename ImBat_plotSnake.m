@@ -1,12 +1,16 @@
 function [snakeTrace] = ImBat_plotSnake(cellData,flightPaths,alignment,varargin)
 
-global batName dateSesh sessionType
+%global batName dateSesh sessionType
 preWindow = 15; %number of frames to include in the trace extraction
 %meanTrace = cell(1,length(flightPaths.clusterIndex));
 
+batName = [];
+dateSesh = [];
+sessionType = [];
+
 % User inputs overrides
 nparams=length(varargin);
-for i=4:2:nparams
+for i=1:2:nparams
     switch lower(varargin{i})
         case 'batName'
             batName=varargin{i+1};

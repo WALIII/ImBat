@@ -1,10 +1,24 @@
-function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData)
-
-global batName dateSesh sessionType
+function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData,varargin)
 
 nclusters = 4; %number of clusters for kmeans clustering of flight trajectories
 ntrajectories = 6; %number of output trajectories from kmeans that you want to look at 
 
+batName = [];
+dateSesh = [];
+sessionType = [];
+
+% User inputs overrides
+nparams=length(varargin);
+for i=1:2:nparams
+    switch lower(varargin{i})
+        case 'batName'
+            batName=varargin{i+1};
+        case 'dateSesh'
+            dateSesh = varargin{i+1};
+        case 'sessionType'
+            sessionType = varargin{i+1};
+    end
+end
 %find ttl pulses for synching
 %event_ttls = trackData.AnalogSignals(:,2); %from motion data
 %[R,LT,UT,LL,UL] = risetime(event_ttls,trackData.VideoFrameRate); %find times of ttl pulses in SECONDS
@@ -159,7 +173,7 @@ for traj = 1 : 10
         disp(' no more flights...');
     end
 end
-sgtitle(['Flight Clusters start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
+mtit(['Flight Clusters start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
 
