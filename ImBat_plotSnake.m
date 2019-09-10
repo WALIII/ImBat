@@ -70,36 +70,36 @@ snakeTrace.sortedTrace = B;
 snakeTrace.sortedIndex = I;
 
 %plot the cells according to their peak for each cluster
+figure();
 snakeTrace.snakePlot_fig1 = imagesc(snakeTrace.normTrace{1}(snakeTrace.sortedIndex{1},:));
 colormap(hot);
-hold on
 title(['Spatial selectivity cluster 1: ' batName ' ' dateSesh ' ' sessionType]);
 xt = get(gca, 'XTick');
 set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
 xlabel('time (s)'); ylabel('cell number');
 %hold off
 
+figure();
 snakeTrace.snakePlot_fig2 = imagesc(snakeTrace.normTrace{2}(snakeTrace.sortedIndex{2},:));
 colormap(hot);
-hold on
 title(['Spatial selectivity cluster 2: ' batName ' ' dateSesh ' ' sessionType]);
 xt = get(gca, 'XTick');
 set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
 xlabel('time (s)'); ylabel('cell number');
 %hold off
 
+figure();
 snakeTrace.snakePlot_fig3 = imagesc(snakeTrace.normTrace{3}(snakeTrace.sortedIndex{3},:));
 colormap(hot);
-hold on
 title(['Spatial selectivity cluster 3: ' batName ' ' dateSesh ' ' sessionType]);
 xt = get(gca, 'XTick');
 set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
 xlabel('time (s)'); ylabel('cell number');
 %hold off
 
+figure();
 snakeTrace.snakePlot_fig4 = imagesc(snakeTrace.normTrace{4}(snakeTrace.sortedIndex{4},:));
 colormap(hot);
-hold on
 title(['Spatial selectivity cluster 4: ' batName ' ' dateSesh ' ' sessionType]);
 xt = get(gca, 'XTick');
 set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
