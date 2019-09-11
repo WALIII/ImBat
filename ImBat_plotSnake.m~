@@ -1,8 +1,7 @@
 function [snakeTrace] = ImBat_plotSnake(cellData,flightPaths,alignment,varargin)
 
 %global batName dateSesh sessionType
-prePad = 0.5*cellData.results.Fs; %number of frames to include in the trace extraction
-postPad = 2*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
+preWindow = 15; %number of frames to include in the trace extraction
 %meanTrace = cell(1,length(flightPaths.clusterIndex));
 
 batName = [];
@@ -39,9 +38,9 @@ for clust_i = 1:4 %length(flightPaths.clusterIndex)
         maxDur = max(dur);
         %meanTrace{clust_i}=zeros(length(cellData.results.C(:,1)),maxDur+preWindow+1);
         %initialize the vector to store the neural activity of each flight
-        trace = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePad+postPad+1);
+        trace = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+preWindow+1);
         for trace_i = 1:length(flightPaths.clusterIndex{clust_i})
-            trace(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPad);
+            trace(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - preWindow:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)));
         end
         
         %calculate the mean neural activity across all flights in a cluster for each cell
