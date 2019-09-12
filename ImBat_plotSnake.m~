@@ -1,8 +1,6 @@
 function [snakeTrace] = ImBat_plotSnake(cellData,flightPaths,alignment,varargin)
 
-%global batName dateSesh sessionType
-preWindow = 15; %number of frames to include in the trace extraction
-%meanTrace = cell(1,length(flightPaths.clusterIndex));
+saveFlag = 1; %do you want to load and save the data individually outside of ImBatAnalyze
 
 batName = [];
 dateSesh = [];
@@ -21,6 +19,22 @@ for i=1:2:nparams
     end
 end
 
+%labels for loading and saving data if running independent fromImBat_analyze
+if saveFlag == 1
+date = strcat(lower(batName(1:2)),dateSesh);
+label = [batName '_' dateSesh '_' sessionType];
+
+cellData.results = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
+alignment.out = load([pwd '/processed/Alignment.mat']);
+flightPaths = load([pwd '/analysis/' label '_flightPaths.mat']);
+end
+
+%global batName dateSesh sessionType
+prePad = 0.5*cellData.results.Fs; %number of frames to include in the trace extraction
+postPad = 2*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
+%meanTrace = cell(1,length(flightPaths.clusterIndex));
+
+
 %for each cluster type
 for clust_i = 1:4 %length(flightPaths.clusterIndex)
     %for each cell
@@ -38,23 +52,28 @@ for clust_i = 1:4 %length(flightPaths.clusterIndex)
         maxDur = max(dur);
         %meanTrace{clust_i}=zeros(length(cellData.results.C(:,1)),maxDur+preWindow+1);
         %initialize the vector to store the neural activity of each flight
-        trace = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+preWindow+1);
+        trace = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePad+postPad+1);
+        speed = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePad+postPad+1);
         for trace_i = 1:length(flightPaths.clusterIndex{clust_i})
-            trace(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - preWindow:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)));
+            trace(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPad);
+            speed(trace_i,:) = flightPaths.batSpeed(closestIndexStart(trace_i) - prePad:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPad); 
         end
         
         %calculate the mean neural activity across all flights in a cluster for each cell
         meanTrace{clust_i}(cell_i,:) = mean(trace);
+        meanSpeed{clust_i} = mean(speed);
         %smooth and zscore the neural data. subtract the min of the zscore so the
         %min is 0 rather than mean 0
         normTrace{clust_i}(cell_i,:) = zscore(smooth(meanTrace{clust_i}(cell_i,:),3));
         normTrace{clust_i}(cell_i,:) = normTrace{clust_i}(cell_i,:) - min(normTrace{clust_i}(cell_i,:));
+        smoothSpeed{clust_i} = smooth(meanTrace{clust_i}(cell_i,:),20);
         %find time index of 
         [~,maxNormTrace{clust_i}(cell_i,1)] = max(normTrace{clust_i}(cell_i,:));
     end
     
     %sort each cell by the timing of its peak firing
     [B{clust_i},I{clust_i}] = sort(maxNormTrace{clust_i});
+    [B1{clust_i},I1{clust_i}] = sort(maxNormTrace{1});
     %split dataset into even and odd for comparing 2 halves 
     normTraceOdd{clust_i} = normTrace{clust_i}(1:2:end,:);
     normTraceEven{clust_i} = normTrace{clust_i}(2:2:end,:);
@@ -64,19 +83,78 @@ for clust_i = 1:4 %length(flightPaths.clusterIndex)
     else
     [Bodd{clust_i},Iodd{clust_i}] = sort(maxNormTrace{clust_i}(1:2:end));
     end
-
-    %     %plot the cells according to their peak
-    %     strcat('snakePlot_fig' num2str(clust_i)) = figure();
-    %     imagesc(normTrace{clust_i}(I{clust_i},:));
-    %     colormap(hot);
-    %     hold on
-    %     %set(gcf,'Name',figName, 'NumberTitle','Off');
-    %     title(['Spatial selectivity cluster ' num2str(clust_i) ' : '  batName ' ' dateSesh ' ' sessionType]);
-    %     xt = get(gca, 'XTick');
-    %     set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-%     xlabel('time (s)'); ylabel('cell number');
-%     hold off
 end
+
+
+
+%%
+%plot the cells according to their peak for each cluster with velocity on top
+snakePlot_clust = figure();
+for p = 1:clust_i
+    p1 = subplot(4,clust_i,p);
+    plot(1:length(smoothSpeed{p}),smoothSpeed{p});
+    title(['Cluster ' num2str(p)]);
+    ylabel('velocity (cm/s)');
+    yt = get(gca,'YTick');
+    set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
+    p2 = subplot(4,clust_i,[clust_i+p,2*clust_i+p,3*clust_i+p]);
+    imagesc(normTrace{p}(I{p},:));
+    colormap(hot);
+    xt = get(gca, 'XTick');
+    set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
+    xlabel('time (s)'); ylabel('cell number');
+    %hold off
+    sgtitle(['Spatial selectivity sort by peak: ' batName ' ' dateSesh ' ' sessionType]);
+
+end
+
+%plot the cells by cluster sorted by cluster1 order
+snakePlot_clustBy1 = figure();
+for p = 1:clust_i
+    p1 = subplot(4,clust_i,p);
+    plot(1:length(smoothSpeed{p}),smoothSpeed{p});
+    title(['Cluster ' num2str(p)]);
+    ylabel('velocity (cm/s)');
+    yt = get(gca,'YTick');
+    set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
+    p2 = subplot(4,clust_i,[clust_i+p,2*clust_i+p,3*clust_i+p]);
+    imagesc(normTrace{p}(I1{p},:));
+    colormap(hot);
+    xt = get(gca, 'XTick');
+    set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
+    xlabel('time (s)'); ylabel('cell number');
+    %hold off
+    sgtitle(['Spatial selectivity sort by cluster 1: ' batName ' ' dateSesh ' ' sessionType]);
+
+end
+
+%plot half the odd cells sorted and then plot the even cells according to
+%the odd sorting
+snakePlot_clustOddEven = figure();
+for p = 1:clust_i
+    p1 = subplot(4,2*clust_i,2*p-1);
+    plot(1:length(smoothSpeed{p}),smoothSpeed{p});
+    title(['Cluster ' num2str(p)]);
+    ylabel('velocity (cm/s)');
+    yt = get(gca,'YTick');
+    set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
+    p2 = subplot(4,2*clust_i,[2*clust_i+(2*p-1),4*clust_i+(2*p-1),6*clust_i+(2*p-1)]);
+    imagesc(normTraceOdd{p}(Iodd{p},:));
+    colormap(hot);
+    title(['Cluster ' num2str(p) ' Odd']);
+    xt = get(gca, 'XTick');
+    set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
+    xlabel('time (s)'); ylabel('cell number');
+    p3 = subplot(4,2*clust_i,[2*clust_i+(2*p),4*clust_i+(2*p),6*clust_i+(2*p)]);
+    imagesc(normTraceEven{p}(Iodd{p},:));
+    colormap(hot);
+    title(['Cluster ' num2str(p) ' Even']);
+    xt = get(gca, 'XTick');
+    set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
+    xlabel('time (s)'); ylabel('cell number');
+    sgtitle(['Spatial selectivity Odd (sorted) vs Even Trials: ' batName ' ' dateSesh ' ' sessionType]);
+end
+
 snakeTrace.meanTrace = meanTrace;
 snakeTrace.normTrace = normTrace;
 snakeTrace.maxNormTrace = maxNormTrace;
@@ -84,112 +162,23 @@ snakeTrace.sortedTrace = B;
 snakeTrace.sortedIndex = I;
 snakeTrace.sortedTraceOdd = Bodd;
 snakeTrace.sortedIndexOdd = Iodd;
+snakeTrace.sortedTraceClustBy1 = B1;
+snakeTrace.sortedIndexClustBy1 = I1;
 snakeTrace.normTraceEven = normTraceEven;
 snakeTrace.normTraceOdd = normTraceOdd;
+snakeTrace.meanSpeed = meanSpeed;
+snakeTrace.smoothSpeed = smoothSpeed;
+snakeTrace.snakePlot_clustAll = snakePlot_clust;
+snakeTrace.snakePlot_clustOddEven = snakePlot_clustOddEven;
+snakeTrace.snakePlot_clustBy1 = snakePlot_clustBy1;
 
 %%
-%plot the cells according to their peak for each cluster
-figure();
-snakeTrace.snakePlot_fig1 = imagesc(snakeTrace.normTrace{1}(snakeTrace.sortedIndex{1},:));
-colormap(hot);
-title(['Spatial selectivity cluster 1: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
-%hold off
-
-figure();
-snakeTrace.snakePlot_fig2 = imagesc(snakeTrace.normTrace{2}(snakeTrace.sortedIndex{2},:));
-colormap(hot);
-title(['Spatial selectivity cluster 2: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
-%hold off
-
-figure();
-snakeTrace.snakePlot_fig3 = imagesc(snakeTrace.normTrace{3}(snakeTrace.sortedIndex{3},:));
-colormap(hot);
-title(['Spatial selectivity cluster 3: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
-%hold off
-
-figure();
-snakeTrace.snakePlot_fig4 = imagesc(snakeTrace.normTrace{4}(snakeTrace.sortedIndex{4},:));
-colormap(hot);
-title(['Spatial selectivity cluster 4: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
-%hold off
-
-%%
-figure();
-snakeTrace.snakePlot_fig1_odd = imagesc(snakeTrace.normTraceOdd{1}(snakeTrace.sortedIndexOdd{1},:));
-colormap(hot);
-title(['Spatial selectivity cluster 1 Odd: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
-%hold off
-
-figure();
-snakeTrace.snakePlot_fig1_even = imagesc(snakeTrace.normTraceEven{1}(snakeTrace.sortedIndexOdd{1},:));
-colormap(hot);
-title(['Spatial selectivity cluster 1 Even: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
-
-figure();
-snakeTrace.snakePlot_fig2_odd = imagesc(snakeTrace.normTraceOdd{2}(snakeTrace.sortedIndexOdd{2},:));
-colormap(hot);
-title(['Spatial selectivity cluster 2 Odd: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
-%hold off
-
-figure();
-snakeTrace.snakePlot_fig2_even = imagesc(snakeTrace.normTraceEven{2}(snakeTrace.sortedIndexOdd{2},:));
-colormap(hot);
-title(['Spatial selectivity cluster 2 Even: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
-
-figure();
-snakeTrace.snakePlot_fig3_odd = imagesc(snakeTrace.normTraceOdd{3}(snakeTrace.sortedIndexOdd{3},:));
-colormap(hot);
-title(['Spatial selectivity cluster 3 Odd: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
-%hold off
-
-figure();
-snakeTrace.snakePlot_fig3_even = imagesc(snakeTrace.normTraceEven{3}(snakeTrace.sortedIndexOdd{3},:));
-colormap(hot);
-title(['Spatial selectivity cluster 3 Even: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
-
-figure();
-snakeTrace.snakePlot_fig4_odd = imagesc(snakeTrace.normTraceOdd{4}(snakeTrace.sortedIndexOdd{4},:));
-colormap(hot);
-title(['Spatial selectivity cluster 4 Odd: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
-%hold off
-
-figure();
-snakeTrace.snakePlot_fig4_even = imagesc(snakeTrace.normTraceEven{4}(snakeTrace.sortedIndexOdd{4},:));
-colormap(hot);
-title(['Spatial selectivity cluster 4 Even: ' batName ' ' dateSesh ' ' sessionType]);
-xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
-xlabel('time (s)'); ylabel('cell number');
+if saveFlag == 1
+saveas(snakeTrace.snakePlot_clustAll, [pwd '\analysis\snakePlots\' label '_snakePlots_clustAll.svg']);
+saveas(snakeTrace.snakePlot_,clustOddEven, [pwd '\analysis\snakePlots\' label '_snakePlots_clustOddEven.svg']);
+saveas(snakeTrace.snakePlot_fig1_clustBy1, [pwd '\analysis\snakePlots\' label '_snakePlots_clustBy1.svg']);
+save([pwd '/analysis/' label '_snakePlotData.mat'],'snakeTrace');
+saveas(snakeTrace.snakePlot_clustAll, [pwd '/analysis/snakePlots/' label '_snakePlots_clustAll.fig']);
+saveas(snakeTrace.snakePlot_,clustOddEven, [pwd '/analysis/snakePlots/' label '_snakePlots_clustOddEven.fig']);
+saveas(snakeTrace.snakePlot_fig1_clustBy1, [pwd '/analysis/snakePlots/' label '_snakePlots_clustBy1.fig']);
+end

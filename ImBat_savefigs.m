@@ -1,6 +1,19 @@
 date = 'zu190821';
 label = 'Zuzu_190821_fly-1';
 
+saveas(snakeTrace.snakePlot_clustAll, [pwd '\analysis\snakePlots\' label '_snakePlots_clustAll.svg']);
+saveas(snakeTrace.snakePlot_,clustOddEven, [pwd '\analysis\snakePlots\' label '_snakePlots_clustOddEven.svg']);
+saveas(snakeTrace.snakePlot_fig1_clustBy1, [pwd '\analysis\snakePlots\' label '_snakePlots_clustBy1.svg']);
+save([pwd '/analysis/' label '_snakePlotData.mat'],'snakeTrace');
+saveas(snakeTrace.snakePlot_clustAll, [pwd '/analysis/snakePlots/' label '_snakePlots_clustAll.fig']);
+saveas(snakeTrace.snakePlot_,clustOddEven, [pwd '/analysis/snakePlots/' label '_snakePlots_clustOddEven.fig']);
+saveas(snakeTrace.snakePlot_fig1_clustBy1, [pwd '/analysis/snakePlots/' label '_snakePlots_clustBy1.fig']);
+
+
+%%
+date = 'zu190821';
+label = 'Zuzu_190821_fly-1';
+
 
 saveas(snakeTrace.snakePlot_fig1_odd, [pwd '\analysis\snakePlots\' label '_snakePlots_fig1_odd.svg']);
 saveas(snakeTrace.snakePlot_fig1_even, [pwd '\analysis\snakePlots\' label '_snakePlots_fig1_even.svg']);
@@ -11,7 +24,6 @@ saveas(snakeTrace.snakePlot_fig3_even, [pwd '\analysis\snakePlots\' label '_snak
 saveas(snakeTrace.snakePlot_fig4_odd, [pwd '\analysis\snakePlots\' label '_snakePlots_fig4_odd.svg']);
 saveas(snakeTrace.snakePlot_fig4_even, [pwd '\analysis\snakePlots\' label '_snakePlots_fig4_even.svg']);
 
-save([pwd '\analysis\' label '_snakePlotData_sortCluster1.mat'],'snakeTrace');
 
 saveas(snakeTrace.snakePlot_fig1_odd,[pwd '\analysis\snakePlots\' label '_snakePlots_fig1_odd.fig']);
 saveas(snakeTrace.snakePlot_fig1_even,[pwd '\analysis\snakePlots\' label '_snakePlots_fig1_even.fig']);
