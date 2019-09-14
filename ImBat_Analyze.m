@@ -203,6 +203,9 @@ for i = 1:length(subFolders)
         saveas(snakeTrace.snakePlot_clustAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustAll.svg']);
         saveas(snakeTrace.snakePlot_clustOddEven, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustOddEven.svg']);
         saveas(snakeTrace.snakePlot_clustBy1, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustBy1.svg']);
+        saveas(snakeTrace.snakePlot_clustAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustAll.tif']);
+        saveas(snakeTrace.snakePlot_clustOddEven, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustOddEven.tif']);
+        saveas(snakeTrace.snakePlot_clustBy1, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustBy1.tif']);
         save([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_snakePlotData.mat'],'snakeTrace');
         savefig(snakeTrace.snakePlot_clustAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustAll.fig']);
         savefig(snakeTrace.snakePlot_clustOddEven, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustOddEven.fig']);
