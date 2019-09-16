@@ -1,6 +1,23 @@
-function [flightVsVelocity,smoothVelocity,smoothAvgSpiking] = ImBat_plotFlightsVsCells(cellData,alignment,flightPaths)
+function [flightVsVelocity,smoothVelocity,smoothAvgSpiking] = ImBat_plotFlightsVsCells(cellData,alignment,flightPaths,varargin)
 
-global batName dateSesh sessionType topROI
+global topROI
+
+batName = [];
+dateSesh = [];
+sessionType = [];
+
+% User inputs overrides
+nparams=length(varargin);
+for i=1:2:nparams
+    switch lower(varargin{i})
+        case 'batName'
+            batName=varargin{i+1};
+        case 'dateSesh'
+            dateSesh = varargin{i+1};
+        case 'sessionType'
+            sessionType = varargin{i+1};
+    end
+end
 
 topROILocal = round((topROI * 0.01 * length(cellData.results.S(:,2)))/2); %top # of cells you want to look at divided by 2 for easier viewing 
 %smooth and zscore the velocity

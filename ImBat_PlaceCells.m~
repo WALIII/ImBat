@@ -5,12 +5,12 @@ function ImBat_PlaceCells(neuron, out);
 
 plotting =1;
 
-out.Location2 = out.flights;
+out.Location2;
 
 
 % get general data on ROI traces
 
-offset = 0.2; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
+offset = -0.4; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
 
 
 
@@ -64,7 +64,7 @@ end
 
   for ii = 1:size(neuron.C_raw,1); % for each cell
       hold on;
-plot3(out.flights(:,1),out.flights(:,2),out.flights(:,3),'k');% plot the flight trajectory in space
+plot3(out.Location3(:,1),out.Location3(:,2),out.Location3(:,3),'k');% plot the flight trajectory in space
 
 [~,xy] = find(neuron.S(ii,:)>0.1);  % get time neuron is active
 peak_heights = neuron.S(ii,xy);
@@ -95,9 +95,7 @@ catch % if cell was not active...
     disp('cell not active');
     continue
 end
-xlim([-2500 2500]);
-ylim([-2500 2500]);
-zlim([-500 2500]);
+
 % Save 'place cells' as jpg and fig files..
 saveas(gcf,['PlaceCells/fig/','Cell_',num2str(ii)]);
 saveas(gcf,['PlaceCells/jpg/','Cell_',num2str(ii),'.jpg']);

@@ -63,7 +63,7 @@ for clust_i = 1:4 %length(flightPaths.clusterIndex)
             catch
                 sizeToRecordingEnd = size(cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:end),2);
                 sizeToTraceEnd = size(trace(trace_i,:),2);
-                trace(trace_i,:) = (cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:end)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                trace(trace_i,:) = [cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:end) zeros(1,sizeToTraceEnd - sizeToRecordingEnd)];
                 speed(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - prePad:end)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd))); 
             
             end    

@@ -1,11 +1,27 @@
-function [plotFiringTrajectory] = ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment)
+function [plotFiringTrajectory] = ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,varargin)
 
-global batName dateSesh sessionType topROI
+global topROI
 
 offset = 0.1; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
 spikeThresh = 8; %threshold for eliminating noise from the S matrix
 topROI = 30;
 
+batName = [];
+dateSesh = [];
+sessionType = [];
+
+% User inputs overrides
+nparams=length(varargin);
+for i=1:2:nparams
+    switch lower(varargin{i})
+        case 'batName'
+            batName=varargin{i+1};
+        case 'dateSesh'
+            dateSesh = varargin{i+1};
+        case 'sessionType'
+            sessionType = varargin{i+1};
+    end
+end
 
 % Plot the location in space that each cell is active
 plotFiringTrajectory =  figure();
