@@ -33,7 +33,7 @@ alignment = load([pwd '/processed/Alignment.mat']);
 load([pwd '/analysis/' label '_flightPaths.mat']);
 end
 
-prePad = 2*cellData.results.Fs; %number of frames to include in the trace extraction
+prePad = 2*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postPad = 6*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 %meanTrace = cell(1,length(flightPaths.clusterIndex));
 

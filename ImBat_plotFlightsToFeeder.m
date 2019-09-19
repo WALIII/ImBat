@@ -47,15 +47,23 @@ mx = fillmissing(mx,'nearest');
 my = fillmissing(my,'nearest');
 mz = fillmissing(mz,'nearest');
 
+%threshold based on speed
+Vx = gradient(mx, 1/trackData.VideoFrameRate);
+Vy = gradient(my, 1/trackData.VideoFrameRate);
+Vz = gradient(mz, 1/trackData.VideoFrameRate);
+batSpeed = sqrt(Vx.^2 + Vy.^2 + Vz.^2)/1000; %in m/s
+
+nonflying = find(batSpeed < 1.5);
+
 %plot flight paths of bat to feeder
 flightPathsToFeeder = figure();
 CM = jet(length(LT));
-flightToFeederEnd = zeros(length(LT));
-flightToFeederStart = zeros(length(LT));
+flightToFeederEnd = zeros(length(LT),1);
+flightToFeederStart = zeros(length(LT),1);
 %try
 for i = 1:length(LT)
     flightToFeederEnd(i) = round(LT(i) * trackData.VideoFrameRate);
-    flightToFeederStart(i) = flightToFeederEnd(i) - (trackData.VideoFrameRate*preflightTime); %minus the preflight # of seconds
+    flightToFeederStart(i) = find(batSpeed(1:flightToFeederEnd(i))<1.5,1,'last'); %flightToFeederEnd(i) - (trackData.VideoFrameRate*preflightTime); %minus the preflight # of seconds
     %scatter3(markerSet(flightStart:flightEnd,1,1),markerSet(flightStart:flightEnd,1,2),markerSet(flightStart:flightEnd,1,3))
     plot3(mx(flightToFeederStart(i):flightToFeederEnd(i)),my(flightToFeederStart(i):flightToFeederEnd(i)),mz(flightToFeederStart(i):flightToFeederEnd(i)),'LineWidth',2,'color',CM(i,:))
     hold on
@@ -68,7 +76,7 @@ for i = 1:length(LT)
     fFeedEndxyz(i,2) = round(nanmean(my(flightToFeederEnd(i):flightToFeederEnd(i)+trackData.VideoFrameRate/2)));
     fFeedEndxyz(i,3) = round(nanmean(mz(flightToFeederEnd(i):flightToFeederEnd(i)+trackData.VideoFrameRate/2)));
     
-    scatter3(fFeedStartxyz(i,1),fFeedStartxyz(i,2),fFeedStartxyz(i,3),100,'r','filled')
+    %scatter3(fFeedStartxyz(i,1),fFeedStartxyz(i,2),fFeedStartxyz(i,3),100,'r','filled')
     hold on
     scatter3(fFeedEndxyz(i,1),fFeedEndxyz(i,2),fFeedEndxyz(i,3),100,'k','filled')
 end
@@ -133,8 +141,8 @@ for traj = 1 : 10
     for nf = allflights{ssf(traj)}
         plot3(mx(flightToFeederStart(nf):flightToFeederEnd(nf)),my(flightToFeederStart(nf):flightToFeederEnd(nf)),mz(flightToFeederStart(nf):flightToFeederEnd(nf)),'LineWidth',1,'Color',jj(traj*10,:))
         hold on
-        scatter3(fFeedStartxyz(nf,1),fFeedStartxyz(nf,2),fFeedStartxyz(nf,3),100,'r','filled')
-        hold on
+        %scatter3(fFeedStartxyz(nf,1),fFeedStartxyz(nf,2),fFeedStartxyz(nf,3),100,'r','filled')
+        %hold on
         scatter3(fFeedEndxyz(nf,1),fFeedEndxyz(nf,2),fFeedEndxyz(nf,3),100,'k','filled')
         hold on
         %axis equal
@@ -148,7 +156,7 @@ for traj = 1 : 10
         disp(' no more flights...');
     end
 end
-mtit(['Flight Clusters to Feeder start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
+sgtitle(['Flight Clusters to Feeder start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
 
@@ -159,7 +167,7 @@ for traj = 1 : ntrajectories
     for nf = allflights{ssf(traj)}
         plot3(mx(flightToFeederStart(nf):flightToFeederEnd(nf)),my(flightToFeederStart(nf):flightToFeederEnd(nf)),mz(flightToFeederStart(nf):flightToFeederEnd(nf)),'LineWidth',1,'Color',jj(traj*10,:))
         hold on
-        scatter3(fFeedStartxyz(nf,1),fFeedStartxyz(nf,2),fFeedStartxyz(nf,3),100,'r','filled')
+        %scatter3(fFeedStartxyz(nf,1),fFeedStartxyz(nf,2),fFeedStartxyz(nf,3),100,'r','filled')
         hold on
         scatter3(fFeedEndxyz(nf,1),fFeedEndxyz(nf,2),fFeedEndxyz(nf,3),100,'k','filled')
         hold on
