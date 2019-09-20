@@ -112,10 +112,10 @@ snakePlot_clust = figure();
 for p = 1:clust_i
     p1 = subplot(4,clust_i,p);
     plot(1:length(smoothSpeed{p}),smoothSpeed{p},'k');
-           hold on
-%     for n = 1:length(speed{p}(:,1))
-%         plot(1:length(speed{p}(n,:)),speed{p}(n,:));
-%     end
+    for n = 1:length(speed{p}(:,1))
+        hold on
+        plot(1:length(speed{p}(n,:)),speed{p}(n,:));
+    end
     title(['Cluster ' num2str(p)]);
     if p == 1
     ylabel('velocity (cm/s)');
