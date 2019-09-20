@@ -6,6 +6,7 @@ batName = [];
 dateSesh = [];
 sessionType = [];
 saveFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
+offset = 0.1; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
 
 
 % User inputs overrides
@@ -49,17 +50,18 @@ for clust_i = 1:4 %length(flightPaths.clusterIndex)
             %calculate duration of each flight in a particular cluster so
             %you can pad all flights to the longest flight in that cluster
             dur(dur_i) = closestIndexEnd(dur_i)-closestIndexStart(dur_i);
+            durSpeed(dur_i)=
         end
         %calculate max duration for each cluster of trajectories
         maxDur = max(dur);
         %meanTrace{clust_i}=zeros(length(cellData.results.C(:,1)),maxDur+preWindow+1);
         %initialize the vector to store the neural activity of each flight
         trace = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePad+postPad+1);
-        speed{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePad+postPad+1);
+        %speed{clust_i} = zeros;%zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePad+postPad+1);
         for trace_i = 1:length(flightPaths.clusterIndex{clust_i})
             try
             trace(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPad);
-            speed{clust_i}(trace_i,:) = flightPaths.batSpeed(closestIndexStart(trace_i) - prePad:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPad); 
+            speed{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePad:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDur-dur(trace_i)) + postPad); 
             catch
                 sizeToRecordingEnd = size(cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:end),2);
                 sizeToTraceEnd = size(trace(trace_i,:),2);
@@ -112,10 +114,10 @@ snakePlot_clust = figure();
 for p = 1:clust_i
     p1 = subplot(4,clust_i,p);
     plot(1:length(smoothSpeed{p}),smoothSpeed{p},'k');
-    for n = 1:length(speed{p}(:,1))
-        hold on
-        plot(1:length(speed{p}(n,:)),speed{p}(n,:));
-    end
+           hold on
+%     for n = 1:length(speed{p}(:,1))
+%         plot(1:length(speed{p}(n,:)),speed{p}(n,:));
+%     end
     title(['Cluster ' num2str(p)]);
     if p == 1
     ylabel('velocity (cm/s)');

@@ -6,8 +6,8 @@ preflightTime = 2;
 %length of time to wait before bat leaves feeder for FlightFromFeeder track %(s)
 delay = 3;
 %number of clusters for kmeans clustering of flight trajectories
-nclusters = 4;
-ntrajectories = 6; %number of output trajectories from kmeans that you want to look at
+nclusters = 6;
+ntrajectories = 2; %number of output trajectories from kmeans that you want to look at
 
 batName = [];
 dateSesh = [];
@@ -17,13 +17,25 @@ sessionType = [];
 nparams=length(varargin);
 for i=1:2:nparams
     switch lower(varargin{i})
-        case 'batName'
+        case 'batname'
             batName=varargin{i+1};
-        case 'dateSesh'
+        case 'datesesh'
             dateSesh = varargin{i+1};
-        case 'sessionType'
+        case 'sessiontype'
             sessionType = varargin{i+1};
+        case 'saveflag'
+            saveFlag = varargin{i+1};
     end
+end
+
+%labels for loading and saving data if running independent fromImBat_analyze
+if saveFlag == 1
+    date = strcat(lower(batName(1:2)),dateSesh);
+    label = [batName '_' dateSesh '_' sessionType];
+    
+    cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
+    alignment = load([pwd '/processed/Alignment.mat']);
+    load([pwd '/analysis/' label '_flightPaths.mat']);
 end
  
 
@@ -201,3 +213,4 @@ flightFeedersStartStop.fFeedEndxyz = fFeedEndxyz;
 %     
 % end
 
+beta = 1;

@@ -1,7 +1,7 @@
 function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData,varargin)
 
-nclusters = 8; %number of clusters for kmeans clustering of flight trajectories
-ntrajectories = 4; %number of output trajectories from kmeans that you want to look at
+nclusters = 4; %number of clusters for kmeans clustering of flight trajectories
+ntrajectories = 6; %number of output trajectories from kmeans that you want to look at 
 
 batName = [];
 dateSesh = [];
@@ -11,25 +11,13 @@ sessionType = [];
 nparams=length(varargin);
 for i=1:2:nparams
     switch lower(varargin{i})
-        case 'batname'
+        case 'batName'
             batName=varargin{i+1};
-        case 'datesesh'
+        case 'dateSesh'
             dateSesh = varargin{i+1};
-        case 'sessiontype'
+        case 'sessionType'
             sessionType = varargin{i+1};
-        case 'saveflag'
-            saveFlag = varargin{i+1};
     end
-end
-
-%labels for loading and saving data if running independent fromImBat_analyze
-if saveFlag == 1
-    date = strcat(lower(batName(1:2)),dateSesh);
-    label = [batName '_' dateSesh '_' sessionType];
-    
-    cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
-    alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/analysis/' label '_flightPaths.mat']);
 end
 %find ttl pulses for synching
 %event_ttls = trackData.AnalogSignals(:,2); %from motion data
@@ -61,9 +49,9 @@ nonflying = find(batSpeed < 1.5);
 toofast = find(batSpeed > 35);
 
 %set low speed points to zero
-%mx([nonflying]) = nan;%mx(nonflying) = nan; %mx([nonflying; toofast]) = nan;
-%my([nonflying]) = nan;%my(nonflying) = nan;%my([nonflying; toofast]) = nan;
-%mz([nonflying]) = nan;%mz(nonflying) = nan;%mz([nonflying; toofast]) = nan;
+mx([nonflying; toofast]) = nan;%mx(nonflying) = nan; %mx([nonflying; toofast]) = nan;
+my([nonflying; toofast]) = nan;%my(nonflying) = nan;%my([nonflying; toofast]) = nan;
+mz([nonflying; toofast]) = nan;%mz(nonflying) = nan;%mz([nonflying; toofast]) = nan;
 
 trajectories_continuous(1,:) = mx';
 trajectories_continuous(2,:) = my';
@@ -134,7 +122,7 @@ else
     
     fendxyz(1,1) = (0);
     fendxyz(1,2) = (0);
-    fendxyz(1,3) = (0);
+    fendxyz(1,3) = (0);    
 end
 title(['All flights start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('mm'); ylabel('mm'); zlabel('mm');
@@ -144,13 +132,13 @@ hold off
 %find pairs of start and endpoints with a high number of flights
 rng(2) %control random number generation
 try
-    kstart = kmeans(fstartxyz,nclusters);
+kstart = kmeans(fstartxyz,nclusters);
 catch
     kstart = kmeans(fstartxyz,nclusters/2);
 end
 rng(2)
 try
-    kend = kmeans(fendxyz,nclusters);
+kend = kmeans(fendxyz,nclusters);
 catch
     kend = kmeans(fendxyz,nclusters/2);
 end
@@ -166,29 +154,29 @@ for ks = 1 : nclusters
         allflights{ncounter} = intersect(find(kstart == ks),find(kend == ke))';
     end
 end
-
+ 
 [~, ssf] = sort(nflights,'descend'); %sort clustered flights
 %plot clustered flights
 flightPathsClusterEach = figure();
 jj = jet;
 for traj = 1 : 10
     try
-        if traj<ntrajectories + 1 % Only plot the first ntrajectories...
-            subplot(3,2,traj)
-            for nf = allflights{ssf(traj)}
-                plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
-                hold on
-                %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),50,'r','filled')
-                hold on
-                scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')
-                hold on
-                %axis equal
-                view(0,90)
-                xlabel('mm'); ylabel('mm');
-            end
-        end
+    if traj<ntrajectories + 1 % Only plot the first ntrajectories...
+    subplot(3,2,traj)
+    for nf = allflights{ssf(traj)}
+        plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+        hold on
+        %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),50,'r','filled')
+        hold on
+        scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')
+        hold on
+        %axis equal
+        view(0,90)
+        xlabel('mm'); ylabel('mm');
+    end
+    end
         clusterIndex{traj}(:) = allflights{ssf(traj)};
-        
+
     catch
         disp(' no more flights...');
     end
@@ -226,7 +214,7 @@ flightPaths.flight_starts_idx = flight_starts;
 flightPaths.flight_ends_idx = flight_ends;
 flightPaths.flight_ends_xyz = fendxyz;
 flightPaths.flight_starts_xyz = fstartxyz;
-flightPaths.trajectories_continuous = trajectories_continuous;
-flightPaths.batSpeed = batSpeed;
+flightPaths.trajectories_continuous = trajectories_continuous; 
+flightPaths.batSpeed = batSpeed; 
 
 beta = 1;
