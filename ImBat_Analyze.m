@@ -21,18 +21,18 @@ topROI = 60;
 analysisFlag = 1;
 reAnalyze = 1;
 %roi plot flags
-plotROIFlag = 1;
-centroidFlag = 1;
-roiHeatFlag = 1;
-binaryMaskFlag = 1;
+plotROIFlag = 0;
+centroidFlag = 0;
+roiHeatFlag = 0;
+binaryMaskFlag = 0;
 %flight plot flags
 plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
 flightPathsFeederFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 1;
+plotPlaceCellsFlag = 0;
 %snake/schnitz plot flags
-plotSnakesFlag = 1;
+plotSnakesFlag = 0;
 
 % Get all folders in directory
 files = dir(pwd);

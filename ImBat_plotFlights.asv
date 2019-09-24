@@ -46,12 +46,12 @@ Vz = gradient(mz, 1/trackData.VideoFrameRate);
 batSpeed = sqrt(Vx.^2 + Vy.^2 + Vz.^2)/1000; %in m/s
 
 nonflying = find(batSpeed < 1.5);
-toofast = find(batSpeed > 10);
+toofast = find(batSpeed > 35);
 
 %set low speed points to zero
-mx([nonflying; toofast]) = nan;
-my([nonflying; toofast]) = nan;
-mz([nonflying; toofast]) = nan;
+mx([nonflying; toofast]) = nan;%mx(nonflying) = nan; %mx([nonflying; toofast]) = nan;
+my([nonflying; toofast]) = nan;%my(nonflying) = nan;%my([nonflying; toofast]) = nan;
+mz([nonflying; toofast]) = nan;%mz(nonflying) = nan;%mz([nonflying; toofast]) = nan;
 
 trajectories_continuous(1,:) = mx';
 trajectories_continuous(2,:) = my';
@@ -110,9 +110,9 @@ if size(R,2) > 0
         fendxyz(nf,2) = round(nanmean(my(flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
         fendxyz(nf,3) = round(nanmean(mz(flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
         
-        scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),100,'r','filled')
+        %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),75,'r','filled')
         hold on
-        scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),100,'k','filled')
+        scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')
         %pause
     end
 else
@@ -166,9 +166,9 @@ for traj = 1 : 10
     for nf = allflights{ssf(traj)}
         plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
         hold on
-        scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),100,'r','filled')
+        %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),50,'r','filled')
         hold on
-        scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),100,'k','filled')
+        scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')
         hold on
         %axis equal
         view(0,90)
@@ -181,7 +181,7 @@ for traj = 1 : 10
         disp(' no more flights...');
     end
 end
-mtit(['Flight Clusters start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
+sgtitle(['Flight Clusters start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
 
@@ -192,9 +192,9 @@ for traj = 1 : ntrajectories
     for nf = allflights{ssf(traj)}
         plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
         hold on
-        scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),100,'r','filled')
+        %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),25,'r','filled')
         hold on
-        scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),100,'k','filled')
+        scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')
         hold on
     end
 end
@@ -216,3 +216,5 @@ flightPaths.flight_ends_xyz = fendxyz;
 flightPaths.flight_starts_xyz = fstartxyz;
 flightPaths.trajectories_continuous = trajectories_continuous; 
 flightPaths.batSpeed = batSpeed; 
+
+beta = 1;

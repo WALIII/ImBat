@@ -6,6 +6,7 @@ batName = [];
 dateSesh = [];
 sessionType = [];
 saveFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
+offset = 0.1; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
 
 
 % User inputs overrides
@@ -33,7 +34,7 @@ alignment = load([pwd '/processed/Alignment.mat']);
 load([pwd '/analysis/' label '_flightPaths.mat']);
 end
 
-prePad = 2*cellData.results.Fs; %number of frames to include in the trace extraction
+prePad = 2*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postPad = 6*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 %meanTrace = cell(1,length(flightPaths.clusterIndex));
 
@@ -49,23 +50,26 @@ for clust_i = 1:4 %length(flightPaths.clusterIndex)
             %calculate duration of each flight in a particular cluster so
             %you can pad all flights to the longest flight in that cluster
             dur(dur_i) = closestIndexEnd(dur_i)-closestIndexStart(dur_i);
+            durSpeed(dur_i)= flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(dur_i))-flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(dur_i));
         end
         %calculate max duration for each cluster of trajectories
         maxDur = max(dur);
+        maxDurSpeed = max(durSpeed);
         %meanTrace{clust_i}=zeros(length(cellData.results.C(:,1)),maxDur+preWindow+1);
         %initialize the vector to store the neural activity of each flight
         trace = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePad+postPad+1);
-        speed = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePad+postPad+1);
+        speed{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDurSpeed+prePad+postPad+1);
         for trace_i = 1:length(flightPaths.clusterIndex{clust_i})
             try
             trace(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPad);
-            speed(trace_i,:) = flightPaths.batSpeed(closestIndexStart(trace_i) - prePad:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPad); 
+            speed{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePad:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postPad); 
+            smoothSpeedRaw{clust_i}(trace_i,:) = smooth(speed{clust_i}(trace_i,:),100);
             catch
                 sizeToRecordingEnd = size(cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:end),2);
                 sizeToTraceEnd = size(trace(trace_i,:),2);
                 trace(trace_i,:) = (cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:end)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
-                speed(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - prePad:end)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd))); 
-            
+                speed{clust_i}(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - prePad:end)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd))); 
+                
             end    
         end
         
@@ -73,7 +77,7 @@ for clust_i = 1:4 %length(flightPaths.clusterIndex)
         meanTrace{clust_i}(cell_i,:) = mean(trace);
         meanTraceOdd{clust_i}(cell_i,:) = mean(trace(1:2:end,:));
         meanTraceEven{clust_i}(cell_i,:) = mean(trace(2:2:end,:));
-        meanSpeed{clust_i} = mean(speed);
+        meanSpeed{clust_i} = mean(speed{clust_i});
         %smooth and zscore the neural data. subtract the min of the zscore so the
         %min is 0 rather than mean 0
         normTrace{clust_i}(cell_i,:) = zscore(smooth(meanTrace{clust_i}(cell_i,:),3));
@@ -82,7 +86,7 @@ for clust_i = 1:4 %length(flightPaths.clusterIndex)
         normTraceOdd{clust_i}(cell_i,:) = normTraceOdd{clust_i}(cell_i,:) - min(normTraceOdd{clust_i}(cell_i,:));
         normTraceEven{clust_i}(cell_i,:) = zscore(smooth(meanTraceEven{clust_i}(cell_i,:),3));
         normTraceEven{clust_i}(cell_i,:) = normTraceEven{clust_i}(cell_i,:) - min(normTraceEven{clust_i}(cell_i,:));
-        smoothSpeed{clust_i} = smooth(meanTrace{clust_i}(cell_i,:),20);
+        smoothSpeed{clust_i} = smooth(meanSpeed{clust_i},40);
         %find time index of max peaks
         [~,maxNormTrace{clust_i}(cell_i,1)] = max(normTrace{clust_i}(cell_i,:));
         [~,maxNormTraceOdd{clust_i}(cell_i,1)] = max(normTraceOdd{clust_i}(cell_i,:));
@@ -111,7 +115,11 @@ end
 snakePlot_clust = figure();
 for p = 1:clust_i
     p1 = subplot(4,clust_i,p);
-    plot(1:length(smoothSpeed{p}),smoothSpeed{p});
+    plot(1:length(smoothSpeed{p}),smoothSpeed{p},'k');
+           hold on
+    for n = 1:size(smoothSpeedRaw{p},1)
+        plot(1:length(smoothSpeedRaw{p}(n,:)),smoothSpeedRaw{p}(n,:));
+    end
     title(['Cluster ' num2str(p)]);
     if p == 1
     ylabel('velocity (cm/s)');
@@ -141,7 +149,11 @@ end
 snakePlot_clustBy1 = figure();
 for p = 1:clust_i
     p1 = subplot(4,clust_i,p);
-    plot(1:length(smoothSpeed{p}),smoothSpeed{p});
+    plot(1:length(smoothSpeed{p}),smoothSpeed{p},'k');
+               hold on
+    for n = 1:size(smoothSpeedRaw{p},1)
+        plot(1:length(smoothSpeedRaw{p}(n,:)),smoothSpeedRaw{p}(n,:));
+    end
     title(['Cluster ' num2str(p)]);
     if p == 1
     ylabel('velocity (cm/s)');
@@ -172,7 +184,11 @@ end
 snakePlot_clustOddEven = figure();
 for p = 1:clust_i
     p1 = subplot(4,2*clust_i,2*p-1);
-    plot(1:length(smoothSpeed{p}),smoothSpeed{p});
+    plot(1:length(smoothSpeed{p}),smoothSpeed{p},'k');
+    hold on
+    for n = 1:size(smoothSpeedRaw{p},1)
+        plot(1:length(smoothSpeedRaw{p}(n,:)),smoothSpeedRaw{p}(n,:));
+    end
     title(['Cluster ' num2str(p)]);
     if p == 1
     ylabel('velocity (cm/s)');
@@ -220,7 +236,7 @@ snakeTrace.smoothSpeed = smoothSpeed;
 snakeTrace.snakePlot_clustAll = snakePlot_clust;
 snakeTrace.snakePlot_clustOddEven = snakePlot_clustOddEven;
 snakeTrace.snakePlot_clustBy1 = snakePlot_clustBy1;
-
+snakeTrace.smoothSpeedRaw = smoothSpeedRaw;
 %%
 if saveFlag == 1
 saveas(snakeTrace.snakePlot_clustAll, [pwd '\analysis\snakePlots\' label '_snakePlots_clustAll.svg']);

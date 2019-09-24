@@ -49,7 +49,7 @@ for i= 1:topROILocal
     try
     plot(alignment.out.video_times,(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',8)))+i*2) %may have to tweak the +i*6 at the end
     catch
-        plot(1:length(cellData.results.C_raw(i,:)),(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',8)))+i*2)
+        plot(1:length(cellData.results.C_raw(i,:)),(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',8))/4)+i*2)
     end
 end
 title(['Velocity vs Cell Activity: ' batName ' ' dateSesh ' ' sessionType])
