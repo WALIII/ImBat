@@ -7,6 +7,8 @@ function ImBat_MYmovie(out,Y)
 [a b] = min(find(out.Location(:,1)~=0))
 t = out.Location_time(a);
 
+% clean up movie:
+
 
 
 [minValue,closestIndex] = min(abs(t-out.video_times));
@@ -18,7 +20,8 @@ mY = mean(Y(:,:,closestIndex:size(Y,3)),3);
 Y = Y-mY;
 % Y = mat2gray(Y);
 
-v = VideoWriter('peaks4.avi');
+v = VideoWriter('peaks6.avi');
+v.FrameRate = 90;
 open(v);
 
 for i = closestIndex-300:closestIndex+4000;%size(Y,3);
