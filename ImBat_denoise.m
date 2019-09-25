@@ -15,13 +15,13 @@ thresh = 3;
 % User inputs overrides
 nparams=length(varargin);
 for i=1:2:nparams
-    switch lower(varargin{i})
-        case 'thresh'
-            thresh=varargin{i+1};
-        case 'itterations'
-            maxItter = varargin{i+1};
+	switch lower(varargin{i})
+  case 'thresh'
+			thresh=varargin{i+1};
+  case 'itterations'
+          maxItter = varargin{i+1};
     end
-end
+  end
 
 
 
