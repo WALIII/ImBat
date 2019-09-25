@@ -82,6 +82,8 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
     set(findall(gcf,'-property','FontSize'),'FontSize',20);
     saveas(gcf,[batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.tif']);
     savefig(gcf,[batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.fig']);
+    saveas(gcf,[batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.svg']);
+
     
     
     
