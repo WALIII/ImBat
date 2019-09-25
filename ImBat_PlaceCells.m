@@ -1,16 +1,41 @@
-function ImBat_PlaceCells(neuron, out);
+function [output] = ImBat_PlaceCells(neuron, out,varargin);
 % ImBat_PlaceCells
 
 % Basic plotting of the location that certian cells are active...
 
-plotting =1;
+% Example:
+% output{i} = ImBat_PlaceCells(neuron, out1,'roi',roi_2_disp(i),'flights',flight_input_data);
 
+
+
+plotting =0; % save in folder...
 out.Location2 = out.flights;
-
+ROI2Plot = 1:size(neuron.C_raw,1);
 
 % get general data on ROI traces
 
-offset = 0.2; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
+offset = .0; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
+
+
+ nparams=length(varargin);
+
+% if mod(nparams,2)>0
+% 	error('Parameters must be specified as parameter/value pairs');
+% end
+for i=1:2:nparams
+	switch lower(varargin{i})
+		case 'starts'
+			starts=varargin{i+1};     
+        case 'stops'
+            stops=varargin{i+1};
+         case 'roi'
+            ROI2Plot=varargin{i+1};
+        case 'flights'
+            out.Location2 = varargin{i+1};
+            out.flights = varargin{i+1};
+        end                     
+    end
+
 
 
 
@@ -60,9 +85,10 @@ end
 
   mkdir('PlaceCells/fig'); % save as a figure file in local dir
    mkdir('PlaceCells/jpg'); % Save as .jpg in local dir
+ end
   figure();
 
-  for ii = 1:size(neuron.C_raw,1); % for each cell
+  for ii = ROI2Plot; % for each cell
       hold on;
 plot3(out.flights(:,1),out.flights(:,2),out.flights(:,3),'k');% plot the flight trajectory in space
 
@@ -86,11 +112,18 @@ end
 
 % display, in the title, how many bursts there were:
 disp([num2str(size(LX)),' Bursts in flight'])
+output.spikes = PH;
 PH = mat2gray(PH);
 
 scatter3(LX,LY,LZ,(PH*200)+1,'or','filled');
-
 title(['Cell no ',num2str(ii),'  ',num2str(size(LX)),' Bursts in flight']);
+
+output.LX = LX;
+output.LY = LY;
+output.LZ = LZ;
+output.PH = (PH*200)+1;
+
+
 catch % if cell was not active...
     disp('cell not active');
     continue
@@ -98,11 +131,36 @@ end
 xlim([-2500 2500]);
 ylim([-2500 2500]);
 zlim([-500 2500]);
+ 
+if plotting ==0;
+disp('Press key to move to the next cell...');
+%pause();
+else 
 % Save 'place cells' as jpg and fig files..
 saveas(gcf,['PlaceCells/fig/','Cell_',num2str(ii)]);
 saveas(gcf,['PlaceCells/jpg/','Cell_',num2str(ii),'.jpg']);
-
 clf
+end
+ 
+
+
+
+% get mean euclid distance of all points:
+% clear nans
+LX(isnan(LX)) = [];
+LY(isnan(LY)) = [];
+LZ(isnan(LZ)) = [];
+
+Pos(1,:) = LX;
+Pos(2,:) = LY;
+Pos(3,:) = LZ;
+outy = squareform(pdist(Pos'));
+figure(); histogram(outy(:));
+title(['Cell no ',num2str(ii),'  ',num2str(size(LX)),' Bursts in flight']);
+outy(outy == 0) = [];
+output.distance = outy;
+
+
 
 % Clear the buffer for the next cell:
 clear LX LY LZ closestIndex Spike_times PH
