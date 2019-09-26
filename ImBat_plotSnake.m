@@ -31,7 +31,7 @@ label = [batName '_' dateSesh '_' sessionType];
 
 cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
 alignment = load([pwd '/processed/Alignment.mat']);
-load([pwd '/analysis/' label '_flightPaths.mat']);
+load([pwd '/analysis/' label '_flightPaths_6clusters.mat']);
 end
 
 prePad = 2*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
@@ -39,7 +39,7 @@ postPad = 6*cellData.results.Fs; %add 2 seconds to the end of the plots to inclu
 %meanTrace = cell(1,length(flightPaths.clusterIndex));
 
 %for each cluster type
-for clust_i = 1:4 %length(flightPaths.clusterIndex)
+for clust_i = 1:6 %length(flightPaths.clusterIndex)
     %for each cell
     for cell_i = 1:length(cellData.results.C(:,1))
         %for each trial in cluster, calculate the start/stop times and duration of the calcium videos
