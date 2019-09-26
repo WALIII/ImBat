@@ -1,20 +1,21 @@
 function ImBat_Markov(ROI_Data)
 
 % Segregate Flights:
+day2use = 5;
 
-[out] =  ImBat_SegTrajectories(ROI_Data{1,12}.Alignment.out.flights,ROI_Data{1,12}.Alignment.out.Location_time);
-
+[out] =  ImBat_SegTrajectories(ROI_Data{1,day2use}.Alignment.out.flights,ROI_Data{1,day2use}.Alignment.out.Location_time);
+close all
 
 % Plot flights
 
 figure(); 
 hold on;
-plot3(ROI_Data{1,12}.Alignment.out.flights(:,1),ROI_Data{1,12}.Alignment.out.flights(:,2),ROI_Data{1,12}.Alignment.out.flights(:,3),'k');% plot the flight trajectory in space
+plot3(ROI_Data{1,day2use}.Alignment.out.flights(:,1),ROI_Data{1,day2use}.Alignment.out.flights(:,2),ROI_Data{1,day2use}.Alignment.out.flights(:,3),'k');% plot the flight trajectory in space
 
 % plot all segregated trajectories
 hold on;
-for i = 1:67
-plot3(ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),1),ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),2),ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),3),'r');% plot the flight trajectory in space
+for i = 1:size(out.flight_starts_indx,2)
+plot3(ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),1),ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),2),ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),3),'r');% plot the flight trajectory in space
 end
 
 
@@ -25,18 +26,18 @@ colorC = hsv(size(out.ClusterIndex,2));
 for i = 1:size(out.ClusterIndex,2)
     for ii = 1: size(out.ClusterIndex{i},2)
         idX = out.ClusterIndex{i}(ii);
-        plot3(ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),1),ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),2),ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),3),'Color',colorC(i,:));% plot the flight trajectory in space
+        plot3(ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),1),ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),2),ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),3),'Color',colorC(i,:));% plot the flight trajectory in space
     end
 end
 
 
 
 
-% plot all segregated trajectories
-hold on;
-for i = 1:67
-plot3(ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),1),ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),2),ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),3),'r');% plot the flight trajectory in space
-end
+% % plot all segregated trajectories
+% hold on;
+% for i = 1:size(out.flight_starts_indx,2)
+% plot3(ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),1),ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),2),ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(i):out.flight_ends_indx(i),3),'r');% plot the flight trajectory in space
+% end
 
 
 
@@ -50,7 +51,7 @@ for i = 1:size(out.ClusterIndex,2)
     hold on;
     for ii = 1: size(out.ClusterIndex{i},2)
         idX = out.ClusterIndex{i}(ii);
-        plot3(ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),1),ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),2),ROI_Data{1,12}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),3),'Color',colorC(i,:));% plot the flight trajectory in space
+        plot3(ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),1),ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),2),ROI_Data{1,day2use}.Alignment.out.flights(out.flight_starts_indx(idX):out.flight_ends_indx(idX),3),'Color',colorC(i,:));% plot the flight trajectory in space
     end
     title(['Flight ', num2str(i)]);
 end
@@ -66,7 +67,7 @@ end
 
 
 % build sequence
-Seq2 = (1:67);
+Seq2 = (1:size(out.flight_starts_indx,2));
 VA(:,1) = Seq;
 % VA(:,2) = Seq2;
  [u,~,n] = unique(VA,'rows');
@@ -97,8 +98,8 @@ figure(); simplot(mc,X,'FrameRate',0.5,'Type','graph');
 
 
 
-x0 = [0 0 0 0 0 50 0 0];
-X1 = simulate(mc,numSteps,'X0',x0);
-
-figure;
-simplot(mc,X1);
+% x0 = [0 0 0 0 0 50];
+% X1 = simulate(mc,numSteps,'X0',x0);
+% 
+% figure;
+% simplot(mc,X1);
