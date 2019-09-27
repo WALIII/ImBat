@@ -33,8 +33,9 @@ for i=1:2:nparams
         case 'flights'
             out.Location2 = varargin{i+1};
             out.flights = varargin{i+1};
-        case 'save'
-            plotting = varargin{i+1};
+        case ''
+            out.Location2 = varargin{i+1};
+            out.flights = varargin{i+1};
         end                     
     end
 
