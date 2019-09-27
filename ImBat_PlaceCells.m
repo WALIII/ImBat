@@ -1,4 +1,4 @@
-function [output] = ImBat_PlaceCells(neuron, out,varargin);
+    function [output] = ImBat_PlaceCells(neuron, out,varargin);
 % ImBat_PlaceCells
 
 % Basic plotting of the location that certian cells are active...

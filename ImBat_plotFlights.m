@@ -6,6 +6,7 @@ ntrajectories = 4; %number of output trajectories from kmeans that you want to l
 batName = [];
 dateSesh = [];
 sessionType = [];
+saveFlag = 0;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -26,10 +27,8 @@ end
 if saveFlag == 1
     date = strcat(lower(batName(1:2)),dateSesh);
     label = [batName '_' dateSesh '_' sessionType];
-    
-    cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
-    alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/analysis/' label '_flightPaths.mat']);
+    folderName = extractBefore(pwd,batName);
+    trackData = load([folderName label '_track.mat']);
 end
 %find ttl pulses for synching
 %event_ttls = trackData.AnalogSignals(:,2); %from motion data
@@ -90,7 +89,7 @@ hold off
 %splice out individual flights
 batspeed = batSpeed;
 batspeed(nonflying) = nan;
-batspeed(toofast) = nan;
+%batspeed(toofast) = nan;
 
 bflying=~isnan(batspeed);
 
@@ -228,5 +227,25 @@ flightPaths.flight_ends_xyz = fendxyz;
 flightPaths.flight_starts_xyz = fstartxyz;
 flightPaths.trajectories_continuous = trajectories_continuous;
 flightPaths.batSpeed = batSpeed;
+
+if saveFlag == 1
+    set(findall(flightPathsAll,'-property','FontSize'),'FontSize',20);
+    saveas(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll.tif']);
+    savefig(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll.fig']);
+    saveas(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll.svg']);
+    set(findall(flightPathsClusterEach,'-property','FontSize'),'FontSize',20);
+    saveas(flightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach.tif']);
+    savefig(flightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach.fig']);
+    saveas(flightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach.svg']);
+    set(findall(flightPathsClusterAll,'-property','FontSize'),'FontSize',20);
+    saveas(flightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll.tif']);
+    savefig(flightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll.fig']);
+    saveas(flightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll.svg']);
+    set(findall(flightPathsStartStop,'-property','FontSize'),'FontSize',20);
+    saveas(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop.tif']);
+    savefig(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop.fig']);
+    saveas(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop.svg']);
+    save([pwd '\analysis\' batName '_' dateSesh '_' sessionType '_flightPaths.mat'],'flightPaths')
+end
 
 beta = 1;

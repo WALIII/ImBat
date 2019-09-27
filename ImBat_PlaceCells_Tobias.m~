@@ -50,22 +50,22 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
     peak_heights = cellData.results.S(ii,xy);
     
     LX = zeros(1,length(Spike_times(:,1)));
-    LY = zeros(1,length(Spike_times(:,1)));
-    LZ = zeros(1,length(Spike_times(:,1)));
+        LY = zeros(1,length(Spike_times(:,1)));
+            LZ = zeros(1,length(Spike_times(:,1)));
     PH = zeros(1,length(Spike_times(:,1)));
 
     try % this 'try/catch' is to avoid crashing if cells are not active in plotting window...
         for i = 1:size(Spike_times,1)
-            try
+           % try
                 % Find the closest 'Location time' to the 'Spike time'
                 [minValue(:,i),closestIndex(:,i)] = min(abs(alignment.out.Location_time-Spike_times(i)));
                 LX(i) = alignment.out.flights(closestIndex(:,i),1);
                 LY(i) = alignment.out.flights(closestIndex(:,i),2);
                 LZ(i) = alignment.out.flights(closestIndex(:,i),3);
                 PH(i) = full(peak_heights(i));
-            catch % we need this if Spiketime occurs before/after the location tracking was on..
-                continue
-            end
+            %catch % we need this if Spiketime occurs before/after the location tracking was on..
+             %   continue
+            %end
         end
         
         % display, in the title, how many bursts there were:
@@ -74,8 +74,7 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
         disp([num2str(size(LX_s)),' Bursts in flight'])
         PH = mat2gray(PH);
         hold on
-        dots = scatter3(LX,LY,LZ,(PH*400)+1,'or','filled');
-        %uistack(dots,'top');
+        scatter3(LX,LY,LZ,(PH*200)+1,'or','filled');
         title(['Cell no ',num2str(ii),'- ',num2str(size(LX_s)),' Bursts in flight: ' batName ' ' dateSesh ' ' sessionType]);
         xlabel('mm'); ylabel('mm');
     catch % if cell was not active...
@@ -85,9 +84,9 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
     
     % Save 'place cells' as jpg and fig files..
     set(findall(gcf,'-property','FontSize'),'FontSize',20);
-    saveas(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.tif']);
-    savefig(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.fig']);
-    saveas(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.svg']);
+    saveas(gcf,[batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.tif']);
+    savefig(gcf,[batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.fig']);
+    saveas(gcf,[batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.svg']);
 
     
     
