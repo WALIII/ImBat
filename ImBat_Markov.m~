@@ -118,8 +118,5 @@ T = find_patterns(VA);
 % Single element transitions- get the lengths of each cell 
 L = cellfun(@length,T);
 %%extract cells of length 5 
-iwant = T(L==2);
-
-
-
+iwant = T(L==2) ;
 

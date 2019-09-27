@@ -8,7 +8,7 @@ function [output] = ImBat_PlaceCells(neuron, out,varargin);
 
 
 
-plotting =0; % save in folder...
+plotting =1; % save in folder...
 out.Location2 = out.flights;
 ROI2Plot = 1:size(neuron.C_raw,1);
 
@@ -155,15 +155,15 @@ Pos(1,:) = LX;
 Pos(2,:) = LY;
 Pos(3,:) = LZ;
 outy = squareform(pdist(Pos'));
-figure(); histogram(outy(:));
-title(['Cell no ',num2str(ii),'  ',num2str(size(LX)),' Bursts in flight']);
+% figure(); histogram(outy(:));
+% title(['Cell no ',num2str(ii),'  ',num2str(size(LX)),' Bursts in flight']);
 outy(outy == 0) = [];
 output.distance = outy;
 
 
 
 % Clear the buffer for the next cell:
-clear LX LY LZ closestIndex Spike_times PH
+clear LX LY LZ closestIndex Spike_times PH Pos
   end
 
  end
