@@ -74,7 +74,7 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
         disp([num2str(size(LX_s)),' Bursts in flight'])
         PH = mat2gray(PH);
         hold on
-        dots = scatter3(LX,LY,LZ,(PH*400)+1,'or','filled');
+        scatter3(LX,LY,LZ,(PH*400)+1,'or','filled');
         %uistack(dots,'top');
         title(['Cell no ',num2str(ii),'- ',num2str(size(LX_s)),' Bursts in flight: ' batName ' ' dateSesh ' ' sessionType]);
         xlabel('mm'); ylabel('mm');

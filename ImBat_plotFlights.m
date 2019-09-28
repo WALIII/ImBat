@@ -28,7 +28,7 @@ if saveFlag == 1
     date = strcat(lower(batName(1:2)),dateSesh);
     label = [batName '_' dateSesh '_' sessionType];
     folderName = extractBefore(pwd,batName);
-    trackData = load([folderName label '_track.mat']);
+    %trackData = load([folderName label '_track.mat']);
 end
 %find ttl pulses for synching
 %event_ttls = trackData.AnalogSignals(:,2); %from motion data
