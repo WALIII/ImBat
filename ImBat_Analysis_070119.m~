@@ -86,8 +86,7 @@ for i = clust; % for this clustered Trajectory ( use one to start)
         ClustFlight(:,:,ii) = A(out.flight_starts_indx(idX(ii))-ForePad:out.flight_starts_indx(idX(ii))+AftPad,:);
         InFlight(:,ii) = b(out.flight_starts_indx(idX(ii))-ForePad:out.flight_starts_indx(idX(ii))+AftPad);
         FlightTimes(:,ii) = At(out.flight_starts_indx(idX(ii))-ForePad:out.flight_starts_indx(idX(ii))+AftPad);
-        CutFlights(:,ii) = Velocity(out.flight_starts_indx(idX(ii))-(ROI_ON/fs)*tfs:out.flight_starts_indx(idX(ii))+(ROI_OFF/fs)*tfs );
-  
+        CutFlights(:,ii) = Velocity(out.flight_starts_indx(idX(ii))-(ROI_ON/fs)*tfs:out.flight_starts_indx(idX(ii))+(ROI_OFF/fs)*tfs );  
     end
 end
 figure(); imagesc(InFlight')

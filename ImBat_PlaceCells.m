@@ -8,7 +8,7 @@
 
 
 
-plotting =0; % save in folder...
+plotting =1; % save in folder...
 out.Location2 = out.flights;
 ROI2Plot = 1:size(neuron.C_raw,1);
 
@@ -50,6 +50,7 @@ for i=1:2:nparams
 
 
 
+
 %Using subplots, show:
 % 1: the velocity/accel of the bat
 % 2: average population activity ( smoothed, average of the
@@ -80,6 +81,13 @@ end
 
 
 
+
+  
+  % Remove that pesky first flight that starts at 0:0;
+a = find(out.flights(:,1) == 0);
+a2 = isnan(out.flights(a(1):end,1));
+a3 = find(a2>0);
+out.flights(a(1):a(1)+a3(1),:) = NaN;
 
 
  if plotting ==1;

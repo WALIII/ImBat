@@ -8,7 +8,7 @@
 
 
 
-plotting =0; % save in folder...
+plotting =1; % save in folder...
 out.Location2 = out.flights;
 ROI2Plot = 1:size(neuron.C_raw,1);
 
@@ -33,9 +33,8 @@ for i=1:2:nparams
         case 'flights'
             out.Location2 = varargin{i+1};
             out.flights = varargin{i+1};
-        case ''
-            out.Location2 = varargin{i+1};
-            out.flights = varargin{i+1};
+        case 'save'
+            plotting = varargin{i+1};
         end                     
     end
 
@@ -81,6 +80,11 @@ end
 
 
 
+% Remove that pesky first flight that starts at 0:0;
+a = find(out.flights(:,1) == 0);
+a2 = isnan(out.flights(a(1):end,1));
+a3 = find(a2>0);
+out.flights(a(1):a(1)+a3(1),:) = NaN;
 
 
  if plotting ==1;
@@ -93,7 +97,7 @@ end
 
   for ii = ROI2Plot; % for each cell
       hold on;
-plot3(out.flights(:,1),out.flights(:,2),out.flights(:,3),'k');% plot the flight trajectory in space
+plot3(out.flights(10:end,1),out.flights(10:end,2),out.flights(10:end,3),'k');% plot the flight trajectory in space
 
 [~,xy] = find(neuron.S(ii,:)>0.1);  % get time neuron is active
 peak_heights = neuron.S(ii,xy);
