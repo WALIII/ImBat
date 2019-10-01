@@ -1,7 +1,7 @@
 function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData,varargin)
 
 nclusters = 6; %nIumber of clusters for kmeans clustering of flight trajectories
-ntrajectories = 3; %number of output trajectories from kmeans that you want to look at
+ntrajectories = 6; %number of output trajectories from kmeans that you want to look at
 
 batName = [];
 dateSesh = [];
@@ -184,13 +184,13 @@ for traj = 1 : 10
         if traj<ntrajectories + 1 % Only plot the first ntrajectories...
             subplot(3,2,traj)
             for nf = allflights{ssf(traj)}
-                %plot(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
-                plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+                plot(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+                %plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
                 hold on
                 %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),50,'r','filled')
                 hold on
-                %scatter(fendxyz(nf,1),fendxyz(nf,2),50,'k','filled')
-                scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')
+                scatter(fendxyz(nf,1),fendxyz(nf,2),50,'k','filled')
+                %scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')
                 hold on
                 %axis equal
                 view(0,90)
@@ -212,12 +212,11 @@ flightPathsClusterAll = figure();
 jj = jet;
 for traj = 1 : ntrajectories
     for nf = allflights{ssf(traj)}
-        %plot(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
-        plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+        plot(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+        %plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
         hold on
         %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),25,'r','filled')
         hold on
-        %scatter(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')
         scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')
         hold on
     end
