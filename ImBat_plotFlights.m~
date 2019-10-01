@@ -1,11 +1,12 @@
 function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData,varargin)
 
-nclusters = 8; %number of clusters for kmeans clustering of flight trajectories
-ntrajectories = 4; %number of output trajectories from kmeans that you want to look at
+nclusters = 6; %nIumber of clusters for kmeans clustering of flight trajectories
+ntrajectories = 6; %number of output trajectories from kmeans that you want to look at
 
 batName = [];
 dateSesh = [];
 sessionType = [];
+saveFlag = 0;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -27,10 +28,7 @@ if saveFlag == 1
     date = strcat(lower(batName(1:2)),dateSesh);
     label = [batName '_' dateSesh '_' sessionType];
     folderName = extractBefore(pwd,batName);
-    trackData = load([pwd '/
-    cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
-    alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/analysis/' label '_flightPaths.mat']);
+    %trackData = load([folderName label '_track.mat']);
 end
 %find ttl pulses for synching
 %event_ttls = trackData.AnalogSignals(:,2); %from motion data
@@ -48,14 +46,21 @@ mx(find(mx == 0)) = nan;
 my(find(my == 0)) = nan;
 mz(find(mz == 0)) = nan;
 
-mx = fillmissing(mx,'nearest');
-my = fillmissing(my,'nearest');
-mz = fillmissing(mz,'nearest');
+trajPartial(1,:) = mx';
+trajPartial(2,:) = my';
+trajPartial(3,:) = mz';
+
+%mxNan = find(mx == nan);
+mxNan = find(isnan(mx));
+
+mxFull = fillmissing(mx,'nearest');
+myFull = fillmissing(my,'nearest');
+mzFull = fillmissing(mz,'nearest');
 
 %threshold based on speed
-Vx = gradient(mx, 1/trackData.VideoFrameRate);
-Vy = gradient(my, 1/trackData.VideoFrameRate);
-Vz = gradient(mz, 1/trackData.VideoFrameRate);
+Vx = gradient(mxFull, 1/trackData.VideoFrameRate);
+Vy = gradient(myFull, 1/trackData.VideoFrameRate);
+Vz = gradient(mzFull, 1/trackData.VideoFrameRate);
 batSpeed = sqrt(Vx.^2 + Vy.^2 + Vz.^2)/1000; %in m/s
 
 nonflying = find(batSpeed < 1.5);
@@ -66,13 +71,15 @@ toofast = find(batSpeed > 35);
 %my([nonflying]) = nan;%my(nonflying) = nan;%my([nonflying; toofast]) = nan;
 %mz([nonflying]) = nan;%mz(nonflying) = nan;%mz([nonflying; toofast]) = nan;
 
-trajectories_continuous(1,:) = mx';
-trajectories_continuous(2,:) = my';
-trajectories_continuous(3,:) = mz';
+
+
+trajectories_continuous(1,:) = mxFull';
+trajectories_continuous(2,:) = myFull';
+trajectories_continuous(3,:) = mzFull';
 
 %plot all flights in black
 flightPathsAll = figure();
-plot3(mx,my,mz,'LineWidth',2,'Color','k')
+plot3(mxFull,myFull,mzFull,'LineWidth',2,'Color','k')
 hold on
 % % modify labels for tick marks
 % xticks = get(gca,'xtick');
@@ -112,16 +119,16 @@ if size(R,2) > 0
     CM = jet(size(R,2));
     for nf = 1 : size(R,2)
         hold on
-        plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',CM(nf,:))
+        plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',CM(nf,:))
         hold on
         
-        fstartxyz(nf,1) = round(nanmean(mx(flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
-        fstartxyz(nf,2) = round(nanmean(my(flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
-        fstartxyz(nf,3) = round(nanmean(mz(flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
+        fstartxyz(nf,1) = round(nanmean(mxFull(flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
+        fstartxyz(nf,2) = round(nanmean(myFull(flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
+        fstartxyz(nf,3) = round(nanmean(mzFull(flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
         
-        fendxyz(nf,1) = round(nanmean(mx(flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
-        fendxyz(nf,2) = round(nanmean(my(flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
-        fendxyz(nf,3) = round(nanmean(mz(flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
+        fendxyz(nf,1) = round(nanmean(mxFull(flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
+        fendxyz(nf,2) = round(nanmean(myFull(flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
+        fendxyz(nf,3) = round(nanmean(mzFull(flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
         
         %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),75,'r','filled')
         hold on
@@ -177,11 +184,13 @@ for traj = 1 : 10
         if traj<ntrajectories + 1 % Only plot the first ntrajectories...
             subplot(3,2,traj)
             for nf = allflights{ssf(traj)}
-                plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+                plot(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+                %plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
                 hold on
                 %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),50,'r','filled')
                 hold on
-                scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')
+                scatter(fendxyz(nf,1),fendxyz(nf,2),50,'k','filled')
+                %scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')
                 hold on
                 %axis equal
                 view(0,90)
@@ -203,7 +212,8 @@ flightPathsClusterAll = figure();
 jj = jet;
 for traj = 1 : ntrajectories
     for nf = allflights{ssf(traj)}
-        plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+        plot(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+        %plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
         hold on
         %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),25,'r','filled')
         hold on
@@ -232,21 +242,21 @@ flightPaths.batSpeed = batSpeed;
 
 if saveFlag == 1
     set(findall(flightPathsAll,'-property','FontSize'),'FontSize',20);
-    saveas('flightpathsAll',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll.tif']);
-    savefig('flightpathsAll',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll.fig']);
-    saveas('flightpathsAll',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll.svg']);
-    set(findall(flightClusterEach,'-property','FontSize'),'FontSize',20);
-    saveas('flightPathsClusterEach',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach.tif']);
-    savefig('flightPathsClusterEach',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach.fig']);
-    saveas('flightPathsClusterEach',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach.svg']);
-    set(findall(flightClusterAll,'-property','FontSize'),'FontSize',20);
-    saveas('flightPathsClusterAll',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll.tif']);
-    savefig('flightPathsClusterAll',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll.fig']);
-    saveas('flightPathsClusterAll',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll.svg']);
+    saveas(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.tif']);
+    savefig(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.fig']);
+    saveas(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.svg']);
+    set(findall(flightPathsClusterEach,'-property','FontSize'),'FontSize',20);
+    saveas(flightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.tif']);
+    savefig(flightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.fig']);
+    saveas(flightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.svg']);
+    set(findall(flightPathsClusterAll,'-property','FontSize'),'FontSize',20);
+    saveas(flightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll_full.tif']);
+    savefig(flightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll_full.fig']);
+    saveas(flightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll_full.svg']);
     set(findall(flightPathsStartStop,'-property','FontSize'),'FontSize',20);
-    saveas('flightPathsStartStop',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop.tif']);
-    savefig('flightPathsStartStop',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop.fig']);
-    saveas('flightPathsStartStop',[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop.svg']);
+    saveas(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.tif']);
+    savefig(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.fig']);
+    saveas(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.svg']);
     save([pwd '\analysis\' batName '_' dateSesh '_' sessionType '_flightPaths.mat'],'flightPaths')
 end
 

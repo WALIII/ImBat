@@ -1,10 +1,8 @@
 function [plotFiringTrajectory] = ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,varargin)
 
-global topROI
 
 offset = 0.1; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
 spikeThresh = 0.1; %threshold for eliminating noise from the S matrix
-topROI = 30;
 
 batName = [];
 dateSesh = [];
@@ -30,7 +28,7 @@ end
 if saveFlag == 1
     date = strcat(lower(batName(1:2)),dateSesh);
     label = [batName '_' dateSesh '_' sessionType];
-    
+    %label = [dateSesh '_' sessionType];
     cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
     alignment = load([pwd '/processed/Alignment.mat']);
     load([pwd '/analysis/' label '_flightPaths.mat']);
@@ -41,8 +39,9 @@ plotFiringTrajectory =  figure();
 
 for ii = 1:length(cellData.results.S(:,1)); % for each cell
     hold on;
-    plot3(alignment.out.flights(:,1),alignment.out.flights(:,2),alignment.out.flights(:,3),'k','LineWidth',2);% plot the flight trajectory in space
-    
+    plot(alignment.out.flights(:,1),alignment.out.flights(:,2),'k','LineWidth',2);% plot the flight trajectory in space
+    %plot3(alignment.out.flights(:,1),alignment.out.flights(:,2),alignment.out.flights(:,3),'k','LineWidth',2);% plot the flight trajectory in space
+
     
     [~,xy] = find(cellData.results.S(ii,:)>spikeThresh);  % get time neuron is active
     xy = xy(xy<length(alignment.out.video_times));
@@ -64,6 +63,7 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
                 LZ(i) = alignment.out.flights(closestIndex(:,i),3);
                 PH(i) = full(peak_heights(i));
             catch % we need this if Spiketime occurs before/after the location tracking was on..
+                disp('cell catch');
                 continue
             end
         end
@@ -74,7 +74,8 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
         disp([num2str(size(LX_s)),' Bursts in flight'])
         PH = mat2gray(PH);
         hold on
-        dots = scatter3(LX,LY,LZ,(PH*400)+1,'or','filled');
+        scatter(LX,LY,(PH*400)+1,'or','filled');
+        %scatter3(LX,LY,LZ,(PH*400)+1,'or','filled');
         %uistack(dots,'top');
         title(['Cell no ',num2str(ii),'- ',num2str(size(LX_s)),' Bursts in flight: ' batName ' ' dateSesh ' ' sessionType]);
         xlabel('mm'); ylabel('mm');
@@ -85,9 +86,9 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
     
     % Save 'place cells' as jpg and fig files..
     set(findall(gcf,'-property','FontSize'),'FontSize',20);
-    saveas(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.tif']);
-    savefig(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.fig']);
-    saveas(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.svg']);
+    saveas(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '_2d.tif']);
+    savefig(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '_2d.fig']);
+    saveas(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '_2d.svg']);
 
     
     
