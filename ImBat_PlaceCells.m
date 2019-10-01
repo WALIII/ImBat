@@ -9,7 +9,6 @@
 
 
 plotting =1; % save in folder...
-out.Location2 = out.flights;
 ROI2Plot = 1:size(neuron.C_raw,1);
 
 % get general data on ROI traces
@@ -88,6 +87,8 @@ a = find(out.flights(:,1) == 0);
 a2 = isnan(out.flights(a(1):end,1));
 a3 = find(a2>0);
 out.flights(a(1):a(1)+a3(1),:) = NaN;
+out.Location2 = out.flights;
+
 
 
  if plotting ==1;
