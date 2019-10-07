@@ -59,7 +59,7 @@ smoothAvgSpiking = zscore(smooth(mean((full(cellData.results.C_raw(1:topROILocal
     %plot zscored spike data for #cells
     a1 = subplot(topROILocal+11,1,11:topROILocal+11);
     hold on
-    for i = [9 31 16 27 26 29 41 46 54 61 68 98 86 87 151]%1:topROILocal
+    for i = 1:topROILocal %[9 31 16 27 26 29 41 46 54 61 68 98 86 87 151]%
         try
             plot(alignment.out.video_times,(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
         catch

@@ -34,13 +34,20 @@ if saveFlag == 1
     load([pwd '/analysis/' label '_flightPaths.mat']);
 end
 
+% Remove that pesky first flight that starts at 0:0;
+a = find(alignment.out.flights(:,1) == 0);
+a2 = isnan(alignment.out.flights(a(1):end,1));
+a3 = find(a2>0);
+alignment.out.flights(a(1):a(1)+a3(1),:) = NaN;
+alignment.out.Location2 = alignment.out.flights;
+
 % Plot the location in space that each cell is active
 plotFiringTrajectory =  figure();
 
 for ii = 1:length(cellData.results.S(:,1)); % for each cell
     hold on;
-    plot(alignment.out.flights(:,1),alignment.out.flights(:,2),'k','LineWidth',2);% plot the flight trajectory in space
-    %plot3(alignment.out.flights(:,1),alignment.out.flights(:,2),alignment.out.flights(:,3),'k','LineWidth',2);% plot the flight trajectory in space
+    %plot(alignment.out.flights(:,1),alignment.out.flights(:,2),'k','LineWidth',2);% plot the flight trajectory in space
+    plot3(alignment.out.flights(:,1),alignment.out.flights(:,2),alignment.out.flights(:,3),'k');%,'LineWidth',2);% plot the flight trajectory in space
 
     
     [~,xy] = find(cellData.results.S(ii,:)>spikeThresh);  % get time neuron is active
@@ -74,8 +81,8 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
         disp([num2str(size(LX_s)),' Bursts in flight'])
         PH = mat2gray(PH);
         hold on
-        scatter(LX,LY,(PH*400)+1,'or','filled');
-        %scatter3(LX,LY,LZ,(PH*400)+1,'or','filled');
+        %scatter(LX,LY,(PH*400)+1,'or','filled');
+        scatter3(LX,LY,LZ,(PH*400)+1,'or','filled');
         %uistack(dots,'top');
         title(['Cell no ',num2str(ii),'- ',num2str(size(LX_s)),' Bursts in flight: ' batName ' ' dateSesh ' ' sessionType]);
         xlabel('mm'); ylabel('mm');
@@ -86,9 +93,9 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
     
     % Save 'place cells' as jpg and fig files..
     set(findall(gcf,'-property','FontSize'),'FontSize',20);
-    saveas(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '_2d.tif']);
-    savefig(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '_2d.fig']);
-    saveas(gcf,[pwd '\analysis\placeCells\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '_2d.svg']);
+    saveas(gcf,[pwd '\analysis\placeCells\recut_' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.tif']);
+    savefig(gcf,[pwd '\analysis\placeCells\recut_' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.fig']);
+    saveas(gcf,[pwd '\analysis\placeCells\recut_' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.svg']);
 
     
     
