@@ -37,8 +37,11 @@ if loadFlag == 1
     load([pwd '/analysis/' label '_flightPaths_6clusters.mat']);
 end
 
-prePad = 2*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
-postPad = 6*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
+prePadCalcium = 2*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
+postPadCalcium = 6*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
+prePadSpeed = 2*120; %add 2 seconds * FS of tracking data (120)
+postPadSpeed = 6*120;%add 6 seconds * FS of tracking data (120)
+
 %meanTrace = cell(1,length(flightPaths.clusterIndex));
 meanTraceAll = []; %initialize the variable to concatenate all traces for uniform zscore
 
@@ -67,18 +70,18 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
         maxDurSpeed = max(durSpeed);
         %meanTrace{clust_i}=zeros(length(cellData.results.C(:,1)),maxDur+preWindow+1);
         %initialize the vector to store the neural activity of each flight
-        trace = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePad+postPad+1);
-        speed{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDurSpeed+prePad+postPad+1);
+        trace = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePadCalcium+postPadCalcium+1);
+        speed{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDurSpeed+prePadSpeed+postPadSpeed+1);
         for trace_i = 1:length(flightPaths.clusterIndex{clust_i})
             try
-                trace(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPad);
-                speed{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePad:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postPad);
+                trace(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
+                speed{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePadSpeed:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postPadSpeed);
                 smoothSpeedRaw{clust_i}(trace_i,:) = smooth(speed{clust_i}(trace_i,:),100);
             catch
-                sizeToRecordingEnd = size(cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:end),2);
+                sizeToRecordingEnd = size(cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:end),2);
                 sizeToTraceEnd = size(trace(trace_i,:),2);
-                trace(trace_i,:) = (cellData.results.C(cell_i,closestIndexStart(trace_i) - prePad:end)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
-                speed{clust_i}(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - prePad:end)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                trace(trace_i,:) = (cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:end + postPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                speed{clust_i}(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - prePadSpeed:end + postPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
                 
             end
         end
@@ -196,7 +199,7 @@ for p = 1:nClusters
         yt = get(gca,'YTick');
         set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
     else
-        set(gca,'xticklabel',{[]},'yticklabel',{[]});
+        %set(gca,'xticklabel',{[]},'yticklabel',{[]});
     end
     p2 = subplot(4,clust_i,[clust_i+p,2*clust_i+p,3*clust_i+p]);
     imagesc(normMeanTraceEach{p},[0.5 5.5]);
@@ -208,7 +211,7 @@ for p = 1:nClusters
         set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
+    %set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
     xlabel('time (s)');
     %hold off
     sgtitle(['Spatial selectivity sort by flight preference: ' batName ' ' dateSesh ' ' sessionType]);
@@ -355,7 +358,7 @@ snakeTrace.snakePlot_clustBy1 = snakePlot_clustBy1;
 snakeTrace.smoothSpeedRaw = smoothSpeedRaw;
 snakeTrace.normMeanTraceEach = normMeanTraceEach;
 snakeTrace.normMeanTraceSort = normMeanTraceSort;
-snakeTrace.normMeanTraceAllSmooth = normMeanTraceAllSmooth;
+%snakeTrace.normMeanTraceAllSmooth = normMeanTraceAllSmooth;
 snakeTrace.normMeanTraceAll = normMeanTraceAll;
 snakeTrace.snakePlot_prefEach = snakePlot_prefEach;
 snakeTrace.snakePlot_prefAll = snakePlot_prefAll;

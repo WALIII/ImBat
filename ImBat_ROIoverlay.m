@@ -31,7 +31,7 @@ end
 Atemp = full(results.A);
 %ROI2plot = (:,:,zeros(length(Atemp(1,:)));
 % get ROI centroids for top 30%;
-for i = 1:round((topROILocal*length(results.A(1,:))))
+for i = [5 39 52 57 64]%1:round((topROILocal*length(results.A(1,:))))
     %create 3d matrix with all ROI heat maps
     ROI2plot(:,:,i) = mat2gray(reshape(Atemp(:,i),Ysiz(1),Ysiz(2)));
     %binarize the coordinates into mask
@@ -44,6 +44,7 @@ for i = 1:round((topROILocal*length(results.A(1,:))))
     centroid(i,1) = mean(ROI_coords{i,1});%*scaling;
     centroid(i,2) = mean(ROI_coords{i,2});%*scaling;%get the centroid of mask
 end
+%ROI_coords = smoothdata(ROI_coords,'gaussian',3); %filter the ROI coordinate mask so it is not so jagged
 hold on
 % modify labels for tick marks
 xticks = get(gca,'xtick');
@@ -74,7 +75,7 @@ if binaryMaskFlag == 1
     for i = 1:length(ROI_coords)
        try
            p = plot(ROI_coords{i,1},ROI_coords{i,2},'LineWidth',8);
-           p.Color(4) = 0.1;
+           p.Color(4) = 0.4;
        catch
        end
     end
