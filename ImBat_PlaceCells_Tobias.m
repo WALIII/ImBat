@@ -7,7 +7,7 @@ spikeThresh = 0.1; %threshold for eliminating noise from the S matrix
 batName = [];
 dateSesh = [];
 sessionType = [];
-saveFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
+loadFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
 
 % User inputs overrides
 nparams=length(varargin);
@@ -19,13 +19,13 @@ for i=1:2:nparams
             dateSesh = varargin{i+1};
         case 'sessiontype'
             sessionType = varargin{i+1};
-        case 'saveflag'
-            saveFlag = varargin{i+1};
+        case 'loadflag'
+            loadFlag = varargin{i+1};
     end
 end
 
 %labels for loading and saving data if running independent fromImBat_analyze
-if saveFlag == 1
+if loadFlag == 1
     date = strcat(lower(batName(1:2)),dateSesh);
     label = [batName '_' dateSesh '_' sessionType];
     %label = [dateSesh '_' sessionType];

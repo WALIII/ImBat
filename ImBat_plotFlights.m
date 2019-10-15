@@ -1,6 +1,6 @@
 function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData,varargin)
 
-nclusters = 6; %nIumber of clusters for kmeans clustering of flight trajectories
+nclusters = 5; %nIumber of clusters for kmeans clustering of flight trajectories
 ntrajectories = 5; %number of output trajectories from kmeans that you want to look at
 
 
