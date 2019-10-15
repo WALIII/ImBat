@@ -3,6 +3,7 @@ function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEa
 nclusters = 6; %nIumber of clusters for kmeans clustering of flight trajectories
 ntrajectories = 5; %number of output trajectories from kmeans that you want to look at
 
+
 batName = [];
 dateSesh = [];
 sessionType = [];
