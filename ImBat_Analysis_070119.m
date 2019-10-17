@@ -125,7 +125,7 @@ roidat2 = (ROI_Data{1,day}.ROIs.results.C_raw);
 % smooth data
 disp('Smoothing data...');
 for i = 1:size(roidat2,1)
-    roidat2(i,:) = smooth(roidat2(i,:),20);
+    roidat2(i,:) = smooth(roidat2(i,:),15);
 end
 
 

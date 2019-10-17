@@ -1,6 +1,6 @@
 
 
-function ImBat_analysis_091219(ROI_Data);
+function [CutCells, CutCells2,Idx] = ImBat_analysis_091219(ROI_Data);
 % manually picked cells- how do things look all together?
 
 
