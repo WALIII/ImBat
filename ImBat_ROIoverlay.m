@@ -1,11 +1,7 @@
-function [ROIoverlay] = ImBat_ROIoverlay(results,Ysiz,centroidFlag,binaryMaskFlag,roiHeatFlag)
+function [ROIoverlay] = ImBat_ROIoverlay(results,Ysiz,centroidFlag,binaryMaskFlag,roiHeatFlag,varargin)
 
-global batName dateSesh sessionType topROI
+global topROI
 
-batName = 'Zack';
-dateSesh = '190529';
-sessionType = 'fly-1';
-topROI = 55;
 %manual inputs
 %centroidFlag = 1;
 %binaryMaskFlag = 1;
@@ -13,13 +9,29 @@ topROI = 55;
 scaling = 8; %depends on size of frame and downsizing from extraction step
 topROILocal = topROI * 0.01; %look at first x% of ROIs
 
+batName = [];
+dateSesh = [];
+sessionType = [];
+
+% User inputs overrides
+nparams=length(varargin);
+for i=1:2:nparams
+    switch lower(varargin{i})
+        case 'batName'
+            batName=varargin{i+1};
+        case 'dateSesh'
+            dateSesh = varargin{i+1};
+        case 'sessionType'
+            sessionType = varargin{i+1};
+    end
+end
 
 % Plot binary mask of all neurons in the A matrix
 %convert A matrix into full matrix
 Atemp = full(results.A);
 %ROI2plot = (:,:,zeros(length(Atemp(1,:)));
 % get ROI centroids for top 30%;
-for i = 1:round((topROILocal*length(results.A(1,:))))
+for i = 45%[5 39 52 57 64]%1:round((topROILocal*length(results.A(1,:))))
     %create 3d matrix with all ROI heat maps
     ROI2plot(:,:,i) = mat2gray(reshape(Atemp(:,i),Ysiz(1),Ysiz(2)));
     %binarize the coordinates into mask
@@ -32,6 +44,7 @@ for i = 1:round((topROILocal*length(results.A(1,:))))
     centroid(i,1) = mean(ROI_coords{i,1});%*scaling;
     centroid(i,2) = mean(ROI_coords{i,2});%*scaling;%get the centroid of mask
 end
+%ROI_coords = smoothdata(ROI_coords,'gaussian',3); %filter the ROI coordinate mask so it is not so jagged
 hold on
 % modify labels for tick marks
 xticks = get(gca,'xtick');
@@ -47,8 +60,12 @@ col = jet(length(ROI_coords));
 %plot centroid over top of max projection
 if centroidFlag == 1
     for i = 1:length(ROI_coords)
-    p = plot(centroid(i,1),centroid(i,2),'o');
-    p.Color(1:3) = col(i,:); 
+        try
+            p = plot(centroid(i,1),centroid(i,2),'o');
+            p.Color(1:3) = col(i,:);
+            
+        catch
+        end
     end
     hold off
 end
@@ -56,8 +73,11 @@ end
 if binaryMaskFlag == 1
     hold on
     for i = 1:length(ROI_coords)
-        p = plot(ROI_coords{i,1},ROI_coords{i,2},'LineWidth',8);
-        p.Color(4) = 0.1;
+       try
+           p = plot(ROI_coords{i,1},ROI_coords{i,2},'LineWidth',8);
+           p.Color(4) = 0.4;
+       catch
+       end
     end
     hold off
 end

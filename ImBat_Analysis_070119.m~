@@ -1,10 +1,16 @@
-function [CutCells, Ydata, ClustFlight] = ImBat_Analysis_070119(ROI_Data,varargin);
+function [CutCells, Ydata, ClustFlight,CutCells2, CutFlights,Velocity] = ImBat_Analysis_070119(ROI_Data,varargin);
 
 %% align ROI data to the cut out flight data...
 
 % Which day
-day = 12;
+day = 3;
 clust = 1;
+LoadY =0;
+fs = 30; % video fs
+tfs = 120; % tracking fs
+% Frame offsets ( a new pad...);
+ROI_ON = 100;
+ROI_OFF = 400;
 
 % Manual inputs
     vin=varargin;
@@ -21,18 +27,20 @@ clust = 1;
         
     end
     
+    if LoadY ==1;
  if exist('Y') ==0; % load in Y from local directory
      disp( 'Y matrix is being loaded from local directory...');
      load([ROI_Data{day}.date,'/',ROI_Data{day}.folder,'/Motion_corrected_Data_DS.mat'])
  end
+    end
      
-
+disp(['Running day ', ROI_Data{day}.date]);
 % Plot flights
 figure();
 a(1) = subplot(2,1,1);
 hold on
-plot(ROI_Data{1,day}.Alignment.out.Location_time,(ROI_Data{1,day}.Alignment.out.flights)/60)
-plot(ROI_Data{1,day}.Alignment.out.video_times,smooth(mean(full(ROI_Data{1,day}.ROIs.results.S(1:20,:)),1))*10,20);
+plot(ROI_Data{1,day}.Alignment.out.Location_time,(ROI_Data{1,day}.Alignment.out.flights)./500)
+plot(ROI_Data{1,day}.Alignment.out.video_times(1:end-1),zscore(smooth(mean(full(ROI_Data{1,day}.ROIs.results.S(1:20,1:end-1)),1),100)));
 a(2) = subplot(2,1,2);
 hold on;
 % C = mean(full(ROI_Data{1,day}.ROIs.results.C(1:50,:)));
@@ -68,12 +76,17 @@ b = double(-b+1);
 ForePad = 10;
 AftPad = 300;
 
+% get velocity:
+Velocity = (abs(diff(ROI_Data{1,day}.Alignment.out.Location2(:,1)))+abs(diff(ROI_Data{1,day}.Alignment.out.Location2(:,2)))+abs(diff(ROI_Data{1,day}.Alignment.out.Location2(:,3))))/3;
+Velocity = smooth(Velocity,100);
+
 for i = clust; % for this clustered Trajectory ( use one to start)
     idX = out.ClusterIndex{i};
     for ii = 1:size(idX,2)
         ClustFlight(:,:,ii) = A(out.flight_starts_indx(idX(ii))-ForePad:out.flight_starts_indx(idX(ii))+AftPad,:);
         InFlight(:,ii) = b(out.flight_starts_indx(idX(ii))-ForePad:out.flight_starts_indx(idX(ii))+AftPad);
         FlightTimes(:,ii) = At(out.flight_starts_indx(idX(ii))-ForePad:out.flight_starts_indx(idX(ii))+AftPad);
+        CutFlights(:,ii) = Velocity(out.flight_starts_indx(idX(ii))-(ROI_ON/fs)*tfs:out.flight_starts_indx(idX(ii))+(ROI_OFF/fs)*tfs );  
     end
 end
 figure(); imagesc(InFlight')
@@ -104,21 +117,26 @@ end
 % typical length:
 RoundFrames = round((FlightTimes(size(FlightTimes,1)) - FlightTimes(1,1) )*30);
 
-
 % plot individual cells
 roidat = ROI_Data{1,day}.ROIs.results.C;
 roidat2 = (ROI_Data{1,day}.ROIs.results.C_raw);
 
-% Frame offsets ( a new pad...);
-ROI_ON = 100;
-ROI_OFF = 400;
+% smooth data
+disp('Smoothing data...');
+for i = 1:size(roidat2,1)
+    roidat2(i,:) = smooth(roidat2(i,:),20);
+end
+
+
 for i = 1:size(FlightTimes,2);
     try
        
        CutCells(:,:,i) = roidat(:,closestIndex_1(:,i)-ROI_ON :closestIndex_1(:,i)+RoundFrames+ROI_OFF);
-       CutCells2(:,:,i) = roidat2(:,closestIndex_1(:,i)-ROI_ON :closestIndex_1(:,i)+RoundFrames+ROI_OFF);
-Ydata(:,:,:,i) = Y(:,:,closestIndex_1(:,i)-ROI_ON :closestIndex_1(:,i)+RoundFrames+ROI_OFF);
-    catch
+      CutCells2(:,:,i) = roidat2(:,closestIndex_1(:,i)-ROI_ON :closestIndex_1(:,i)+RoundFrames+ROI_OFF);
+if exist('Y')
+      Ydata(:,:,:,i) = Y(:,:,closestIndex_1(:,i)-ROI_ON :closestIndex_1(:,i)+RoundFrames+ROI_OFF);
+end
+      catch
         disp('Flight is too close to beginning, or end of flight for current pad setting');
     end
 end
@@ -127,14 +145,18 @@ end
 
 % index of the most likely 'place cells'
 
-mC = squeeze(mean(CutCells(:,:,:),3));
-mCA = (squeeze(mean(CutCells(:,:,1:2:size(CutCells,3)),3)));
-mCB = (squeeze(mean(CutCells(:,:,2:2:size(CutCells,3)),3)));
-figure();
-for i = 1:size(mCA,1)
-mCD(i) = corr(zscore(mCA(i,30:400)'),zscore(mCB(i,30:400)'),'type','Spearman');
-end
+% mC = squeeze(mean(CutCells(:,:,:),3));
+% mCA = (squeeze(mean(CutCells(:,:,1:2:size(CutCells,3)),3)));
+% mCB = (squeeze(mean(CutCells(:,:,2:2:size(CutCells,3)),3)));
+% figure();
+% for i = 1:size(mCA,1)
+% mCD(i) = corr(zscore(mCA(i,30:400)'),zscore(mCB(i,30:400)'),'type','Spearman');
+% end
 
+for i = 1: size(CutCells,1)
+ a = corr(squeeze(CutCells(i,:,:)));
+mCD(:,i) = median(mean((a)));
+end
 % hold on;
 % plot(mCA(i,:));
 % plot(mCB(i,:));
@@ -155,10 +177,11 @@ end
 figure(); 
 histogram(mCD);
 figure();
-for ii = 1:size(mC,1);
+for ii = 1:size(mc42,2);
     i = mc42(ii);
     Dplot = squeeze(CutCells(i,:,:))';
     imagesc(zscore(Dplot,[],2));
+    title(['Cell number ' num2str(i)]);
     pause(0.01);
 end
 
@@ -183,6 +206,12 @@ idx = kmeans(roidat_2,numFlights);
 figure(); imagesc(roidat_2(idx2,:),[0 10]);
 colormap(hot);
 
+
+if exist('Y')
+else
+    Ydata = 0;
+end
+end
 % 
 % 
 % figure(); imagesc(roidat2(indX99,:),[0 10]);

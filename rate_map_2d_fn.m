@@ -2,7 +2,7 @@ function [place_field_density_smoothed_with_NaN_X_Y,place_field_density_smoothed
     peak_firing_rate_X_Y,peak_firing_rate_Z_Y,peak_firing_rate_X_Z,SI_XY,SI_YZ,SI_XZ]...
     = rate_map_2d_fn(pos,firpos,figure_flag)
 %% Parameters for rate map
-frames_per_second = 180;
+frames_per_second = 120;
 room_dimensions = [0 5400 0 5400 0 2000]; % x,y,z
 % room_dimensions = [0 6000 0 6000 0 2000]; % x,y,z
 X_room_dimensions = room_dimensions(1:2);

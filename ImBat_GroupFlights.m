@@ -35,7 +35,7 @@ colorbar;
 
 % Segregate flights:
 
-[out] =  ImBat_SegTrajectories(AllFlights,AllFlightsTime,'nclusters',5,'day_index',DayIndex);
+[out] =  ImBat_SegTrajectories(AllFlights,AllFlightsTime,'nclusters',10,'day_index',DayIndex);
 
 
 
@@ -60,8 +60,10 @@ clear temp;
 end
 linkaxes(ax, 'xy');
 
-figure(); bar(histDat(:,1:6),'stacked'); 
-legend('flightpath 1','flightpath 2','flightpath 3','flightpath 4','flightpath 5','flightpath 6','flightpath 7')
+
+figure(); bar(histDat(:,1:10),'stacked'); 
+colormap(lines(winter));
+legend('flightpath 1','flightpath 2','flightpath 3','flightpath 4','flightpath 5','flightpath 6','flightpath 7','flightpath 8','flightpath 9','flightpath 10')
 title('Distribution of most common sterotyped flight paths');
 xlabel('days')
 ylabel('Number of flights');

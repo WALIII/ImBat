@@ -1,4 +1,4 @@
-function video =  ImBat_denoise(video);% % Video recon
+function video =  ImBat_denoise(video,varargin);% % Video recon
 % ImBat_denoise.m
 
 % Remove wireless artifacts from CaIm video data
@@ -6,25 +6,43 @@ function video =  ImBat_denoise(video);% % Video recon
 % WAL3
 % d05/10/2019
 
+% default params
 display_mov = 0;
-% Additional artifact rejection:
-video = single(video);
+maxItter = 10;
+thresh = 3;
 
-% remove initial baseline trend:
-baseline = (smooth(squeeze(mean(mean(video(1:20,:,:),1),2)),50));
-baseline2 = baseline-mean(baseline);
 
-for ii = 1: size(video,3);
-    video(:,:,ii) =  video(:,:,ii)-baseline2(ii);
-end
+% User inputs overrides
+nparams=length(varargin);
+for i=1:2:nparams
+	switch lower(varargin{i})
+  case 'thresh'
+			thresh=varargin{i+1};
+  case 'itterations'
+          maxItter = varargin{i+1};
+    end
+  end
+
+
+
+  % Additional artifact rejection:
+  video = single(video);
+
+  % remove initial baseline trend:
+  baseline = (smooth(squeeze(mean(mean(video(1:20,:,:),1),2)),50));
+  baseline2 = baseline-mean(baseline);
+
+  for ii = 1: size(video,3);
+      video(:,:,ii) =  video(:,:,ii)-baseline2(ii);
+  end
+
 
 figure();
-for i = 1:10; % 100 itterations...
-thresh = 3;
-% remove large offsets
+for i = 1:maxItter; % 100 itterations...
 
-siga = squeeze(mean(mean(video(:,1:20,:),1),2));
-sigb = squeeze(mean(mean(video(1:20,:,:),1),2));
+% remove large offsets
+siga = squeeze(mean(mean(video(:,[1:20 (end-20):end],:),1),2));
+sigb = squeeze(mean(mean(video([1:20 (end-20):end],:,:),1),2));
 sig = (siga+sigb)/2;
 % sig_base = smooth(sig,50);
 % sig_base = sig_base-mean(sig_base);
