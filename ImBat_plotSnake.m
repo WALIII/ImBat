@@ -183,6 +183,8 @@ for c = 1:nClusters
     normMeanTraceEach{c} = normMeanTraceSort(:,traceIndConcat(c,1):traceIndConcat(c,2));
 end
 
+
+
 %% Plot the clusters normalized and clustered by their preferred flight (max dff across flights)
 snakePlot_prefEach = figure();
 for p = 1:nClusters
@@ -339,29 +341,6 @@ for p = 1:clust_i
     sgtitle(['Spatial selectivity Odd (sorted) vs Even Trials: ' batName ' ' dateSesh ' ' sessionType]);
 end
 
-snakeTrace.meanTrace = meanTrace;
-snakeTrace.normTrace = normTrace;
-snakeTrace.maxNormTrace = maxNormTrace;
-snakeTrace.sortedTrace = B;
-snakeTrace.sortedIndex = I;
-snakeTrace.sortedTraceOdd = Bodd;
-snakeTrace.sortedIndexOdd = Iodd;
-snakeTrace.sortedTraceClustBy1 = B1;
-snakeTrace.sortedIndexClustBy1 = I1;
-snakeTrace.normTraceEven = normTraceEven;
-snakeTrace.normTraceOdd = normTraceOdd;
-snakeTrace.meanSpeed = meanSpeed;
-snakeTrace.smoothSpeed = smoothSpeed;
-snakeTrace.snakePlot_clustAll = snakePlot_clust;
-snakeTrace.snakePlot_clustOddEven = snakePlot_clustOddEven;
-snakeTrace.snakePlot_clustBy1 = snakePlot_clustBy1;
-snakeTrace.smoothSpeedRaw = smoothSpeedRaw;
-snakeTrace.normMeanTraceEach = normMeanTraceEach;
-snakeTrace.normMeanTraceSort = normMeanTraceSort;
-%snakeTrace.normMeanTraceAllSmooth = normMeanTraceAllSmooth;
-snakeTrace.normMeanTraceAll = normMeanTraceAll;
-snakeTrace.snakePlot_prefEach = snakePlot_prefEach;
-snakeTrace.snakePlot_prefAll = snakePlot_prefAll;
 
 %%
 %plot the fully normalized cells according to their peak for each cluster with velocity on top
@@ -431,7 +410,32 @@ for p = 1:clust_i
     sgtitle(['Spatial selectivity (norm) sort by cluster 1: ' batName ' ' dateSesh ' ' sessionType]);
     
 end
-%%
+%% save to snakeTrace variable
+snakeTrace.meanTrace = meanTrace;
+snakeTrace.normTrace = normTrace;
+snakeTrace.maxNormTrace = maxNormTrace;
+snakeTrace.sortedTrace = B;
+snakeTrace.sortedIndex = I;
+snakeTrace.sortedTraceOdd = Bodd;
+snakeTrace.sortedIndexOdd = Iodd;
+snakeTrace.sortedTraceClustBy1 = B1;
+snakeTrace.sortedIndexClustBy1 = I1;
+snakeTrace.normTraceEven = normTraceEven;
+snakeTrace.normTraceOdd = normTraceOdd;
+snakeTrace.meanSpeed = meanSpeed;
+snakeTrace.smoothSpeed = smoothSpeed;
+snakeTrace.snakePlot_clustAll = snakePlot_clust;
+snakeTrace.snakePlot_clustOddEven = snakePlot_clustOddEven;
+snakeTrace.snakePlot_clustBy1 = snakePlot_clustBy1;
+snakeTrace.smoothSpeedRaw = smoothSpeedRaw;
+snakeTrace.normMeanTraceEach = normMeanTraceEach;
+snakeTrace.normMeanTraceSort = normMeanTraceSort;
+%snakeTrace.normMeanTraceAllSmooth = normMeanTraceAllSmooth;
+snakeTrace.normMeanTraceAll = normMeanTraceAll;
+snakeTrace.snakePlot_prefEach = snakePlot_prefEach;
+snakeTrace.snakePlot_prefAll = snakePlot_prefAll;
+snakeTrace.traceIndConcat = traceIndConcat;
+%% save figures and matlab variable
 if saveFlag == 1
     saveas(snakeTrace.snakePlot_clustAll, [pwd '\analysis\snakePlots\' label '_snakePlots_clustAll.svg']);
     saveas(snakeTrace.snakePlot_clustOddEven, [pwd '\analysis\snakePlots\' label '_snakePlots_clustOddEven.svg']);
