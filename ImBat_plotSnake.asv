@@ -53,9 +53,6 @@ postFlightPadSpeed = postFlightPad*120;%add 6 seconds * FS of tracking data (120
 
 %meanTrace = cell(1,length(flightPaths.clusterIndex));
 meanTraceFlightAll = []; %initialize the variable to concatenate all traces for uniform zscore
-meanTracePreAll = []; %initialize the variable to concatenate all traces for uniform zscore
-meanTracePostAll = []; %initialize the variable to concatenate all traces for uniform zscore
-
 
 %this is to merge specific clusters if 2 or more of them are the same but
 %were separated by the flight k-means
@@ -96,16 +93,16 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
                 smoothSpeedRawFlight{clust_i}(trace_i,:) = smooth(speedFlight{clust_i}(trace_i,:),100);
                 tracePre(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
                 speedPre{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - preFlightPadSpeed:flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)));
-                smoothSpeedRawPre{clust_i}(trace_i,:) = smooth(speedPre{clust_i}(trace_i,:),100);
+                smoothSpeedPreRaw{clust_i}(trace_i,:) = smooth(speedPre{clust_i}(trace_i,:),100);
                 tracePost(trace_i,:) = cellData.results.C(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
                 speedPost{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)):flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + postFlightPadCalcium);
-                smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),100);
+                smoothSpeedPostRaw{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),100);
             catch
-%                 sizeToRecordingEnd = size(cellData.results.C(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end),2);
-%                 sizeToTraceEnd = size(traceFlight(trace_i,:),2);
-%                 traceFlight(trace_i,:) = (cellData.results.C(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end + postFlightPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
-%                 speedFlight{clust_i}(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - preFlightPadSpeed:end + postFlightPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
-                 disp('End of rec')
+                sizeToRecordingEnd = size(cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:end),2);
+                sizeToTraceEnd = size(traceFlight(trace_i,:),2);
+                traceFlight(trace_i,:) = (cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:end + postPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                speedFlight{clust_i}(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - prePadSpeed:end + postPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                disp('End of rec')
             end
         end
         
@@ -161,8 +158,8 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
     %concatenate all clusters together and then zscore to equalize the
     %peaks across all trials
     meanTraceFlightAll = [meanTraceFlightAll meanTraceFlight{clust_i}]; %concatenate all traces
-    meanTracePreAll = [meanTracePreAll meanTracePre{clust_i}]; %concatenate all traces
-    meanTracePostAll = [meanTracePostAll meanTracePost{clust_i}]; %concatenate all traces
+    meanTracePreAll = [meanTracePreAll meanTraceFlight{clust_i}]; %concatenate all traces
+    meanTracePostAll = [meanTracePostAll meanTraceFlight{clust_i}]; %concatenate all traces
 
 end
 %% this is to smooth, zscore, and sort the entire cell data by their preferred flight according to a homemade k-means (max dff across flights)
@@ -296,7 +293,6 @@ for p = 1:nClusters
     else
         %set(gca,'xticklabel',{[]},'yticklabel',{[]});
     end
-    
     p2 = subplot(12,clust_i,[clust_i+p,2*clust_i+p,3*clust_i+p]);
     imagesc(normMeanTraceEachFlight{p},[0.5 5.5]);
     colormap(hot);
@@ -310,32 +306,13 @@ for p = 1:nClusters
     %set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
     xlabel('time (s)');
     %hold off
-    
     p3 = subplot(12,clust_i,p+20);
     plot(1:length(smoothSpeedPre{p}),smoothSpeedPre{p},'k');
     hold on
-%     for cell_ii = 1:size(smoothSpeedRawPre{p},1)
-%         plot(1:length(smoothSpeedRawPre{p}(cell_ii,:)),smoothSpeedRawPre{p}(cell_ii,:));
-%     end
-    
-    p4 = subplot(12,clust_i,[clust_i+p+20,2*clust_i+p+20,3*clust_i+p+20]);
-    imagesc(normMeanTraceEachPre{p},[0.5 5.5]);
-    colormap(hot);
-   
-    p5 = subplot(12,clust_i,p+40);
-    plot(1:length(smoothSpeedPost{p}),smoothSpeedPost{p},'k');
-    hold on
-%     for cell_ii = 1:size(smoothSpeedRawPost{p},1)
-%         plot(1:length(smoothSpeedRawPost{p}(cell_ii,:)),smoothSpeedRawPost{p}(cell_ii,:));
-%     end
-    
-    p6 = subplot(12,clust_i,[clust_i+p+40,2*clust_i+p+40,3*clust_i+p+40]);
-    imagesc(normMeanTraceEachPost{p},[0.5 5.5]);
-    colormap(hot);
-    
-    
-    
-    sgtitle(['Selectivity sort by pre/post/flight preference: ' batName ' ' dateSesh ' ' sessionType]);
+    for cell_ii = 1:size(smoothSpeedRawPre{p},1)
+        plot(1:length(smoothSpeedRawPre{p}(cell_ii,:)),smoothSpeedRawPre{p}(cell_ii,:));
+    end
+    sgtitle(['Spatial selectivity sort by flight preference: ' batName ' ' dateSesh ' ' sessionType]);
 end
 
 

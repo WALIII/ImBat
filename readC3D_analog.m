@@ -1,4 +1,4 @@
-function [ ,VideoFrameRate,AnalogSignals,AnalogFrameRate,Event,ParameterGroup,CameraInfo,ResidualError]=readC3D_analog(FullFileName)
+function [Markers,VideoFrameRate,AnalogSignals,AnalogFrameRate,Event,ParameterGroup,CameraInfo,ResidualError]=readC3D_analog(FullFileName)
 % GetC3D:	Getting 3D coordinate/analog data from a C3D file 
 %
 % Input:	FullFileName - file (including path) to be read

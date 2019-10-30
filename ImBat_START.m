@@ -10,7 +10,7 @@ function ImBat_START(varargin)
 
 ROI_flag = 1; % run ROI extraction
 reROI_extract = 0; %rerun ROI extraction
-Analysis_flag = 0; % run basic ROI analysis...
+Analysis_flag = 1; % run basic ROI analysis...
 extract  = 1;
 reExtract =0;
 
