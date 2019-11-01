@@ -185,7 +185,7 @@ for p = 1:snakeTrace.nClusters
         set(gca,'yticklabel',{[]});
     end
     set(gca,'xticklabel',[]);
-    hold on
+
     
     p3 = subplot(12,snakeTrace.nClusters,p+20);
     plot(1:length(snakeTrace.smoothSpeedFlight{p}),snakeTrace.smoothSpeedFlight{p},'k');
@@ -261,7 +261,7 @@ for p = 1:snakeTrace.nClusters
     else
         set(gca,'xticklabel',{[]},'yticklabel',{[]});
     end
-    p2 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p,2*snakeTrace.nClusters+p,3*snakeTrace.nClusters+p]);
+    p2 = subplot(4,snakeTrace.nClusters,[snakeTrace.nClusters+p,2*snakeTrace.nClusters+p,3*snakeTrace.nClusters+p]);
     imagesc(snakeTrace.normTracePre{p}(snakeTrace.I1Pre{p},:));
     colormap(hot);
     %make labels for first left plot only
