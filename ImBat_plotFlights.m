@@ -1,4 +1,3 @@
-function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData,varargin)
 function [flightPaths] = ImBat_plotFlights(trackData,varargin)
 
 nclusters = 5; %nIumber of clusters for kmeans clustering of flight trajectories
