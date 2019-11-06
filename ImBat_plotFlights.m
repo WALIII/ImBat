@@ -1,4 +1,5 @@
 function [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData,varargin)
+function [flightPaths] = ImBat_plotFlights(trackData,varargin)
 
 nclusters = 5; %nIumber of clusters for kmeans clustering of flight trajectories
 ntrajectories = 5; %number of output trajectories from kmeans that you want to look at
@@ -8,6 +9,7 @@ batName = [];
 dateSesh = [];
 sessionType = [];
 saveFlag = 0;
+loadFlag = 0;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -21,11 +23,13 @@ for i=1:2:nparams
             sessionType = varargin{i+1};
         case 'saveflag'
             saveFlag = varargin{i+1};
+                 case 'loadflag'
+            loadFlag = varargin{i+1};   
     end
 end
 
 %labels for loading and saving data if running independent fromImBat_analyze
-if saveFlag == 1
+if loadFlag == 1
     date = strcat(lower(batName(1:2)),dateSesh);
     label = [batName '_' dateSesh '_' sessionType];
     folderName = extractBefore(pwd,batName);
@@ -79,7 +83,7 @@ trajectories_continuous(2,:) = myFull';
 trajectories_continuous(3,:) = mzFull';
 
 %plot all flights in black
-flightPathsAll = figure();
+plotFlightPathsAll = figure();
 plot3(mxFull,myFull,mzFull,'LineWidth',2,'Color','k')
 hold on
 % % modify labels for tick marks
@@ -115,7 +119,7 @@ flight_starts = round(rLT);
 flight_ends = round(fLT);
 
 %cut out flights and save
-flightPathsStartStop = figure();
+plotFlightPathsStartStop = figure();
 if size(R,2) > 0
     CM = jet(size(R,2));
     for nf = 1 : size(R,2)
@@ -178,7 +182,7 @@ end
 
 [~, ssf] = sort(nflights,'descend'); %sort clustered flights
 %plot clustered flights
-flightPathsClusterEach = figure();
+plotFlightPathsClusterEach = figure();
 jj = jet;
 for traj = 1 : 10
     try
@@ -209,7 +213,7 @@ xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
 
 %plot all the clusters in 1 figure in different colors
-flightPathsClusterAll = figure();
+plotFlightPathsClusterAll = figure();
 jj = jet;
 for traj = 1 : ntrajectories
     for nf = allflights{ssf(traj)}
@@ -241,6 +245,11 @@ flightPaths.flight_ends_xyz = fendxyz;
 flightPaths.flight_starts_xyz = fstartxyz;
 flightPaths.trajectories_continuous = trajectories_continuous;
 flightPaths.batSpeed = batSpeed;
+flightPaths.flightPathsAll = plotFlightPathsAll;
+flightPaths.flightPathsClusterEach = plotFlightPathsClusterEach;
+flightPaths.flightPathsClusterAll = plotFlightPathsClusterAll;
+flightPaths.flightPathsStartStop = plotFlightPathsStartStop;
+
 
 if saveFlag == 1
     mkdir('analyis');
@@ -260,7 +269,24 @@ if saveFlag == 1
     saveas(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.tif']);
     savefig(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.fig']);
     saveas(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.svg']);
+
+    set(findall(plotFlightPathsAll,'-property','FontSize'),'FontSize',20);
+    saveas(plotFlightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.tif']);
+    savefig(plotFlightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.fig']);
+    saveas(plotFlightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.svg']);
+    set(findall(plotFlightPathsClusterEach,'-property','FontSize'),'FontSize',20);
+    saveas(plotFlightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.tif']);
+    savefig(plotFlightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.fig']);
+    saveas(plotFlightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.svg']);
+    set(findall(plotFlightPathsClusterAll,'-property','FontSize'),'FontSize',20);
+    saveas(plotFlightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll_full.tif']);
+    savefig(plotFlightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll_full.fig']);
+    saveas(plotFlightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll_full.svg']);
+    set(findall(plotFlightPathsStartStop,'-property','FontSize'),'FontSize',20);
+    saveas(plotFlightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.tif']);
+    savefig(plotFlightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.fig']);
+    saveas(plotFlightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.svg']);
+
     save([pwd '\analysis\' batName '_' dateSesh '_' sessionType '_flightPaths.mat'],'flightPaths')
 end
 
-beta = 1;
