@@ -243,7 +243,7 @@ flightPaths.trajectories_continuous = trajectories_continuous;
 flightPaths.batSpeed = batSpeed;
 
 if saveFlag == 1
-    mkdir('analyis');
+    mkdir(
     set(findall(flightPathsAll,'-property','FontSize'),'FontSize',20);
     saveas(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.tif']);
     savefig(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.fig']);
