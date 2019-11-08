@@ -12,6 +12,7 @@ ntrajectories = 2; %number of output trajectories from kmeans that you want to l
 batName = [];
 dateSesh = [];
 sessionType = [];
+saveFlag = 0;
 
 % User inputs overrides
 nparams=length(varargin);

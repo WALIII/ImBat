@@ -265,6 +265,24 @@ flightPaths.flightPathsStartStop = plotFlightPathsStartStop;
 
 
 if saveFlag == 1
+    mkdir('analyis');
+    set(findall(flightPathsAll,'-property','FontSize'),'FontSize',20);
+    saveas(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.tif']);
+    savefig(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.fig']);
+    saveas(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.svg']);
+    set(findall(flightPathsClusterEach,'-property','FontSize'),'FontSize',20);
+    saveas(flightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.tif']);
+    savefig(flightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.fig']);
+    saveas(flightPathsClusterEach,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.svg']);
+    set(findall(flightPathsClusterAll,'-property','FontSize'),'FontSize',20);
+    saveas(flightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll_full.tif']);
+    savefig(flightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll_full.fig']);
+    saveas(flightPathsClusterAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterAll_full.svg']);
+    set(findall(flightPathsStartStop,'-property','FontSize'),'FontSize',20);
+    saveas(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.tif']);
+    savefig(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.fig']);
+    saveas(flightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.svg']);
+
     set(findall(plotFlightPathsAll,'-property','FontSize'),'FontSize',20);
     saveas(plotFlightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.tif']);
     savefig(plotFlightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.fig']);
@@ -281,7 +299,7 @@ if saveFlag == 1
     saveas(plotFlightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.tif']);
     savefig(plotFlightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.fig']);
     saveas(plotFlightPathsStartStop,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.svg']);
+
     save([pwd '\analysis\' batName '_' dateSesh '_' sessionType '_flightPaths.mat'],'flightPaths')
 end
 
-beta = 1;

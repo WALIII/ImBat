@@ -331,10 +331,12 @@ snakeTrace.nClusters = nClusters;
 snakeTrace.batName = batName;
 snakeTrace.dateSesh = dateSesh;
 snakeTrace.sessionType = sessionType;
-snakeTrace.label = label;
-
+snakeTrace.InormFlightAll = InormFlightAll;
+snakeTrace.normTraceFlightAll = normTraceFlightAll;
+snakeTrace.I1normFlightAll = I1normFlightAll;
 
 if saveFlag == 1
+    snakeTrace.label = label;
    save([pwd '/analysis/' label '_snakePlotData.mat'],'snakeTrace');
 end
 

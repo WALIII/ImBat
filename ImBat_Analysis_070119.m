@@ -3,14 +3,14 @@ function [CutCells, Ydata, ClustFlight,CutCells2, CutFlights,Velocity] = ImBat_A
 %% align ROI data to the cut out flight data...
 
 % Which day
-day = 3;
+day = 12;
 clust = 1;
 LoadY =0;
 fs = 30; % video fs
 tfs = 120; % tracking fs
 % Frame offsets ( a new pad...);
-ROI_ON = 100;
-ROI_OFF = 400;
+ROI_ON = 400;
+ROI_OFF = 500;
 
 % Manual inputs
     vin=varargin;
@@ -190,7 +190,7 @@ end
 
 clear temp data
 for i = 1:size(CutCells,3);
-temp(i,:,:) = CutCells(:,50:300,i)';
+temp(i,:,:) = CutCells(:,:,i)';
 end
 data.undirected = temp(1:2:size(CutCells,3),:,:);
 data.directed = temp(2:2:size(CutCells,3),:,:);

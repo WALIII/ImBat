@@ -8,7 +8,6 @@ batName = [];
 dateSesh = [];
 sessionType = [];
 saveFlag = 0;
-loadFlag = 0;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -22,13 +21,11 @@ for i=1:2:nparams
             sessionType = varargin{i+1};
         case 'saveflag'
             saveFlag = varargin{i+1};
-                 case 'loadflag'
-            loadFlag = varargin{i+1};   
     end
 end
 
 %labels for loading and saving data if running independent fromImBat_analyze
-if loadFlag == 1
+if saveFlag == 1
     date = strcat(lower(batName(1:2)),dateSesh);
     label = [batName '_' dateSesh '_' sessionType];
     folderName = extractBefore(pwd,batName);
@@ -244,10 +241,9 @@ flightPaths.flight_ends_xyz = fendxyz;
 flightPaths.flight_starts_xyz = fstartxyz;
 flightPaths.trajectories_continuous = trajectories_continuous;
 flightPaths.batSpeed = batSpeed;
-flightPaths.flightPathsAll = flightPathsAll;
-flightPaths.flightPathsClusterEach = flightPathsClusterEach;
 
 if saveFlag == 1
+    mkdir(
     set(findall(flightPathsAll,'-property','FontSize'),'FontSize',20);
     saveas(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.tif']);
     savefig(flightPathsAll,[pwd '\analysis\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.fig']);

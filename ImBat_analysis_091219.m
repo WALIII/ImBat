@@ -14,7 +14,7 @@ for i = 1:3
 close all
 end
 
-figure(); hold on;  col = {'r','g','b'}; for i = 1:3 plot(CutFlights{i},col{i}); end
+figure(); hold on;  col = {'r','g','b'}; for i = 1:3 plot((1:size(CutFlights{i},1))/120,CutFlights{i},col{i}); end
 title( ' velocity profiles for clustered flights');
 figure(); 
 hold on;
@@ -34,6 +34,9 @@ All_cells = cat(2, bestCells{1},bestCells{2},bestCells{3});
 
 All_cells = unique(All_cells);
 
+disp('Plotting all cells');
+All_cells = 1:150;
+
 
 for Fl_sort = 1:3; 
 %     Idx = bestCells{Fl_sort};
@@ -50,8 +53,10 @@ IM1  =  zscore(squeeze(CutCells{1}(Idx(i),:,1:9)));
 IM2  =  zscore(squeeze(CutCells{2}(Idx(i),:,1:9)));
 IM3  =  zscore(squeeze(CutCells{3}(Idx(i),:,1:9)));
 % mean cells
+lastFrame = size(IM2,1)-10; % to contorl for pad...
+
 for iii = 1:3
-mIM(:,:,iii) = zscore(squeeze(mean(CutCells{iii}(Idx(b1),1:578,:),3)),[],2);
+mIM(:,:,iii) = zscore(squeeze(mean(CutCells{iii}(Idx(b1),1:lastFrame,:),3)),[],2);
 end
     else
         
@@ -72,9 +77,9 @@ imagesc(IM2',([0 4]));
 subplot(133)
 imagesc(IM3',([0 4])); 
 colormap(hot)
-figure(); [RGB1 RGB2] = CaBMI_XMASS(squeeze(mIM(:,1:578,1)),squeeze(mIM(:,1:578,2)),squeeze(mIM(:,1:578,2)),'HL',[0.3 0.7]); figure(); imagesc(squeeze(RGB1(:,:,1,:)))
+figure(); [RGB1 RGB2] = CaBMI_XMASS(squeeze(mIM(:,1:lastFrame,1)),squeeze(mIM(:,1:lastFrame,2)),squeeze(mIM(:,1:lastFrame,2)),'HL',[0.3 0.7]); figure(); imagesc(squeeze(RGB1(:,:,1,:)))
 
-figure(); [RGB1 RGB2] = CaBMI_XMASS(IM1(1:578,:)',IM2(1:578,:)',IM3(1:578,:)','HL',[0.3 0.7]); figure(); imagesc(squeeze(RGB1(:,:,1,:)))
+figure(); [RGB1 RGB2] = CaBMI_XMASS(IM1(1:lastFrame,:)',IM2(1:lastFrame,:)',IM3(1:lastFrame,:)','HL',[0.3 0.7]); figure(); imagesc(squeeze(RGB1(:,:,1,:)))
 end
 
 

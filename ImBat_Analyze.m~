@@ -132,20 +132,20 @@ for i = 1:length(subFolders)
             mkdir('analysis/flights')
             %plot all flights in 3D
             if flightPathsAllFlag == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
-                [flightPaths] = ImBat_plotFlights(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
+                [flightPathsAll,flightPathsStartStop, flightPaths, flightPathsClusterEach, flightPathsClusterAll] = ImBat_plotFlights(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
                 save([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_flightPaths.mat'],'flightPaths');
-                set(findall(flightPaths.flightPathsAll,'-property','FontSize'),'FontSize',20);
-                savefig(flightPaths.flightPathsAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAll.fig']);
-                saveas(flightPaths.flightPathsAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAll.tif']);
-                set(findall(flightPaths.flightPathsStartStop,'-property','FontSize'),'FontSize',20);
-                savefig(flightPaths.flightPathsStartStop,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAllStartStop.fig']);
-                saveas(flightPaths.flightPathsStartStop, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAllStartStop.tif']);
-                set(findall(flightPaths.flightPathsClusterEach,'-property','FontSize'),'FontSize',20);
-                savefig(flightPaths.flightPathsClusterEach,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterEach.fig']);
-                saveas(flightPaths.flightPathsClusterEach, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterEach.tif']);
-                set(findall(flightPaths.flightPathsClusterAll,'-property','FontSize'),'FontSize',20);
-                savefig(flightPaths.flightPathsClusterAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterAll.fig']);
-                saveas(flightPaths.flightPathsClusterAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterAll.tif']);
+                set(findall(flightPathsAll,'-property','FontSize'),'FontSize',20);
+                savefig(flightPathsAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAll.fig']);
+                saveas(flightPathsAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAll.tif']);
+                set(findall(flightPathsStartStop,'-property','FontSize'),'FontSize',20);
+                savefig(flightPathsStartStop,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAllStartStop.fig']);
+                saveas(flightPathsStartStop, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsAllStartStop.tif']);
+                set(findall(flightPathsClusterEach,'-property','FontSize'),'FontSize',20);
+                savefig(flightPathsClusterEach,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterEach.fig']);
+                saveas(flightPathsClusterEach, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterEach.tif']);
+                set(findall(flightPathsClusterAll,'-property','FontSize'),'FontSize',20);
+                savefig(flightPathsClusterAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterAll.fig']);
+                saveas(flightPathsClusterAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsClusterAll.tif']);
             end
             %plot flights to/from feeder in 3D
             if flightPathsFeederFlag == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
@@ -201,29 +201,29 @@ for i = 1:length(subFolders)
         %load([subFolders(i).folder,'/',subFolders(i).name,'/',imageFolders(kk).name,'/analysis/',batName,'_',dateSesh,'_',sessionType,'_flightPaths.mat']);
         [snakeTrace] = ImBat_snakeData(cellData,flightPaths,alignment)        
         [snakeTrace] = ImBat_plotSnake(snakeTrace)
-        saveas(snakeTrace.snakePlot_clust, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clust.svg']);
+        saveas(snakeTrace.snakePlot_clustAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustAll.svg']);
         saveas(snakeTrace.snakePlot_clustOddEven, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustOddEven.svg']);
         saveas(snakeTrace.snakePlot_clustBy1, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustBy1.svg']);
         saveas(snakeTrace.snakePlot_prefEachPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_prefEachPrePostFlight.svg']);
         saveas(snakeTrace.snakePlot_clustPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_clustPrePostFlight.svg']);
-        saveas(snakeTrace.snakePlot_clust, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustAll.tif']);
+        saveas(snakeTrace.snakePlot_clustAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustAll.tif']);
         saveas(snakeTrace.snakePlot_clustOddEven, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustOddEven.tif']);
         saveas(snakeTrace.snakePlot_clustBy1, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustBy1.tif']);
         saveas(snakeTrace.snakePlot_prefEachPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_prefEachPrePostFlight.tif']);
         saveas(snakeTrace.snakePlot_clustPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_clustPrePostFlight.tif']);
         saveas(snakeTrace.snakePlot_prefAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_prefAll.tif']);
         saveas(snakeTrace.snakePlot_prefAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_prefAll.svg']);
-        saveas(snakeTrace.snakePlot_clustBy1PrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_clustBy1PrePostFlight.tif']);
+        saveas(snakeTrace.snakePlot_clustBy1PrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_clustBy1PrePostFlight.svg']);
         saveas(snakeTrace.snakePlot_clustBy1PrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_clustBy1PrePostFlight.svg']);
 
         save([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_snakePlotData.mat'],'snakeTrace');
-        savefig(snakeTrace.snakePlot_clust, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustAll.fig']);
+        savefig(snakeTrace.snakePlot_clustAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustAll.fig']);
         savefig(snakeTrace.snakePlot_clustOddEven, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustOddEven.fig']);
         savefig(snakeTrace.snakePlot_clustBy1, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_clustBy1.fig']);
         savefig(snakeTrace.snakePlot_clustPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_clustPrePostFlight.fig']);
         savefig(snakeTrace.snakePlot_prefEachPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_prefEachPrePostFlight.fig']);
-        savefig(snakeTrace.snakePlot_prefAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlots_prefAll.fig']);
-        savefig(snakeTrace.snakePlot_clustBy1PrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_clustBy1PrePostFlight.fig']);
+        savefig(snakeTrace.snakePlot_prefAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' label '_snakePlots_prefAll.fig']);
+        savefig(snakeTrace.snakePlot_clustBy1PrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' label '_snakePlot_clustBy1PrePostFlight.fig']);
 
     end
     
