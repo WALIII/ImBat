@@ -53,6 +53,7 @@ postFlightPadSpeed = postFlightPad*120;%add 6 seconds * FS of tracking data (120
 meanTraceFlightAll = []; %initialize the variable to concatenate all traces for uniform zscore
 meanTracePreAll = []; %initialize the variable to concatenate all traces for uniform zscore
 meanTracePostAll = []; %initialize the variable to concatenate all traces for uniform zscore
+meanTracePreFlightPostAll = []; %initialize the variable to concatenate all pre/post/flight traces for uniform zscore
 
 
 %this is to merge specific clusters if 2 or more of them are the same but
@@ -163,7 +164,7 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
     meanTraceFlightAll = [meanTraceFlightAll meanTraceFlight{clust_i}]; %concatenate all traces
     meanTracePreAll = [meanTracePreAll meanTracePre{clust_i}]; %concatenate all traces
     meanTracePostAll = [meanTracePostAll meanTracePost{clust_i}]; %concatenate all traces
-
+    meanTracePreFlightPostAll = [meanTracePreFlightPostAll meanTracePreFlightPost{clust_i} 
 end
 %% this is to smooth, zscore, and sort the entire cell data by their preferred flight according to a homemade k-means (max dff across flights)
 %zscore the full data set and subtract min to start at 0
