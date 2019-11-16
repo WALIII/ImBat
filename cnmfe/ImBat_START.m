@@ -81,7 +81,7 @@ end
     load(track_fname);
     
 
-    % gindex into the flight_subfolder
+% gindex into the flight_subfolder
 cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])
 if extract ==1;    
 % Run processing script 

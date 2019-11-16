@@ -36,8 +36,8 @@ if loadFlag == 1
 end
 
 %padding for during flight snake plot to include some time before and after flight
-prePad = 2; %number of seconds to plot before alignment point for during flight
-postPad = 6; %number of seconds to plot after alignment point for during flight
+prePad = 0; %number of seconds to plot before alignment point for during flight
+postPad = 0; %number of seconds to plot after alignment point for during flight
 prePadCalcium = prePad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postPadCalcium = postPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 prePadSpeed = prePad*120; %add 2 seconds * FS of tracking data (120)
@@ -88,8 +88,8 @@ for cell_i = 1:length(cellData.results.C(:,1))
                 tracePre(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
                 speedPre(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(trace_i) - preFlightPadSpeed:flightPaths.flight_starts_idx(trace_i));
                 smoothSpeedRawPre(trace_i,:) = smooth(speedPre(trace_i,:),100);
-                tracePost(trace_i,:) = cellData.results.C(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
-                speedPost(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(trace_i):flightPaths.flight_ends_idx(trace_i) + postFlightPadSpeed);
+                tracePost(trace_i,:) = cellData.results.C(cell_i,closestIndexEnd(trace_i)+postPadCalcium:closestIndexEnd(trace_i)+postPadCalcium + postFlightPadCalcium);
+                speedPost(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(trace_i)+postPadCalcium:flightPaths.flight_ends_idx(trace_i)+postPadCalcium + postFlightPadSpeed);
                 smoothSpeedRawPost(trace_i,:) = smooth(speedPost(trace_i,:),100);
             catch
                 sizeToRecordingEnd = size(cellData.results.C(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end),2);
@@ -131,7 +131,7 @@ end
     
     %concatenate all clusters together and then zscore to equalize the
     %peaks across all trials
-    meanTracePreFlightPostAll = [meanTraceFlight meanTracePre meanTracePost]; %concatenate all traces
+    meanTracePreFlightPostAll = [meanTracePre meanTraceFlight meanTracePost]; %concatenate all traces
    
 
 %% this is to smooth, zscore, and sort the entire cell data by their preferred flight according to a homemade k-means (max dff across flights)
@@ -142,9 +142,9 @@ for cell_ii = 1:length(cellData.results.C(:,1))
 end
 %split the data back into its pre/during/post flight groups
 %regroup by each flight group
-normTraceFlightAll = normMeanTracePreFlightPostAll(:,preFlightPadCalcium+1:preFlightPadCalcium+maxDur);
+normTraceFlightAll = normMeanTracePreFlightPostAll(:,preFlightPadCalcium+1:preFlightPadCalcium+maxDur+prePadCalcium+postPadCalcium);
 normTracePreAll = normMeanTracePreFlightPostAll(:,1:preFlightPadCalcium);
-normTracePostAll = normMeanTracePreFlightPostAll(:,preFlightPadCalcium+maxDur+1:preFlightPadCalcium+maxDur+postFlightPadCalcium);
+normTracePostAll = normMeanTracePreFlightPostAll(:,preFlightPadCalcium+maxDur+1+prePadCalcium+postPadCalcium:preFlightPadCalcium++prePadCalcium+postPadCalcium+maxDur+postFlightPadCalcium);
 %find the order of the maximum for each flight group within the regrouping
 for cell_iii = 1:length(cellData.results.C(:,1))
     [~,maxNormFlightAll(cell_iii,1)] = max(normTraceFlightAll(cell_iii,:));
@@ -166,7 +166,7 @@ end
 %sort based on each clustered peaks for flight, pre and post
 rng(2);
 for n = 1:size(maxAllPreFlightPost,1);    
-    if maxAllPreFlightPost(n) >= 1 & maxAllPreFlightPost(n) < prePadCalcium +maxDur+postPadCalcium; %if the peak is within each cluster, sort it into that particular cluster
+    if maxAllPreFlightPost(n) >= 1 & maxAllPreFlightPost(n) < prePadCalcium +maxDur+preFlightPadCalcium+postFlightPadCalcium+postPadCalcium+1; %if the peak is within each cluster, sort it into that particular cluster
         kPeaksPreFlightPost(:,n) = 1;
     end
 end
@@ -186,11 +186,12 @@ normMeanTraceSortPreFlightPost(aMatFlight,:) = aSortFlight;
 clear aMatFlight aTempFlight maxIndFlight ImaxFlight BaxFlight aSortFlight
 
 %divide the normMeanTraceSort overall variable into the respective clusters
-normMeanTraceEachFlight = normMeanTraceSortPreFlightPost(:,prePadCalcium+1:prePadCalcium+maxDur);
-normMeanTraceEachPre = normMeanTraceSortPreFlightPost(:,1:prePadCalcium);
-normMeanTraceEachPost = normMeanTraceSortPreFlightPost(:,prePadCalcium+maxDur+1:prePadCalcium+maxDur+postPadCalcium);
+normMeanTraceEachFlight = normMeanTraceSortPreFlightPost(:,preFlightPadCalcium+1:preFlightPadCalcium+prePadCalcium+postPadCalcium+maxDur);
+normMeanTraceEachPre = normMeanTraceSortPreFlightPost(:,1:preFlightPadCalcium);
+normMeanTraceEachPost = normMeanTraceSortPreFlightPost(:,preFlightPadCalcium+prePadCalcium+postPadCalcium+maxDur+1:preFlightPadCalcium+prePadCalcium+postPadCalcium+maxDur+postFlightPadCalcium);
 
 %% save to snakeTrace variable
+snakeTracePrePost.normMeanTraceSortPreFlightPost = normMeanTraceSortPreFlightPost;
 snakeTracePrePost.meanTracePreFlightPostAll=meanTracePreFlightPostAll;
 snakeTracePrePost.maxAllPreFlightPost=maxAllPreFlightPost;
 snakeTracePrePost.normMeanTracePreFlightPostAll=normMeanTracePreFlightPostAll;
@@ -211,6 +212,7 @@ snakeTracePrePost.IFlight = IFlight;
 snakeTracePrePost.BPre = BPre;
 snakeTracePrePost.IPre = IPre;
 snakeTracePrePost.BPost = BPost;
+snakeTracePrePost.IPost = IPost;
 snakeTracePrePost.meanSpeedFlight = meanSpeedFlight;
 snakeTracePrePost.smoothSpeedFlight = smoothSpeedFlight;
 snakeTracePrePost.meanSpeedPre = meanSpeedPre;
