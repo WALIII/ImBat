@@ -26,7 +26,7 @@ filt2use = 3;
 
 figure();
 for i = 1:numClust
-[im1_rgb norm_max_proj{i},I{i},idx_img{i}] = CABMI_allpxs(imresize(Ydata3{i}(:,:,150:250),3),'filt_rad',filt2use,'exp',exp2use);
+[im1_rgb norm_max_proj{i},I{i},idx_img{i}] = CABMI_allpxs(imresize(Ydata3{i}(:,:,150:400),3),'filt_rad',filt2use,'exp',exp2use);
 end
 
 
