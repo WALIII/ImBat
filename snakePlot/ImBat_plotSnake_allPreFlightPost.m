@@ -2,7 +2,7 @@ function [snakeTrace] = ImBat_plotSnake_allPreFlightPost(snakeTrace)
 
 % plot the cells according to their peak for each cluster with velocity on top (pre/post/flight)
 snakePlot_allPrePostFlight = figure();
-for p = 2%snakeTrace.nClusters
+for p = 1:snakeTrace.nClusters
     p1 = subplot(snakeTrace.nClusters*3,3,((p-1)*9)+1);
     plot(1:length(snakeTrace.smoothSpeedPre{p}),snakeTrace.smoothSpeedPre{p},'k');
     hold on

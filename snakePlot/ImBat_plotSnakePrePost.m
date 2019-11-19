@@ -1,4 +1,4 @@
-function [snakeTracePrePost] = ImBat_plotSnake(snakeTracePrePost,varargin)
+function [snakeTracePrePost] = ImBat_plotSnakePrePost(snakeTracePrePost,varargin)
 % User inputs overrides
 saveFlag = 0;
 

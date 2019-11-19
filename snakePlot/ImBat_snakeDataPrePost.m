@@ -43,8 +43,8 @@ postPadCalcium = postPad*cellData.results.Fs; %add 2 seconds to the end of the p
 prePadSpeed = prePad*120; %add 2 seconds * FS of tracking data (120)
 postPadSpeed = postPad*120;%add 6 seconds * FS of tracking data (120)
 %padding for pre and post flight snakePlots
-preFlightPad = 10; %number of seconds to include before flight starts
-postFlightPad = 10; %of of seconds to include after flight ends
+preFlightPad = 15; %number of seconds to include before flight starts
+postFlightPad = 15; %of of seconds to include after flight ends
 preFlightPadCalcium = preFlightPad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postFlightPadCalcium = postFlightPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 preFlightPadSpeed = preFlightPad*120; %add 2 seconds * FS of tracking data (120)
