@@ -81,7 +81,7 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
         maxDurSpeed = max(durSpeed);
         %meanTrace{clust_i}=zeros(length(cellData.results.C(:,1)),maxDur+preWindow+1);
         %initialize the vector to store the neural activity of each flight
-        traceFlight{clust_i}(cell_i) = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePadCalcium+postPadCalcium+1);
+        traceFlight{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePadCalcium+postPadCalcium+1);
         speedFlight{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDurSpeed+prePadSpeed+postPadSpeed+1);
         tracePre{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),preFlightPadCalcium+1);
         speedPre{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),preFlightPadSpeed+1);
@@ -90,7 +90,7 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
         %build the calcium and speed vectors for each flight within each cluster
         for trace_i = 1:length(flightPaths.clusterIndex{clust_i})
             try
-                traceFlight{clust_i}(trace_i,:)(cell_i) = cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
+                traceFlight{clust_i}{cell_i}(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
                 speedFlight{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePadSpeed:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postPadSpeed);
                 smoothTraceRawFlight{clust_i}(trace_i,:) = smooth(traceFlight{clust_i}(trace_i,:),3);
                 smoothSpeedRawFlight{clust_i}(trace_i,:) = smooth(speedFlight{clust_i}(trace_i,:),100);

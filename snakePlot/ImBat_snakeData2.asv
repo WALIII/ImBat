@@ -1,4 +1,4 @@
-function [snakeTrace] = ImBat_snakeData(cellData,flightPaths,alignment,varargin)
+function [snakeTrace] = ImBat_snakeData2(cellData,flightPaths,alignment,varargin)
 
 batName = [];
 dateSesh = [];
@@ -7,9 +7,6 @@ loadFlag = 0; %do you want to load and save the data individually outside of ImB
 saveFlag = 0;
 %offset = 0.1; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
 nClusters = 5; %number of flight trajectories to look at and for k means clustering of whole time series by peak
-preFlightPad = 15; %number of seconds to include before flight starts
-postFlightPad = 15; %of of seconds to include after flight ends
-
 
 % User inputs overrides
 nparams=length(varargin);
@@ -25,12 +22,6 @@ for i=1:2:nparams
             loadFlag = varargin{i+1};
         case 'saveflag'
             saveFlag = varargin{i+1};
-        case 'nclusters'
-            nClusters = varargin{i+1};
-        case 'preflightpad'
-            preFlightPad = varargin{i+1};
-        case 'postflightpad'
-            postFlightPad = varargin{i+1};
     end
 end
 
@@ -51,6 +42,8 @@ postPadCalcium = postPad*cellData.results.Fs; %add 2 seconds to the end of the p
 prePadSpeed = prePad*120; %add 2 seconds * FS of tracking data (120)
 postPadSpeed = postPad*120;%add 6 seconds * FS of tracking data (120)
 %padding for pre and post flight snakePlots
+preFlightPad = 15; %number of seconds to include before flight starts
+postFlightPad = 15; %of of seconds to include after flight ends
 preFlightPadCalcium = preFlightPad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postFlightPadCalcium = postFlightPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 preFlightPadSpeed = preFlightPad*120; %add 2 seconds * FS of tracking data (120)
@@ -103,27 +96,19 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
         %build the calcium and speed vectors for each flight within each cluster
         for trace_i = 1:length(flightPaths.clusterIndex{clust_i})
             try
-                traceFlightIdx{clust_i}(trace_i) = flightPaths.clusterIndex{clust_i}(trace_i);
                 traceFlight{clust_i}(trace_i,:,cell_i) = cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
                 speedFlight{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePadSpeed:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postPadSpeed);
-                smoothTraceRawFlight{clust_i}(trace_i,:,cell_i) = smooth(traceFlight{clust_i}(trace_i,:,cell_i),3);
-                normTraceRawFlight{clust_i}(trace_i,:,cell_i) = zscore(smooth(traceFlight{clust_i}(trace_i,:,cell_i),3));
-                normTraceRawFlight{clust_i}(trace_i,:,cell_i) = normTraceRawFlight{clust_i}(trace_i,:,cell_i) - min(normTraceRawFlight{clust_i}(trace_i,:,cell_i));
+                smoothTraceRawFlight{clust_i}(trace_i,:) = smooth(traceFlight{clust_i}(trace_i,:),3);
                 smoothSpeedRawFlight{clust_i}(trace_i,:) = smooth(speedFlight{clust_i}(trace_i,:),100);
-                tracePre{clust_i}(trace_i,:,cell_i) = cellData.results.C(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
+                tracePre{clust_i}(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
                 speedPre{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - preFlightPadSpeed:flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)));
-                smoothTraceRawPre{clust_i}(trace_i,:,cell_i) = smooth(tracePre{clust_i}(trace_i,:,cell_i),3);
-                normTraceRawPre{clust_i}(trace_i,:,cell_i) = zscore(smooth(tracePre{clust_i}(trace_i,:,cell_i),3));
-                normTraceRawPre{clust_i}(trace_i,:,cell_i) = normTraceRawPre{clust_i}(trace_i,:,cell_i) - min(normTraceRawPre{clust_i}(trace_i,:,cell_i));
+                smoothTraceRawPre{clust_i}(trace_i,:) = smooth(tracePre{clust_i}(trace_i,:),3);
                 smoothSpeedRawPre{clust_i}(trace_i,:) = smooth(speedPre{clust_i}(trace_i,:),100);
-                tracePost{clust_i}(trace_i,:,cell_i) = cellData.results.C(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
+                tracePost{clust_i}(trace_i,:) = cellData.results.C(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
                 speedPost{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postFlightPadSpeed);
-                smoothTraceRawPost{clust_i}(trace_i,:,cell_i) = smooth(tracePost{clust_i}(trace_i,:,cell_i),3);
-                normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smooth(tracePost{clust_i}(trace_i,:,cell_i),3));
-                normTraceRawPost{clust_i}(trace_i,:,cell_i) = normTraceRawPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPost{clust_i}(trace_i,:,cell_i));
+                smoothTraceRawPost{clust_i}(trace_i,:) = smooth(tracePost{clust_i}(trace_i,:),3);
                 smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),100);
             catch
-                disp('catch')
                 sizeToRecordingEnd = size(cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:end),2);
                 sizeToTraceEnd = size(traceFlight{clust_i}(trace_i,:),2);
                 traceFlight{clust_i}(trace_i,:) = (cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:end + postPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
@@ -133,11 +118,11 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
         end
         
         %calculate the mean neural activity across all flights in a cluster for each cell
-        meanTraceFlight{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(:,:,cell_i));
-        meanTraceOdd{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(1:2:end,:,cell_i));
-        meanTraceEven{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(2:2:end,:,cell_i));
-        meanTracePre{clust_i}(cell_i,:) = mean(tracePre{clust_i}(:,:,cell_i));
-        meanTracePost{clust_i}(cell_i,:) = mean(tracePost{clust_i}(:,:,cell_i));
+        meanTraceFlight{clust_i}(cell_i,:) = mean(traceFlight{clust_i});
+        meanTraceOdd{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(1:2:end,:));
+        meanTraceEven{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(2:2:end,:));
+        meanTracePre{clust_i}(cell_i,:) = mean(tracePre{clust_i});
+        meanTracePost{clust_i}(cell_i,:) = mean(tracePost{clust_i});
         meanSpeedFlight{clust_i} = mean(speedFlight{clust_i});
         meanSpeedPre{clust_i} = mean(speedPre{clust_i});
         meanSpeedPost{clust_i} = mean(speedPost{clust_i});
@@ -358,10 +343,6 @@ for c = 1:nClusters
 end
 
 %% save to snakeTrace variable
-snakeTrace.preFlightPadCalcium = preFlightPadCalcium;
-snakeTrace.postFlightPadCalcium = postFlightPadCalcium;
-snakeTrace.preFlightPadSpeed = preFlightPadSpeed;
-snakeTrace.postFlightPadSpeed = postFlightPadSpeed;
 snakeTrace.normMeanTraceSortPreFlightPost = normMeanTraceSortPreFlightPost;
 snakeTrace.meanTracePreFlightPostAll=meanTracePreFlightPostAll;
 snakeTrace.maxAllPreFlightPost=maxAllPreFlightPost;
@@ -428,10 +409,6 @@ snakeTrace.I1normFlightAll = I1normFlightAll;
 snakeTrace.smoothTraceRawPost = smoothTraceRawPost;
 snakeTrace.smoothTraceRawPre = smoothTraceRawPre;
 snakeTrace.smoothTraceRawFlight = smoothTraceRawFlight;
-snakeTrace.traceFlightIdx = traceFlightIdx;
-snakeTrace.normTraceRawPre = normTraceRawPre;
-snakeTrace.normTraceRawFlight = normTraceRawFlight;
-snakeTrace.normTraceRawPost = normTraceRawPost;
 
 if saveFlag == 1
     snakeTrace.label = label;
