@@ -90,8 +90,8 @@ neuron_init = neuron.copy();
 
 %% iteratively update A, C and B
 % parameters, merge neurons
-display_merge = false;          % visually check the merged neurons
-view_neurons = false;           % view all neurons
+display_merge = true;          % visually check the merged neurons
+view_neurons = true;           % view all neurons
 
 % parameters, estimate the background
 spatial_ds_factor = 1;      % spatial downsampling factor. it's for faster estimation

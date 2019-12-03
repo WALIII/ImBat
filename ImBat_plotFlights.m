@@ -22,7 +22,7 @@ for i=1:2:nparams
             sessionType = varargin{i+1};
         case 'saveflag'
             saveFlag = varargin{i+1};
-                 case 'loadflag'
+        case 'loadflag'
             loadFlag = varargin{i+1};   
     end
 end
