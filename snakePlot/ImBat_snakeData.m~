@@ -89,18 +89,18 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
      %calculate max duration for each cluster of trajectories
         maxDur = max(dur);
         maxDurSpeed = max(durSpeed);
-        %meanTrace{clust_i}=zeros(length(cellData.results.C_raw(:,1)),maxDur+preWindow+1);
+        %meanTrace{clust_i}=zeros(length(cellData.results.C(:,1)),maxDur+preWindow+1);
     %initialize the vector to store the neural activity of each flight
-        traceFlight{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePadCalcium+postPadCalcium+1,length(cellData.results.C_raw(:,1)));
+        traceFlight{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePadCalcium+postPadCalcium+1,length(cellData.results.C(:,1)));
         speedFlight{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDurSpeed+prePadSpeed+postPadSpeed+1);
-        tracePre{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),preFlightPadCalcium+1,length(cellData.results.C_raw(:,1)));
+        tracePre{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),preFlightPadCalcium+1,length(cellData.results.C(:,1)));
         speedPre{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),preFlightPadSpeed+1);
-        tracePost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),postFlightPadCalcium+1,length(cellData.results.C_raw(:,1)));
+        tracePost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),postFlightPadCalcium+1,length(cellData.results.C(:,1)));
         speedPost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),postFlightPadSpeed+1);
         tracePreFlightPost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),length(tracePre{clust_i}(1,:,1)) + length(traceFlight{clust_i}(1,:,1)) + length(tracePost{clust_i}(1,:,1)));
         speedPreFlightPost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),length(speedPre{clust_i}(1,:)) + length(speedFlight{clust_i}(1,:)) + length(speedPost{clust_i}(1,:))); 
         %for each cell
-    for cell_i = 1:length(cellData.results.C_raw(:,1))
+    for cell_i = 1:length(cellData.results.C(:,1))
         %build the calcium and speed vectors for each flight within each cluster
         for trace_i = 1:length(flightPaths.clusterIndex{clust_i})
             try
@@ -111,13 +111,13 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
                 normTraceRawFlight{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawFlight{clust_i}(trace_i,:,cell_i),0,2);
                 normTraceRawFlight{clust_i}(trace_i,:,cell_i) = normTraceRawFlight{clust_i}(trace_i,:,cell_i) - min(normTraceRawFlight{clust_i}(trace_i,:,cell_i));
                 smoothSpeedRawFlight{clust_i}(trace_i,:) = smooth(speedFlight{clust_i}(trace_i,:),100);
-                tracePre{clust_i}(trace_i,:,cell_i) = cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
+                tracePre{clust_i}(trace_i,:,cell_i) = cellData.results.C(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
                 speedPre{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - preFlightPadSpeed:flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)));
                 smoothTraceRawPre{clust_i}(trace_i,:,cell_i) = smooth(tracePre{clust_i}(trace_i,:,cell_i),3);
                 normTraceRawPre{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPre{clust_i}(trace_i,:,cell_i),0,2);
                 normTraceRawPre{clust_i}(trace_i,:,cell_i) = normTraceRawPre{clust_i}(trace_i,:,cell_i) - min(normTraceRawPre{clust_i}(trace_i,:,cell_i));
                 smoothSpeedRawPre{clust_i}(trace_i,:) = smooth(speedPre{clust_i}(trace_i,:),100);
-                tracePost{clust_i}(trace_i,:,cell_i) = cellData.results.C_raw(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
+                tracePost{clust_i}(trace_i,:,cell_i) = cellData.results.C(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
                 speedPost{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postFlightPadSpeed);
                 smoothTraceRawPost{clust_i}(trace_i,:,cell_i) = smooth(tracePost{clust_i}(trace_i,:,cell_i),3);
                 normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,2);
@@ -126,17 +126,17 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
                 
                 tracePreFlightPost{clust_i}(trace_i,:,cell_i) = cat(2,tracePre{clust_i}(trace_i,:,cell_i),traceFlight{clust_i}(trace_i,:,cell_i),tracePost{clust_i}(trace_i,:,cell_i));
                 speedPreFlightPost{clust_i}(trace_i,:) = horzcat(speedPre{clust_i}(trace_i,:),speedFlight{clust_i}(trace_i,:),speedPost{clust_i}(trace_i,:));
-                smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = smooth(tracePreFlightPost{clust_i}(trace_i,:,cell_i),10);
+                smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = smooth(tracePreFlightPost{clust_i}(trace_i,:,cell_i),3);
                 normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i),0,2);
                 normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i));
                 smoothSpeedRawPreFlightPost{clust_i}(trace_i,:) = smooth(speedPreFlightPost{clust_i}(trace_i,:),100);
                 
             catch
                 disp('catch')
-                %sizeToRecordingEnd = size(cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - prePadCalcium:end),2);
-                %sizeToTraceEnd = size(traceFlight{clust_i}(trace_i,:),2);
-                %traceFlight{clust_i}(trace_i,:,cell_i) = (cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - prePadCalcium:end + postPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
-                %speedFlight{clust_i}(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - prePadSpeed:end + postPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                sizeToRecordingEnd = size(cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:end),2);
+                sizeToTraceEnd = size(traceFlight{clust_i}(trace_i,:),2);
+                traceFlight{clust_i}(trace_i,:,cell_i) = (cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - prePadCalcium:end + postPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                speedFlight{clust_i}(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - prePadSpeed:end + postPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
                 disp('End of rec')
             end
         end
@@ -206,7 +206,7 @@ end
     
 %% this is to smooth, zscore, and sort the entire cell data by their preferred flight according to a homemade k-means (max dff across flights)
 %zscore the full data set and subtract min to start at 0
-for cell_ii = 1:length(cellData.results.C_raw(:,1))
+for cell_ii = 1:length(cellData.results.C(:,1))
     normMeanTraceFlightAll(cell_ii,:) = zscore(smooth(meanTraceFlightAll(cell_ii,:),10));
     normMeanTraceFlightAll(cell_ii,:) = normMeanTraceFlightAll(cell_ii,:) - min(normMeanTraceFlightAll(cell_ii,:));
     normMeanTracePreAll(cell_ii,:) = zscore(smooth(meanTracePreAll(cell_ii,:),10));
@@ -239,7 +239,7 @@ for clust_iii = 1:nClusters
     normTraceFlightClustAll{clust_iii} = normMeanTracePreFlightPostAll{clust_iii}(:,preFlightPadCalcium+1:preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:)));
     normTracePostClustAll{clust_iii} = normMeanTracePreFlightPostAll{clust_iii}(:,preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:))+1:preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:))+postFlightPadCalcium);
     %find the order of the maximum for each cluster within the regrouping
-    for cell_iii = 1:length(cellData.results.C_raw(:,1))
+    for cell_iii = 1:length(cellData.results.C(:,1))
         [~,maxNormFlightAll{clust_iii}(cell_iii,1)] = max(normTraceFlightAll{clust_iii}(cell_iii,:));
         [~,maxNormPreAll{clust_iii}(cell_iii,1)] = max(normTracePreAll{clust_iii}(cell_iii,:));
         [~,maxNormPostAll{clust_iii}(cell_iii,1)] = max(normTracePostAll{clust_iii}(cell_iii,:));

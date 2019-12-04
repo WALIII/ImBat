@@ -336,7 +336,6 @@ elseif plotPreFlightPostFlag == 1
         ylabel('flight trials');
         linkaxes([p5, p7], 'x');
         linkaxes([p6, p8], 'x');
-        sgtitle(['Flights aligned to A or B: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
         pause
         cla(p5)
         cla(p6)
