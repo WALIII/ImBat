@@ -241,7 +241,7 @@ if plotEachFlag == 1
 elseif plotPreFlightPostFlag == 1
     %% plot flight vs cell traces for each cluster for each cell with the pre/flight/post concatenated together in 1 plot
     
-    plotPreFlightPostvsCells_transitions = figure();%'units','normalized','outerposition',[0 0 1 1]);
+    plotPreFlightPostvsCells_transitions = figure('units','normalized','outerposition',[0 0 1 1]);
     %for each flight in the subgroup AtoB
     for flight_i = 1:length(flightTransitions.AtoB)
         

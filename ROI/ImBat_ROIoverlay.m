@@ -31,7 +31,7 @@ end
 Atemp = full(results.A);
 %ROI2plot = (:,:,zeros(length(Atemp(1,:)));
 % get ROI centroids for top 30%;
-for i = 1:round((topROILocal*length(results.A(1,:))))
+for i = 1:round(length(results.A(1,:)))
     %create 3d matrix with all ROI heat maps
     ROI2plot(:,:,i) = mat2gray(reshape(Atemp(:,i),Ysiz(1),Ysiz(2)));
     %binarize the coordinates into mask

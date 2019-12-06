@@ -16,21 +16,21 @@ global topROI
 % d07/24/2019
 
 %topROI is top% of cells you want to look at
-topROI = 60;
+topROI = 80;
 % Manual inputs
 analysisFlag = 1;
 reAnalyze = 1;
 %roi plot flags
-plotROIFlag = 1;
-centroidFlag = 1;
-roiHeatFlag = 1;
-binaryMaskFlag = 1;
+plotROIFlag = 0;
+centroidFlag = 0;
+roiHeatFlag = 0;
+binaryMaskFlag = 0;
 %flight plot flags
 plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
 flightPathsFeederFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 1;
+plotPlaceCellsFlag = 0;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 
