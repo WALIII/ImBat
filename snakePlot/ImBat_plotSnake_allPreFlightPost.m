@@ -75,5 +75,9 @@ for p = 1:snakeTrace.nClusters
     xt = get(gca, 'XTick');
     set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     xlabel('time (s)');
+    
+    sgtitle('ROI Activity for all cells resorted for each cluster')
 
 end
+
+snakeTrace.snakePlot_allPrePostFlight = snakePlot_allPrePostFlight;

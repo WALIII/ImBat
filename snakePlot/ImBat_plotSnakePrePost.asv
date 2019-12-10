@@ -12,7 +12,7 @@ end
 
 
 %plot all the flight trajectories concatenated sorted by their preference
-snakePlot_concat_preFlightPost = figure();
+snakePlot_prefAll = figure();
 imagesc(snakeTracePrePost.normMeanTraceSortPreFlightPost);
 colormap(hot);
 ylabel('cell number');
@@ -23,7 +23,7 @@ xlabel('time (s)');
 sgtitle(['Selectivity sort by group preference (pre/post/flight): ' snakeTracePrePost.batName ' ' snakeTracePrePost.dateSesh ' ' snakeTracePrePost.sessionType]);
 
 
-% plot the cells according to their peak within each grouping with velocity on top (pre/post/flight)
+%% plot the cells according to their peak within each grouping with velocity on top (pre/post/flight)
 snakePlot_noClust_withinPrePostFlight = figure();
 
     p1 = subplot(4,3,1);
@@ -88,7 +88,7 @@ snakePlot_noClust_withinPrePostFlight = figure();
     
     sgtitle(['Selectivity sort within groupings (pre/post/flight): ' snakeTracePrePost.batName ' ' snakeTracePrePost.dateSesh ' ' snakeTracePrePost.sessionType]);
   
-% plot the cells according to their peak across the groupings with velocity on top (pre/post/flight)
+%% plot the cells according to their peak across the groupings with velocity on top (pre/post/flight)
 snakePlot_noClust_acrossPrePostFlight = figure();
 
     p1 = subplot(4,3,1);
@@ -153,6 +153,6 @@ snakePlot_noClust_acrossPrePostFlight = figure();
     sgtitle(['Selectivity sort across groups (pre/post/flight): ' snakeTracePrePost.batName ' ' snakeTracePrePost.dateSesh ' ' snakeTracePrePost.sessionType]);
     
     
-    snakeTracePrePost.snakePlot_concat_preFlightPost = snakePlot_concat_preFlightPost;
+    snakeTracePrePost.snakePlot_prefAll = snakePlot_prefAll;
     snakeTracePrePost.snakePlot_noClust_withinPrePostFlight = snakePlot_noClust_withinPrePostFlight;
     snakeTracePrePost.snakePlot_noClust_acrossPrePostFlight = snakePlot_noClust_acrossPrePostFlight; 

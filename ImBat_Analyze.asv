@@ -30,7 +30,7 @@ plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
 flightPathsFeederFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 0;
+plotPlaceCellsFlag = 1;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 plotSnakePrePostFlag = 1;
@@ -241,25 +241,7 @@ for i = 1:length(subFolders)
         savefig(snakeTrace.snakePlot_allPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_allPrePostFlight.fig']);
         saveas(snakeTrace.snakePlot_clust, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_allPrePostFlight.tif']);
         saveas(snakeTrace.snakePlot_clust, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_allPrePostFlight.svg']);
-        
-        %run pre/post/during analysis with large borders to examine overall
-        %population activity of all neurons in snakePlot format 
-        [snakeTracePrePost] = ImBat_snakeDataPrePost(cellData,flightPaths,alignment)
-        save([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_snakeTracePrePost.mat'],'snakeTracePrePost');
-        
-        [snakeTracePrePost] = ImBat_plotSnakePrePost(snakeTracePrePost)
-        save([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_snakeTracePrePost.mat'],'snakeTracePrePost');
-        savefig(snakeTracePrePost.snakePlot_concat_preFlightPost, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_concat_preFlightPost.fig']);
-        saveas(snakeTracePrePost.snakePlot_concat_preFlightPost, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_concat_preFlightPost.tif']);
-        saveas(snakeTracePrePost.snakePlot_concat_preFlightPost, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_concat_preFlightPost.svg']);
-        savefig(snakeTracePrePost.snakePlot_noClust_withinPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_noClust_withinPrePostFlight.fig']);
-        saveas(snakeTracePrePost.snakePlot_noClust_withinPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_noClust_withinPrePostFlight.tif']);
-        saveas(snakeTracePrePost.snakePlot_noClust_withinPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_noClust_withinPrePostFlight.svg']);
-        savefig(snakeTracePrePost.snakePlot_noClust_acrossPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_noClust_acrossPrePostFlight.fig']);
-        saveas(snakeTracePrePost.snakePlot_noClust_acrossPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_noClust_acrossPrePostFlight.tif']);
-        saveas(snakeTracePrePost.snakePlot_noClust_acrossPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/snakePlots/' fileName '_snakePlot_noClust_acrossPrePostFlight.svg']);
-        
-        
+
         end
     
     %plot the dominant A-B transitions with neural data aligned to flight A
@@ -270,8 +252,10 @@ for i = 1:length(subFolders)
         cd([subFolders(i).folder,'/',subFolders(i).name,'/',imageFolders(kk).name,'/analysis/AtoB']) 
         [flightTransitions] = ImBat_transition_flights(flightPaths)
         save([imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/' fileName '_transitions_AtoB.mat'],'flightTransitions');
-        %plot each cell
-        ImBat_plotFlightvsCells_transitions(snakeTrace,flightTransitions,flightPaths,'saveflag',1,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)    
+        ImBat_plotFlightvsCells_transitions(snakeTrace,flightTransitions,flightPaths,'saveflag',1)
+        
+        %plot 
+        [snakeTracePrePost] = ImBat_snakeDataPrePost(cellData,flightPaths,alignment,'saveFlag',1)
     end
     
     close all;    

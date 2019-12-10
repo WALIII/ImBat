@@ -1,6 +1,29 @@
-function ImBat_plotFlightvsCells_transitions(snakeTrace,flightTransitions,flightPaths)
+function ImBat_plotFlightvsCells_transitions(snakeTrace,flightTransitions,flightPaths,varargin)
 plotEachFlag = 0;
 plotPreFlightPostFlag = 1;
+
+batName = [];
+dateSesh = [];
+sessionType = [];
+loadFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
+saveFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
+
+% User inputs overrides
+nparams=length(varargin);
+for i=1:2:nparams
+    switch lower(varargin{i})
+        case 'batname'
+            batName=varargin{i+1};
+        case 'datesesh'
+            dateSesh = varargin{i+1};
+        case 'sessiontype'
+            sessionType = varargin{i+1};
+        case 'loadflag'
+            loadFlag = varargin{i+1};
+        case 'saveflag'
+            saveFlag = varargin{i+1};
+    end
+end
 
 %%plot the pre/post/and flight traces for each cell by their transitions
 if plotEachFlag == 1
@@ -337,7 +360,16 @@ elseif plotPreFlightPostFlag == 1
         linkaxes([p5, p7], 'x');
         linkaxes([p6, p8], 'x');
         sgtitle(['Flights aligned to A or B: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
-        pause
+        if saveFlag ==1
+        % Save 'each cell' as jpg and fig files..
+        set(findall(gcf,'-property','FontSize'),'FontSize',20);
+        saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.tif']);
+        savefig(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.fig']);
+        saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.svg']);
+        else
+          pause
+        end
+        
         cla(p5)
         cla(p6)
         cla(p7)

@@ -93,9 +93,9 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
     
     % Save 'place cells' as jpg and fig files..
     set(findall(gcf,'-property','FontSize'),'FontSize',20);
-    saveas(gcf,[pwd '\recut_' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.tif']);
-    savefig(gcf,[pwd '\recut_' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.fig']);
-    saveas(gcf,[pwd '\recut_' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.svg']);
+    saveas(gcf,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.tif']);
+    savefig(gcf,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.fig']);
+    saveas(gcf,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.svg']);
 
     
     

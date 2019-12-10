@@ -40,11 +40,10 @@ if loadFlag == 1
     label = [batName '_' dateSesh '_' sessionType];
     
     cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
-    alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/analysis/' label '_flightPaths.mat']);
+    alignment = load([pwd '/processed_191206_ar2/Alignment.mat']);
+    load([pwd '/analysis_191208_ar2_cRaw/' label '_flightPaths.mat']);
 end
 %padding for during flight snake plot to include some time before and after flight
-traceData = cellData.results.C_raw; %assign the data from cnmfe output
 prePad = 0; %number of seconds to plot before alignment point
 postPad = 0; %number of seconds to plot after alignment point
 prePadCalcium = prePad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
@@ -60,6 +59,7 @@ traceSmooth = 3; %number of imaging frames to smooth the data by using mean smoo
 speedSmooth = 100; %number of tracking frames to smooth the data by using mean smooth
 
 %meanTrace = cell(1,length(flightPaths.clusterIndex));
+traceData = cellData.results.C_raw; %assign the data from cnmfe output
 meanTraceFlightAll = []; %initialize the variable to concatenate all traces for uniform zscore
 meanTracePreAll = []; %initialize the variable to concatenate all traces for uniform zscore
 meanTracePostAll = []; %initialize the variable to concatenate all traces for uniform zscore
@@ -125,7 +125,7 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
                 smoothTraceRawPost{clust_i}(trace_i,:,cell_i) = smooth(tracePost{clust_i}(trace_i,:,cell_i),traceSmooth);
                 normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,2);
                 normTraceRawPost{clust_i}(trace_i,:,cell_i) = normTraceRawPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPost{clust_i}(trace_i,:,cell_i));
-                smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),speedSmooth);
+                smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),);
                 
                 tracePreFlightPost{clust_i}(trace_i,:,cell_i) = cat(2,tracePre{clust_i}(trace_i,:,cell_i),traceFlight{clust_i}(trace_i,:,cell_i),tracePost{clust_i}(trace_i,:,cell_i));
                 speedPreFlightPost{clust_i}(trace_i,:) = horzcat(speedPre{clust_i}(trace_i,:),speedFlight{clust_i}(trace_i,:),speedPost{clust_i}(trace_i,:));

@@ -515,6 +515,7 @@ snakeTrace.snakePlot_prefEachPrePostFlight = snakePlot_prefEachPrePostFlight;
 snakeTrace.snakePlot_clustPrePostFlight = snakePlot_clustPrePostFlight;
 snakeTrace.snakePlot_clust = snakePlot_clust;
 snakeTrace.snakePlot_prefAll = snakePlot_prefAll;
+snakeTrace.snakePlot_prefEach = snakePlot_prefEach;
 snakeTrace.snakePlot_clustBy1PrePostFlight = snakePlot_clustBy1PrePostFlight;
 %% save figures and matlab variable
 if saveFlag == 1
