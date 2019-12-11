@@ -6,6 +6,7 @@ flightPaths.clusterIndex{2}=cat(2,flightPaths.clusterIndex{2},flightPaths.cluste
 flightPaths.clusterIndex{3} =[];
 flightPaths.clusterIndex= flightPaths.clusterIndex(~cellfun('isempty',flightPaths.clusterIndex));
 
+%initialize the cluster order
 clustOrder = zeros(length(flightPaths.flight_starts_idx(1,:)),1);
 for n = 1:length(flightPaths.flight_starts_idx(1,:))
     for clust_i = 1:length(flightPaths.clusterIndex)

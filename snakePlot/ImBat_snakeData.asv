@@ -1,4 +1,4 @@
-function [snakeTrace] = ImBat_snakeData(cellData,flightPaths,alignment,varargin)
+function [snakeTrace_cRaw,snakeTrace_c] = ImBat_snakeData(cellData,flightPaths,alignment,varargin)
 
 batName = [];
 dateSesh = [];
@@ -40,8 +40,8 @@ if loadFlag == 1
     label = [batName '_' dateSesh '_' sessionType];
     
     cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
-    alignment = load([pwd '/processed_191206_ar2/Alignment.mat']);
-    load([pwd '/analysis_191208_ar2_cRaw/' label '_flightPaths.mat']);
+    alignment = load([pwd '/processed/Alignment.mat']);
+    load([pwd '/analysis/' label '_flightPaths.mat']);
 end
 %padding for during flight snake plot to include some time before and after flight
 prePad = 0; %number of seconds to plot before alignment point
@@ -55,21 +55,9 @@ preFlightPadCalcium = preFlightPad*cellData.results.Fs; %number of frames (secon
 postFlightPadCalcium = postFlightPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 preFlightPadSpeed = preFlightPad*120; %add 2 seconds * FS of tracking data (120)
 postFlightPadSpeed = postFlightPad*120;%add 6 seconds * FS of tracking data (120)
-traceSmooth = 3; %number of imaging frames to smooth the data by using mean smooth
 speedSmooth = 100; %number of tracking frames to smooth the data by using mean smooth
 
-%meanTrace = cell(1,length(flightPaths.clusterIndex));
-traceData = cellData.results.C_raw; %assign the data from cnmfe output
-meanTraceFlightAll = []; %initialize the variable to concatenate all traces for uniform zscore
-meanTracePreAll = []; %initialize the variable to concatenate all traces for uniform zscore
-meanTracePostAll = []; %initialize the variable to concatenate all traces for uniform zscore
-meanTracePreFlightPostAll = []; %initialize the variable to concatenate all pre/post/flight traces for uniform zscore
-traceFlight = cell(1,nClusters);
-tracePre = cell(1,nClusters);
-tracePost = cell(1,nClusters);
-speedFlight = cell(1,nClusters);
-speedPre = cell(1,nClusters);
-speedPost = cell(1,nClusters);
+
 
 %this is to merge specific clusters if 2 or more of them are the same but
 %were separated by the flight k-means
@@ -77,9 +65,56 @@ flightPaths.clusterIndex{2}=cat(2,flightPaths.clusterIndex{2},flightPaths.cluste
 flightPaths.clusterIndex{3} =[];
 flightPaths.clusterIndex= flightPaths.clusterIndex(~cellfun('isempty',flightPaths.clusterIndex));
 
-%for each cluster type
-for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
-            %for each trial in cluster, calculate the start/stop times and duration of the calcium videos
+%for each C_raw and C matrix
+data_i = 1; %start with the cRaw data
+for data_i = 1:2
+    if data_i ==1
+        traceData = cellData.results.C_raw; %assign the data from cnmfe output for C_raw matrix
+        traceSmooth = 3; %number of imaging frames to smooth the data by using mean smooth
+    elseif data_i ==2
+        traceData = cellData.results.C; %assign the data from cnmfe output for C matrix
+        traceSmooth = 3; %number of imaging frames to smooth the data by using mean smooth
+    end
+    
+    %initialize variables
+    %meanTrace = cell(1,length(flightPaths.clusterIndex));
+    meanTraceFlightAll = []; %initialize the variable to concatenate all traces for uniform zscore
+    meanTracePreAll = []; %initialize the variable to concatenate all traces for uniform zscore
+    meanTracePostAll = []; %initialize the variable to concatenate all traces for uniform zscore
+    meanTracePreFlightPostAll = []; %initialize the variable to concatenate all pre/post/flight traces for uniform zscore
+    traceFlight = cell(1,nClusters);
+    tracePre = cell(1,nClusters);
+    tracePost = cell(1,nClusters);
+    speedFlight = cell(1,nClusters);
+    speedPre = cell(1,nClusters);
+    speedPost = cell(1,nClusters);
+    meanTraceFlight = cell(1,nClusters);
+    meanTraceOdd = cell(1,nClusters);
+    meanTraceEven = cell(1,nClusters);
+    meanTracePreFlightPost = cell(1,nClusters);
+    normTraceFlight = cell(1,nClusters);
+    normTraceOdd= cell(1,nClusters);
+    normTraceEven = cell(1,nClusters);
+    tracePreFlightPost = cell(1,nClusters);
+    smoothTraceRawFlight = cell(1,nClusters);
+    normTraceRawFlight = cell(1,nClusters);
+    smoothTraceRawPre = cell(1,nClusters);
+    normTraceRawPre = cell(1,nClusters);
+    smoothTraceRawPost = cell(1,nClusters);
+    normTraceRawPost = cell(1,nClusters);
+    smoothTraceRawPreFlightPost = cell(1,nClusters);
+    normTraceRawPreFlightPost = cell(1,nClusters);
+    speedFlight = cell(1,nClusters);
+    smoothSpeedRawFlight = cell(1,nClusters);
+    smoothSpeedRawPre = cell(1,nClusters);
+    speedPre = cell(1,nClusters);
+    smoothSpeedRawPost = cell(1,nClusters);
+    speedPost = cell(1,nClusters);
+    speedPreFlightPost = cell(1,nClusters);
+    smoothSpeedRawPreFlightPost = cell(1,nClusters);
+    %for each cluster type
+    for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
+        %for each trial in cluster, calculate the start/stop times and duration of the calcium videos
         for dur_i = 1:length(flightPaths.clusterIndex{clust_i})
             %get imaging times of start and stop index converting from tracking to video times
             [minValueStart(dur_i),closestIndexStart(dur_i)] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(dur_i)))));
@@ -88,12 +123,12 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
             %you can pad all flights to the longest flight in that cluster
             dur(dur_i) = closestIndexEnd(dur_i)-closestIndexStart(dur_i);
             durSpeed(dur_i)= flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(dur_i))-flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(dur_i));
-        end    
-     %calculate max duration for each cluster of trajectories
+        end
+        %calculate max duration for each cluster of trajectories
         maxDur = max(dur);
         maxDurSpeed = max(durSpeed);
         %meanTrace{clust_i}=zeros(length(traceData(:,1)),maxDur+preWindow+1);
-    %initialize the vector to store the neural activity of each flight
+        %initialize the vector to store the neural activity of each flight
         traceFlight{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePadCalcium+postPadCalcium+1,length(traceData(:,1)));
         speedFlight{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDurSpeed+prePadSpeed+postPadSpeed+1);
         tracePre{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),preFlightPadCalcium+1,length(traceData(:,1)));
@@ -101,364 +136,453 @@ for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
         tracePost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),postFlightPadCalcium+1,length(traceData(:,1)));
         speedPost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),postFlightPadSpeed+1);
         tracePreFlightPost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),length(tracePre{clust_i}(1,:,1)) + length(traceFlight{clust_i}(1,:,1)) + length(tracePost{clust_i}(1,:,1)));
-        speedPreFlightPost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),length(speedPre{clust_i}(1,:)) + length(speedFlight{clust_i}(1,:)) + length(speedPost{clust_i}(1,:))); 
+        speedPreFlightPost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),length(speedPre{clust_i}(1,:)) + length(speedFlight{clust_i}(1,:)) + length(speedPost{clust_i}(1,:)));
         %for each cell
-    for cell_i = 1:length(traceData(:,1))
-        %build the calcium and speed vectors for each flight within each cluster
-        for trace_i = 1:length(flightPaths.clusterIndex{clust_i})
-            try
-                traceFlightIdx{clust_i}(trace_i) = flightPaths.clusterIndex{clust_i}(trace_i);
-                traceFlight{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
-                speedFlight{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePadSpeed:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postPadSpeed);
-                smoothTraceRawFlight{clust_i}(trace_i,:,cell_i) = smooth(traceFlight{clust_i}(trace_i,:,cell_i),traceSmooth);
-                normTraceRawFlight{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawFlight{clust_i}(trace_i,:,cell_i),0,2);
-                normTraceRawFlight{clust_i}(trace_i,:,cell_i) = normTraceRawFlight{clust_i}(trace_i,:,cell_i) - min(normTraceRawFlight{clust_i}(trace_i,:,cell_i));
-                smoothSpeedRawFlight{clust_i}(trace_i,:) = smooth(speedFlight{clust_i}(trace_i,:),speedSmooth);
-                tracePre{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
-                speedPre{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - preFlightPadSpeed:flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)));
-                smoothTraceRawPre{clust_i}(trace_i,:,cell_i) = smooth(tracePre{clust_i}(trace_i,:,cell_i),traceSmooth);
-                normTraceRawPre{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPre{clust_i}(trace_i,:,cell_i),0,2);
-                normTraceRawPre{clust_i}(trace_i,:,cell_i) = normTraceRawPre{clust_i}(trace_i,:,cell_i) - min(normTraceRawPre{clust_i}(trace_i,:,cell_i));
-                smoothSpeedRawPre{clust_i}(trace_i,:) = smooth(speedPre{clust_i}(trace_i,:),speedSmooth);
-                tracePost{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
-                speedPost{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postFlightPadSpeed);
-                smoothTraceRawPost{clust_i}(trace_i,:,cell_i) = smooth(tracePost{clust_i}(trace_i,:,cell_i),traceSmooth);
-                normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,2);
-                normTraceRawPost{clust_i}(trace_i,:,cell_i) = normTraceRawPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPost{clust_i}(trace_i,:,cell_i));
-                smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),);
-                
-                tracePreFlightPost{clust_i}(trace_i,:,cell_i) = cat(2,tracePre{clust_i}(trace_i,:,cell_i),traceFlight{clust_i}(trace_i,:,cell_i),tracePost{clust_i}(trace_i,:,cell_i));
-                speedPreFlightPost{clust_i}(trace_i,:) = horzcat(speedPre{clust_i}(trace_i,:),speedFlight{clust_i}(trace_i,:),speedPost{clust_i}(trace_i,:));
-                smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = smooth(tracePreFlightPost{clust_i}(trace_i,:,cell_i),traceSmooth);
-                normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i),0,2);
-                normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i));
-                smoothSpeedRawPreFlightPost{clust_i}(trace_i,:) = smooth(speedPreFlightPost{clust_i}(trace_i,:),speedSmooth);
-                
-            catch
-                disp('catch')
-                %sizeToRecordingEnd = size(traceData(cell_i,closestIndexStart(trace_i) - prePadCalcium:end),2);
-                %sizeToTraceEnd = size(traceFlight{clust_i}(trace_i,:),2);
-                %traceFlight{clust_i}(trace_i,:,cell_i) = (traceData(cell_i,closestIndexStart(trace_i) - prePadCalcium:end + postPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
-                %speedFlight{clust_i}(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - prePadSpeed:end + postPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
-                disp('End of rec')
+        for cell_i = 1:length(traceData(:,1))
+            %build the calcium and speed vectors for each flight within each cluster
+            for trace_i = 1:length(flightPaths.clusterIndex{clust_i})
+                try
+                    traceFlightIdx{clust_i}(trace_i) = flightPaths.clusterIndex{clust_i}(trace_i);
+                    traceFlight{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
+                    speedFlight{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePadSpeed:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postPadSpeed);
+                    smoothTraceRawFlight{clust_i}(trace_i,:,cell_i) = smooth(traceFlight{clust_i}(trace_i,:,cell_i),traceSmooth);
+                    normTraceRawFlight{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawFlight{clust_i}(trace_i,:,cell_i),0,2);
+                    normTraceRawFlight{clust_i}(trace_i,:,cell_i) = normTraceRawFlight{clust_i}(trace_i,:,cell_i) - min(normTraceRawFlight{clust_i}(trace_i,:,cell_i));
+                    smoothSpeedRawFlight{clust_i}(trace_i,:) = smooth(speedFlight{clust_i}(trace_i,:),speedSmooth);
+                    tracePre{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
+                    speedPre{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - preFlightPadSpeed:flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)));
+                    smoothTraceRawPre{clust_i}(trace_i,:,cell_i) = smooth(tracePre{clust_i}(trace_i,:,cell_i),traceSmooth);
+                    normTraceRawPre{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPre{clust_i}(trace_i,:,cell_i),0,2);
+                    normTraceRawPre{clust_i}(trace_i,:,cell_i) = normTraceRawPre{clust_i}(trace_i,:,cell_i) - min(normTraceRawPre{clust_i}(trace_i,:,cell_i));
+                    smoothSpeedRawPre{clust_i}(trace_i,:) = smooth(speedPre{clust_i}(trace_i,:),speedSmooth);
+                    tracePost{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
+                    speedPost{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postFlightPadSpeed);
+                    smoothTraceRawPost{clust_i}(trace_i,:,cell_i) = smooth(tracePost{clust_i}(trace_i,:,cell_i),traceSmooth);
+                    normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,2);
+                    normTraceRawPost{clust_i}(trace_i,:,cell_i) = normTraceRawPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPost{clust_i}(trace_i,:,cell_i));
+                    smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),speedSmooth);
+                    tracePreFlightPost{clust_i}(trace_i,:,cell_i) = cat(2,tracePre{clust_i}(trace_i,:,cell_i),traceFlight{clust_i}(trace_i,:,cell_i),tracePost{clust_i}(trace_i,:,cell_i));
+                    speedPreFlightPost{clust_i}(trace_i,:) = horzcat(speedPre{clust_i}(trace_i,:),speedFlight{clust_i}(trace_i,:),speedPost{clust_i}(trace_i,:));
+                    smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = smooth(tracePreFlightPost{clust_i}(trace_i,:,cell_i),traceSmooth);
+                    normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i),0,2);
+                    normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i));
+                    smoothSpeedRawPreFlightPost{clust_i}(trace_i,:) = smooth(speedPreFlightPost{clust_i}(trace_i,:),speedSmooth);
+                    
+                    
+                catch
+%                     tracePost{clust_i}(trace_i,:,cell_i) = [traceData(cell_i,closestIndexEnd(trace_i):end),zeros(1,size(tracePost{clust_i}(trace_i,:,cell_i),2) - size(traceData(cell_i,closestIndexEnd(trace_i):end),2))];
+%                     speedPost{clust_i}(trace_i,:) = [flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):end),zeros(1,size(speedPost{clust_i}(trace_i,:),2)-size(flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):end,2)))];
+%                     smoothTraceRawPost{clust_i}(trace_i,:,cell_i) = smooth(tracePost{clust_i}(trace_i,:,cell_i),traceSmooth);
+%                     normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,2);
+%                     normTraceRawPost{clust_i}(trace_i,:,cell_i) = normTraceRawPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPost{clust_i}(trace_i,:,cell_i));
+%                     smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),speedSmooth);
+                     disp('End of rec')
+                end
+                 
+            end
+            
+            %calculate the mean neural activity across all flights in a cluster for each cell
+            meanTraceFlight{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(:,:,cell_i));
+            meanTraceOdd{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(1:2:end,:,cell_i));
+            meanTraceEven{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(2:2:end,:,cell_i));
+            meanTracePre{clust_i}(cell_i,:) = mean(tracePre{clust_i}(:,:,cell_i));
+            meanTracePost{clust_i}(cell_i,:) = mean(tracePost{clust_i}(:,:,cell_i));
+            meanSpeedFlight{clust_i} = mean(speedFlight{clust_i});
+            meanSpeedPre{clust_i} = mean(speedPre{clust_i});
+            meanSpeedPost{clust_i} = mean(speedPost{clust_i});
+            meanTracePreFlightPost{clust_i}(cell_i,:) = mean(tracePreFlightPost{clust_i}(:,:,cell_i));
+            meanSpeedPreFlightPost{clust_i} = mean(speedPreFlightPost{clust_i});
+            
+            %smooth and zscore the neural data. subtract the min of the zscore so the
+            %min is 0 rather than mean 0
+            normTraceFlight{clust_i}(cell_i,:) = zscore(smooth(meanTraceFlight{clust_i}(cell_i,:),traceSmooth));
+            normTraceFlight{clust_i}(cell_i,:) = normTraceFlight{clust_i}(cell_i,:) - min(normTraceFlight{clust_i}(cell_i,:));
+            smoothSpeedFlight{clust_i} = smooth(meanSpeedFlight{clust_i},40);
+            normTraceOdd{clust_i}(cell_i,:) = zscore(smooth(meanTraceOdd{clust_i}(cell_i,:),traceSmooth));
+            normTraceOdd{clust_i}(cell_i,:) = normTraceOdd{clust_i}(cell_i,:) - min(normTraceOdd{clust_i}(cell_i,:));
+            normTraceEven{clust_i}(cell_i,:) = zscore(smooth(meanTraceEven{clust_i}(cell_i,:),traceSmooth));
+            normTraceEven{clust_i}(cell_i,:) = normTraceEven{clust_i}(cell_i,:) - min(normTraceEven{clust_i}(cell_i,:));
+            normTracePre{clust_i}(cell_i,:) = zscore(smooth(meanTracePre{clust_i}(cell_i,:),traceSmooth));
+            normTracePre{clust_i}(cell_i,:) = normTracePre{clust_i}(cell_i,:) - min(normTracePre{clust_i}(cell_i,:));
+            smoothSpeedPre{clust_i} = smooth(meanSpeedPre{clust_i},40);
+            normTracePost{clust_i}(cell_i,:) = zscore(smooth(meanTracePost{clust_i}(cell_i,:),traceSmooth));
+            normTracePost{clust_i}(cell_i,:) = normTracePost{clust_i}(cell_i,:) - min(normTracePost{clust_i}(cell_i,:));
+            smoothSpeedPost{clust_i} = smooth(meanSpeedPost{clust_i},40);
+            %find time index of max peaks
+            [~,maxnormTraceFlight{clust_i}(cell_i,1)] = max(normTraceFlight{clust_i}(cell_i,:));
+            [~,maxnormTracePre{clust_i}(cell_i,1)] = max(normTracePre{clust_i}(cell_i,:));
+            [~,maxnormTracePost{clust_i}(cell_i,1)] = max(normTracePost{clust_i}(cell_i,:));
+            [~,maxNormTraceOdd{clust_i}(cell_i,1)] = max(normTraceOdd{clust_i}(cell_i,:));
+            
+        end
+        %sort each cell by the timing of its peak firing
+        [BFlight{clust_i},IFlight{clust_i}] = sort(maxnormTraceFlight{clust_i});
+        [BPre{clust_i},IPre{clust_i}] = sort(maxnormTracePre{clust_i});
+        [BPost{clust_i},IPost{clust_i}] = sort(maxnormTracePost{clust_i});
+        [B1Flight{clust_i},I1Flight{clust_i}] = sort(maxnormTraceFlight{1}); %sort by cluster 1
+        [B1Pre{clust_i},I1Pre{clust_i}] = sort(maxnormTracePre{1}); %sort by cluster 1
+        [B1Post{clust_i},I1Post{clust_i}] = sort(maxnormTracePost{1}); %sort by cluster 1
+        [Bodd{clust_i},Iodd{clust_i}] = sort(maxNormTraceOdd{clust_i});
+        %split dataset into even and odd for comparing 2 halves
+        %     normTraceOdd{clust_i} = normTraceFlight{clust_i}(1:2:end,:);
+        %      normTraceEven{clust_i} = normTraceFlight{clust_i}(2:2:end,:);
+        %     %sort odd clusters in ascending order of the peak of the odds
+        %     if length(normTraceOdd{clust_i}(:,1))>length(normTraceEven{clust_i}(:,1)) %if number of odd elements is greater than even
+        %     [Bodd{clust_i},Iodd{clust_i}] = sort(maxNormTrace{clust_i}(1:2:end-1));
+        %     else
+        %     [Bodd{clust_i},Iodd{clust_i}] = sort(maxnormTraceFlight{clust_i}(1:2:end));
+        %     end
+        
+        %concatenate all clusters together and then zscore to equalize the
+        %peaks across all trials
+        meanTraceFlightAll = [meanTraceFlightAll meanTraceFlight{clust_i}]; %concatenate all traces
+        meanTracePreAll = [meanTracePreAll meanTracePre{clust_i}]; %concatenate all traces
+        meanTracePostAll = [meanTracePostAll meanTracePost{clust_i}]; %concatenate all traces
+        meanTracePreFlightPostAll{clust_i} = [meanTracePre{clust_i} meanTraceFlight{clust_i} meanTracePost{clust_i}];
+        
+        
+    end
+    
+    
+    %% this is to smooth, zscore, and sort the entire cell data by their preferred flight according to a homemade k-means (max dff across flights)
+    %zscore the full data set and subtract min to start at 0
+    for cell_ii = 1:length(traceData(:,1))
+        normMeanTraceFlightAll(cell_ii,:) = zscore(smooth(meanTraceFlightAll(cell_ii,:),traceSmooth));
+        normMeanTraceFlightAll(cell_ii,:) = normMeanTraceFlightAll(cell_ii,:) - min(normMeanTraceFlightAll(cell_ii,:));
+        normMeanTracePreAll(cell_ii,:) = zscore(smooth(meanTracePreAll(cell_ii,:),traceSmooth));
+        normMeanTracePreAll(cell_ii,:) = normMeanTracePreAll(cell_ii,:) - min(normMeanTracePreAll(cell_ii,:));
+        normMeanTracePostAll(cell_ii,:) = zscore(smooth(meanTracePostAll(cell_ii,:),traceSmooth));
+        normMeanTracePostAll(cell_ii,:) = normMeanTracePostAll(cell_ii,:) - min(normMeanTracePostAll(cell_ii,:));
+        for clust_i = 1:nClusters
+            normMeanTracePreFlightPostAll{clust_i}(cell_ii,:) = zscore(smooth(meanTracePreFlightPostAll{clust_i}(cell_ii,:),traceSmooth));
+            normMeanTracePreFlightPostAll{clust_i}(cell_ii,:) = normMeanTracePreFlightPostAll{clust_i}(cell_ii,:) - min(normMeanTracePreFlightPostAll{clust_i}(cell_ii,:));
+        end
+    end
+    %split the data back into its clusters
+    traceFlightIndConcat = [1 length(normTraceFlight{1}(1,:))]; %initialize index variable to hold the indices for start/stop of each cluster
+    tracePreIndConcat = [1 length(normTracePre{1}(1,:))]; %initialize index variable to hold the indices for start/stop of each cluster
+    tracePostIndConcat = [1 length(normTracePost{1}(1,:))]; %initialize index variable to hold the indices for start/stop of each cluster
+    
+    %find the start and stop indices for 2nd through n cluster
+    for clust_ii = 2:nClusters
+        traceFlightIndConcat = vertcat(traceFlightIndConcat,[traceFlightIndConcat(clust_ii-1,2)+1 traceFlightIndConcat(clust_ii-1,2)+length(normTraceFlight{clust_ii}(1,:))]);
+        tracePreIndConcat = vertcat(tracePreIndConcat,[tracePreIndConcat(clust_ii-1,2)+1 tracePreIndConcat(clust_ii-1,2)+length(normTracePre{clust_ii}(1,:))]);
+        tracePostIndConcat = vertcat(tracePostIndConcat,[tracePostIndConcat(clust_ii-1,2)+1 tracePostIndConcat(clust_ii-1,2)+length(normTracePost{clust_ii}(1,:))]);
+        
+    end
+    %regroup by each flight cluster
+    for clust_iii = 1:nClusters
+        normTraceFlightAll{clust_iii} = normMeanTraceFlightAll(:,traceFlightIndConcat(clust_iii,1):traceFlightIndConcat(clust_iii,2));
+        normTracePreAll{clust_iii} = normMeanTracePreAll(:,tracePreIndConcat(clust_iii,1):tracePreIndConcat(clust_iii,2));
+        normTracePostAll{clust_iii} = normMeanTracePostAll(:,tracePostIndConcat(clust_iii,1):tracePostIndConcat(clust_iii,2));
+        normTracePreClustAll{clust_iii} = normMeanTracePreFlightPostAll{clust_iii}(:,1:preFlightPadCalcium);
+        normTraceFlightClustAll{clust_iii} = normMeanTracePreFlightPostAll{clust_iii}(:,preFlightPadCalcium+1:preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:)));
+        normTracePostClustAll{clust_iii} = normMeanTracePreFlightPostAll{clust_iii}(:,preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:))+1:preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:))+postFlightPadCalcium);
+        %find the order of the maximum for each cluster within the regrouping
+        for cell_iii = 1:length(traceData(:,1))
+            [~,maxNormFlightAll{clust_iii}(cell_iii,1)] = max(normTraceFlightAll{clust_iii}(cell_iii,:));
+            [~,maxNormPreAll{clust_iii}(cell_iii,1)] = max(normTracePreAll{clust_iii}(cell_iii,:));
+            [~,maxNormPostAll{clust_iii}(cell_iii,1)] = max(normTracePostAll{clust_iii}(cell_iii,:));
+            [~,maxNormPreClustAll{clust_iii}(cell_iii,1)] = max(normTracePreClustAll{clust_iii}(cell_iii,:));
+            [~,maxNormFlightClustAll{clust_iii}(cell_iii,1)] = max(normTraceFlightClustAll{clust_iii}(cell_iii,:));
+            [~,maxNormPostClustAll{clust_iii}(cell_iii,1)] = max(normTracePostClustAll{clust_iii}(cell_iii,:));
+        end
+        %sort each cell by the timing of its peak firing
+        [BnormFlightAll{clust_iii},InormFlightAll{clust_iii}] = sort(maxNormFlightAll{clust_iii});
+        [B1normFlightAll{clust_iii},I1normFlightAll{clust_iii}] = sort(maxNormFlightAll{1}); %sort by cluster 1
+        [BnormPreAll{clust_iii},InormPreAll{clust_iii}] = sort(maxNormPreAll{clust_iii});
+        [B1normPreAll{clust_iii},I1normPreAll{clust_iii}] = sort(maxNormPreAll{1}); %sort by cluster 1
+        [BnormPostAll{clust_iii},InormPostAll{clust_iii}] = sort(maxNormPostAll{clust_iii});
+        [B1normPostAll{clust_iii},I1normPostAll{clust_iii}] = sort(maxNormPostAll{1}); %sort by cluster 1
+        
+        [BnormPreClustAll{clust_iii},InormPreClustAll{clust_iii}] = sort(maxNormPreClustAll{clust_iii});
+        [B1normPreClustAll{clust_iii},I1normPreClustAll{clust_iii}] = sort(maxNormPreClustAll{1}); %sort by cluster 1
+        [BnormFlightClustAll{clust_iii},InormFlightClustAll{clust_iii}] = sort(maxNormFlightClustAll{clust_iii});
+        [B1FlightClustAll{clust_iii},I1FlightClustAll{clust_iii}] = sort(maxNormFlightClustAll{1}); %sort by cluster 1
+        [BnormPostClustAll{clust_iii},InormPostClustAll{clust_iii}] = sort(maxNormPostClustAll{clust_iii});
+        [B1normPostClustAll{clust_iii},I1normPostClustAll{clust_iii}] = sort(maxNormPostClustAll{1}); %sort by cluster 1
+        
+        
+        
+        
+    end
+    
+    
+    %find max and sort based on the peaks of the cell across the whole
+    %timeseries
+    [~,maxAllFlight] = max(normMeanTraceFlightAll,[],2);
+    [~,maxAllPre] = max(normMeanTracePreAll,[],2);
+    [~,maxAllPost] = max(normMeanTracePostAll,[],2);
+    for clust_i = 1:nClusters
+        [~,maxAllPreFlightPost{clust_i}] = max(normMeanTracePreFlightPostAll{clust_iii},[],2);
+    end
+    
+    
+    %kPeaks = kmeans(maxAll,nClusters); %take k-means cluster of the peaks of each cell whole time
+    %sort based on each clustered peaks for flight, pre and post
+    rng(2);
+    for n = 1:size(maxAllFlight,1)
+        for ii = 1:nClusters
+            if maxAllFlight(n) >= traceFlightIndConcat(ii,1) & maxAllFlight(n) < traceFlightIndConcat(ii,2); %if the peak is within each cluster, sort it into that particular cluster
+                kPeaksFlight(:,n) = 1;
+            end
+            
+        end
+    end
+    for n = 1:size(maxAllPre,1)
+        for ii = 1:nClusters
+            if maxAllPre(n) >= tracePreIndConcat(ii,1) & maxAllPre(n) < tracePreIndConcat(ii,2); %if the peak is within each cluster, sort it into that particular cluster
+                kPeaksPre(:,n) = 1;
             end
         end
-        
-        %calculate the mean neural activity across all flights in a cluster for each cell
-        meanTraceFlight{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(:,:,cell_i));
-        meanTraceOdd{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(1:2:end,:,cell_i));
-        meanTraceEven{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(2:2:end,:,cell_i));
-        meanTracePre{clust_i}(cell_i,:) = mean(tracePre{clust_i}(:,:,cell_i));
-        meanTracePost{clust_i}(cell_i,:) = mean(tracePost{clust_i}(:,:,cell_i));
-        meanSpeedFlight{clust_i} = mean(speedFlight{clust_i});
-        meanSpeedPre{clust_i} = mean(speedPre{clust_i});
-        meanSpeedPost{clust_i} = mean(speedPost{clust_i});
-        meanTracePreFlightPost{clust_i}(cell_i,:) = mean(tracePreFlightPost{clust_i}(:,:,cell_i));
-        meanSpeedPreFlightPost{clust_i} = mean(speedPreFlightPost{clust_i});
-        
-        %smooth and zscore the neural data. subtract the min of the zscore so the
-        %min is 0 rather than mean 0
-        normTraceFlight{clust_i}(cell_i,:) = zscore(smooth(meanTraceFlight{clust_i}(cell_i,:),traceSmooth));
-        normTraceFlight{clust_i}(cell_i,:) = normTraceFlight{clust_i}(cell_i,:) - min(normTraceFlight{clust_i}(cell_i,:));
-        smoothSpeedFlight{clust_i} = smooth(meanSpeedFlight{clust_i},40);
-        normTraceOdd{clust_i}(cell_i,:) = zscore(smooth(meanTraceOdd{clust_i}(cell_i,:),traceSmooth));
-        normTraceOdd{clust_i}(cell_i,:) = normTraceOdd{clust_i}(cell_i,:) - min(normTraceOdd{clust_i}(cell_i,:));
-        normTraceEven{clust_i}(cell_i,:) = zscore(smooth(meanTraceEven{clust_i}(cell_i,:),traceSmooth));
-        normTraceEven{clust_i}(cell_i,:) = normTraceEven{clust_i}(cell_i,:) - min(normTraceEven{clust_i}(cell_i,:));
-        normTracePre{clust_i}(cell_i,:) = zscore(smooth(meanTracePre{clust_i}(cell_i,:),traceSmooth));
-        normTracePre{clust_i}(cell_i,:) = normTracePre{clust_i}(cell_i,:) - min(normTracePre{clust_i}(cell_i,:));       
-        smoothSpeedPre{clust_i} = smooth(meanSpeedPre{clust_i},40);
-        normTracePost{clust_i}(cell_i,:) = zscore(smooth(meanTracePost{clust_i}(cell_i,:),traceSmooth));
-        normTracePost{clust_i}(cell_i,:) = normTracePost{clust_i}(cell_i,:) - min(normTracePost{clust_i}(cell_i,:));       
-        smoothSpeedPost{clust_i} = smooth(meanSpeedPost{clust_i},40);
-        %find time index of max peaks
-        [~,maxnormTraceFlight{clust_i}(cell_i,1)] = max(normTraceFlight{clust_i}(cell_i,:));
-        [~,maxnormTracePre{clust_i}(cell_i,1)] = max(normTracePre{clust_i}(cell_i,:));
-        [~,maxnormTracePost{clust_i}(cell_i,1)] = max(normTracePost{clust_i}(cell_i,:));
-        [~,maxNormTraceOdd{clust_i}(cell_i,1)] = max(normTraceOdd{clust_i}(cell_i,:));
-        
     end
-    %sort each cell by the timing of its peak firing
-    [BFlight{clust_i},IFlight{clust_i}] = sort(maxnormTraceFlight{clust_i});
-    [BPre{clust_i},IPre{clust_i}] = sort(maxnormTracePre{clust_i});
-    [BPost{clust_i},IPost{clust_i}] = sort(maxnormTracePost{clust_i});
-    [B1Flight{clust_i},I1Flight{clust_i}] = sort(maxnormTraceFlight{1}); %sort by cluster 1
-    [B1Pre{clust_i},I1Pre{clust_i}] = sort(maxnormTracePre{1}); %sort by cluster 1
-    [B1Post{clust_i},I1Post{clust_i}] = sort(maxnormTracePost{1}); %sort by cluster 1    
-    [Bodd{clust_i},Iodd{clust_i}] = sort(maxNormTraceOdd{clust_i});
-    %split dataset into even and odd for comparing 2 halves
-    %     normTraceOdd{clust_i} = normTraceFlight{clust_i}(1:2:end,:);
-    %      normTraceEven{clust_i} = normTraceFlight{clust_i}(2:2:end,:);
-    %     %sort odd clusters in ascending order of the peak of the odds
-    %     if length(normTraceOdd{clust_i}(:,1))>length(normTraceEven{clust_i}(:,1)) %if number of odd elements is greater than even
-    %     [Bodd{clust_i},Iodd{clust_i}] = sort(maxNormTrace{clust_i}(1:2:end-1));
-    %     else
-    %     [Bodd{clust_i},Iodd{clust_i}] = sort(maxnormTraceFlight{clust_i}(1:2:end));
-    %     end
-    
-    %concatenate all clusters together and then zscore to equalize the
-    %peaks across all trials
-    meanTraceFlightAll = [meanTraceFlightAll meanTraceFlight{clust_i}]; %concatenate all traces
-    meanTracePreAll = [meanTracePreAll meanTracePre{clust_i}]; %concatenate all traces
-    meanTracePostAll = [meanTracePostAll meanTracePost{clust_i}]; %concatenate all traces
-    meanTracePreFlightPostAll{clust_i} = [meanTracePre{clust_i} meanTraceFlight{clust_i} meanTracePost{clust_i}]; 
-    
-
-end
-    
-    
-%% this is to smooth, zscore, and sort the entire cell data by their preferred flight according to a homemade k-means (max dff across flights)
-%zscore the full data set and subtract min to start at 0
-for cell_ii = 1:length(traceData(:,1))
-    normMeanTraceFlightAll(cell_ii,:) = zscore(smooth(meanTraceFlightAll(cell_ii,:),traceSmooth));
-    normMeanTraceFlightAll(cell_ii,:) = normMeanTraceFlightAll(cell_ii,:) - min(normMeanTraceFlightAll(cell_ii,:));
-    normMeanTracePreAll(cell_ii,:) = zscore(smooth(meanTracePreAll(cell_ii,:),traceSmooth));
-    normMeanTracePreAll(cell_ii,:) = normMeanTracePreAll(cell_ii,:) - min(normMeanTracePreAll(cell_ii,:));
-    normMeanTracePostAll(cell_ii,:) = zscore(smooth(meanTracePostAll(cell_ii,:),traceSmooth));
-    normMeanTracePostAll(cell_ii,:) = normMeanTracePostAll(cell_ii,:) - min(normMeanTracePostAll(cell_ii,:));
+    for n = 1:size(maxAllPost,1)
+        for ii = 1:nClusters
+            if maxAllPost(n) >= tracePostIndConcat(ii,1) & maxAllPost(n) < tracePostIndConcat(ii,2); %if the peak is within each cluster, sort it into that particular cluster
+                kPeaksPost(:,n) = 1;
+            end
+        end
+    end
     for clust_i = 1:nClusters
-        normMeanTracePreFlightPostAll{clust_i}(cell_ii,:) = zscore(smooth(meanTracePreFlightPostAll{clust_i}(cell_ii,:),traceSmooth));
-        normMeanTracePreFlightPostAll{clust_i}(cell_ii,:) = normMeanTracePreFlightPostAll{clust_i}(cell_ii,:) - min(normMeanTracePreFlightPostAll{clust_i}(cell_ii,:));
-    end
-end
-%split the data back into its clusters
-traceFlightIndConcat = [1 length(normTraceFlight{1}(1,:))]; %initialize index variable to hold the indices for start/stop of each cluster
-tracePreIndConcat = [1 length(normTracePre{1}(1,:))]; %initialize index variable to hold the indices for start/stop of each cluster
-tracePostIndConcat = [1 length(normTracePost{1}(1,:))]; %initialize index variable to hold the indices for start/stop of each cluster
-
-%find the start and stop indices for 2nd through n cluster
-for clust_ii = 2:nClusters
-    traceFlightIndConcat = vertcat(traceFlightIndConcat,[traceFlightIndConcat(clust_ii-1,2)+1 traceFlightIndConcat(clust_ii-1,2)+length(normTraceFlight{clust_ii}(1,:))]);
-    tracePreIndConcat = vertcat(tracePreIndConcat,[tracePreIndConcat(clust_ii-1,2)+1 tracePreIndConcat(clust_ii-1,2)+length(normTracePre{clust_ii}(1,:))]);
-    tracePostIndConcat = vertcat(tracePostIndConcat,[tracePostIndConcat(clust_ii-1,2)+1 tracePostIndConcat(clust_ii-1,2)+length(normTracePost{clust_ii}(1,:))]);
-
-end
-%regroup by each flight cluster
-for clust_iii = 1:nClusters
-    normTraceFlightAll{clust_iii} = normMeanTraceFlightAll(:,traceFlightIndConcat(clust_iii,1):traceFlightIndConcat(clust_iii,2));
-    normTracePreAll{clust_iii} = normMeanTracePreAll(:,tracePreIndConcat(clust_iii,1):tracePreIndConcat(clust_iii,2));
-    normTracePostAll{clust_iii} = normMeanTracePostAll(:,tracePostIndConcat(clust_iii,1):tracePostIndConcat(clust_iii,2));
-    normTracePreClustAll{clust_iii} = normMeanTracePreFlightPostAll{clust_iii}(:,1:preFlightPadCalcium);
-    normTraceFlightClustAll{clust_iii} = normMeanTracePreFlightPostAll{clust_iii}(:,preFlightPadCalcium+1:preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:)));
-    normTracePostClustAll{clust_iii} = normMeanTracePreFlightPostAll{clust_iii}(:,preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:))+1:preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:))+postFlightPadCalcium);
-    %find the order of the maximum for each cluster within the regrouping
-    for cell_iii = 1:length(traceData(:,1))
-        [~,maxNormFlightAll{clust_iii}(cell_iii,1)] = max(normTraceFlightAll{clust_iii}(cell_iii,:));
-        [~,maxNormPreAll{clust_iii}(cell_iii,1)] = max(normTracePreAll{clust_iii}(cell_iii,:));
-        [~,maxNormPostAll{clust_iii}(cell_iii,1)] = max(normTracePostAll{clust_iii}(cell_iii,:));
-        [~,maxNormPreClustAll{clust_iii}(cell_iii,1)] = max(normTracePreClustAll{clust_iii}(cell_iii,:));
-        [~,maxNormFlightClustAll{clust_iii}(cell_iii,1)] = max(normTraceFlightClustAll{clust_iii}(cell_iii,:));
-        [~,maxNormPostClustAll{clust_iii}(cell_iii,1)] = max(normTracePostClustAll{clust_iii}(cell_iii,:));
-    end
-    %sort each cell by the timing of its peak firing
-    [BnormFlightAll{clust_iii},InormFlightAll{clust_iii}] = sort(maxNormFlightAll{clust_iii});
-    [B1normFlightAll{clust_iii},I1normFlightAll{clust_iii}] = sort(maxNormFlightAll{1}); %sort by cluster 1
-    [BnormPreAll{clust_iii},InormPreAll{clust_iii}] = sort(maxNormPreAll{clust_iii});
-    [B1normPreAll{clust_iii},I1normPreAll{clust_iii}] = sort(maxNormPreAll{1}); %sort by cluster 1
-    [BnormPostAll{clust_iii},InormPostAll{clust_iii}] = sort(maxNormPostAll{clust_iii});
-    [B1normPostAll{clust_iii},I1normPostAll{clust_iii}] = sort(maxNormPostAll{1}); %sort by cluster 1
-
-    [BnormPreClustAll{clust_iii},InormPreClustAll{clust_iii}] = sort(maxNormPreClustAll{clust_iii});
-    [B1normPreClustAll{clust_iii},I1normPreClustAll{clust_iii}] = sort(maxNormPreClustAll{1}); %sort by cluster 1
-    [BnormFlightClustAll{clust_iii},InormFlightClustAll{clust_iii}] = sort(maxNormFlightClustAll{clust_iii});
-    [B1FlightClustAll{clust_iii},I1FlightClustAll{clust_iii}] = sort(maxNormFlightClustAll{1}); %sort by cluster 1
-    [BnormPostClustAll{clust_iii},InormPostClustAll{clust_iii}] = sort(maxNormPostClustAll{clust_iii});
-    [B1normPostClustAll{clust_iii},I1normPostClustAll{clust_iii}] = sort(maxNormPostClustAll{1}); %sort by cluster 1
-
-
-
-
-end
-
-
-%find max and sort based on the peaks of the cell across the whole
-%timeseries
-[~,maxAllFlight] = max(normMeanTraceFlightAll,[],2);
-[~,maxAllPre] = max(normMeanTracePreAll,[],2);
-[~,maxAllPost] = max(normMeanTracePostAll,[],2);
-for clust_i = 1:nClusters
-    [~,maxAllPreFlightPost{clust_i}] = max(normMeanTracePreFlightPostAll{clust_iii},[],2);
-end
-
-
-%kPeaks = kmeans(maxAll,nClusters); %take k-means cluster of the peaks of each cell whole time
-%sort based on each clustered peaks for flight, pre and post
-rng(2);
-for n = 1:size(maxAllFlight,1)
-    for ii = 1:nClusters
-        if maxAllFlight(n) >= traceFlightIndConcat(ii,1) & maxAllFlight(n) < traceFlightIndConcat(ii,2); %if the peak is within each cluster, sort it into that particular cluster
-            kPeaksFlight(:,n) = 1;
+        for n = 1:size(maxAllPreFlightPost{clust_i},1)
+            if maxAllPreFlightPost{clust_i}(n) >= 1 & maxAllPreFlightPost{clust_i}(n) < (length(normTraceFlightAll{clust_iii}(1,:))+preFlightPadCalcium+postFlightPadCalcium+1) %if the peak is within each cluster, sort it into that particular cluster
+                kPeaksPreFlightPost{clust_i}(:,n) = 1;
+            end
         end
+        [BkPeaksPreFlightPost{clust_i},IkPeaksPreFlightPost{clust_i}] = sort(kPeaksPreFlightPost{clust_i});
+        normMeanTraceSortPreFlightPost{clust_i} = normMeanTracePreFlightPostAll{clust_i}(IkPeaksPreFlightPost{clust_i},:);
+    end
+    
+    %sort the clusters according to their peak times
+    [BkPeaksFlight,IkPeaksFlight] = sort(kPeaksFlight);
+    normMeanTraceSortFlight = normMeanTraceFlightAll(IkPeaksFlight,:);
+    [BkPeaksPre,IkPeaksPre] = sort(kPeaksPre);
+    normMeanTraceSortPre = normMeanTracePreAll(IkPeaksPre,:);
+    [BkPeaksPost,IkPeaksPost] = sort(kPeaksPost);
+    normMeanTraceSortPost = normMeanTracePostAll(IkPeaksPost,:);
+    
+    %for each cluster, find the peaks of the cluster (aMat aka aTemp), tke the max
+    %(maxInd), and sort that max (aSort) from the cluster, add this to the
+    %normMeanTraceSort variable
+    for c = 1:nClusters
+        aMatFlight = find(BkPeaksFlight == c);
+        aTempFlight = normMeanTraceSortFlight(aMatFlight,:);
+        [~,maxIndFlight] = max(aTempFlight,[],2);
+        [BmaxFlight,ImaxFlight] = sort(maxIndFlight);
+        aSortFlight = aTempFlight(ImaxFlight,:);
+        normMeanTraceSortFlight(aMatFlight,:) = aSortFlight;
+        clear aMatFlight aTempFlight maxIndFlight ImaxFlight BaxFlight aSortFlight
+        aMatPre = find(BkPeaksPre == c);
+        aTempPre = normMeanTraceSortPre(aMatPre,:);
+        [~,maxIndPre] = max(aTempPre,[],2);
+        [BmaxPre,ImaxPre] = sort(maxIndPre);
+        aSortPre = aTempPre(ImaxPre,:);
+        normMeanTraceSortPre(aMatPre,:) = aSortPre;
+        clear aMatPre aTempPre maxIndPre ImaxPre BaxPre aSortPre
+        aMatPost = find(BkPeaksPost == c);
+        aTempPost = normMeanTraceSortPost(aMatPost,:);
+        [~,maxIndPost] = max(aTempPost,[],2);
+        [BmaxPost,ImaxPost] = sort(maxIndPost);
+        aSortPost = aTempPost(ImaxPost,:);
+        normMeanTraceSortPost(aMatPost,:) = aSortPost;
+        clear aMatPost aTempPost maxIndPost ImaxPost BaxPost aSortPost
+        aMatPreFlightPost = find(BkPeaksPreFlightPost{c} == 1);
+        aTempPreFlightPost = normMeanTraceSortPreFlightPost{c}(aMatPreFlightPost,:);
+        [~,maxIndPreFlightPost] = max(aTempPreFlightPost,[],2);
+        [BmaxPreFlightPost,ImaxPreFlightPost] = sort(maxIndPreFlightPost);
+        aSortPreFlightPost = aTempPreFlightPost(ImaxPreFlightPost,:);
+        normMeanTraceSortPreFlightPost{c}(aMatPreFlightPost,:) = aSortPreFlightPost;
+        clear aMatPreFlightPost aTempPreFlightPost maxIndPreFlightPost ImaxPreFlightPost BaxPreFlightPost aSortPreFlightPost
+        
         
     end
-end
-for n = 1:size(maxAllPre,1)
-    for ii = 1:nClusters
-        if maxAllPre(n) >= tracePreIndConcat(ii,1) & maxAllPre(n) < tracePreIndConcat(ii,2); %if the peak is within each cluster, sort it into that particular cluster
-            kPeaksPre(:,n) = 1;
-        end
+    %divide the normMeanTraceSort overall variable into the respective clusters
+    for c = 1:nClusters
+        normMeanTraceEachFlight{c} = normMeanTraceSortFlight(:,traceFlightIndConcat(c,1):traceFlightIndConcat(c,2));
+        normMeanTraceEachPre{c} = normMeanTraceSortPre(:,tracePreIndConcat(c,1):tracePreIndConcat(c,2));
+        normMeanTraceEachPost{c} = normMeanTraceSortPost(:,tracePostIndConcat(c,1):tracePostIndConcat(c,2));
+        normMeanTraceEachPFlightP{c} = normMeanTraceSortPreFlightPost{c}(:,preFlightPadCalcium+1:length(normTraceFlightAll{c}(1,:))+preFlightPadCalcium);
+        normMeanTraceEachPreFP{c} = normMeanTraceSortPreFlightPost{c}(:,1:preFlightPadCalcium);
+        normMeanTraceEachPFPost{c} = normMeanTraceSortPreFlightPost{c}(:,length(normTraceFlightAll{c}(1,:))+preFlightPadCalcium+1:length(normTraceFlightAll{c}(1,:))+preFlightPadCalcium+postFlightPadCalcium+1);
+        
     end
-end
-for n = 1:size(maxAllPost,1)
-    for ii = 1:nClusters
-        if maxAllPost(n) >= tracePostIndConcat(ii,1) & maxAllPost(n) < tracePostIndConcat(ii,2); %if the peak is within each cluster, sort it into that particular cluster
-            kPeaksPost(:,n) = 1;
-        end
-    end
-end
-for clust_i = 1:nClusters
-    for n = 1:size(maxAllPreFlightPost{clust_i},1)
-        if maxAllPreFlightPost{clust_i}(n) >= 1 & maxAllPreFlightPost{clust_i}(n) < (length(normTraceFlightAll{clust_iii}(1,:))+preFlightPadCalcium+postFlightPadCalcium+1) %if the peak is within each cluster, sort it into that particular cluster
-            kPeaksPreFlightPost{clust_i}(:,n) = 1;
-        end
-    end
-    [BkPeaksPreFlightPost{clust_i},IkPeaksPreFlightPost{clust_i}] = sort(kPeaksPreFlightPost{clust_i});
-    normMeanTraceSortPreFlightPost{clust_i} = normMeanTracePreFlightPostAll{clust_i}(IkPeaksPreFlightPost{clust_i},:);
-end
-
-%sort the clusters according to their peak times
-[BkPeaksFlight,IkPeaksFlight] = sort(kPeaksFlight);
-normMeanTraceSortFlight = normMeanTraceFlightAll(IkPeaksFlight,:);
-[BkPeaksPre,IkPeaksPre] = sort(kPeaksPre);
-normMeanTraceSortPre = normMeanTracePreAll(IkPeaksPre,:);
-[BkPeaksPost,IkPeaksPost] = sort(kPeaksPost);
-normMeanTraceSortPost = normMeanTracePostAll(IkPeaksPost,:);
-
-%for each cluster, find the peaks of the cluster (aMat aka aTemp), tke the max
-%(maxInd), and sort that max (aSort) from the cluster, add this to the
-%normMeanTraceSort variable
-for c = 1:nClusters
-    aMatFlight = find(BkPeaksFlight == c);
-    aTempFlight = normMeanTraceSortFlight(aMatFlight,:);
-    [~,maxIndFlight] = max(aTempFlight,[],2);
-    [BmaxFlight,ImaxFlight] = sort(maxIndFlight);
-    aSortFlight = aTempFlight(ImaxFlight,:);
-    normMeanTraceSortFlight(aMatFlight,:) = aSortFlight;
-    clear aMatFlight aTempFlight maxIndFlight ImaxFlight BaxFlight aSortFlight
-    aMatPre = find(BkPeaksPre == c);
-    aTempPre = normMeanTraceSortPre(aMatPre,:);
-    [~,maxIndPre] = max(aTempPre,[],2);
-    [BmaxPre,ImaxPre] = sort(maxIndPre);
-    aSortPre = aTempPre(ImaxPre,:);
-    normMeanTraceSortPre(aMatPre,:) = aSortPre;
-    clear aMatPre aTempPre maxIndPre ImaxPre BaxPre aSortPre
-    aMatPost = find(BkPeaksPost == c);
-    aTempPost = normMeanTraceSortPost(aMatPost,:);
-    [~,maxIndPost] = max(aTempPost,[],2);
-    [BmaxPost,ImaxPost] = sort(maxIndPost);
-    aSortPost = aTempPost(ImaxPost,:);
-    normMeanTraceSortPost(aMatPost,:) = aSortPost;
-    clear aMatPost aTempPost maxIndPost ImaxPost BaxPost aSortPost
-    aMatPreFlightPost = find(BkPeaksPreFlightPost{c} == 1);
-    aTempPreFlightPost = normMeanTraceSortPreFlightPost{c}(aMatPreFlightPost,:);
-    [~,maxIndPreFlightPost] = max(aTempPreFlightPost,[],2);
-    [BmaxPreFlightPost,ImaxPreFlightPost] = sort(maxIndPreFlightPost);
-    aSortPreFlightPost = aTempPreFlightPost(ImaxPreFlightPost,:);
-    normMeanTraceSortPreFlightPost{c}(aMatPreFlightPost,:) = aSortPreFlightPost;
-    clear aMatPreFlightPost aTempPreFlightPost maxIndPreFlightPost ImaxPreFlightPost BaxPreFlightPost aSortPreFlightPost
     
-
+    %% save to snakeTrace variable
+    if data_i ==1
+        snakeTrace_cRaw.preFlightPadCalcium = preFlightPadCalcium;
+        snakeTrace_cRaw.postFlightPadCalcium = postFlightPadCalcium;
+        snakeTrace_cRaw.preFlightPadSpeed = preFlightPadSpeed;
+        snakeTrace_cRaw.postFlightPadSpeed = postFlightPadSpeed;
+        snakeTrace_cRaw.normMeanTraceSortPreFlightPost = normMeanTraceSortPreFlightPost;
+        snakeTrace_cRaw.meanTracePreFlightPostAll=meanTracePreFlightPostAll;
+        snakeTrace_cRaw.maxAllPreFlightPost=maxAllPreFlightPost;
+        snakeTrace_cRaw.normMeanTracePreFlightPostAll=normMeanTracePreFlightPostAll;
+        snakeTrace_cRaw.kPeaksPreFlightPost=kPeaksPreFlightPost;
+        snakeTrace_cRaw.IkPeaksPreFlightPost=IkPeaksPreFlightPost;
+        snakeTrace_cRaw.normMeanTraceEachPFlightP = normMeanTraceEachPFlightP;
+        snakeTrace_cRaw.normMeanTraceEachPreFP = normMeanTraceEachPreFP;
+        snakeTrace_cRaw.normMeanTraceEachPFPost = normMeanTraceEachPFPost;
+        snakeTrace_cRaw.meanTraceFlight = meanTraceFlight;
+        snakeTrace_cRaw.normTraceFlight = normTraceFlight;
+        snakeTrace_cRaw.maxnormTraceFlight = maxnormTraceFlight;
+        snakeTrace_cRaw.meanTracePre = meanTracePre;
+        snakeTrace_cRaw.normTracePre = normTracePre;
+        snakeTrace_cRaw.maxnormTracePre = maxnormTracePre;
+        snakeTrace_cRaw.meanTracePost = meanTracePost;
+        snakeTrace_cRaw.normTracePost = normTracePost;
+        snakeTrace_cRaw.maxnormTracePost = maxnormTracePost;
+        snakeTrace_cRaw.BFlight = BFlight;
+        snakeTrace_cRaw.IFlight = IFlight;
+        snakeTrace_cRaw.BPre = BPre;
+        snakeTrace_cRaw.IPre = IPre;
+        snakeTrace_cRaw.BPost = BPost;
+        snakeTrace_cRaw.IPost = IPost;
+        snakeTrace_cRaw.BOdd = Bodd;
+        snakeTrace_cRaw.B1Flight = B1Flight;
+        snakeTrace_cRaw.I1Flight = I1Flight;
+        snakeTrace_cRaw.B1Pre = B1Pre;
+        snakeTrace_cRaw.I1Pre = I1Pre;
+        snakeTrace_cRaw.B1Post = B1Post;
+        snakeTrace_cRaw.I1Post = I1Post;
+        snakeTrace_cRaw.Iodd = Iodd;
+        snakeTrace_cRaw.Bodd = Bodd;
+        snakeTrace_cRaw.normTraceEven = normTraceEven;
+        snakeTrace_cRaw.normTraceOdd = normTraceOdd;
+        snakeTrace_cRaw.meanSpeedFlight = meanSpeedFlight;
+        snakeTrace_cRaw.smoothSpeedFlight = smoothSpeedFlight;
+        snakeTrace_cRaw.meanSpeedPre = meanSpeedPre;
+        snakeTrace_cRaw.smoothSpeedPre = smoothSpeedPre;
+        snakeTrace_cRaw.meanSpeedPost = meanSpeedPost;
+        snakeTrace_cRaw.smoothSpeedPost = smoothSpeedPost;
+        snakeTrace_cRaw.smoothSpeedRawPre = smoothSpeedRawPre;
+        snakeTrace_cRaw.smoothSpeedRawPost = smoothSpeedRawPost;
+        snakeTrace_cRaw.smoothSpeedRawFlight = smoothSpeedRawFlight;
+        snakeTrace_cRaw.normMeanTraceEachFlight = normMeanTraceEachFlight;
+        snakeTrace_cRaw.normMeanTraceSortFlight = normMeanTraceSortFlight;
+        snakeTrace_cRaw.normMeanTraceFlightAll = normMeanTraceFlightAll;
+        snakeTrace_cRaw.traceFlightIndConcat = traceFlightIndConcat;
+        snakeTrace_cRaw.normMeanTraceEachPre = normMeanTraceEachPre;
+        snakeTrace_cRaw.normMeanTraceSortPre = normMeanTraceSortPre;
+        snakeTrace_cRaw.normMeanTracePreAll = normMeanTracePreAll;
+        snakeTrace_cRaw.tracePreIndConcat = tracePreIndConcat;
+        snakeTrace_cRaw.normMeanTraceEachPost = normMeanTraceEachPost;
+        snakeTrace_cRaw.normMeanTraceSortPost = normMeanTraceSortPost;
+        snakeTrace_cRaw.normMeanTracePostAll = normMeanTracePostAll;
+        snakeTrace_cRaw.tracePostIndConcat = tracePostIndConcat;
+        snakeTrace_cRaw.nClusters = nClusters;
+        snakeTrace_cRaw.batName = batName;
+        snakeTrace_cRaw.dateSesh = dateSesh;
+        snakeTrace_cRaw.sessionType = sessionType;
+        snakeTrace_cRaw.InormFlightAll = InormFlightAll;
+        snakeTrace_cRaw.normTraceFlightAll = normTraceFlightAll;
+        snakeTrace_cRaw.I1normFlightAll = I1normFlightAll;
+        snakeTrace_cRaw.smoothTraceRawPost = smoothTraceRawPost;
+        snakeTrace_cRaw.smoothTraceRawPre = smoothTraceRawPre;
+        snakeTrace_cRaw.smoothTraceRawFlight = smoothTraceRawFlight;
+        snakeTrace_cRaw.traceFlightIdx = traceFlightIdx;
+        snakeTrace_cRaw.normTraceRawPre = normTraceRawPre;
+        snakeTrace_cRaw.normTraceRawFlight = normTraceRawFlight;
+        snakeTrace_cRaw.normTraceRawPost = normTraceRawPost;
+        snakeTrace_cRaw.traceFlight = traceFlight;
+        snakeTrace_cRaw.tracePreFlightPost = tracePreFlightPost;
+        snakeTrace_cRaw.meanSpeedPreFlightPost = meanSpeedPreFlightPost;
+        snakeTrace_cRaw.meanTracePreFlightPost = meanTracePreFlightPost;
+        snakeTrace_cRaw.speedPreFlightPost = speedPreFlightPost;
+        snakeTrace_cRaw.smoothTraceRawPreFlightPost = smoothTraceRawPreFlightPost;
+        snakeTrace_cRaw.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
+        snakeTrace_cRaw.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
+        snakeTrace_cRaw.smoothSpeedRawPreFlightPost = smoothSpeedRawPreFlightPost;
+    elseif data_i ==2
+        snakeTrace_c.preFlightPadCalcium = preFlightPadCalcium;
+        snakeTrace_c.postFlightPadCalcium = postFlightPadCalcium;
+        snakeTrace_c.preFlightPadSpeed = preFlightPadSpeed;
+        snakeTrace_c.postFlightPadSpeed = postFlightPadSpeed;
+        snakeTrace_c.normMeanTraceSortPreFlightPost = normMeanTraceSortPreFlightPost;
+        snakeTrace_c.meanTracePreFlightPostAll=meanTracePreFlightPostAll;
+        snakeTrace_c.maxAllPreFlightPost=maxAllPreFlightPost;
+        snakeTrace_c.normMeanTracePreFlightPostAll=normMeanTracePreFlightPostAll;
+        snakeTrace_c.kPeaksPreFlightPost=kPeaksPreFlightPost;
+        snakeTrace_c.IkPeaksPreFlightPost=IkPeaksPreFlightPost;
+        snakeTrace_c.normMeanTraceEachPFlightP = normMeanTraceEachPFlightP;
+        snakeTrace_c.normMeanTraceEachPreFP = normMeanTraceEachPreFP;
+        snakeTrace_c.normMeanTraceEachPFPost = normMeanTraceEachPFPost;
+        snakeTrace_c.meanTraceFlight = meanTraceFlight;
+        snakeTrace_c.normTraceFlight = normTraceFlight;
+        snakeTrace_c.maxnormTraceFlight = maxnormTraceFlight;
+        snakeTrace_c.meanTracePre = meanTracePre;
+        snakeTrace_c.normTracePre = normTracePre;
+        snakeTrace_c.maxnormTracePre = maxnormTracePre;
+        snakeTrace_c.meanTracePost = meanTracePost;
+        snakeTrace_c.normTracePost = normTracePost;
+        snakeTrace_c.maxnormTracePost = maxnormTracePost;
+        snakeTrace_c.BFlight = BFlight;
+        snakeTrace_c.IFlight = IFlight;
+        snakeTrace_c.BPre = BPre;
+        snakeTrace_c.IPre = IPre;
+        snakeTrace_c.BPost = BPost;
+        snakeTrace_c.IPost = IPost;
+        snakeTrace_c.BOdd = Bodd;
+        snakeTrace_c.B1Flight = B1Flight;
+        snakeTrace_c.I1Flight = I1Flight;
+        snakeTrace_c.B1Pre = B1Pre;
+        snakeTrace_c.I1Pre = I1Pre;
+        snakeTrace_c.B1Post = B1Post;
+        snakeTrace_c.I1Post = I1Post;
+        snakeTrace_c.Iodd = Iodd;
+        snakeTrace_c.Bodd = Bodd;
+        snakeTrace_c.normTraceEven = normTraceEven;
+        snakeTrace_c.normTraceOdd = normTraceOdd;
+        snakeTrace_c.meanSpeedFlight = meanSpeedFlight;
+        snakeTrace_c.smoothSpeedFlight = smoothSpeedFlight;
+        snakeTrace_c.meanSpeedPre = meanSpeedPre;
+        snakeTrace_c.smoothSpeedPre = smoothSpeedPre;
+        snakeTrace_c.meanSpeedPost = meanSpeedPost;
+        snakeTrace_c.smoothSpeedPost = smoothSpeedPost;
+        snakeTrace_c.smoothSpeedRawPre = smoothSpeedRawPre;
+        snakeTrace_c.smoothSpeedRawPost = smoothSpeedRawPost;
+        snakeTrace_c.smoothSpeedRawFlight = smoothSpeedRawFlight;
+        snakeTrace_c.normMeanTraceEachFlight = normMeanTraceEachFlight;
+        snakeTrace_c.normMeanTraceSortFlight = normMeanTraceSortFlight;
+        snakeTrace_c.normMeanTraceFlightAll = normMeanTraceFlightAll;
+        snakeTrace_c.traceFlightIndConcat = traceFlightIndConcat;
+        snakeTrace_c.normMeanTraceEachPre = normMeanTraceEachPre;
+        snakeTrace_c.normMeanTraceSortPre = normMeanTraceSortPre;
+        snakeTrace_c.normMeanTracePreAll = normMeanTracePreAll;
+        snakeTrace_c.tracePreIndConcat = tracePreIndConcat;
+        snakeTrace_c.normMeanTraceEachPost = normMeanTraceEachPost;
+        snakeTrace_c.normMeanTraceSortPost = normMeanTraceSortPost;
+        snakeTrace_c.normMeanTracePostAll = normMeanTracePostAll;
+        snakeTrace_c.tracePostIndConcat = tracePostIndConcat;
+        snakeTrace_c.nClusters = nClusters;
+        snakeTrace_c.batName = batName;
+        snakeTrace_c.dateSesh = dateSesh;
+        snakeTrace_c.sessionType = sessionType;
+        snakeTrace_c.InormFlightAll = InormFlightAll;
+        snakeTrace_c.normTraceFlightAll = normTraceFlightAll;
+        snakeTrace_c.I1normFlightAll = I1normFlightAll;
+        snakeTrace_c.smoothTraceRawPost = smoothTraceRawPost;
+        snakeTrace_c.smoothTraceRawPre = smoothTraceRawPre;
+        snakeTrace_c.smoothTraceRawFlight = smoothTraceRawFlight;
+        snakeTrace_c.traceFlightIdx = traceFlightIdx;
+        snakeTrace_c.normTraceRawPre = normTraceRawPre;
+        snakeTrace_c.normTraceRawFlight = normTraceRawFlight;
+        snakeTrace_c.normTraceRawPost = normTraceRawPost;
+        snakeTrace_c.traceFlight = traceFlight;
+        snakeTrace_c.tracePreFlightPost = tracePreFlightPost;
+        snakeTrace_c.meanSpeedPreFlightPost = meanSpeedPreFlightPost;
+        snakeTrace_c.meanTracePreFlightPost = meanTracePreFlightPost;
+        snakeTrace_c.speedPreFlightPost = speedPreFlightPost;
+        snakeTrace_c.smoothTraceRawPreFlightPost = smoothTraceRawPreFlightPost;
+        snakeTrace_c.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
+        snakeTrace_c.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
+        snakeTrace_c.smoothSpeedRawPreFlightPost = smoothSpeedRawPreFlightPost;
+    end
 end
-%divide the normMeanTraceSort overall variable into the respective clusters
-for c = 1:nClusters
-    normMeanTraceEachFlight{c} = normMeanTraceSortFlight(:,traceFlightIndConcat(c,1):traceFlightIndConcat(c,2));
-    normMeanTraceEachPre{c} = normMeanTraceSortPre(:,tracePreIndConcat(c,1):tracePreIndConcat(c,2));
-    normMeanTraceEachPost{c} = normMeanTraceSortPost(:,tracePostIndConcat(c,1):tracePostIndConcat(c,2));
-    normMeanTraceEachPFlightP{c} = normMeanTraceSortPreFlightPost{c}(:,preFlightPadCalcium+1:length(normTraceFlightAll{c}(1,:))+preFlightPadCalcium);
-    normMeanTraceEachPreFP{c} = normMeanTraceSortPreFlightPost{c}(:,1:preFlightPadCalcium);
-    normMeanTraceEachPFPost{c} = normMeanTraceSortPreFlightPost{c}(:,length(normTraceFlightAll{c}(1,:))+preFlightPadCalcium+1:length(normTraceFlightAll{c}(1,:))+preFlightPadCalcium+postFlightPadCalcium+1);
-
-end
-
-%% save to snakeTrace variable
-snakeTrace.preFlightPadCalcium = preFlightPadCalcium;
-snakeTrace.postFlightPadCalcium = postFlightPadCalcium;
-snakeTrace.preFlightPadSpeed = preFlightPadSpeed;
-snakeTrace.postFlightPadSpeed = postFlightPadSpeed;
-snakeTrace.normMeanTraceSortPreFlightPost = normMeanTraceSortPreFlightPost;
-snakeTrace.meanTracePreFlightPostAll=meanTracePreFlightPostAll;
-snakeTrace.maxAllPreFlightPost=maxAllPreFlightPost;
-snakeTrace.normMeanTracePreFlightPostAll=normMeanTracePreFlightPostAll;
-snakeTrace.kPeaksPreFlightPost=kPeaksPreFlightPost;
-snakeTrace.IkPeaksPreFlightPost=IkPeaksPreFlightPost;
-snakeTrace.normMeanTraceEachPFlightP = normMeanTraceEachPFlightP;
-snakeTrace.normMeanTraceEachPreFP = normMeanTraceEachPreFP;
-snakeTrace.normMeanTraceEachPFPost = normMeanTraceEachPFPost;
-snakeTrace.meanTraceFlight = meanTraceFlight;
-snakeTrace.normTraceFlight = normTraceFlight;
-snakeTrace.maxnormTraceFlight = maxnormTraceFlight;
-snakeTrace.meanTracePre = meanTracePre;
-snakeTrace.normTracePre = normTracePre;
-snakeTrace.maxnormTracePre = maxnormTracePre;
-snakeTrace.meanTracePost = meanTracePost;
-snakeTrace.normTracePost = normTracePost;
-snakeTrace.maxnormTracePost = maxnormTracePost;
-snakeTrace.BFlight = BFlight;
-snakeTrace.IFlight = IFlight;
-snakeTrace.BPre = BPre;
-snakeTrace.IPre = IPre;
-snakeTrace.BPost = BPost;
-snakeTrace.IPost = IPost;
-snakeTrace.BOdd = Bodd;
-snakeTrace.B1Flight = B1Flight;
-snakeTrace.I1Flight = I1Flight;
-snakeTrace.B1Pre = B1Pre;
-snakeTrace.I1Pre = I1Pre;
-snakeTrace.B1Post = B1Post;
-snakeTrace.I1Post = I1Post;
-snakeTrace.Iodd = Iodd;
-snakeTrace.Bodd = Bodd;
-snakeTrace.normTraceEven = normTraceEven;
-snakeTrace.normTraceOdd = normTraceOdd;
-snakeTrace.meanSpeedFlight = meanSpeedFlight;
-snakeTrace.smoothSpeedFlight = smoothSpeedFlight;
-snakeTrace.meanSpeedPre = meanSpeedPre;
-snakeTrace.smoothSpeedPre = smoothSpeedPre;
-snakeTrace.meanSpeedPost = meanSpeedPost;
-snakeTrace.smoothSpeedPost = smoothSpeedPost;
-snakeTrace.smoothSpeedRawPre = smoothSpeedRawPre;
-snakeTrace.smoothSpeedRawPost = smoothSpeedRawPost;
-snakeTrace.smoothSpeedRawFlight = smoothSpeedRawFlight;
-snakeTrace.normMeanTraceEachFlight = normMeanTraceEachFlight;
-snakeTrace.normMeanTraceSortFlight = normMeanTraceSortFlight;
-snakeTrace.normMeanTraceFlightAll = normMeanTraceFlightAll;
-snakeTrace.traceFlightIndConcat = traceFlightIndConcat;
-snakeTrace.normMeanTraceEachPre = normMeanTraceEachPre;
-snakeTrace.normMeanTraceSortPre = normMeanTraceSortPre;
-snakeTrace.normMeanTracePreAll = normMeanTracePreAll;
-snakeTrace.tracePreIndConcat = tracePreIndConcat;
-snakeTrace.normMeanTraceEachPost = normMeanTraceEachPost;
-snakeTrace.normMeanTraceSortPost = normMeanTraceSortPost;
-snakeTrace.normMeanTracePostAll = normMeanTracePostAll;
-snakeTrace.tracePostIndConcat = tracePostIndConcat;
-snakeTrace.nClusters = nClusters;
-snakeTrace.batName = batName;
-snakeTrace.dateSesh = dateSesh;
-snakeTrace.sessionType = sessionType;
-snakeTrace.InormFlightAll = InormFlightAll;
-snakeTrace.normTraceFlightAll = normTraceFlightAll;
-snakeTrace.I1normFlightAll = I1normFlightAll;
-snakeTrace.smoothTraceRawPost = smoothTraceRawPost;
-snakeTrace.smoothTraceRawPre = smoothTraceRawPre;
-snakeTrace.smoothTraceRawFlight = smoothTraceRawFlight;
-snakeTrace.traceFlightIdx = traceFlightIdx;
-snakeTrace.normTraceRawPre = normTraceRawPre;
-snakeTrace.normTraceRawFlight = normTraceRawFlight;
-snakeTrace.normTraceRawPost = normTraceRawPost;
-snakeTrace.traceFlight = traceFlight;
-snakeTrace.tracePreFlightPost = tracePreFlightPost; 
-snakeTrace.meanSpeedPreFlightPost = meanSpeedPreFlightPost;
-snakeTrace.meanTracePreFlightPost = meanTracePreFlightPost;
-snakeTrace.speedPreFlightPost = speedPreFlightPost; 
-snakeTrace.smoothTraceRawPreFlightPost = smoothTraceRawPreFlightPost;
-snakeTrace.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
-snakeTrace.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
-snakeTrace.smoothSpeedRawPreFlightPost = smoothSpeedRawPreFlightPost;
-
-
 if saveFlag == 1
-    snakeTrace.label = label;
-   save([pwd '/analysis/' label '_snakePlotData.mat'],'snakeTrace');
+    snakeTrace_c.label = label;
+    snakeTrace_cRaw.label = label;
+    save([pwd '/analysis/' label '_snakeTraceData_cRaw.mat'],'snakeTrace_c');
+    save([pwd '/analysis/' label '_snakeTraceData_c.mat'],'snakeTrace_cRaw');
 end
 
 %snakeTrace.normMeanTraceAllSmooth = normMeanTraceAllSmooth;
