@@ -41,7 +41,7 @@ if loadFlag == 1
     
     cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
     alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/analysis/' label '_flightPaths.mat']);
+    load([pwd '/analysis/' label '-12Clust_flightPaths.mat']);
 end
 %padding for during flight snake plot to include some time before and after flight
 prePad = 0; %number of seconds to plot before alignment point
@@ -497,6 +497,8 @@ for data_i = 1:3
         snakeTrace_cRaw.normTraceRawFlight = normTraceRawFlight;
         snakeTrace_cRaw.normTraceRawPost = normTraceRawPost;
         snakeTrace_cRaw.traceFlight = traceFlight;
+        snakeTrace_cRaw.tracePre = tracePre;
+        snakeTrace_cRaw.tracePost = tracePost;        
         snakeTrace_cRaw.tracePreFlightPost = tracePreFlightPost;
         snakeTrace_cRaw.meanSpeedPreFlightPost = meanSpeedPreFlightPost;
         snakeTrace_cRaw.meanTracePreFlightPost = meanTracePreFlightPost;
@@ -581,6 +583,8 @@ for data_i = 1:3
         snakeTrace_c.normTraceRawFlight = normTraceRawFlight;
         snakeTrace_c.normTraceRawPost = normTraceRawPost;
         snakeTrace_c.traceFlight = traceFlight;
+        snakeTrace_c.tracePre = tracePre;
+        snakeTrace_c.tracePost = tracePost; 
         snakeTrace_c.tracePreFlightPost = tracePreFlightPost;
         snakeTrace_c.meanSpeedPreFlightPost = meanSpeedPreFlightPost;
         snakeTrace_c.meanTracePreFlightPost = meanTracePreFlightPost;
@@ -665,6 +669,8 @@ for data_i = 1:3
         snakeTrace_s.normTraceRawFlight = normTraceRawFlight;
         snakeTrace_s.normTraceRawPost = normTraceRawPost;
         snakeTrace_s.traceFlight = traceFlight;
+        snakeTrace_s.tracePre = tracePre;
+        snakeTrace_s.tracePost = tracePost; 
         snakeTrace_s.tracePreFlightPost = tracePreFlightPost;
         snakeTrace_s.meanSpeedPreFlightPost = meanSpeedPreFlightPost;
         snakeTrace_s.meanTracePreFlightPost = meanTracePreFlightPost;
