@@ -8,7 +8,7 @@ dateSesh = [];
 sessionType = [];
 loadFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
 saveFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
-
+meanSmooth = 30; %number of video frames to smooth the calcium mean spiking activity
 
 traceDataAll = snakeTrace.meanTracePreFlightPost;
 traceDataPre = snakeTrace.meanTracePre;
@@ -446,7 +446,7 @@ elseif plotPreFlightPostFlag == 1
         p5 = subplot(5,2,[5 7]); %plot neuron traces for each pre-flight A to B
         plot(1:length(traceDataAll{1}(1,:)),traceDataAll{1}(cell_i,:));
         hold on
-        plot(1:length(traceDataAll{1}(1,:)),smooth(traceDataAll{1}(cell_i,:),10)); %plot the smoothed trace on top
+        plot(1:length(traceDataAll{1}(1,:)),smooth(traceDataAll{1}(cell_i,:),meanSmooth)); %plot the smoothed trace on top
 
         %normTraceRawAllAtoB = [flight_i,traceDataAll{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:,cell_i)];
         %plot(1:length(traceDataAll{1}(1,:,1)),traceDataAll{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:,cell_i)+flight_i*2)
@@ -469,7 +469,7 @@ elseif plotPreFlightPostFlag == 1
         p6 = subplot(5,2,[6 8]); 
         plot(1:length(traceDataAll{2}(1,:)),traceDataAll{2}(cell_i,:));
         hold on        
-        plot(1:length(traceDataAll{2}(1,:)),smooth(traceDataAll{2}(cell_i,:),10)); %plot the smoothed trace on top
+        plot(1:length(traceDataAll{2}(1,:)),smooth(traceDataAll{2}(cell_i,:),meanSmooth)); %plot the smoothed trace on top
         %normTraceRawAllBtoA(flight_i,:) = [traceDataAll{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataAll{1}(:,1)),:,cell_i)];
         %plot(1:length(traceDataAll{2}(1,:,1)),traceDataAll{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataAll{1}(:,1)),:,cell_i)+flight_i*2)
         title(['Cell # ' num2str(cell_i)]);
