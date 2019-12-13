@@ -7,8 +7,8 @@ loadFlag = 0; %do you want to load and save the data individually outside of ImB
 saveFlag = 0;
 %offset = 0.1; % account for slow calcium estimation ~move locations back  0ms in time... This is the knob to turn for 'prospective' coding...
 nClusters = 5; %number of flight trajectories to look at and for k means clustering of whole time series by peak
-preFlightPad = 30; %number of seconds to include before flight starts
-postFlightPad = 30; %of of seconds to include after flight ends
+preFlightPad = 7; %number of seconds to include before flight starts
+postFlightPad = 7; %of of seconds to include after flight ends
 
 
 % User inputs overrides
@@ -41,7 +41,7 @@ if loadFlag == 1
     
     cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
     alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/analysis/' label '-12Clust_flightPaths.mat']);
+    load([pwd '/analysis/' label '_flightPaths.mat']);
 end
 %padding for during flight snake plot to include some time before and after flight
 prePad = 0; %number of seconds to plot before alignment point

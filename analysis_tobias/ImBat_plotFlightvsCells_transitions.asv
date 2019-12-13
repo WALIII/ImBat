@@ -1,6 +1,6 @@
 function ImBat_plotFlightvsCells_transitions(snakeTrace,flightTransitions,flightPaths,varargin)
 plotEachFlag = 0;
-plotPreFlightPostFlag = 0;
+plotPreFlightPostFlag = 1;
 plotMeanSpikeFlag = 1;
 
 batName = [];
@@ -386,7 +386,9 @@ elseif plotPreFlightPostFlag == 1
     
     elseif plotMeanSpikeFlag == 1
     %% plot flight vs spike Means for each cluster for each cell with the pre/flight/post concatenated together in 1 plot
-     
+    
+    meanSpike
+    
     plotMeanSpike_transitions = figure('units','normalized','outerposition',[0 0 1 1]);
     %for each flight in the subgroup AtoB
     for flight_i = 1:length(flightTransitions.AtoB)
@@ -440,63 +442,57 @@ elseif plotPreFlightPostFlag == 1
         xlim([1 length(snakeTrace.smoothSpeedRawPreFlightPost{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(snakeTrace.smoothSpeedRawPreFlightPost{1}(:,1)),:))]);
     end
     
-    %plot neural traces
     for cell_i = 1:length(snakeTrace.smoothTraceRawPreFlightPost{1}(:,1,:))
-        %plot average spike activity for flights A to B
-        p5 = subplot(5,2,[5 7]); %plot neuron traces for each pre-flight A to B
-        plot(1:length(traceDataAll{1}(1,:)),traceDataAll{1}(cell_i,:));
-        hold on
-        plot(1:length(traceDataAll{1}(1,:)),smooth(traceDataAll{1}(cell_i,:),10)); %plot the smoothed trace on top
-
-        %normTraceRawAllAtoB = [flight_i,traceDataAll{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:,cell_i)];
-        %plot(1:length(traceDataAll{1}(1,:,1)),traceDataAll{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:,cell_i)+flight_i*2)
-        title(['Cell # ' num2str(cell_i)]);
-        ylabel('# Spikes');
-        yt = get(gca,'YTick');
-        %set(gca,'YTick',yt,'YTickLabel',yt/10);
-        set(gca,'xticklabel',{[]});
-        xlim([1 length(traceDataAll{1}(1,:))]);
-        %plot heatmap for each pre-flight A to B
-        p7 = subplot(5,2,9);
-        imagesc(traceDataAll{1}(cell_i,:))
-        colormap('hot');
-        xt = get(gca, 'XTick');
-        set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
-        xlabel('time (s)');
-        ylabel('flight trials');
+            p5 = subplot(5,2,[5 7]); %plot neuron traces for each pre-flight A to B
+            plot(1:length(traceDataAll{1}(1,:)),traceDataAll{1}(cell_i,:));
+            %normTraceRawAllAtoB = [flight_i,traceDataAll{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:,cell_i)];
+            %plot(1:length(traceDataAll{1}(1,:,1)),traceDataAll{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:,cell_i)+flight_i*2)
+            hold on
+            title(['Cell # ' num2str(cell_i)]);
+            ylabel('Norm df/f');
+            yt = get(gca,'YTick');
+            %set(gca,'YTick',yt,'YTickLabel',yt/10);
+            set(gca,'xticklabel',{[]});
+            xlim([1 length(traceDataAll{1}(1,:,1))]);
+            
+            p7 = subplot(5,2,9);
+            imagesc(traceDataAll{1}(cell_i,:))
+            colormap('hot');
+            xt = get(gca, 'XTick');
+            set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+            xlabel('time (s)');
+            ylabel('flight trials');
         
-        %plot neuron traces for each pre-flight B to A
-        p6 = subplot(5,2,[6 8]); 
-        plot(1:length(traceDataAll{2}(1,:)),traceDataAll{2}(cell_i,:));
-        hold on        
-        plot(1:length(traceDataAll{2}(1,:)),smooth(traceDataAll{2}(cell_i,:),10)); %plot the smoothed trace on top
-        %normTraceRawAllBtoA(flight_i,:) = [traceDataAll{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataAll{1}(:,1)),:,cell_i)];
-        %plot(1:length(traceDataAll{2}(1,:,1)),traceDataAll{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataAll{1}(:,1)),:,cell_i)+flight_i*2)
-        title(['Cell # ' num2str(cell_i)]);
-        ylabel('# Spikes');
-        yt = get(gca,'YTick');
-        %set(gca,'YTick',yt,'YTickLabel',yt/10);
-        set(gca,'xticklabel',{[]});
-        xlim([1 length(traceDataAll{2}(1,:))]);
-         %plot heatmap for each pre-flight B to A       
-        p8 = subplot(5,2,10);
-        imagesc(traceDataAll{2}(cell_i,:))
-        colormap('hot');
-        xt = get(gca, 'XTick');
-        set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
-        xlabel('time (s)');
-        ylabel('flight trials');
-        linkaxes([p5, p7], 'x');
-        linkaxes([p6, p8], 'x');
-        sgtitle(['Flights aligned to A or B: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
-        if saveFlag ==1
-            % Save 'each cell' as jpg and fig files..
-            set(findall(gcf,'-property','FontSize'),'FontSize',20);
-            saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.tif']);
-            savefig(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.fig']);
-            saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.svg']);
-        else
-            pause
+            p6 = subplot(5,2,[6 8]); %plot neuron traces for each pre-flight B to A
+            plot(1:length(traceDataAll{2}(1,:)),traceDataAll{2}(cell_i,:));
+            %normTraceRawAllBtoA(flight_i,:) = [traceDataAll{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataAll{1}(:,1)),:,cell_i)];
+            %plot(1:length(traceDataAll{2}(1,:,1)),traceDataAll{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataAll{1}(:,1)),:,cell_i)+flight_i*2)
+            hold on
+            title(['Cell # ' num2str(cell_i)]);
+            ylabel('Norm df/f');
+            yt = get(gca,'YTick');
+            %set(gca,'YTick',yt,'YTickLabel',yt/10);
+            set(gca,'xticklabel',{[]});
+            xlim([1 length(traceDataAll{2}(1,:))]);
+            
+            p8 = subplot(5,2,10);
+            imagesc(normTraceRawAllBtoA)
+            colormap('hot');
+            xt = get(gca, 'XTick');
+            set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+            xlabel('time (s)');
+            ylabel('flight trials');
+            linkaxes([p5, p7], 'x');
+            linkaxes([p6, p8], 'x');
+            sgtitle(['Flights aligned to A or B: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
+            if saveFlag ==1
+                % Save 'each cell' as jpg and fig files..
+                set(findall(gcf,'-property','FontSize'),'FontSize',20);
+                saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.tif']);
+                savefig(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.fig']);
+                saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.svg']);
+            else
+                pause
         end
         
         cla(p5)
