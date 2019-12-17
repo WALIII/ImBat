@@ -507,6 +507,9 @@ for data_i = 1:3
         snakeTrace_cRaw.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
         snakeTrace_cRaw.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
         snakeTrace_cRaw.smoothSpeedRawPreFlightPost = smoothSpeedRawPreFlightPost;
+        snakeTrace_cRaw.preFlightPad = preFlightPad;
+        snakeTrace_cRaw.postFlightPad = postFlightPad;
+        snakeTrace_cRaw.dur = dur;
     elseif data_i ==2
         snakeTrace_c.preFlightPadCalcium = preFlightPadCalcium;
         snakeTrace_c.postFlightPadCalcium = postFlightPadCalcium;
@@ -593,6 +596,9 @@ for data_i = 1:3
         snakeTrace_c.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
         snakeTrace_c.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
         snakeTrace_c.smoothSpeedRawPreFlightPost = smoothSpeedRawPreFlightPost;
+        snakeTrace_c.preFlightPad = preFlightPad;
+        snakeTrace_c.postFlightPad = postFlightPad;
+        snakeTrace_c.dur = dur;
     elseif data_i ==3
         snakeTrace_s.preFlightPadCalcium = preFlightPadCalcium;
         snakeTrace_s.postFlightPadCalcium = postFlightPadCalcium;
@@ -679,6 +685,9 @@ for data_i = 1:3
         snakeTrace_s.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
         snakeTrace_s.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
         snakeTrace_s.smoothSpeedRawPreFlightPost = smoothSpeedRawPreFlightPost;
+        snakeTrace_s.preFlightPad = preFlightPad;
+        snakeTrace_s.postFlightPad = postFlightPad;
+        snakeTrace_s.dur = dur;
     end
 end
 if saveFlag == 1
