@@ -1,4 +1,4 @@
-function [out, metrics] = ImBat_alignTimeStamps(audio,video,TS,Markers);
+function [out] = ImBat_alignTimeStamps(audio,video,TS,Markers);
 % ImBat_alignTimeStamps
 
 % Align the Freedomscope analog input with 'Cortex' software timestamps,
@@ -107,10 +107,10 @@ out.RewardVector = Rewards;
 out.RewardTime = rewardLocs;
 
 % metrics for plotting later
-metrics.audio_tv_offset = audio_tv_offset;
-metrics.audio_infer = audio_infer;
-metrics.TS_tv_offset = TS_tv_offset;
-metrics.TS_infer = TS_infer;
+metrics.audio_tv_offset;
+metrics.audio_infer;
+out.metrics.TS_tv_offset;
+out.metrics.TS_infer;
 
 
 % Smooth Location data
@@ -144,4 +144,4 @@ for i = 1:(size(out.Location,1))-20
 end
 
 
-save('Alignment.mat','out','metrics','-v7.3');
+save('Alignment.mat','out','-v7.3');

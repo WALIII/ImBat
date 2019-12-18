@@ -6,6 +6,8 @@ function ImBat_START(varargin)
 
 % WAL3
 % d05/16/2019
+% d12/18/2019
+
 
 % Core Functions:
 
@@ -95,7 +97,7 @@ for i = 1:length(subFolders);
         if extract ==1;
             % Run processing script
             mkdir('processed');
-            ImBat_processVideos('downsample',0.5);
+            ImBat_processVideos('downsample',1);
             disp('processing!!');
         end
 
