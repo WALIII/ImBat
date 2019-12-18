@@ -1,27 +1,33 @@
 function CNMFe_align(Yf)
+% CNMFe_align.m
 
 
 
 gcp;
 %% read data and convert to double
-
 %addpath(genpath('../../NoRMCorre'));
 type = 2; % non-rigid
+
+if type ==1;
+  disp( 'Rigid motoion correction')
+else
+  disp('non-rigid motion correction')
+
 [d1,d2,T] = size(Yf);
 
 %% perform some sort of deblurring/high pass filtering
 
-if (0)    
+if (0)
     hLarge = fspecial('average', 40);
-    hSmall = fspecial('average', 2); 
+    hSmall = fspecial('average', 2);
     for t = 1:T
         Y(:,:,t) = filter2(hSmall,Yf(:,:,t)) - filter2(hLarge, Yf(:,:,t));
     end
     %Ypc = Yf - Y;
     bound = size(hLarge,1);
 else
-    gSig = 7; 
-    gSiz = 17; 
+    gSig = 7;
+    gSiz = 17;
     psf = fspecial('gaussian', round(2*gSiz), gSig);
     ind_nonzero = (psf(:)>=max(psf(:,1)));
     psf = psf-mean(psf(ind_nonzero));
@@ -34,7 +40,7 @@ end
 %% first try out rigid motion correction
     % exclude boundaries due to high pass filtering effects
     if type ==1;
-        
+
 options_r = NoRMCorreSetParms('d1',d1-bound,'d2',d2-bound,'bin_width',200,'max_shift',20,'iter',1,'correct_bidir',false);
 
 %% register using the high pass filtered data and apply shifts to original data
@@ -42,7 +48,7 @@ tic; [M1,shifts1,template1] = normcorre_batch(Y(bound/2+1:end-bound/2,bound/2+1:
     % exclude boundaries due to high pass filtering effects
 tic; Mr = apply_shifts(Yf,shifts1,options_r,bound/2,bound/2); toc % apply shifts to full dataset
     % apply shifts on the whole movie
-%% compute metrics 
+%% compute metrics
 [cY,mY,vY] = motion_metrics(Y(bound/2+1:end-bound/2,bound/2+1:end-bound/2,:),options_r.max_shift);
 [cYf,mYf,vYf] = motion_metrics(Yf,options_r.max_shift);
 
@@ -80,7 +86,7 @@ tic; Mpr = apply_shifts(Yf,shifts2,options_nr,bound/2,bound/2); toc % apply the 
 [cM2,mM2,vM2] = motion_metrics(M2,options_nr.max_shift);
 [cM2f,mM2f,vM2f] = motion_metrics(Mpr,options_nr.max_shift);
 
-%% plot shifts        
+%% plot shifts
 
  %shifts_r = squeeze(cat(3,shifts1(:).shifts));
 shifts_nr = cat(ndims(shifts2(1).shifts)+1,shifts2(:).shifts);
@@ -92,7 +98,7 @@ patch_id = 1:size(shifts_x,2);
 str = strtrim(cellstr(int2str(patch_id.')));
 str = cellfun(@(x) ['patch # ',x],str,'un',0);
 
- %all_shifts.shifts_r = shifts_r; 
+ %all_shifts.shifts_r = shifts_r;
 all_shifts.shifts_nr = shifts_nr;
 all_shifts.shifts_x = shifts_x;
 all_shifts.shifts_y = shifts_y;
@@ -106,13 +112,13 @@ all_shifts.shifts_y = shifts_y;
 %     ax3 = subplot(313); plot(shifts_y); hold on; plot(shifts_r(:,1),'--k','linewidth',2); title('displacements along y','fontsize',14,'fontweight','bold')
 %             xlabel('timestep','fontsize',14,'fontweight','bold')
 %     linkaxes([ax1,ax2,ax3],'x')
-    
+
 %% display downsampled data
 
 
     end
 % % tsub = 5;
-% % 
+% %
 % % Y_ds = downsample_data(Y,'time',tsub);
 % % Yf_ds = downsample_data(Yf,'time',tsub);
 % % M1_ds = downsample_data(M1,'time',tsub);
@@ -123,8 +129,8 @@ all_shifts.shifts_y = shifts_y;
 % % mmY_ds = quantile(Y_ds(:),0.9995);
 % % nnYf_ds = quantile(Yf_ds(:),0.0005);
 % % mmYf_ds = quantile(Yf_ds(:),0.99995);
-% % %  
-% % 
+% % %
+% %
 % % make_avi = false; % save a movie
 % % if make_avi
 % %     vidObj = VideoWriter('filtered.avi');
@@ -136,7 +142,7 @@ all_shifts.shifts_y = shifts_y;
 % %     fac = min(min((screensize(3:4)-100)./[3*d2,d1]),10);
 % %     set(gcf, 'PaperUnits', 'points', 'Units', 'points');
 % %     set(gcf, 'Position', round([100 100 fac*3*d2 fac*d1]));
-% % 
+% %
 % % for t = 1:1:size(Y_ds,3)
 % %     if (0)
 % %         plot filtered data
@@ -144,7 +150,7 @@ all_shifts.shifts_y = shifts_y;
 % %         colormap('bone');
 % %         set(gca,'XTick',[],'YTick',[]);
 % %         subplot(132);imagesc(M1_ds(:,:,t),[nnY_ds,mmY_ds]); xlabel('rigid corrected','fontsize',14,'fontweight','bold'); axis equal; axis tight;
-% %         title(sprintf('Frame %i out of %i',t,size(Y_ds,3)),'fontweight','bold','fontsize',14); 
+% %         title(sprintf('Frame %i out of %i',t,size(Y_ds,3)),'fontweight','bold','fontsize',14);
 % %         colormap('bone')
 % %         set(gca,'XTick',[],'YTick',[]);
 % %         subplot(133);imagesc(M2_ds(:,:,t),[nnY_ds,mmY_ds]); xlabel('non-rigid corrected','fontsize',14,'fontweight','bold'); axis equal; axis tight;
@@ -156,7 +162,7 @@ all_shifts.shifts_y = shifts_y;
 % %         colormap('bone');
 % %         set(gca,'XTick',[],'YTick',[]);
 % %         subplot(132);imagesc(M1f_ds(:,:,t),[nnYf_ds,mmYf_ds]); xlabel('rigid corrected','fontsize',14,'fontweight','bold'); axis equal; axis tight;
-% %         title(sprintf('Frame %i out of %i',t,size(Y_ds,3)),'fontweight','bold','fontsize',14); 
+% %         title(sprintf('Frame %i out of %i',t,size(Y_ds,3)),'fontweight','bold','fontsize',14);
 % %         colormap('bone')
 % %         set(gca,'XTick',[],'YTick',[]);
 % %         subplot(133);imagesc(M2f_ds(:,:,t),[nnYf_ds,mmYf_ds]); xlabel('non-rigid corrected','fontsize',14,'fontweight','bold'); axis equal; axis tight;
@@ -164,9 +170,9 @@ all_shifts.shifts_y = shifts_y;
 % %         set(gca,'XTick',[],'YTick',[]);
 % %     end
 % %     drawnow;
-% %     if make_avi  
+% %     if make_avi
 % %         currFrame = getframe(fig);
-% %         writeVideo(vidObj,currFrame);    
+% %         writeVideo(vidObj,currFrame);
 % %     end
 % % end
 % % if make_avi
@@ -184,13 +190,10 @@ disp('Smoothing corrected data...');
 [Y] = ImBat_Filter(Y);
 disp('Saving corrected data...');
 save('processed/Motion_corrected_Data.mat','all_shifts','Y','Ysiz','-v7.3');
-%clear Y Ysiz
-% saving Downsampled video
 
- Y = imresize(Y,0.5);
- Ysiz = size(Y);
+
+% Saving Downsampled video
+Y = imresize(Y,0.5);
+Ysiz = size(Y);
 disp('Saving corrected downsampled data...');
 save('processed/Motion_corrected_Data_DS.mat','all_shifts','Y','Ysiz','-v7.3');
-
-
-

@@ -8,6 +8,7 @@ function ImBat_processVideos(varargin)
 % WAL3
 % d05/10/2019
 
+% Core function: ImBat_denoise
 
 % Default params
 video = 1;
