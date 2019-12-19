@@ -1,4 +1,4 @@
-function [transitions] = ImBat_plotFlightvsCells_transitions(snakeTrace,flightTransitions,flightPaths,varargin)
+function [transitions] = ImBat_plotFlightvsCells_transitions(snakeTrace,flightTransitions,flightPaths,goodCellIdx,varargin)
 plotEachFlag = 0;
 plotPreFlightPostFlag = 0;
 plotMeanSpikeFlag = 1;
@@ -271,6 +271,8 @@ if plotEachFlag == 1
 elseif plotPreFlightPostFlag == 1
     %% plot flight vs cell traces for each cluster for each cell with the pre/flight/post concatenated together in 1 plot
     
+    norm
+    
     plotPreFlightPostvsCells_transitions = figure('units','normalized','outerposition',[0 0 1 1]);
     %for each flight in the subgroup AtoB
     for flight_i = 1:length(flightTransitions.AtoB)
@@ -368,13 +370,13 @@ elseif plotPreFlightPostFlag == 1
         linkaxes([p6, p8], 'x');
         sgtitle(['Flights aligned to A or B: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
         if saveFlag ==1
-        % Save 'each cell' as jpg and fig files..
-        set(findall(gcf,'-property','FontSize'),'FontSize',20);
-        saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.tif']);
-        savefig(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.fig']);
-        saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.svg']);
+            % Save 'each cell' as jpg and fig files..
+            set(findall(gcf,'-property','FontSize'),'FontSize',20);
+            saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.tif']);
+            savefig(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.fig']);
+            saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.svg']);
         else
-          pause
+            pause
         end
         
         cla(p5)
@@ -384,9 +386,44 @@ elseif plotPreFlightPostFlag == 1
     end
     
     
-    elseif plotMeanSpikeFlag == 1
+elseif plotMeanSpikeFlag == 1
     %% plot flight vs spike Means for each cluster for each cell with the pre/flight/post concatenated together in 1 plot
-     
+    concAtoB = [];
+    concBtoA = [];
+    concSemAtoB = [];
+    concSemBtoA = [];
+    %normalize all the A to B data
+    for cell_i = 1:length(traceDataAll{1}(:,1))
+    concAtoB = [concAtoB traceDataAll{1}(cell_i,:)]; %concatenate all the data, zscore, then split it up
+    concSemAtoB = [ concSemAtoB snakeTrace.semTracePreFlightPost{1}(cell_i,:)];
+    end
+    normConcAtoB = zscore(concAtoB);
+    normConcAtoB = normConcAtoB - min(normConcAtoB);
+    normConcSemAtoB = zscore(concSemAtoB);
+    normConcSemAtoB = normConcSemAtoB - min(normConcSemAtoB);
+    for cell_i = 1:length(traceDataAll{1}(:,1))
+        normAtoB(cell_i,:) = concAtoB(1+(length(traceDataAll{1}(1,:))*(cell_i-1)):length(traceDataAll{1}(1,:))*cell_i);
+        normSemAtoB(cell_i,:) = concSemAtoB(1+(length(traceDataAll{1}(1,:))*(cell_i-1)):length(traceDataAll{1}(1,:))*cell_i);
+    end
+    %normalize all the B to A data
+    for cell_i = 1:length(traceDataAll{2}(:,1))
+        concBtoA = [concBtoA traceDataAll{2}(cell_i,:)]; %concatenate all the data, zscore, then split it up
+        concSemBtoA = [ concSemBtoA snakeTrace.semTracePreFlightPost{2}(cell_i,:)];
+    end
+    normConcBtoA = zscore(concBtoA);
+    normConcBtoA = normConcBtoA - min(normConcBtoA);
+    normConcSemBtoA = zscore(concSemBtoA);
+    normConcSemBtoA = normConcSemBtoA - min(normConcSemBtoA);
+    for cell_i = 1:length(traceDataAll{2}(:,1))
+        normBtoA(cell_i,:) = concBtoA(1+(length(traceDataAll{2}(1,:))*(cell_i-1)):length(traceDataAll{2}(1,:))*cell_i);
+        normSemBtoA(cell_i,:) = concSemBtoA(1+(length(traceDataAll{2}(1,:))*(cell_i-1)):length(traceDataAll{2}(1,:))*cell_i);
+    end    
+    
+%     normAtoB = zscore(traceDataAll{1},0,2);
+%     normAtoB = normAtoB - min(normAtoB);
+%     normBtoA = zscore(traceDataAll{2},0,2);
+%     normBtoA = normBtoA - min(normBtoA);
+    
     plotMeanSpike_transitions = figure('units','normalized','outerposition',[0 0 1 1]);
     %for each flight in the subgroup AtoB
     for flight_i = 1:length(flightTransitions.AtoB)
@@ -441,9 +478,13 @@ elseif plotPreFlightPostFlag == 1
     end
     
     %plot neural traces
-    for cell_i = 1:length(snakeTrace.smoothTraceRawPreFlightPost{1}(:,1,:))
+    for cell_i = goodCellIdx.goodCellIndex%1:length(snakeTrace.smoothTraceRawPreFlightPost{1}(:,1,:))
         %smooth data and calculate full-width half max + offset from flight starts
         smoothAtoB(cell_i,:) = smooth(traceDataAll{1}(cell_i,:),meanSmooth); %smooth the data
+        smoothAtoB(cell_i,:) = smooth(normAtoB(cell_i,:),meanSmooth); %smooth the normalized data
+        smoothSDAtoB(cell_i,:) = smooth(snakeTrace.sdTracePreFlightPost{1}(cell_i,:),meanSmooth); %smooth the data
+        smoothSEMAtoB(cell_i,:) = smooth(snakeTrace.semTracePreFlightPost{1}(cell_i,:),meanSmooth); %smooth the data        
+        %smoothSEMAtoB(cell_i,:) = smooth(normSemAtoB,meanSmooth);
         [maxAtoB(cell_i),indMaxAtoB(cell_i)] = max(smoothAtoB(cell_i,5:end-5));
         tStartAtoMax(cell_i) = indMaxAtoB(cell_i) - length(traceDataPre{1}(cell_i,:)); %find offset from start of flight A to peak
         halfMaxAtoB(cell_i) = maxAtoB(cell_i)/2; %find halfmax
@@ -457,18 +498,22 @@ elseif plotPreFlightPostFlag == 1
         catch
             indFallAtoB(cell_i) = length(smoothAtoB(cell_i,:)); %in case the activity never drops below the fwhm by end of sample
         end
+        if indFallAtoB(cell_i) < indRiseAtoB(cell_i)
+            indFallAtoB(cell_i) = length(smoothAtoB(cell_i,:));
+        end
         fwhmAtoB(cell_i) = indRiseAtoB(cell_i) - indFallAtoB(cell_i); %fwhm by subtracting the indices
         
         %plot average spike activity for flights A to B
         p5 = subplot(5,2,[5 7]); %plot neuron traces for each pre-flight A to B
-        plot(1:length(traceDataAll{1}(1,:)),traceDataAll{1}(cell_i,:));
+        boundedline(1:length(traceDataAll{1}(1,:)),smoothAtoB(cell_i,:),smoothSEMAtoB(cell_i,:),'r');
         hold on
-        plot(1:length(traceDataAll{1}(1,:)),smoothAtoB(cell_i,:)); %plot the smoothed trace on top
-        plot(indMaxAtoB(cell_i),maxAtoB(cell_i),'o','MarkerFaceColor','r','MarkerSize',10) %plot peak on 
+        plot(1:length(traceDataAll{1}(1,:)),traceDataAll{1}(cell_i,:));
+        %plot(1:length(traceDataAll{1}(1,:)),smoothAtoB(cell_i,:)); %plot the smoothed trace on top
+        plot(indMaxAtoB(cell_i),maxAtoB(cell_i),'o','MarkerFaceColor','r','MarkerSize',10) %plot peak on
         plot(indRiseAtoB(cell_i):indFallAtoB(cell_i),halfMaxAtoB(cell_i),'o') %plot the half width max height
         %titles
         title(['Cell # ' num2str(cell_i)]);
-        ylabel('# Spikes');
+        ylabel('z-scored # spikes (std)');%ylabel('# Spikes');
         yt = get(gca,'YTick');
         %set(gca,'YTick',yt,'YTickLabel',yt/10);
         set(gca,'xticklabel',{[]});
@@ -482,11 +527,15 @@ elseif plotPreFlightPostFlag == 1
         xlabel('time (s)');
         ylabel('flight trials');
         
-        %plot neuron traces for each pre-flight B to A 
-         %smooth data and calculate full-width half max + offset from flight starts
-        smoothBtoA(cell_i,:) = smooth(traceDataAll{2}(cell_i,:),meanSmooth);
-        [maxBtoA(cell_i),indMaxBtoA(cell_i)] = max(smoothBtoA(cell_i,5:end-5)); 
-        tStartBtoMax(cell_i) = indMaxBtoA(cell_i) - length(traceDataPre{2}(cell_i,:)); %find offset from start of flight A to peak        
+        %plot neuron traces for each pre-flight B to A
+        %smooth data and calculate full-width half max + offset from flight starts
+        %smoothBtoA(cell_i,:) = smooth(traceDataAll{2}(cell_i,:),meanSmooth);
+        smoothBtoA(cell_i,:) = smooth(normBtoA(cell_i,:),meanSmooth); %smooth the normalized data
+        smoothSDBtoA(cell_i,:) = smooth(snakeTrace.sdTracePreFlightPost{2}(cell_i,:),meanSmooth);
+        smoothSEMBtoA(cell_i,:) = smooth(snakeTrace.semTracePreFlightPost{2}(cell_i,:),meanSmooth);
+        %smoothSEMBtoA(cell_i,:) = smooth(normSemBtoA,meanSmooth); %smooth the normalized SEM
+        [maxBtoA(cell_i),indMaxBtoA(cell_i)] = max(smoothBtoA(cell_i,5:end-5));
+        tStartBtoMax(cell_i) = indMaxBtoA(cell_i) - length(traceDataPre{2}(cell_i,:)); %find offset from start of flight A to peak
         halfMaxBtoA(cell_i) = maxBtoA(cell_i)/2; %find halfmax
         try
             indRiseBtoA(cell_i) = find(smoothBtoA(cell_i,5:indMaxBtoA(cell_i))<=halfMaxBtoA(cell_i),1,'last')+5; %find where data goes above half max
@@ -498,23 +547,27 @@ elseif plotPreFlightPostFlag == 1
         catch
             indFallBtoA(cell_i) = length(smoothBtoA(cell_i,:)); %in case the activity never drops below the fwhm by end of sample
         end
+        if indFallBtoA(cell_i) < indRiseBtoA(cell_i)
+            indFallBtoA(cell_i) = length(smoothBtoA(cell_i,:));
+        end
         fwhmBtoA(cell_i) = indRiseBtoA(cell_i) - indFallBtoA(cell_i); %fwhm by subtracting the indices
         
         %plots
         p6 = subplot(5,2,[6 8]);
+        boundedline(1:length(traceDataAll{2}(1,:)),smoothBtoA(cell_i,:),smoothSEMBtoA(cell_i,:),'r');
+        hold on
         plot(1:length(traceDataAll{2}(1,:)),traceDataAll{2}(cell_i,:)); %plot the mean spiking activity aligned to start of flight B
-        hold on        
-        plot(1:length(traceDataAll{2}(1,:)),smoothBtoA(cell_i,:)); %plot the smoothed trace on top
+        %plot(1:length(traceDataAll{2}(1,:)),smoothBtoA(cell_i,:)); %plot the smoothed trace on top
         plot(indMaxBtoA(cell_i),maxBtoA(cell_i),'o','MarkerFaceColor','r','MarkerSize',10) %plot the peak of the activity
         plot(indRiseBtoA(cell_i):indFallBtoA(cell_i),halfMaxBtoA(cell_i),'o') %plot the half width max height
         %titles
         title(['Cell # ' num2str(cell_i)]);
-        ylabel('# Spikes');
+        ylabel('z-scored # spikes (std)');%ylabel('# Spikes');
         yt = get(gca,'YTick');
         %set(gca,'YTick',yt,'YTickLabel',yt/10);
         set(gca,'xticklabel',{[]});
         xlim([1 length(traceDataAll{2}(1,:))]);
-         %plot heatmap for each pre-flight B to A       
+        %plot heatmap for each pre-flight B to A
         p8 = subplot(5,2,10);
         imagesc(traceDataAll{2}(cell_i,:))
         colormap('hot');
@@ -525,12 +578,13 @@ elseif plotPreFlightPostFlag == 1
         linkaxes([p5, p7], 'x');
         linkaxes([p6, p8], 'x');
         sgtitle(['Flights aligned to A or B: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
+        
         if saveFlag ==1
             % Save 'each cell' as jpg and fig files..
             set(findall(gcf,'-property','FontSize'),'FontSize',20);
-            saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.tif']);
-            savefig(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.fig']);
-            saveas(gcf,[pwd '\' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_cell' num2str(cell_i) '.svg']);
+            saveas(gcf,[pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_sPeaks_cell' num2str(cell_i) '.tif']);
+            savefig(gcf,[pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_sPeaks_cell' num2str(cell_i) '.fig']);
+            saveas(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_transAtoB_sPeaks_cell' num2str(cell_i) '.svg']);
         else
             pause
         end
@@ -543,14 +597,18 @@ elseif plotPreFlightPostFlag == 1
 end
 
 transitions.smoothAtoB = smoothAtoB;
+transitions.smoothSDAtoB = smoothSDAtoB;
+transitions.smoothSEMAtoB = smoothSEMAtoB;
 transitions.maxAtoB =maxAtoB;
 transitions.indMaxAtoB = indMaxAtoB;
-transitions.tStartAtoMax = tStartAtoMax; 
-transitions.halfMaxAtoB = halfMaxAtoB; 
+transitions.tStartAtoMax = tStartAtoMax;
+transitions.halfMaxAtoB = halfMaxAtoB;
 transitions.indRiseAtoB = indRiseAtoB;
-transitions.indFallAtoB = indFallAtoB; 
-transitions.fwhmAtoB = fwhmAtoB; 
+transitions.indFallAtoB = indFallAtoB;
+transitions.fwhmAtoB = fwhmAtoB;
 transitions.smoothBtoA = smoothBtoA;
+transitions.smoothSDAtoB = smoothSDBtoA;
+transitions.smoothSEMAtoB = smoothSEMBtoA;
 transitions.maxBtoA = maxBtoA;
 transitions.indMaxBtoA = indMaxBtoA;
 transitions.tStartBtoMax = tStartBtoMax;
