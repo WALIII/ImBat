@@ -1,6 +1,6 @@
-function [transitions] = ImBat_plotFlightvsCells_transitions(snakeTrace,flightTransitions,flightPaths,goodCellIdx,varargin)
+function [traceAnalysis] = ImBat_plotFlightvsCells_transitions(snakeTrace,flightTransitions,flightPaths,goodCellIdx,varargin)
 plotEachFlag = 0;
-plotPreFlightPostFlag = 0;
+plotPreFlightPostFlag = 1;
 plotMeanSpikeFlag = 1;
 
 batName = snakeTrace.batName;
@@ -8,12 +8,14 @@ dateSesh = snakeTrace.dateSesh;
 sessionType = snakeTrace.sessionType;
 loadFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
 saveFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
-meanSmooth = 30; %number of video frames to smooth the calcium mean spiking activity
+meanSmooth = 10; %number of video frames to smooth the calcium mean spiking activity
+out = 0; %save output variables?
 
-traceDataAll = snakeTrace.meanTracePreFlightPost;
-traceDataPre = snakeTrace.meanTracePre;
-traceDataFlight = snakeTrace.meanTraceFlight;
-traceDataPost = snakeTrace.meanTracePost;
+traceDataAll = snakeTrace.normTraceRawPreFlightPost;
+meanTraceDataAll = snakeTrace.meanTracePreFlightPost;
+traceDataPre = snakeTrace.normTraceRawPre;
+traceDataFlight = snakeTrace.normTraceRawFlight;
+traceDataPost = snakeTrace.normTraceRawPost;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -188,7 +190,7 @@ if plotEachFlag == 1
         
     end
     
-    for cell_i = 1:length(snakeTrace.smoothTraceRawFlight{1}(:,1,:))
+    for cell_i = 1:10%length(snakeTrace.smoothTraceRawFlight{1}(:,1,:))
         for flight_i = 1:length(flightTransitions.AtoB)
             p13 = subplot(3,6,13); %plot neuron traces for each pre-flight A to B
             plot(1:length(traceDataPre{1}(1,:,1)),traceDataPre{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:,cell_i))
@@ -226,7 +228,7 @@ if plotEachFlag == 1
         
         for flight_i = 1:length(flightTransitions.BtoA)
             p16 = subplot(3,6,16); %plot neuron traces for each pre-flight B to A
-            plot(1:length(traceDataPre{2}(1,:,1)),traceDataPre{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataPost{1}(:,1)),:,cell_i))
+            plot(1:length(traceDataPre{2}(1,:,1)),traceDataPre{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataPre{1}(:,1)),:,cell_i))
             hold on
             title(['Cell # ' num2str(cell_i)]);
             ylabel('Norm df/f');
@@ -237,7 +239,7 @@ if plotEachFlag == 1
             xlabel('time (s)');
             
             p17 = subplot(3,6,17); %plot neuron traces for each during flight B to A
-            plot(1:length(traceDataFlight{2}(1,:,1)),traceDataFlight{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataPost{1}(:,1)),:,cell_i))
+            plot(1:length(traceDataFlight{2}(1,:,1)),traceDataFlight{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataFlight{1}(:,1)),:,cell_i))
             hold on
             title(['Cell # ' num2str(cell_i)]);
             ylabel('Norm df/f');
@@ -267,11 +269,10 @@ if plotEachFlag == 1
         cla(p17)
         cla(p18)
     end
-    
-elseif plotPreFlightPostFlag == 1
-    %% plot flight vs cell traces for each cluster for each cell with the pre/flight/post concatenated together in 1 plot
-    
-    norm
+end
+
+%% plot flight vs cell traces for each cluster for each cell with the pre/flight/post concatenated together in 1 plot
+if plotPreFlightPostFlag == 1
     
     plotPreFlightPostvsCells_transitions = figure('units','normalized','outerposition',[0 0 1 1]);
     %for each flight in the subgroup AtoB
@@ -329,7 +330,7 @@ elseif plotPreFlightPostFlag == 1
     for cell_i = 1:length(snakeTrace.smoothTraceRawPreFlightPost{1}(:,1,:))
         for flight_i = 1:length(flightTransitions.AtoB)
             p5 = subplot(5,2,[5 7]); %plot neuron traces for each pre-flight A to B
-            normTraceRawAllAtoB(flight_i,:) = [flight_i,traceDataAll{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:,cell_i)];
+            normTraceRawAllAtoB(flight_i,:) = traceDataAll{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:,cell_i);
             plot(1:length(traceDataAll{1}(1,:,1)),traceDataAll{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:,cell_i)+flight_i*2)
             hold on
             title(['Cell # ' num2str(cell_i)]);
@@ -349,8 +350,8 @@ elseif plotPreFlightPostFlag == 1
         
         for flight_i = 1:length(flightTransitions.BtoA)
             p6 = subplot(5,2,[6 8]); %plot neuron traces for each pre-flight B to A
-            normTraceRawAllBtoA(flight_i,:) = [traceDataAll{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataAll{1}(:,1)),:,cell_i)];
-            plot(1:length(traceDataAll{2}(1,:,1)),traceDataAll{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataAll{1}(:,1)),:,cell_i)+flight_i*2)
+            normTraceRawAllBtoA(flight_i,:) = traceDataAll{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataAll{1}(:,1,1)),:,cell_i);
+            plot(1:length(traceDataAll{2}(1,:,1)),traceDataAll{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(traceDataAll{1}(:,1,1)),:,cell_i)+flight_i*2)
             hold on
             title(['Cell # ' num2str(cell_i)]);
             ylabel('Norm df/f');
@@ -384,45 +385,45 @@ elseif plotPreFlightPostFlag == 1
         cla(p7)
         cla(p8)
     end
-    
-    
-elseif plotMeanSpikeFlag == 1
+end
+
+if plotMeanSpikeFlag == 1
     %% plot flight vs spike Means for each cluster for each cell with the pre/flight/post concatenated together in 1 plot
     concAtoB = [];
     concBtoA = [];
     concSemAtoB = [];
     concSemBtoA = [];
     %normalize all the A to B data
-    for cell_i = 1:length(traceDataAll{1}(:,1))
-    concAtoB = [concAtoB traceDataAll{1}(cell_i,:)]; %concatenate all the data, zscore, then split it up
-    concSemAtoB = [ concSemAtoB snakeTrace.semTracePreFlightPost{1}(cell_i,:)];
+    for cell_i = 1:length(meanTraceDataAll{1}(:,1))
+        concAtoB = [concAtoB meanTraceDataAll{1}(cell_i,:)]; %concatenate all the data, zscore, then split it up
+        concSemAtoB = [ concSemAtoB snakeTrace.semTracePreFlightPost{1}(cell_i,:)];
     end
     normConcAtoB = zscore(concAtoB);
     normConcAtoB = normConcAtoB - min(normConcAtoB);
     normConcSemAtoB = zscore(concSemAtoB);
     normConcSemAtoB = normConcSemAtoB - min(normConcSemAtoB);
-    for cell_i = 1:length(traceDataAll{1}(:,1))
-        normAtoB(cell_i,:) = concAtoB(1+(length(traceDataAll{1}(1,:))*(cell_i-1)):length(traceDataAll{1}(1,:))*cell_i);
-        normSemAtoB(cell_i,:) = concSemAtoB(1+(length(traceDataAll{1}(1,:))*(cell_i-1)):length(traceDataAll{1}(1,:))*cell_i);
+    for cell_i = 1:length(meanTraceDataAll{1}(:,1))
+        normAtoB(cell_i,:) = concAtoB(1+(length(meanTraceDataAll{1}(1,:))*(cell_i-1)):length(meanTraceDataAll{1}(1,:))*cell_i);
+        normSemAtoB(cell_i,:) = concSemAtoB(1+(length(meanTraceDataAll{1}(1,:))*(cell_i-1)):length(meanTraceDataAll{1}(1,:))*cell_i);
     end
     %normalize all the B to A data
-    for cell_i = 1:length(traceDataAll{2}(:,1))
-        concBtoA = [concBtoA traceDataAll{2}(cell_i,:)]; %concatenate all the data, zscore, then split it up
+    for cell_i = 1:length(meanTraceDataAll{2}(:,1))
+        concBtoA = [concBtoA meanTraceDataAll{2}(cell_i,:)]; %concatenate all the data, zscore, then split it up
         concSemBtoA = [ concSemBtoA snakeTrace.semTracePreFlightPost{2}(cell_i,:)];
     end
     normConcBtoA = zscore(concBtoA);
     normConcBtoA = normConcBtoA - min(normConcBtoA);
     normConcSemBtoA = zscore(concSemBtoA);
     normConcSemBtoA = normConcSemBtoA - min(normConcSemBtoA);
-    for cell_i = 1:length(traceDataAll{2}(:,1))
-        normBtoA(cell_i,:) = concBtoA(1+(length(traceDataAll{2}(1,:))*(cell_i-1)):length(traceDataAll{2}(1,:))*cell_i);
-        normSemBtoA(cell_i,:) = concSemBtoA(1+(length(traceDataAll{2}(1,:))*(cell_i-1)):length(traceDataAll{2}(1,:))*cell_i);
-    end    
+    for cell_i = 1:length(meanTraceDataAll{2}(:,1))
+        normBtoA(cell_i,:) = concBtoA(1+(length(meanTraceDataAll{2}(1,:))*(cell_i-1)):length(meanTraceDataAll{2}(1,:))*cell_i);
+        normSemBtoA(cell_i,:) = concSemBtoA(1+(length(meanTraceDataAll{2}(1,:))*(cell_i-1)):length(meanTraceDataAll{2}(1,:))*cell_i);
+    end
     
-%     normAtoB = zscore(traceDataAll{1},0,2);
-%     normAtoB = normAtoB - min(normAtoB);
-%     normBtoA = zscore(traceDataAll{2},0,2);
-%     normBtoA = normBtoA - min(normBtoA);
+    %     normAtoB = zscore(meanTraceDataAll{1},0,2);
+    %     normAtoB = normAtoB - min(normAtoB);
+    %     normBtoA = zscore(meanTraceDataAll{2},0,2);
+    %     normBtoA = normBtoA - min(normBtoA);
     
     plotMeanSpike_transitions = figure('units','normalized','outerposition',[0 0 1 1]);
     %for each flight in the subgroup AtoB
@@ -478,12 +479,12 @@ elseif plotMeanSpikeFlag == 1
     end
     
     %plot neural traces
-    for cell_i = goodCellIdx.goodCellIndex%1:length(snakeTrace.smoothTraceRawPreFlightPost{1}(:,1,:))
+    for cell_i = 1:10%goodCellIdx.goodCellIndex%1:length(snakeTrace.smoothTraceRawPreFlightPost{1}(:,1,:))
         %smooth data and calculate full-width half max + offset from flight starts
-        smoothAtoB(cell_i,:) = smooth(traceDataAll{1}(cell_i,:),meanSmooth); %smooth the data
+        smoothAtoB(cell_i,:) = smooth(meanTraceDataAll{1}(cell_i,:),meanSmooth); %smooth the data
         smoothAtoB(cell_i,:) = smooth(normAtoB(cell_i,:),meanSmooth); %smooth the normalized data
         smoothSDAtoB(cell_i,:) = smooth(snakeTrace.sdTracePreFlightPost{1}(cell_i,:),meanSmooth); %smooth the data
-        smoothSEMAtoB(cell_i,:) = smooth(snakeTrace.semTracePreFlightPost{1}(cell_i,:),meanSmooth); %smooth the data        
+        smoothSEMAtoB(cell_i,:) = smooth(snakeTrace.semTracePreFlightPost{1}(cell_i,:),meanSmooth); %smooth the data
         %smoothSEMAtoB(cell_i,:) = smooth(normSemAtoB,meanSmooth);
         [maxAtoB(cell_i),indMaxAtoB(cell_i)] = max(smoothAtoB(cell_i,5:end-5));
         tStartAtoMax(cell_i) = indMaxAtoB(cell_i) - length(traceDataPre{1}(cell_i,:)); %find offset from start of flight A to peak
@@ -505,10 +506,10 @@ elseif plotMeanSpikeFlag == 1
         
         %plot average spike activity for flights A to B
         p5 = subplot(5,2,[5 7]); %plot neuron traces for each pre-flight A to B
-        boundedline(1:length(traceDataAll{1}(1,:)),smoothAtoB(cell_i,:),smoothSEMAtoB(cell_i,:),'r');
+        boundedline(1:length(meanTraceDataAll{1}(1,:)),smoothAtoB(cell_i,:),smoothSEMAtoB(cell_i,:),'r');
         hold on
-        plot(1:length(traceDataAll{1}(1,:)),traceDataAll{1}(cell_i,:));
-        %plot(1:length(traceDataAll{1}(1,:)),smoothAtoB(cell_i,:)); %plot the smoothed trace on top
+        plot(1:length(meanTraceDataAll{1}(1,:)),meanTraceDataAll{1}(cell_i,:));
+        %plot(1:length(meanTraceDataAll{1}(1,:)),smoothAtoB(cell_i,:)); %plot the smoothed trace on top
         plot(indMaxAtoB(cell_i),maxAtoB(cell_i),'o','MarkerFaceColor','r','MarkerSize',10) %plot peak on
         plot(indRiseAtoB(cell_i):indFallAtoB(cell_i),halfMaxAtoB(cell_i),'o') %plot the half width max height
         %titles
@@ -517,10 +518,10 @@ elseif plotMeanSpikeFlag == 1
         yt = get(gca,'YTick');
         %set(gca,'YTick',yt,'YTickLabel',yt/10);
         set(gca,'xticklabel',{[]});
-        xlim([1 length(traceDataAll{1}(1,:))]);
+        xlim([1 length(meanTraceDataAll{1}(1,:))]);
         %plot heatmap for each pre-flight A to B
         p7 = subplot(5,2,9);
-        imagesc(traceDataAll{1}(cell_i,:))
+        imagesc(meanTraceDataAll{1}(cell_i,:))
         colormap('hot');
         xt = get(gca, 'XTick');
         set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
@@ -529,7 +530,7 @@ elseif plotMeanSpikeFlag == 1
         
         %plot neuron traces for each pre-flight B to A
         %smooth data and calculate full-width half max + offset from flight starts
-        %smoothBtoA(cell_i,:) = smooth(traceDataAll{2}(cell_i,:),meanSmooth);
+        %smoothBtoA(cell_i,:) = smooth(meanTraceDataAll{2}(cell_i,:),meanSmooth);
         smoothBtoA(cell_i,:) = smooth(normBtoA(cell_i,:),meanSmooth); %smooth the normalized data
         smoothSDBtoA(cell_i,:) = smooth(snakeTrace.sdTracePreFlightPost{2}(cell_i,:),meanSmooth);
         smoothSEMBtoA(cell_i,:) = smooth(snakeTrace.semTracePreFlightPost{2}(cell_i,:),meanSmooth);
@@ -554,10 +555,10 @@ elseif plotMeanSpikeFlag == 1
         
         %plots
         p6 = subplot(5,2,[6 8]);
-        boundedline(1:length(traceDataAll{2}(1,:)),smoothBtoA(cell_i,:),smoothSEMBtoA(cell_i,:),'r');
+        boundedline(1:length(meanTraceDataAll{2}(1,:)),smoothBtoA(cell_i,:),smoothSEMBtoA(cell_i,:),'r');
         hold on
-        plot(1:length(traceDataAll{2}(1,:)),traceDataAll{2}(cell_i,:)); %plot the mean spiking activity aligned to start of flight B
-        %plot(1:length(traceDataAll{2}(1,:)),smoothBtoA(cell_i,:)); %plot the smoothed trace on top
+        plot(1:length(meanTraceDataAll{2}(1,:)),meanTraceDataAll{2}(cell_i,:)); %plot the mean spiking activity aligned to start of flight B
+        %plot(1:length(meanTraceDataAll{2}(1,:)),smoothBtoA(cell_i,:)); %plot the smoothed trace on top
         plot(indMaxBtoA(cell_i),maxBtoA(cell_i),'o','MarkerFaceColor','r','MarkerSize',10) %plot the peak of the activity
         plot(indRiseBtoA(cell_i):indFallBtoA(cell_i),halfMaxBtoA(cell_i),'o') %plot the half width max height
         %titles
@@ -566,10 +567,10 @@ elseif plotMeanSpikeFlag == 1
         yt = get(gca,'YTick');
         %set(gca,'YTick',yt,'YTickLabel',yt/10);
         set(gca,'xticklabel',{[]});
-        xlim([1 length(traceDataAll{2}(1,:))]);
+        xlim([1 length(meanTraceDataAll{2}(1,:))]);
         %plot heatmap for each pre-flight B to A
         p8 = subplot(5,2,10);
-        imagesc(traceDataAll{2}(cell_i,:))
+        imagesc(meanTraceDataAll{2}(cell_i,:))
         colormap('hot');
         xt = get(gca, 'XTick');
         set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
@@ -594,25 +595,27 @@ elseif plotMeanSpikeFlag == 1
         cla(p7)
         cla(p8)
     end
+    traceAnalysis.smoothAtoB = smoothAtoB;
+    traceAnalysis.smoothSDAtoB = smoothSDAtoB;
+    traceAnalysis.smoothSEMAtoB = smoothSEMAtoB;
+    traceAnalysis.maxAtoB =maxAtoB;
+    traceAnalysis.indMaxAtoB = indMaxAtoB;
+    traceAnalysis.tStartAtoMax = tStartAtoMax;
+    traceAnalysis.halfMaxAtoB = halfMaxAtoB;
+    traceAnalysis.indRiseAtoB = indRiseAtoB;
+    traceAnalysis.indFallAtoB = indFallAtoB;
+    traceAnalysis.fwhmAtoB = fwhmAtoB;
+    traceAnalysis.smoothBtoA = smoothBtoA;
+    traceAnalysis.smoothSDAtoB = smoothSDBtoA;
+    traceAnalysis.smoothSEMAtoB = smoothSEMBtoA;
+    traceAnalysis.maxBtoA = maxBtoA;
+    traceAnalysis.indMaxBtoA = indMaxBtoA;
+    traceAnalysis.tStartBtoMax = tStartBtoMax;
+    traceAnalysis.halfMaxBtoA = halfMaxBtoA;
+    traceAnalysis.indRiseBtoA = indRiseBtoA;
+    traceAnalysis.indFallBtoA = indFallBtoA;
+    traceAnalysis.fwhmBtoA = fwhmBtoA;
+    if saveFlag ==1
+    save([pwd '/' batName '_' dateSesh '_' sessionType '_traceAnalysis.mat'],'traceAnalysis');
+    end
 end
-
-transitions.smoothAtoB = smoothAtoB;
-transitions.smoothSDAtoB = smoothSDAtoB;
-transitions.smoothSEMAtoB = smoothSEMAtoB;
-transitions.maxAtoB =maxAtoB;
-transitions.indMaxAtoB = indMaxAtoB;
-transitions.tStartAtoMax = tStartAtoMax;
-transitions.halfMaxAtoB = halfMaxAtoB;
-transitions.indRiseAtoB = indRiseAtoB;
-transitions.indFallAtoB = indFallAtoB;
-transitions.fwhmAtoB = fwhmAtoB;
-transitions.smoothBtoA = smoothBtoA;
-transitions.smoothSDAtoB = smoothSDBtoA;
-transitions.smoothSEMAtoB = smoothSEMBtoA;
-transitions.maxBtoA = maxBtoA;
-transitions.indMaxBtoA = indMaxBtoA;
-transitions.tStartBtoMax = tStartBtoMax;
-transitions.halfMaxBtoA = halfMaxBtoA;
-transitions.indRiseBtoA = indRiseBtoA;
-transitions.indFallBtoA = indFallBtoA;
-transitions.fwhmBtoA = fwhmBtoA;
