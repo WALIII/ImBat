@@ -8,6 +8,7 @@ saveFlag = 0; %do you want to load and save the data individually outside of ImB
 highCorrThresh = 0.5; %threshold for which cells are deemed to be high correlation to use for analyses
 plotOddEvenAllFlag = 1;
 plotHighCorrFlag = 1;
+plotHeatMapFlag = 1;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -20,20 +21,22 @@ end
 %% calculate the mean neural traces for odd and even flights (& normalize)
 
 %initialize the variables for odd and even flights
-meanTraceFlightOdd = zeros(length(traceData{1}(1,1,:)),length(traceData{1}(1,:,1)));
-meanTraceFlightEven = zeros(length(traceData{1}(1,1,:)),length(traceData{1}(1,:,1)));
-normMeanTraceFlightOdd = zeros(length(traceData{1}(1,1,:)),length(traceData{1}(1,:,1)));
-normMeanTraceFlightEven = zeros(length(traceData{1}(1,1,:)),length(traceData{1}(1,:,1)));
-traceFlightOdd = zeros(floor(length(traceData{1}(:,1,1))/2),length(traceData{1}(1,:,1)),length(traceData{1}(1,1,:)));
-traceFlightEven = zeros(floor(length(traceData{1}(:,1,1))/2),length(traceData{1}(1,:,1)),length(traceData{1}(1,1,:)));
-for cell_i = goodCellIdx.goodCellIndex%length(traceData{1}(1,1,:))
+meanTraceFlightOdd = zeros(length(traceData{2}(1,1,:)),length(traceData{2}(1,:,1)));
+meanTraceFlightEven = zeros(length(traceData{2}(1,1,:)),length(traceData{2}(1,:,1)));
+normMeanTraceFlightOdd = zeros(length(traceData{2}(1,1,:)),length(traceData{2}(1,:,1)));
+normMeanTraceFlightEven = zeros(length(traceData{2}(1,1,:)),length(traceData{2}(1,:,1)));
+traceFlightOdd = zeros(floor(length(traceData{2}(:,1,1))/2),length(traceData{2}(1,:,1)),length(traceData{2}(1,1,:)));
+traceFlightEven = zeros(floor(length(traceData{2}(:,1,1))/2),length(traceData{2}(1,:,1)),length(traceData{2}(1,1,:)));
+for cell_i = goodCellIdx.goodCellIndex%length(traceData{2}(1,1,:))
     %build vector of odd flights for each cell
-    for flight_i = 1:2:length(traceData{1}(:,1,1))
-        traceFlightOdd(flight_i,:,cell_i) = traceData{1}(flight_i,:,cell_i);
+    for flight_i = 1:2:length(traceData{2}(:,1,1))
+        traceFlightOdd(flight_i,:,cell_i) = traceData{2}(flight_i,:,cell_i);
+        %traceFlightOdd(flight_i,:,cell_i) = traceFlightOdd(flight_i,:,cell_i) - abs(min(traceData{2}(flight_i,:,cell_i)));
     end
     %build vector of even flights for each cell
-    for flight_i = 2:2:length(traceData{1}(:,1,1))
-        traceFlightEven(flight_i,:,cell_i) = traceData{1}(flight_i,:,cell_i);
+    for flight_i = 2:2:length(traceData{2}(:,1,1))
+        traceFlightEven(flight_i,:,cell_i) = traceData{2}(flight_i,:,cell_i);
+        %traceFlightEven(flight_i,:,cell_i) = traceFlightEven(flight_i,:,cell_i) - abs(min(traceData{2}(flight_i,:,cell_i)));
     end
     %calculate the means for all the odd/even flights and normalize these traces
     meanTraceFlightOdd(cell_i,:) = mean(traceFlightOdd(1:2:end,:,cell_i),1);
@@ -79,23 +82,23 @@ if saveFlag ==1
     end
     % Save 'each cell' as jpg and fig files..
     set(findall(histPairedCorr,'-property','FontSize'),'FontSize',20);
-    saveas(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells.tif']);
-    savefig(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells.fig']);
-    saveas(gcf, [pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells.svg']);
+    saveas(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells30sec.tif']);
+    savefig(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells30sec.fig']);
+    saveas(gcf, [pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells30sec.svg']);
     set(findall(histPearsonCorr,'-property','FontSize'),'FontSize',20);
-    saveas(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells.tif']);
-    savefig(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells.fig']);
-    saveas(gcf, [pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells.svg']);
+    saveas(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells30sec.tif']);
+    savefig(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells30sec.fig']);
+    saveas(gcf, [pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_PearsonCorr_pairedCells30sec.svg']);
     
     
 end
 %% plot the means and norm means for all the cells along with the pearson corrs
 if plotOddEvenAllFlag ==1
     plotOddEvenFlights = figure('units','normalized','outerposition',[0 0 1 0.5]);
-    for cell_i = goodCellIdx.goodCellIndex%length(traceData{1}(1,1,:))
+    for cell_i = goodCellIdx.goodCellIndex%length(traceData{2}(1,1,:))
         %plot all of the odd traces in left figure
         p1 = subplot(1,3,1);
-        for flight_i = 1:2:length(traceData{1}(:,1,1))
+        for flight_i = 1:2:length(traceData{2}(:,1,1))
             plot(traceFlightOdd(flight_i,:,cell_i));
             hold on;
         end
@@ -106,7 +109,7 @@ if plotOddEvenAllFlag ==1
         ylabel('df/f');
         %plot all of the even traces in right figure
         p2 = subplot(1,3,2);
-        for flight_i = 2:2:length(traceData{1}(:,1,1))
+        for flight_i = 2:2:length(traceData{2}(:,1,1))
             plot(traceFlightEven(flight_i,:,cell_i));
             hold on;
         end
@@ -140,9 +143,9 @@ if plotOddEvenAllFlag ==1
             end
             % Save 'each cell' as jpg and fig files..
             %set(findall(gcf,'-property','FontSize'),'FontSize',20);
-            saveas(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_PearsonCorr-' num2str(cell_i) '.tif']);
-            savefig(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_PearsonCorr-' num2str(cell_i) '.fig']);
-            saveas(gcf, [pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_PearsonCorr-' num2str(cell_i) '.svg']);
+            saveas(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_PearsonCorr30sec-' num2str(cell_i) '.tif']);
+            savefig(gcf,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_PearsonCorr30sec-' num2str(cell_i) '.fig']);
+            saveas(gcf, [pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_PearsonCorr30sec-' num2str(cell_i) '.svg']);
         else
             pause
         end
@@ -181,9 +184,9 @@ if plotHighCorrFlag ==1
                 end
                 % Save 'each cell' as jpg and fig files..
                 %set(findall(gcf,'-property','FontSize'),'FontSize',20);
-                saveas(gcf,[pwd '/PearsonCorr/highCorr_cells/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_highCorr-' num2str(cell_i) '.tif']);
-                savefig(gcf,[pwd '/PearsonCorr/highCorr_cells/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_highCorr-' num2str(cell_i) '.fig']);
-                saveas(gcf, [pwd '/PearsonCorr/highCorr_cells/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_highCorr-' num2str(cell_i) '.svg']);
+                saveas(gcf,[pwd '/PearsonCorr/highCorr_cells/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_highCorr30sec-' num2str(cell_i) '.tif']);
+                savefig(gcf,[pwd '/PearsonCorr/highCorr_cells/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_highCorr30sec-' num2str(cell_i) '.fig']);
+                saveas(gcf, [pwd '/PearsonCorr/highCorr_cells/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_meanTrace_oddEven_highCorr30sec-' num2str(cell_i) '.svg']);
             else
                 pause
             end
@@ -208,15 +211,16 @@ cellsPearsonCorr.traceFlightOdd = traceFlightOdd;
 cellsPearsonCorr.highCorrThresh = highCorrThresh;
 if plotHighCorrFlag == 1
 cellsPearsonCorr.highCorrIndex = highCorrIndex;
-goodCellIdx.lowCorrIndex = highCorrIndex;
+goodCellIdx.highCorrIndex = highCorrIndex;
 end
 goodCellIdx.highCorrThresh = highCorrThresh;
 if saveFlag ==1
-    save([pwd '/' batName '_' dateSesh '_' sessionType '_cellsPearsonCorr.mat'],'cellsPearsonCorr');
+    save([pwd '/' batName '_' dateSesh '_' sessionType '_cellsPearsonCorr30sec.mat'],'cellsPearsonCorr');
     save([pwd '/' batName '_' dateSesh '_' sessionType '_goodCellIdx.mat'],'goodCellIdx');
 end
 
-%plot the matrix of odd vs even flights (sorted by the odd flights)
+%% plot the matrix of odd vs even flights (sorted by the odd flights)
+if plotHeatMapFlag ==1
 [~,maxOdd] = max(cellsPearsonCorr.meanTraceFlightOdd,[],2); 
 [Bodd,Iodd] = sort(maxOdd);
 oddSortedHeatMap = figure(); 
@@ -224,7 +228,7 @@ subplot(2,1,1);
 imagesc(cellsPearsonCorr.meanTraceFlightOdd(Iodd,:)); 
 title('Odd'); 
 subplot(2,1,2); 
-imagesc(cellsPearsonCorr.meanTraceFlightEven(Iodd,:),[10 50]); 
+imagesc(cellsPearsonCorr.meanTraceFlightEven(Iodd,:));%,[10 50]); 
 title('Even'); 
 colormap('hot');
 sgtitle(['Odd and even flights sorted by odd: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
@@ -235,8 +239,8 @@ if saveFlag ==1
     end
     % Save 'each cell' as jpg and fig files..
     %set(findall(gcf,'-property','FontSize'),'FontSize',20);
-    saveas(oddSortedHeatMap,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_oddSortedHeatMap.tif']);
-    savefig(oddSortedHeatMap,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_oddSortedHeatMap.fig']);
-    saveas(oddSortedHeatMap, [pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_oddSortedHeatMap.svg']);
+    saveas(oddSortedHeatMap,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_oddSortedHeatMap30sec.tif']);
+    savefig(oddSortedHeatMap,[pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_oddSortedHeatMap30sec.fig']);
+    saveas(oddSortedHeatMap, [pwd '/PearsonCorr/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_oddSortedHeatMap30sec.svg']);
 end
-
+end
