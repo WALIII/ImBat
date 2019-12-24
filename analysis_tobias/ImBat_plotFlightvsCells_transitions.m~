@@ -1,9 +1,11 @@
-function [traceAnalysis] = ImBat_plotFlightvsCells_transitions(snakeTrace,flightTransitions,flightPaths,goodCellIdx,varargin)
+function [traceAnalysis] = ImBat_plotFlightvsCells_transitions(snakeTrace,flightTransitions,flightPaths,goodCellIdx,flightTiming,varargin)
 plotEachFlag = 0;
 plotPreFlightPostFlag = 0;
 plotMeanSpikeFlag = 0;
 plotMeanSortedFlag = 0;
-histoTraceStatsFlag = 1;
+histoTraceStatsFlag = 0;
+plotSortedFWHMFlag = 0;
+plotTimeJitterSortFlag = 1;
 
 batName = snakeTrace.batName;
 dateSesh = snakeTrace.dateSesh;
@@ -631,7 +633,7 @@ for cell_i = goodCellIdx.lowCorrIndex
     traceNormAtoB(cell_i,:) = traceNormAtoB(cell_i,:) - min(traceNormAtoB(cell_i,:));
     traceNormBtoA(cell_i,:) = zscore(traceAnalysis.smoothBtoA(cell_i,:));
     traceNormBtoA(cell_i,:) = traceNormBtoA(cell_i,:) - min(traceNormBtoA(cell_i,:));
-
+    
     [~,maxSmoothBtoA(cell_i,1)] = max(traceAnalysis.smoothBtoA(cell_i,:));
     [~,maxSmoothAtoB(cell_i,1)] = max(traceAnalysis.smoothAtoB(cell_i,:));
     %[~,maxSmoothAtoB(cell_i,1)] = max(traceNormAtoB(cell_i,:));
@@ -708,7 +710,7 @@ if plotMeanSortedFlag == 1
     ylabel('ROI #');
     
     p6 = subplot(6,2,[6 8])
-     %imagesc(smoothBtoA(ITraceBtoA,:));
+    %imagesc(smoothBtoA(ITraceBtoA,:));
     imagesc(traceNormBtoA(ITraceBtoA,:));
     colormap(hot)
     title(['Aligned B to A: Sorted B to A']);
@@ -735,12 +737,12 @@ if plotMeanSortedFlag == 1
     set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     xlabel('time (s)');
     ylabel('ROI #');
-
+    
     if saveFlag ==1
         saveas(plotSortedPeaks, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_heatMap_highCorr_sortedPeaks_NORM_AvB.svg']);
         saveas(plotSortedPeaks, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_heatMap_highCorr_sortedPeaks_NORM_AvB.tif']);
         savefig(plotSortedPeaks, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_heatMap_highCorr_sortedPeaks_NORM_AvB.fig']);
-    end  
+    end
 end
 
 traceAnalysis.traceNormAtoB = traceNormAtoB;
@@ -764,11 +766,11 @@ if histoTraceStatsFlag == 1
     title('Height of half-max aligned to A or B')
     legend('Aligned to A','Aligned to B')
     xlabel('Height of half-max (SD)')
-        if saveFlag == 1
+    if saveFlag == 1
         saveas(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_histo_halfMaxHeight_AvB.svg']);
         saveas(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_histo_halfMaxHeight_AvB.tif']);
         savefig(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_histo_halfMaxHeight_AvB.fig']);
-        end
+    end
     
     figure; histogram(abs(traceAnalysis.fwhmAtoB))
     hold on; histogram(abs(traceAnalysis.fwhmBtoA),11)
@@ -795,23 +797,234 @@ if histoTraceStatsFlag == 1
         saveas(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_histo_timeStartPeak_AvB.tif']);
         savefig(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_histo_timeStartPeak_AvB.fig']);
     end
-    
+end
+
+%% Plot the fwhm across time sorted by the width of the half max
+if plotSortedFWHMFlag ==1
     [BfwhmAtoB,IfwhmAtoB] = sort(traceAnalysis.fwhmAtoB);
     [BfwhmBtoA,IfwhmBtoA] = sort(traceAnalysis.fwhmBtoA);
-    figure; 
-    for cell_i = goodCellIdx.lowCorrIndex
-       plot(traceAnalysis. 
+    
+    plotSortedFWHM = figure('units','normalized','outerposition',[0 0 1 1]);
+    %for each flight in the subgroup AtoB
+    for flight_i = 1:length(flightTransitions.AtoB)
         
+        p1 = subplot(6,2,1); %plot trajectories pre/flight/post for A to B
+        plot(flightPaths.trajectories_continuous(1,flightPaths.flight_starts_idx(flightTransitions.AtoB(flight_i))-snakeTrace.preFlightPadSpeed:flightPaths.flight_ends_idx(flightTransitions.AtoB(flight_i))+snakeTrace.postFlightPadSpeed),flightPaths.trajectories_continuous(2,flightPaths.flight_starts_idx(flightTransitions.AtoB(flight_i))-snakeTrace.preFlightPadSpeed:flightPaths.flight_ends_idx(flightTransitions.AtoB(flight_i))+snakeTrace.postFlightPadSpeed),'LineWidth',1,'Color','b')%,jj(traj*100,:))
+        hold on
+        scatter(flightPaths.flight_starts_xyz(flightTransitions.AtoB(flight_i),1),flightPaths.flight_starts_xyz(flightTransitions.AtoB(flight_i),2),50,'r','filled')
+        scatter(flightPaths.flight_ends_xyz(flightTransitions.AtoB(flight_i),1),flightPaths.flight_ends_xyz(flightTransitions.AtoB(flight_i),2),50,'k','filled')
+        title('A to B (r=start,b=ends)');
+        ylabel('y (cm)');
+        yt = get(gca,'YTick');
+        set(gca,'YTick',yt,'YTickLabel',yt/10);
+        xlabel('x (cm)');
+        xt = get(gca,'XTick');
+        set(gca,'XTick',xt,'XTickLabel',xt/10);
+        
+        p2 = subplot(6,2,3); %plot speed pre/flight/post A to B
+        plot(1:length(snakeTrace.smoothSpeedRawPreFlightPost{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:)),snakeTrace.smoothSpeedRawPreFlightPost{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:))
+        hold on
+        ylabel('velocity (cm/s)');
+        yt = get(gca,'YTick');
+        set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
+        ylim([0 6]);
+        xlim([1 length(snakeTrace.smoothSpeedRawPreFlightPost{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:))]);
     end
-%     subplot(2,2,1);
-%     imagesc(traceAnalysis.smoothAtoB(IfwhmAtoB,:));
-%     subplot(2,2,2);
-%     imagesc(traceAnalysis.smoothBtoA(IfwhmBtoA,:));
-%     subplot(2,2,3);
-%     imagesc(traceAnalysis.smoothAtoB(IfwhmBtoA,:));
-%     subplot(2,2,4);
-%     imagesc(traceAnalysis.smoothBtoA(IfwhmAtoB,:));
-
-
+    
+    %for each flight in the subgroup BtoA
+    for flight_i = 1:length(flightTransitions.BtoA)
+        
+        p3 = subplot(6,2,2); %plot trajectories pre/flight/post for B to A
+        plot(flightPaths.trajectories_continuous(1,flightPaths.flight_starts_idx(flightTransitions.BtoA(flight_i))-snakeTrace.preFlightPadSpeed:flightPaths.flight_ends_idx(flightTransitions.BtoA(flight_i))+snakeTrace.postFlightPadSpeed),flightPaths.trajectories_continuous(2,flightPaths.flight_starts_idx(flightTransitions.BtoA(flight_i))-snakeTrace.preFlightPadSpeed:flightPaths.flight_ends_idx(flightTransitions.BtoA(flight_i))+snakeTrace.postFlightPadSpeed),'LineWidth',1,'Color','m')%,jj(traj*100,:))
+        hold on
+        scatter(flightPaths.flight_starts_xyz(flightTransitions.BtoA(flight_i),1),flightPaths.flight_starts_xyz(flightTransitions.BtoA(flight_i),2),50,'r','filled')
+        scatter(flightPaths.flight_ends_xyz(flightTransitions.BtoA(flight_i),1),flightPaths.flight_ends_xyz(flightTransitions.BtoA(flight_i),2),50,'k','filled')
+        title('B to A (r=start,b=ends)');
+        ylabel('y (cm)');
+        yt = get(gca,'YTick');
+        set(gca,'YTick',yt,'YTickLabel',yt/10);
+        xlabel('x (cm)');
+        xt = get(gca,'XTick');
+        set(gca,'XTick',xt,'XTickLabel',xt/10);
+        
+        p4 = subplot(6,2,4); %plot speed pre/flight/post B to A
+        plot(1:length(snakeTrace.smoothSpeedRawPreFlightPost{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(snakeTrace.smoothSpeedRawPreFlightPost{1}(:,1)),:)),snakeTrace.smoothSpeedRawPreFlightPost{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(snakeTrace.smoothSpeedRawPreFlightPost{1}(:,1)),:))
+        hold on
+        ylabel('velocity (cm/s)');
+        yt = get(gca,'YTick');
+        set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
+        ylim([0 6]);
+        xlim([1 length(snakeTrace.smoothSpeedRawPreFlightPost{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(snakeTrace.smoothSpeedRawPreFlightPost{1}(:,1)),:))]);
+    end
+    
+    %plot the fwhm aligned by flight A or B
+    for cell_i = goodCellIdx.lowCorrIndex
+        p5 = subplot(6,2,[5 7]);
+        plot(traceAnalysis.indRiseAtoB(cell_i):traceAnalysis.indFallAtoB(cell_i),find(IfwhmAtoB==cell_i),'o')
+        hold on;
+        title('Aligned A to B: Sorted A to B');
+        xt = get(gca, 'XTick');
+        set(gca,'XTick',xt,'XTickLabel',[]);
+        ylabel('ROI #');
+        
+        p6 = subplot(6,2,[6 8]);
+        plot(traceAnalysis.indRiseBtoA(cell_i):traceAnalysis.indFallBtoA(cell_i),find(IfwhmBtoA==cell_i),'o')
+        hold on;
+        title('Aligned B to A: Sorted B to A');
+        xt = get(gca, 'XTick');
+        set(gca,'XTick',xt,'XTickLabel',[]);
+        ylabel('ROI #');
+        
+        p7 = subplot(6,2,[9 11]);
+        plot(traceAnalysis.indRiseAtoB(cell_i):traceAnalysis.indFallAtoB(cell_i),find(IfwhmBtoA==cell_i),'o')
+        hold on;
+        title('Aligned A to B: Sorted B to A');
+        xt = get(gca, 'XTick');
+        set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+        xlabel('time (s)');
+        ylabel('ROI #');
+        
+        p8 = subplot(6,2,[10 12]);
+        plot(traceAnalysis.indRiseBtoA(cell_i):traceAnalysis.indFallBtoA(cell_i),find(IfwhmAtoB==cell_i),'o')
+        hold on;
+        title('Aligned B to A: Sorted A to B');
+        xt = get(gca, 'XTick');
+        set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+        xlabel('time (s)');
+        ylabel('ROI #');
+        %pause
+    end
+    %     subplot(2,2,1);
+    %     imagesc(traceAnalysis.smoothAtoB(IfwhmAtoB,:));
+    %     subplot(2,2,2);
+    %     imagesc(traceAnalysis.smoothBtoA(IfwhmBtoA,:));
+    %     subplot(2,2,3);
+    %     imagesc(traceAnalysis.smoothAtoB(IfwhmBtoA,:));
+    %     subplot(2,2,4);
+    %     imagesc(traceAnalysis.smoothBtoA(IfwhmAtoB,:));
+    if saveFlag == 1
+        saveas(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_SortedFWHM_AvB.svg']);
+        saveas(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_SortedFWHM_AvB.tif']);
+        savefig(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_SortedFWHM_AvB.fig']);
+    end
+    
     
 end
+
+%%
+if plotTimeJitterSortFlag == 1
+    
+    [BdiffStartAtoB,IdiffStartAtoB] = sort(flightTiming.diffStartAtoStartB);
+    [BdiffSBtoSA,IdiffSBtoSA] = sort(flightTiming.diffSBtoSA);
+    
+    plotSortedFWHM = figure('units','normalized','outerposition',[0 0 1 1]);
+    %for each flight in the subgroup AtoB
+    for flight_i = 1:length(flightTransitions.AtoB)
+        
+        p1 = subplot(6,2,1); %plot trajectories pre/flight/post for A to B
+        plot(flightPaths.trajectories_continuous(1,flightPaths.flight_starts_idx(flightTransitions.AtoB(flight_i))-snakeTrace.preFlightPadSpeed:flightPaths.flight_ends_idx(flightTransitions.AtoB(flight_i))+snakeTrace.postFlightPadSpeed),flightPaths.trajectories_continuous(2,flightPaths.flight_starts_idx(flightTransitions.AtoB(flight_i))-snakeTrace.preFlightPadSpeed:flightPaths.flight_ends_idx(flightTransitions.AtoB(flight_i))+snakeTrace.postFlightPadSpeed),'LineWidth',1,'Color','b')%,jj(traj*100,:))
+        hold on
+        scatter(flightPaths.flight_starts_xyz(flightTransitions.AtoB(flight_i),1),flightPaths.flight_starts_xyz(flightTransitions.AtoB(flight_i),2),50,'r','filled')
+        scatter(flightPaths.flight_ends_xyz(flightTransitions.AtoB(flight_i),1),flightPaths.flight_ends_xyz(flightTransitions.AtoB(flight_i),2),50,'k','filled')
+        title('A to B (r=start,b=ends)');
+        ylabel('y (cm)');
+        yt = get(gca,'YTick');
+        set(gca,'YTick',yt,'YTickLabel',yt/10);
+        xlabel('x (cm)');
+        xt = get(gca,'XTick');
+        set(gca,'XTick',xt,'XTickLabel',xt/10);
+        
+        p2 = subplot(6,2,3); %plot speed pre/flight/post A to B
+        plot(1:length(snakeTrace.smoothSpeedRawPreFlightPost{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:)),snakeTrace.smoothSpeedRawPreFlightPost{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:))
+        hold on
+        ylabel('velocity (cm/s)');
+        yt = get(gca,'YTick');
+        set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
+        ylim([0 6]);
+        xlim([1 length(snakeTrace.smoothSpeedRawPreFlightPost{1}(find([flightPaths.clusterIndex{:}]==flightTransitions.AtoB(flight_i)),:))]);
+    end
+    
+    %for each flight in the subgroup BtoA
+    for flight_i = 1:length(flightTransitions.BtoA)
+        
+        p3 = subplot(6,2,2); %plot trajectories pre/flight/post for B to A
+        plot(flightPaths.trajectories_continuous(1,flightPaths.flight_starts_idx(flightTransitions.BtoA(flight_i))-snakeTrace.preFlightPadSpeed:flightPaths.flight_ends_idx(flightTransitions.BtoA(flight_i))+snakeTrace.postFlightPadSpeed),flightPaths.trajectories_continuous(2,flightPaths.flight_starts_idx(flightTransitions.BtoA(flight_i))-snakeTrace.preFlightPadSpeed:flightPaths.flight_ends_idx(flightTransitions.BtoA(flight_i))+snakeTrace.postFlightPadSpeed),'LineWidth',1,'Color','m')%,jj(traj*100,:))
+        hold on
+        scatter(flightPaths.flight_starts_xyz(flightTransitions.BtoA(flight_i),1),flightPaths.flight_starts_xyz(flightTransitions.BtoA(flight_i),2),50,'r','filled')
+        scatter(flightPaths.flight_ends_xyz(flightTransitions.BtoA(flight_i),1),flightPaths.flight_ends_xyz(flightTransitions.BtoA(flight_i),2),50,'k','filled')
+        title('B to A (r=start,b=ends)');
+        ylabel('y (cm)');
+        yt = get(gca,'YTick');
+        set(gca,'YTick',yt,'YTickLabel',yt/10);
+        xlabel('x (cm)');
+        xt = get(gca,'XTick');
+        set(gca,'XTick',xt,'XTickLabel',xt/10);
+        
+        p4 = subplot(6,2,4); %plot speed pre/flight/post B to A
+        plot(1:length(snakeTrace.smoothSpeedRawPreFlightPost{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(snakeTrace.smoothSpeedRawPreFlightPost{1}(:,1)),:)),snakeTrace.smoothSpeedRawPreFlightPost{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(snakeTrace.smoothSpeedRawPreFlightPost{1}(:,1)),:))
+        hold on
+        ylabel('velocity (cm/s)');
+        yt = get(gca,'YTick');
+        set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
+        ylim([0 6]);
+        xlim([1 length(snakeTrace.smoothSpeedRawPreFlightPost{2}(find([flightPaths.clusterIndex{:}]==flightTransitions.BtoA(flight_i))-length(snakeTrace.smoothSpeedRawPreFlightPost{1}(:,1)),:))]);
+    end
+    for cell_i = goodCellIdx.lowCorrIndex
+        p5 = subplot(6,2,[5 7]);
+        imagesc(snakeTrace.tracePreFlightPost(flightTransitions.AtoB(IdiffStartAtoB),:,cell_i));
+        hold on;
+        title('Aligned A to B: Sorted from start of A to start of B');
+        xt = get(gca, 'XTick');
+        set(gca,'XTick',xt,'XTickLabel',[]);
+        ylabel('ROI #');
+        colormap('hot');
+        
+        
+        p6 = subplot(6,2,[6 8]);
+                imagesc(snakeTrace.tracePreFlightPost(flightTransitions.BtoA(IdiffSBtoSA),:,cell_i));
+        hold on;
+        title('Aligned B to A: Sorted from start of B to start of A');
+        xt = get(gca, 'XTick');
+        set(gca,'XTick',xt,'XTickLabel',[]);
+        ylabel('ROI #');
+        colormap('hot');
+        
+        
+        p7 = subplot(6,2,[9 11]);
+        imagesc(snakeTrace.tracePreFlightPost(flightTransitions.AtoB(IdiffSBtoSA),:,cell_i));
+        hold on;
+        title('Aligned A to B: Sorted from start of B to start of A');
+        xt = get(gca, 'XTick');
+        set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+        xlabel('time (s)');
+        ylabel('ROI #');
+        colormap('hot');
+        
+        
+        p8 = subplot(6,2,[10 12]);
+        imagesc(snakeTrace.tracePreFlightPost(flightTransitions.BtoA(IdiffStartAtoB),:,cell_i));
+        hold on;
+        title('Aligned B to A: Sorted from start of A to start of B');
+        xt = get(gca, 'XTick');
+        set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+        xlabel('time (s)');
+        ylabel('ROI #');
+        colormap('hot');
+        
+        
+        
+        
+        if saveFlag == 1
+            saveas(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_plotTimeJitterSort_AvB.svg']);
+            saveas(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_plotTimeJitterSort_AvB.tif']);
+            savefig(gcf, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_plotTimeJitterSort_AvB.fig']);
+        else
+            pause
+        end
+        cla(p5)
+        cla(p6)
+        cla(p7)
+        cla(p8)
+    end
+end
+

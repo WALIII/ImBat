@@ -1,10 +1,10 @@
-function [flightTiming] = ImBat_flight_timing(flightPaths,snakeTrace,flightTransitions,varargin)
+function ImBat_flight_timing(flightPaths,snakeTrace,flightTransitions,varargin)
 
 %% Plot the time differences between flights A to B & BtoA
 histAtoBFlag = 1;
 boxplotAtoBFlag = 1;
 plotFlightTimesFlag = 1;
-saveFlag = 0;
+saveFlag = 1;
 
 nparams=length(varargin);
 for i=1:2:nparams
@@ -177,19 +177,16 @@ if plotFlightTimesFlag ==1
 end
 
 
-flightTiming.flightStartA = flightStartA;
-flightTiming.flightStartB = flightStartB;
-flightTiming.flightEndA = flightEndA;
-flightTiming.flightEndB = flightEndB;
-flightTiming.diffStartAtoStartB = diffStartAtoStartB;
-flightTiming.diffEndAtoStartB = diffEndAtoStartB;
-flightTiming.flightSB = flightSB;
-flightTiming.flightSA = flightSA;
-flightTiming.flightEB = flightEB;
-flightTiming.flightEA = flightEA;
-flightTiming.diffSBtoSA = diffSBtoSA;
-flightTiming.diffEBtoSA = diffEBtoSA;
-
-if saveFlag ==1
-    save([pwd '/' batName '_' dateSesh '_' sessionType '_flightTiming.mat'],'flightTiming');
-end
+flightTimingflightStartA = flightStartA;
+flightStartB = flightStartB;
+flightEndA = flightEndA;
+flightEndB = flightEndB;
+    
+    diffStartAtoStartB = diffStartAtoStartB;
+    diffEndAtoStartB = diffEndAtoStartB;
+    flightSB = flightSB; 
+    flightSA = flightSA;
+    flightEB = flightEB;
+    flightEA = flightEA;
+    diffSBtoSA = diffSBtoSA;
+    diffEBtoSA = diffEBtoSA;
