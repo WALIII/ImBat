@@ -1,6 +1,6 @@
-function  [out_mov] = ImBat_Filter(mov);
-% 
-b = 9; %(smoothing )
+function  [out_mov] = ImBat_Filter(mov,smth_frames);
+%
+b = 3; %(smoothing )
 % FiltB = mat2gray(FiltA-FBM);
 % Scale data:
 
@@ -9,8 +9,8 @@ disp('scaling data');
 mov = mat2gray(mov)*256;
 
 disp(['smoothing data by a factor of ', num2str(b)]);
-out_mov = medfilt3(mov,[1 1 b]);
+% out_mov = medfilt3(mov,[1 1 b]);
+out_mov = medfilt3(single(video) ,[1 1 ]);
 
 
 %out_mov = (convn(mov, single(reshape([1 1 1] / b, 1, 1, [])), 'same'));
-
