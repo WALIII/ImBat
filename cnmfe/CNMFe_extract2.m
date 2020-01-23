@@ -396,3 +396,12 @@ for i = 1:size(neuron.C_raw,1)
     subplot(3,2,[5 6]); plot(noise_F(i,:));       hold on;    refline(0,thr(i));  hold off;     %ylim([-0.01 0.1]);
     w = waitforbuttonpress;
 end
+
+% Save data:
+
+%% save results
+results = neuron.obj2struct();
+eval(sprintf('save %s%s%s_results.mat results', dir_nm, filesep, file_nm));
+
+
+
