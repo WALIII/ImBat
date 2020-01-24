@@ -82,19 +82,19 @@ for cell_i = 1:length(cellData.results.C(:,1))
     %build the calcium and speed vectors for each flight within each cluster
         for trace_i = 1:length(flightPaths.flight_starts_idx)
             try
-                traceFlight(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
+                traceFlight(trace_i,:) = cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
                 speedFlight(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(trace_i) - prePadSpeed:flightPaths.flight_ends_idx(trace_i) + (maxDurSpeed-durSpeed(trace_i)) + postPadSpeed);
                 smoothSpeedRawFlight(trace_i,:) = smooth(speedFlight(trace_i,:),100);
-                tracePre(trace_i,:) = cellData.results.C(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
+                tracePre(trace_i,:) = cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
                 speedPre(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(trace_i) - preFlightPadSpeed:flightPaths.flight_starts_idx(trace_i));
                 smoothSpeedRawPre(trace_i,:) = smooth(speedPre(trace_i,:),100);
-                tracePost(trace_i,:) = cellData.results.C(cell_i,closestIndexEnd(trace_i)+postPadCalcium:closestIndexEnd(trace_i)+postPadCalcium + postFlightPadCalcium);
+                tracePost(trace_i,:) = cellData.results.C_raw(cell_i,closestIndexEnd(trace_i)+postPadCalcium:closestIndexEnd(trace_i)+postPadCalcium + postFlightPadCalcium);
                 speedPost(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(trace_i)+postPadCalcium:flightPaths.flight_ends_idx(trace_i)+postPadCalcium + postFlightPadSpeed);
                 smoothSpeedRawPost(trace_i,:) = smooth(speedPost(trace_i,:),100);
             catch
-                sizeToRecordingEnd = size(cellData.results.C(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end),2);
+                sizeToRecordingEnd = size(cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end),2);
                 sizeToTraceEnd = size(traceFlight(trace_i,:),2);
-                traceFlight(trace_i,:) = (cellData.results.C(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end + postFlightPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                traceFlight(trace_i,:) = (cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end + postFlightPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
                 speedFlight(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - preFlightPadSpeed:end + postFlightPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
                 disp('End of rec')
             end

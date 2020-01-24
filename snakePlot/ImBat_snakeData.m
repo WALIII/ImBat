@@ -7,8 +7,8 @@ loadFlag = 0; %do you want to load and save the data individually outside of ImB
 saveFlag = 0;
 %offset = 0.1; % account for slow calcium estimation ~move locations back  0ms in time... This is the knob to turn for 'prospective' coding...
 nClusters = 5; %number of flight trajectories to look at and for k means clustering of whole time series by peak
-preFlightPad = 7; %number of seconds to include before flight starts
-postFlightPad = 7; %of of seconds to include after flight ends
+preFlightPad = 15; %number of seconds to include before flight starts
+postFlightPad = 15; %of of seconds to include after flight ends
 
 
 % User inputs overrides
@@ -55,8 +55,8 @@ preFlightPadCalcium = preFlightPad*cellData.results.Fs; %number of frames (secon
 postFlightPadCalcium = postFlightPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 preFlightPadSpeed = preFlightPad*120; %add 2 seconds * FS of tracking data (120)
 postFlightPadSpeed = postFlightPad*120;%add 6 seconds * FS of tracking data (120)
-speedSmooth = 100; %number of tracking frames to smooth the data by using mean smooth
-
+smoothSpeed = 100; %number of tracking frames to smooth the data by using mean smooth
+smoothTrace = 2; %number of calcium video frames to smooth the data
 
 
 %this is to merge specific clusters if 2 or more of them are the same but
@@ -92,9 +92,11 @@ for data_i = 1:3
     speedPre = cell(1,nClusters);
     speedPost = cell(1,nClusters);
     meanTraceFlight = cell(1,nClusters);
+    sdTraceFlight = cell(1,nClusters);
     meanTraceOdd = cell(1,nClusters);
     meanTraceEven = cell(1,nClusters);
     meanTracePreFlightPost = cell(1,nClusters);
+    sdTracePreFlightPost = cell(1,nClusters);
     normTraceFlight = cell(1,nClusters);
     normTraceOdd= cell(1,nClusters);
     normTraceEven = cell(1,nClusters);
@@ -120,6 +122,7 @@ for data_i = 1:3
     normTracePost = cell(1,nClusters);
     normTracePost = cell(1,nClusters);
     smoothSpeedPost = cell(1,nClusters);
+    semTracePreFlightPost = cell(1,nClusters);
     normMeanTraceFlightAll = [];
     normMeanTracePreAll= [];
     normMeanTracePreAll= [];
@@ -159,43 +162,44 @@ for data_i = 1:3
                     traceFlight{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
                     speedFlight{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePadSpeed:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postPadSpeed);
                     smoothTraceRawFlight{clust_i}(trace_i,:,cell_i) = smooth(traceFlight{clust_i}(trace_i,:,cell_i),traceSmooth);
-                    normTraceRawFlight{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawFlight{clust_i}(trace_i,:,cell_i),0,2);
+                    normTraceRawFlight{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawFlight{clust_i}(trace_i,:,cell_i),0,smoothTrace);
                     normTraceRawFlight{clust_i}(trace_i,:,cell_i) = normTraceRawFlight{clust_i}(trace_i,:,cell_i) - min(normTraceRawFlight{clust_i}(trace_i,:,cell_i));
-                    smoothSpeedRawFlight{clust_i}(trace_i,:) = smooth(speedFlight{clust_i}(trace_i,:),speedSmooth);
+                    smoothSpeedRawFlight{clust_i}(trace_i,:) = smooth(speedFlight{clust_i}(trace_i,:),smoothSpeed);
                     tracePre{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
                     speedPre{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - preFlightPadSpeed:flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)));
                     smoothTraceRawPre{clust_i}(trace_i,:,cell_i) = smooth(tracePre{clust_i}(trace_i,:,cell_i),traceSmooth);
-                    normTraceRawPre{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPre{clust_i}(trace_i,:,cell_i),0,2);
+                    normTraceRawPre{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPre{clust_i}(trace_i,:,cell_i),0,smoothTrace);
                     normTraceRawPre{clust_i}(trace_i,:,cell_i) = normTraceRawPre{clust_i}(trace_i,:,cell_i) - min(normTraceRawPre{clust_i}(trace_i,:,cell_i));
-                    smoothSpeedRawPre{clust_i}(trace_i,:) = smooth(speedPre{clust_i}(trace_i,:),speedSmooth);
+                    smoothSpeedRawPre{clust_i}(trace_i,:) = smooth(speedPre{clust_i}(trace_i,:),smoothSpeed);
                     tracePost{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
                     speedPost{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postFlightPadSpeed);
                     smoothTraceRawPost{clust_i}(trace_i,:,cell_i) = smooth(tracePost{clust_i}(trace_i,:,cell_i),traceSmooth);
-                    normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,2);
+                    normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,smoothTrace);
                     normTraceRawPost{clust_i}(trace_i,:,cell_i) = normTraceRawPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPost{clust_i}(trace_i,:,cell_i));
-                    smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),speedSmooth);
+                    smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),smoothSpeed);
                     tracePreFlightPost{clust_i}(trace_i,:,cell_i) = cat(2,tracePre{clust_i}(trace_i,:,cell_i),traceFlight{clust_i}(trace_i,:,cell_i),tracePost{clust_i}(trace_i,:,cell_i));
                     speedPreFlightPost{clust_i}(trace_i,:) = horzcat(speedPre{clust_i}(trace_i,:),speedFlight{clust_i}(trace_i,:),speedPost{clust_i}(trace_i,:));
                     smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = smooth(tracePreFlightPost{clust_i}(trace_i,:,cell_i),traceSmooth);
-                    normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i),0,2);
+                    normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i),0,smoothTrace);
                     normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i));
-                    smoothSpeedRawPreFlightPost{clust_i}(trace_i,:) = smooth(speedPreFlightPost{clust_i}(trace_i,:),speedSmooth);
+                    smoothSpeedRawPreFlightPost{clust_i}(trace_i,:) = smooth(speedPreFlightPost{clust_i}(trace_i,:),smoothSpeed);
                     
                     
                 catch
-%                     tracePost{clust_i}(trace_i,:,cell_i) = [traceData(cell_i,closestIndexEnd(trace_i):end),zeros(1,size(tracePost{clust_i}(trace_i,:,cell_i),2) - size(traceData(cell_i,closestIndexEnd(trace_i):end),2))];
-%                     speedPost{clust_i}(trace_i,:) = [flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):end),zeros(1,size(speedPost{clust_i}(trace_i,:),2)-size(flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):end,2)))];
-%                     smoothTraceRawPost{clust_i}(trace_i,:,cell_i) = smooth(tracePost{clust_i}(trace_i,:,cell_i),traceSmooth);
-%                     normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,2);
-%                     normTraceRawPost{clust_i}(trace_i,:,cell_i) = normTraceRawPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPost{clust_i}(trace_i,:,cell_i));
-%                     smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),speedSmooth);
-                     disp('End of rec')
+                    %                     tracePost{clust_i}(trace_i,:,cell_i) = [traceData(cell_i,closestIndexEnd(trace_i):end),zeros(1,size(tracePost{clust_i}(trace_i,:,cell_i),2) - size(traceData(cell_i,closestIndexEnd(trace_i):end),2))];
+                    %                     speedPost{clust_i}(trace_i,:) = [flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):end),zeros(1,size(speedPost{clust_i}(trace_i,:),2)-size(flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):end,2)))];
+                    %                     smoothTraceRawPost{clust_i}(trace_i,:,cell_i) = smooth(tracePost{clust_i}(trace_i,:,cell_i),traceSmooth);
+                    %                     normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,2);
+                    %                     normTraceRawPost{clust_i}(trace_i,:,cell_i) = normTraceRawPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPost{clust_i}(trace_i,:,cell_i));
+                    %                     smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),speedSmooth);
+                    disp('End of rec')
                 end
-                 
+                
             end
             
             %calculate the mean neural activity across all flights in a cluster for each cell
             meanTraceFlight{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(:,:,cell_i));
+            sdTraceFlight{clust_i}(cell_i,:) = std(traceFlight{clust_i}(:,:,cell_i));
             meanTraceOdd{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(1:2:end,:,cell_i));
             meanTraceEven{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(2:2:end,:,cell_i));
             meanTracePre{clust_i}(cell_i,:) = mean(tracePre{clust_i}(:,:,cell_i));
@@ -204,23 +208,25 @@ for data_i = 1:3
             meanSpeedPre{clust_i} = mean(speedPre{clust_i});
             meanSpeedPost{clust_i} = mean(speedPost{clust_i});
             meanTracePreFlightPost{clust_i}(cell_i,:) = mean(tracePreFlightPost{clust_i}(:,:,cell_i));
+            sdTracePreFlightPost{clust_i}(cell_i,:) = std(tracePreFlightPost{clust_i}(:,:,cell_i));
+            semTracePreFlightPost{clust_i}(cell_i,:) = std(tracePreFlightPost{clust_i}(:,:,cell_i))/sqrt(length(tracePreFlightPost{clust_i}(:,:,cell_i)));
             meanSpeedPreFlightPost{clust_i} = mean(speedPreFlightPost{clust_i});
             
             %smooth and zscore the neural data. subtract the min of the zscore so the
             %min is 0 rather than mean 0
             normTraceFlight{clust_i}(cell_i,:) = zscore(smooth(meanTraceFlight{clust_i}(cell_i,:),traceSmooth));
             normTraceFlight{clust_i}(cell_i,:) = normTraceFlight{clust_i}(cell_i,:) - min(normTraceFlight{clust_i}(cell_i,:));
-            smoothSpeedFlight{clust_i} = smooth(meanSpeedFlight{clust_i},40);
+            smoothSpeedFlight{clust_i} = smooth(meanSpeedFlight{clust_i},smoothSpeed);
             normTraceOdd{clust_i}(cell_i,:) = zscore(smooth(meanTraceOdd{clust_i}(cell_i,:),traceSmooth));
             normTraceOdd{clust_i}(cell_i,:) = normTraceOdd{clust_i}(cell_i,:) - min(normTraceOdd{clust_i}(cell_i,:));
             normTraceEven{clust_i}(cell_i,:) = zscore(smooth(meanTraceEven{clust_i}(cell_i,:),traceSmooth));
             normTraceEven{clust_i}(cell_i,:) = normTraceEven{clust_i}(cell_i,:) - min(normTraceEven{clust_i}(cell_i,:));
             normTracePre{clust_i}(cell_i,:) = zscore(smooth(meanTracePre{clust_i}(cell_i,:),traceSmooth));
             normTracePre{clust_i}(cell_i,:) = normTracePre{clust_i}(cell_i,:) - min(normTracePre{clust_i}(cell_i,:));
-            smoothSpeedPre{clust_i} = smooth(meanSpeedPre{clust_i},40);
+            smoothSpeedPre{clust_i} = smooth(meanSpeedPre{clust_i},smoothSpeed);
             normTracePost{clust_i}(cell_i,:) = zscore(smooth(meanTracePost{clust_i}(cell_i,:),traceSmooth));
             normTracePost{clust_i}(cell_i,:) = normTracePost{clust_i}(cell_i,:) - min(normTracePost{clust_i}(cell_i,:));
-            smoothSpeedPost{clust_i} = smooth(meanSpeedPost{clust_i},40);
+            smoothSpeedPost{clust_i} = smooth(meanSpeedPost{clust_i},smoothSpeed);
             %find time index of max peaks
             [~,maxnormTraceFlight{clust_i}(cell_i,1)] = max(normTraceFlight{clust_i}(cell_i,:));
             [~,maxnormTracePre{clust_i}(cell_i,1)] = max(normTracePre{clust_i}(cell_i,:));
@@ -421,275 +427,114 @@ for data_i = 1:3
     end
     
     %% save to snakeTrace variable
-    if data_i ==1
-        snakeTrace_cRaw.preFlightPadCalcium = preFlightPadCalcium;
-        snakeTrace_cRaw.postFlightPadCalcium = postFlightPadCalcium;
-        snakeTrace_cRaw.preFlightPadSpeed = preFlightPadSpeed;
-        snakeTrace_cRaw.postFlightPadSpeed = postFlightPadSpeed;
-        snakeTrace_cRaw.normMeanTraceSortPreFlightPost = normMeanTraceSortPreFlightPost;
-        snakeTrace_cRaw.meanTracePreFlightPostAll=meanTracePreFlightPostAll;
-        snakeTrace_cRaw.maxAllPreFlightPost=maxAllPreFlightPost;
-        snakeTrace_cRaw.normMeanTracePreFlightPostAll=normMeanTracePreFlightPostAll;
-        snakeTrace_cRaw.kPeaksPreFlightPost=kPeaksPreFlightPost;
-        snakeTrace_cRaw.IkPeaksPreFlightPost=IkPeaksPreFlightPost;
-        snakeTrace_cRaw.normMeanTraceEachPFlightP = normMeanTraceEachPFlightP;
-        snakeTrace_cRaw.normMeanTraceEachPreFP = normMeanTraceEachPreFP;
-        snakeTrace_cRaw.normMeanTraceEachPFPost = normMeanTraceEachPFPost;
-        snakeTrace_cRaw.meanTraceFlight = meanTraceFlight;
-        snakeTrace_cRaw.normTraceFlight = normTraceFlight;
-        snakeTrace_cRaw.maxnormTraceFlight = maxnormTraceFlight;
-        snakeTrace_cRaw.meanTracePre = meanTracePre;
-        snakeTrace_cRaw.normTracePre = normTracePre;
-        snakeTrace_cRaw.maxnormTracePre = maxnormTracePre;
-        snakeTrace_cRaw.meanTracePost = meanTracePost;
-        snakeTrace_cRaw.normTracePost = normTracePost;
-        snakeTrace_cRaw.maxnormTracePost = maxnormTracePost;
-        snakeTrace_cRaw.BFlight = BFlight;
-        snakeTrace_cRaw.IFlight = IFlight;
-        snakeTrace_cRaw.BPre = BPre;
-        snakeTrace_cRaw.IPre = IPre;
-        snakeTrace_cRaw.BPost = BPost;
-        snakeTrace_cRaw.IPost = IPost;
-        snakeTrace_cRaw.BOdd = Bodd;
-        snakeTrace_cRaw.B1Flight = B1Flight;
-        snakeTrace_cRaw.I1Flight = I1Flight;
-        snakeTrace_cRaw.B1Pre = B1Pre;
-        snakeTrace_cRaw.I1Pre = I1Pre;
-        snakeTrace_cRaw.B1Post = B1Post;
-        snakeTrace_cRaw.I1Post = I1Post;
-        snakeTrace_cRaw.Iodd = Iodd;
-        snakeTrace_cRaw.Bodd = Bodd;
-        snakeTrace_cRaw.normTraceEven = normTraceEven;
-        snakeTrace_cRaw.normTraceOdd = normTraceOdd;
-        snakeTrace_cRaw.meanSpeedFlight = meanSpeedFlight;
-        snakeTrace_cRaw.smoothSpeedFlight = smoothSpeedFlight;
-        snakeTrace_cRaw.meanSpeedPre = meanSpeedPre;
-        snakeTrace_cRaw.smoothSpeedPre = smoothSpeedPre;
-        snakeTrace_cRaw.meanSpeedPost = meanSpeedPost;
-        snakeTrace_cRaw.smoothSpeedPost = smoothSpeedPost;
-        snakeTrace_cRaw.smoothSpeedRawPre = smoothSpeedRawPre;
-        snakeTrace_cRaw.smoothSpeedRawPost = smoothSpeedRawPost;
-        snakeTrace_cRaw.smoothSpeedRawFlight = smoothSpeedRawFlight;
-        snakeTrace_cRaw.normMeanTraceEachFlight = normMeanTraceEachFlight;
-        snakeTrace_cRaw.normMeanTraceSortFlight = normMeanTraceSortFlight;
-        snakeTrace_cRaw.normMeanTraceFlightAll = normMeanTraceFlightAll;
-        snakeTrace_cRaw.traceFlightIndConcat = traceFlightIndConcat;
-        snakeTrace_cRaw.normMeanTraceEachPre = normMeanTraceEachPre;
-        snakeTrace_cRaw.normMeanTraceSortPre = normMeanTraceSortPre;
-        snakeTrace_cRaw.normMeanTracePreAll = normMeanTracePreAll;
-        snakeTrace_cRaw.tracePreIndConcat = tracePreIndConcat;
-        snakeTrace_cRaw.normMeanTraceEachPost = normMeanTraceEachPost;
-        snakeTrace_cRaw.normMeanTraceSortPost = normMeanTraceSortPost;
-        snakeTrace_cRaw.normMeanTracePostAll = normMeanTracePostAll;
-        snakeTrace_cRaw.tracePostIndConcat = tracePostIndConcat;
-        snakeTrace_cRaw.nClusters = nClusters;
-        snakeTrace_cRaw.batName = batName;
-        snakeTrace_cRaw.dateSesh = dateSesh;
-        snakeTrace_cRaw.sessionType = sessionType;
-        snakeTrace_cRaw.InormFlightAll = InormFlightAll;
-        snakeTrace_cRaw.normTraceFlightAll = normTraceFlightAll;
-        snakeTrace_cRaw.I1normFlightAll = I1normFlightAll;
-        snakeTrace_cRaw.smoothTraceRawPost = smoothTraceRawPost;
-        snakeTrace_cRaw.smoothTraceRawPre = smoothTraceRawPre;
-        snakeTrace_cRaw.smoothTraceRawFlight = smoothTraceRawFlight;
-        snakeTrace_cRaw.traceFlightIdx = traceFlightIdx;
-        snakeTrace_cRaw.normTraceRawPre = normTraceRawPre;
-        snakeTrace_cRaw.normTraceRawFlight = normTraceRawFlight;
-        snakeTrace_cRaw.normTraceRawPost = normTraceRawPost;
-        snakeTrace_cRaw.traceFlight = traceFlight;
-        snakeTrace_cRaw.tracePre = tracePre;
-        snakeTrace_cRaw.tracePost = tracePost;        
-        snakeTrace_cRaw.tracePreFlightPost = tracePreFlightPost;
-        snakeTrace_cRaw.meanSpeedPreFlightPost = meanSpeedPreFlightPost;
-        snakeTrace_cRaw.meanTracePreFlightPost = meanTracePreFlightPost;
-        snakeTrace_cRaw.speedPreFlightPost = speedPreFlightPost;
-        snakeTrace_cRaw.smoothTraceRawPreFlightPost = smoothTraceRawPreFlightPost;
-        snakeTrace_cRaw.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
-        snakeTrace_cRaw.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
-        snakeTrace_cRaw.smoothSpeedRawPreFlightPost = smoothSpeedRawPreFlightPost;
-    elseif data_i ==2
-        snakeTrace_c.preFlightPadCalcium = preFlightPadCalcium;
-        snakeTrace_c.postFlightPadCalcium = postFlightPadCalcium;
-        snakeTrace_c.preFlightPadSpeed = preFlightPadSpeed;
-        snakeTrace_c.postFlightPadSpeed = postFlightPadSpeed;
-        snakeTrace_c.normMeanTraceSortPreFlightPost = normMeanTraceSortPreFlightPost;
-        snakeTrace_c.meanTracePreFlightPostAll=meanTracePreFlightPostAll;
-        snakeTrace_c.maxAllPreFlightPost=maxAllPreFlightPost;
-        snakeTrace_c.normMeanTracePreFlightPostAll=normMeanTracePreFlightPostAll;
-        snakeTrace_c.kPeaksPreFlightPost=kPeaksPreFlightPost;
-        snakeTrace_c.IkPeaksPreFlightPost=IkPeaksPreFlightPost;
-        snakeTrace_c.normMeanTraceEachPFlightP = normMeanTraceEachPFlightP;
-        snakeTrace_c.normMeanTraceEachPreFP = normMeanTraceEachPreFP;
-        snakeTrace_c.normMeanTraceEachPFPost = normMeanTraceEachPFPost;
-        snakeTrace_c.meanTraceFlight = meanTraceFlight;
-        snakeTrace_c.normTraceFlight = normTraceFlight;
-        snakeTrace_c.maxnormTraceFlight = maxnormTraceFlight;
-        snakeTrace_c.meanTracePre = meanTracePre;
-        snakeTrace_c.normTracePre = normTracePre;
-        snakeTrace_c.maxnormTracePre = maxnormTracePre;
-        snakeTrace_c.meanTracePost = meanTracePost;
-        snakeTrace_c.normTracePost = normTracePost;
-        snakeTrace_c.maxnormTracePost = maxnormTracePost;
-        snakeTrace_c.BFlight = BFlight;
-        snakeTrace_c.IFlight = IFlight;
-        snakeTrace_c.BPre = BPre;
-        snakeTrace_c.IPre = IPre;
-        snakeTrace_c.BPost = BPost;
-        snakeTrace_c.IPost = IPost;
-        snakeTrace_c.BOdd = Bodd;
-        snakeTrace_c.B1Flight = B1Flight;
-        snakeTrace_c.I1Flight = I1Flight;
-        snakeTrace_c.B1Pre = B1Pre;
-        snakeTrace_c.I1Pre = I1Pre;
-        snakeTrace_c.B1Post = B1Post;
-        snakeTrace_c.I1Post = I1Post;
-        snakeTrace_c.Iodd = Iodd;
-        snakeTrace_c.Bodd = Bodd;
-        snakeTrace_c.normTraceEven = normTraceEven;
-        snakeTrace_c.normTraceOdd = normTraceOdd;
-        snakeTrace_c.meanSpeedFlight = meanSpeedFlight;
-        snakeTrace_c.smoothSpeedFlight = smoothSpeedFlight;
-        snakeTrace_c.meanSpeedPre = meanSpeedPre;
-        snakeTrace_c.smoothSpeedPre = smoothSpeedPre;
-        snakeTrace_c.meanSpeedPost = meanSpeedPost;
-        snakeTrace_c.smoothSpeedPost = smoothSpeedPost;
-        snakeTrace_c.smoothSpeedRawPre = smoothSpeedRawPre;
-        snakeTrace_c.smoothSpeedRawPost = smoothSpeedRawPost;
-        snakeTrace_c.smoothSpeedRawFlight = smoothSpeedRawFlight;
-        snakeTrace_c.normMeanTraceEachFlight = normMeanTraceEachFlight;
-        snakeTrace_c.normMeanTraceSortFlight = normMeanTraceSortFlight;
-        snakeTrace_c.normMeanTraceFlightAll = normMeanTraceFlightAll;
-        snakeTrace_c.traceFlightIndConcat = traceFlightIndConcat;
-        snakeTrace_c.normMeanTraceEachPre = normMeanTraceEachPre;
-        snakeTrace_c.normMeanTraceSortPre = normMeanTraceSortPre;
-        snakeTrace_c.normMeanTracePreAll = normMeanTracePreAll;
-        snakeTrace_c.tracePreIndConcat = tracePreIndConcat;
-        snakeTrace_c.normMeanTraceEachPost = normMeanTraceEachPost;
-        snakeTrace_c.normMeanTraceSortPost = normMeanTraceSortPost;
-        snakeTrace_c.normMeanTracePostAll = normMeanTracePostAll;
-        snakeTrace_c.tracePostIndConcat = tracePostIndConcat;
-        snakeTrace_c.nClusters = nClusters;
-        snakeTrace_c.batName = batName;
-        snakeTrace_c.dateSesh = dateSesh;
-        snakeTrace_c.sessionType = sessionType;
-        snakeTrace_c.InormFlightAll = InormFlightAll;
-        snakeTrace_c.normTraceFlightAll = normTraceFlightAll;
-        snakeTrace_c.I1normFlightAll = I1normFlightAll;
-        snakeTrace_c.smoothTraceRawPost = smoothTraceRawPost;
-        snakeTrace_c.smoothTraceRawPre = smoothTraceRawPre;
-        snakeTrace_c.smoothTraceRawFlight = smoothTraceRawFlight;
-        snakeTrace_c.traceFlightIdx = traceFlightIdx;
-        snakeTrace_c.normTraceRawPre = normTraceRawPre;
-        snakeTrace_c.normTraceRawFlight = normTraceRawFlight;
-        snakeTrace_c.normTraceRawPost = normTraceRawPost;
-        snakeTrace_c.traceFlight = traceFlight;
-        snakeTrace_c.tracePre = tracePre;
-        snakeTrace_c.tracePost = tracePost; 
-        snakeTrace_c.tracePreFlightPost = tracePreFlightPost;
-        snakeTrace_c.meanSpeedPreFlightPost = meanSpeedPreFlightPost;
-        snakeTrace_c.meanTracePreFlightPost = meanTracePreFlightPost;
-        snakeTrace_c.speedPreFlightPost = speedPreFlightPost;
-        snakeTrace_c.smoothTraceRawPreFlightPost = smoothTraceRawPreFlightPost;
-        snakeTrace_c.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
-        snakeTrace_c.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
-        snakeTrace_c.smoothSpeedRawPreFlightPost = smoothSpeedRawPreFlightPost;
-    elseif data_i ==3
-        snakeTrace_s.preFlightPadCalcium = preFlightPadCalcium;
-        snakeTrace_s.postFlightPadCalcium = postFlightPadCalcium;
-        snakeTrace_s.preFlightPadSpeed = preFlightPadSpeed;
-        snakeTrace_s.postFlightPadSpeed = postFlightPadSpeed;
-        snakeTrace_s.normMeanTraceSortPreFlightPost = normMeanTraceSortPreFlightPost;
-        snakeTrace_s.meanTracePreFlightPostAll=meanTracePreFlightPostAll;
-        snakeTrace_s.maxAllPreFlightPost=maxAllPreFlightPost;
-        snakeTrace_s.normMeanTracePreFlightPostAll=normMeanTracePreFlightPostAll;
-        snakeTrace_s.kPeaksPreFlightPost=kPeaksPreFlightPost;
-        snakeTrace_s.IkPeaksPreFlightPost=IkPeaksPreFlightPost;
-        snakeTrace_s.normMeanTraceEachPFlightP = normMeanTraceEachPFlightP;
-        snakeTrace_s.normMeanTraceEachPreFP = normMeanTraceEachPreFP;
-        snakeTrace_s.normMeanTraceEachPFPost = normMeanTraceEachPFPost;
-        snakeTrace_s.meanTraceFlight = meanTraceFlight;
-        snakeTrace_s.normTraceFlight = normTraceFlight;
-        snakeTrace_s.maxnormTraceFlight = maxnormTraceFlight;
-        snakeTrace_s.meanTracePre = meanTracePre;
-        snakeTrace_s.normTracePre = normTracePre;
-        snakeTrace_s.maxnormTracePre = maxnormTracePre;
-        snakeTrace_s.meanTracePost = meanTracePost;
-        snakeTrace_s.normTracePost = normTracePost;
-        snakeTrace_s.maxnormTracePost = maxnormTracePost;
-        snakeTrace_s.BFlight = BFlight;
-        snakeTrace_s.IFlight = IFlight;
-        snakeTrace_s.BPre = BPre;
-        snakeTrace_s.IPre = IPre;
-        snakeTrace_s.BPost = BPost;
-        snakeTrace_s.IPost = IPost;
-        snakeTrace_s.BOdd = Bodd;
-        snakeTrace_s.B1Flight = B1Flight;
-        snakeTrace_s.I1Flight = I1Flight;
-        snakeTrace_s.B1Pre = B1Pre;
-        snakeTrace_s.I1Pre = I1Pre;
-        snakeTrace_s.B1Post = B1Post;
-        snakeTrace_s.I1Post = I1Post;
-        snakeTrace_s.Iodd = Iodd;
-        snakeTrace_s.Bodd = Bodd;
-        snakeTrace_s.normTraceEven = normTraceEven;
-        snakeTrace_s.normTraceOdd = normTraceOdd;
-        snakeTrace_s.meanSpeedFlight = meanSpeedFlight;
-        snakeTrace_s.smoothSpeedFlight = smoothSpeedFlight;
-        snakeTrace_s.meanSpeedPre = meanSpeedPre;
-        snakeTrace_s.smoothSpeedPre = smoothSpeedPre;
-        snakeTrace_s.meanSpeedPost = meanSpeedPost;
-        snakeTrace_s.smoothSpeedPost = smoothSpeedPost;
-        snakeTrace_s.smoothSpeedRawPre = smoothSpeedRawPre;
-        snakeTrace_s.smoothSpeedRawPost = smoothSpeedRawPost;
-        snakeTrace_s.smoothSpeedRawFlight = smoothSpeedRawFlight;
-        snakeTrace_s.normMeanTraceEachFlight = normMeanTraceEachFlight;
-        snakeTrace_s.normMeanTraceSortFlight = normMeanTraceSortFlight;
-        snakeTrace_s.normMeanTraceFlightAll = normMeanTraceFlightAll;
-        snakeTrace_s.traceFlightIndConcat = traceFlightIndConcat;
-        snakeTrace_s.normMeanTraceEachPre = normMeanTraceEachPre;
-        snakeTrace_s.normMeanTraceSortPre = normMeanTraceSortPre;
-        snakeTrace_s.normMeanTracePreAll = normMeanTracePreAll;
-        snakeTrace_s.tracePreIndConcat = tracePreIndConcat;
-        snakeTrace_s.normMeanTraceEachPost = normMeanTraceEachPost;
-        snakeTrace_s.normMeanTraceSortPost = normMeanTraceSortPost;
-        snakeTrace_s.normMeanTracePostAll = normMeanTracePostAll;
-        snakeTrace_s.tracePostIndConcat = tracePostIndConcat;
-        snakeTrace_s.nClusters = nClusters;
-        snakeTrace_s.batName = batName;
-        snakeTrace_s.dateSesh = dateSesh;
-        snakeTrace_s.sessionType = sessionType;
-        snakeTrace_s.InormFlightAll = InormFlightAll;
-        snakeTrace_s.normTraceFlightAll = normTraceFlightAll;
-        snakeTrace_s.I1normFlightAll = I1normFlightAll;
-        snakeTrace_s.smoothTraceRawPost = smoothTraceRawPost;
-        snakeTrace_s.smoothTraceRawPre = smoothTraceRawPre;
-        snakeTrace_s.smoothTraceRawFlight = smoothTraceRawFlight;
-        snakeTrace_s.traceFlightIdx = traceFlightIdx;
-        snakeTrace_s.normTraceRawPre = normTraceRawPre;
-        snakeTrace_s.normTraceRawFlight = normTraceRawFlight;
-        snakeTrace_s.normTraceRawPost = normTraceRawPost;
-        snakeTrace_s.traceFlight = traceFlight;
-        snakeTrace_s.tracePre = tracePre;
-        snakeTrace_s.tracePost = tracePost; 
-        snakeTrace_s.tracePreFlightPost = tracePreFlightPost;
-        snakeTrace_s.meanSpeedPreFlightPost = meanSpeedPreFlightPost;
-        snakeTrace_s.meanTracePreFlightPost = meanTracePreFlightPost;
-        snakeTrace_s.speedPreFlightPost = speedPreFlightPost;
-        snakeTrace_s.smoothTraceRawPreFlightPost = smoothTraceRawPreFlightPost;
-        snakeTrace_s.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
-        snakeTrace_s.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
-        snakeTrace_s.smoothSpeedRawPreFlightPost = smoothSpeedRawPreFlightPost;
-    end
+        snakeTraceData.batName = batName;
+        snakeTraceData.dateSesh = dateSesh;
+        snakeTraceData.sessionType = sessionType;
+        snakeTraceData.dur = dur;
+        snakeTraceData.BPre = BPre;
+        snakeTraceData.IPre = IPre;
+        snakeTraceData.BFlight = BFlight;
+        snakeTraceData.IFlight = IFlight;
+        snakeTraceData.BPost = BPost;
+        snakeTraceData.IPost = IPost;
+        snakeTraceData.Bodd = Bodd;
+        snakeTraceData.Iodd = Iodd;
+        snakeTraceData.B1Pre = B1Pre;
+        snakeTraceData.I1Pre = I1Pre;
+        snakeTraceData.B1Flight = B1Flight;
+        snakeTraceData.I1Flight = I1Flight;
+        snakeTraceData.B1Post = B1Post;
+        snakeTraceData.I1Post = I1Post;
+        snakeTraceData.InormFlightAll = InormFlightAll;
+        snakeTraceData.I1normFlightAll = I1normFlightAll;
+        snakeTraceData.IkPeaksPreFlightPost=IkPeaksPreFlightPost;
+        snakeTraceData.kPeaksPreFlightPost=kPeaksPreFlightPost;
+        snakeTraceData.maxAllPreFlightPost=maxAllPreFlightPost;
+        snakeTraceData.maxnormTracePre = maxnormTracePre;
+        snakeTraceData.maxnormTraceFlight = maxnormTraceFlight;
+        snakeTraceData.maxnormTracePost = maxnormTracePost;snakeTraceData.meanTracePre = meanTracePre;
+        snakeTraceData.meanTraceFlight = meanTraceFlight;
+        snakeTraceData.meanTracePost = meanTracePost;
+        snakeTraceData.meanSpeedPre = meanSpeedPre;
+        snakeTraceData.meanSpeedFlight = meanSpeedFlight;
+        snakeTraceData.meanSpeedPost = meanSpeedPost;
+        snakeTraceData.meanSpeedPreFlightPost = meanSpeedPreFlightPost;
+        snakeTraceData.meanTracePreFlightPost = meanTracePreFlightPost;
+        snakeTraceData.meanTracePreFlightPostAll=meanTracePreFlightPostAll;
+        snakeTraceData.meanTraceEven = meanTraceEven;
+        snakeTraceData.meanTraceOdd = meanTraceOdd;
+        snakeTraceData.nClusters = nClusters;
+        snakeTraceData.normTracePre = normTracePre;
+        snakeTraceData.normTraceFlight = normTraceFlight;
+        snakeTraceData.normTracePost = normTracePost;
+        snakeTraceData.normTraceEven = normTraceEven;
+        snakeTraceData.normTraceOdd = normTraceOdd;
+        snakeTraceData.normTraceFlightAll = normTraceFlightAll;
+        snakeTraceData.normTraceRawPre = normTraceRawPre;
+        snakeTraceData.normTraceRawFlight = normTraceRawFlight;
+        snakeTraceData.normTraceRawPost = normTraceRawPost;
+        snakeTraceData.normTraceRawPreFlightPost = normTraceRawPreFlightPost;
+        snakeTraceData.normMeanTraceSortPreFlightPost = normMeanTraceSortPreFlightPost;
+        snakeTraceData.normMeanTracePreFlightPostAll=normMeanTracePreFlightPostAll;
+        snakeTraceData.normMeanTraceEachPFlightP = normMeanTraceEachPFlightP;
+        snakeTraceData.normMeanTraceEachPreFP = normMeanTraceEachPreFP;
+        snakeTraceData.normMeanTraceEachPFPost = normMeanTraceEachPFPost;
+        snakeTraceData.normMeanTraceEachPre = normMeanTraceEachPre;
+        snakeTraceData.normMeanTraceSortPre = normMeanTraceSortPre;
+        snakeTraceData.normMeanTracePreAll = normMeanTracePreAll;
+        snakeTraceData.normMeanTraceEachFlight = normMeanTraceEachFlight;
+        snakeTraceData.normMeanTraceSortFlight = normMeanTraceSortFlight;
+        snakeTraceData.normMeanTraceFlightAll = normMeanTraceFlightAll;
+        snakeTraceData.normMeanTraceEachPost = normMeanTraceEachPost;
+        snakeTraceData.normMeanTraceSortPost = normMeanTraceSortPost;
+        snakeTraceData.normMeanTracePostAll = normMeanTracePostAll;       
+        snakeTraceData.preFlightPadCalcium = preFlightPadCalcium;
+        snakeTraceData.postFlightPadCalcium = postFlightPadCalcium;
+        snakeTraceData.preFlightPadSpeed = preFlightPadSpeed;
+        snakeTraceData.postFlightPadSpeed = postFlightPadSpeed;
+        snakeTraceData.preFlightPad = preFlightPad;
+        snakeTraceData.postFlightPad = postFlightPad;
+        snakeTraceData.sdTracePreFlightPost = sdTracePreFlightPost;
+        snakeTraceData.semTracePreFlightPost = semTracePreFlightPost;
+        snakeTraceData.smoothTraceRawPreFlightPost = smoothTraceRawPreFlightPost;
+        snakeTraceData.smoothSpeedPre = smoothSpeedPre;
+        snakeTraceData.smoothSpeedFlight = smoothSpeedFlight;
+        snakeTraceData.smoothSpeedPost = smoothSpeedPost;
+        snakeTraceData.smoothSpeedRawPre = smoothSpeedRawPre;
+        snakeTraceData.smoothSpeedRawFlight = smoothSpeedRawFlight;
+        snakeTraceData.smoothSpeedRawPost = smoothSpeedRawPost;
+        snakeTraceData.smoothTraceRawPre = smoothTraceRawPre;
+        snakeTraceData.smoothTraceRawFlight = smoothTraceRawFlight;
+        snakeTraceData.smoothTraceRawPost = smoothTraceRawPost;
+        snakeTraceData.smoothSpeedRawPreFlightPost = smoothSpeedRawPreFlightPost;
+        snakeTraceData.speedPreFlightPost = speedPreFlightPost;
+        snakeTraceData.traceFlightIndConcat = traceFlightIndConcat;
+        snakeTraceData.tracePreIndConcat = tracePreIndConcat;
+        snakeTraceData.tracePostIndConcat = tracePostIndConcat;
+        snakeTraceData.traceFlightIdx = traceFlightIdx;
+        snakeTraceData.tracePre = tracePre;
+        snakeTraceData.traceFlight = traceFlight;
+        snakeTraceData.tracePost = tracePost;
+        snakeTraceData.tracePreFlightPost = tracePreFlightPost;
+        if data_i ==1
+            snakeTrace_cRaw = snakeTraceData;
+        elseif data_i == 2
+            snakeTrace_c = snakeTraceData;
+        elseif data_i == 3
+            snakeTrace_s = snakeTraceData;
+        end   
 end
-if saveFlag == 1
+if loadFlag ==1 && saveFlag == 1
     snakeTrace_c.label = label;
     snakeTrace_cRaw.label = label;
     snakeTrace_s.label = label;
-    save([pwd '/analysis/' label '_snakeTraceData_cRaw.mat'],'snakeTrace_c');
-    save([pwd '/analysis/' label '_snakeTraceData_c.mat'],'snakeTrace_cRaw');
-    save([pwd '/analysis/' label '_snakeTraceData_c.mat'],'snakeTrace_s');
+    save([pwd '/analysis/' label '_snakeTraceData_cRaw.mat'],'snakeTrace_cRaw');
+    save([pwd '/analysis/' label '_snakeTraceData_c.mat'],'snakeTrace_c');
+    save([pwd '/analysis/' label '_snakeTraceData_s.mat'],'snakeTrace_s');
+elseif loadFlag == 0 && saveFlag ==1
+    save([pwd '/' batName '_' dateSesh '_' sessionType '_snakeTraceData_cRaw.mat'],'snakeTrace_cRaw');
+    save([pwd '/' batName '_' dateSesh '_' sessionType '_snakeTraceData_c.mat'],'snakeTrace_c');
+    save([pwd '/' batName '_' dateSesh '_' sessionType '_snakeTraceData_s.mat'],'snakeTrace_s');
 end
 
 %snakeTrace.normMeanTraceAllSmooth = normMeanTraceAllSmooth;
-
-end
