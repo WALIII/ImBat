@@ -1,16 +1,18 @@
-function [metadata] = CNMFe_extract2(nam)
+function [metadata] = CNMFe_extract2(varargin)
 %functionalized from CNMF-angeloII: modified from 'demo_large_data_1p'(CNMF_e-master/demos)
+
 
 
 %% clear the workspace and select data
 close all;
 
-neuron = Sources2D();
-% nam = './Dsampled.tif';
-%nam = neuron.select_data(nam);         %if nam is [], then select data interactively
 
-%% select data and map it to the RAM
-cnmfe_choose_data;
+
+
+neuron = Sources2D();
+nam = './Dsampled.tif';
+nam = neuron.select_data(nam);         %if nam is [], then select data interactively
+
 
 
 %% parameters
