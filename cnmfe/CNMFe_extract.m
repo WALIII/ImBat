@@ -7,23 +7,23 @@ rmpath(genpath('C:\Users\WAL3\Documents\MATLAB\CaImAn-MATLAB'));
 nam = nam;
 %% clear workspace
 clc; close all;
-global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
+global  d1 d2 numFrame metadata.cnmfe.ssub metadata.cnmfe.tsub sframe num2read metadata.cnmfe.Fs neuron neuron_ds ...
     neuron_full Ybg_weights; %#ok<NUSED> % global variables, don't change them manually
 
 %% select data and map it to the RAM
 cnmfe_choose_data;
 
 %% create Source2D class object for storing results and parameters
-Fs = 30;             % frame rate
-ssub = 1;           % spatial downsampling factor
-tsub = 20;           % temporal downsampling factor
-gSig = 3;           % width of the gaussian kernel, which can approximates the average neuron shape
-gSiz = 13;          % maximum diameter of neurons in the image plane. larger values are preferred.
+metadata.cnmfe.Fs = 7;             % frame rate
+metadata.cnmfe.ssub = 1;           % spatial downsampling factor
+metadata.cnmfe.tsub = 1;           % temporal downsampling factor
+metadata.cnmfe.gSig = 4;           % width of the gaussian kernel, which can approximates the average neuron shape
+metadata.cnmfe.gSiz = 4*metadata.cnmfe.gSig+1;          % maximum diameter of neurons in the image plane. larger values are preferred.
 neuron_full = Sources2D('d1',d1,'d2',d2, ... % dimensions of datasets
-    'ssub', ssub, 'tsub', tsub, ...  % downsampleing
-    'gSig', gSig,...    % sigma of the 2D gaussian that approximates cell bodies
-    'gSiz', gSiz);      % average neuron size (diameter)
-neuron_full.Fs = Fs;         % frame rate
+    'ssub', metadata.cnmfe.ssub, 'tsub', metadata.cnmfe.tsub, ...  % downsampleing
+    'gSig', metadata.cnmfe.gSig,...    % sigma of the 2D gaussian that approximates cell bodies
+    'gSiz', metadata.cnmfe.gSiz);      % average neuron size (diameter)
+neuron_full.Fs = metadata.cnmfe.Fs;         % frame rate
 
 % with dendrites or not
 with_dendrites = false;
@@ -69,12 +69,12 @@ save_avi = false;   %save the initialization procedure as an avi movie.
 patch_par = [1,1]*1; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large
 K = []; % maximum number of neurons to search within each patch. you can use [] to search the number automatically
 
-min_corr = 0.8;     % minimum local correlation for a seeding pixel
-min_pnr = 8;       % minimum peak-to-noise ratio for a seeding pixel
-min_pixel = gSig^2;      % minimum number of nonzero pixels for each neuron
-bd = 1;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
-neuron.updateParams('min_corr', min_corr, 'min_pnr', min_pnr, ...
-    'min_pixel', min_pixel, 'bd', bd);
+metadata.cnmfe.min_corr = 0.8;     % minimum local correlation for a seeding pixel
+metadata.cnmfe.min_pnr = 8;       % minimum peak-to-noise ratio for a seeding pixel
+metadata.cnmfe.min_pixel = metadata.cnmfe.gSig^2;      % minimum number of nonzero pixels for each neuron
+bd = 2;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
+neuron.updateParams('min_corr', metadata.cnmfe.min_corr, 'min_pnr', metadata.cnmfe.min_pnr, ...
+    'min_pixel', metadata.cnmfe.min_pixel, 'bd', metadata.cnmfe.bd);
 neuron.options.nk = 5;  % number of knots for detrending
 
 % greedy method for initialization
@@ -166,7 +166,7 @@ while miter <= maxIter
 end
 
 %% apply results to the full resolution
-if or(ssub>1, tsub>1)
+if or(metadata.cnmfe.ssub>1, metadata.cnmfe.tsub>1)
     neuron_ds = neuron.copy();  % save the result
     neuron = neuron_full.copy();
     cnmfe_full;
