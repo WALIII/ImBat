@@ -1,5 +1,9 @@
 function CNMFe_extract(nam)
 
+
+rmpath(genpath('C:\Users\WAL3\Documents\MATLAB\CaImAn-MATLAB'));
+
+
 nam = nam;
 %% clear workspace
 clc; close all;
