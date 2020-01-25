@@ -233,6 +233,6 @@ close all
 
 %% save results
 results = neuron.obj2struct();
-results.metadata = metadata;
+%results.metadata = metadata;
 save('results.mat','results');
 %eval(sprintf('save %s%s%s_results.mat results', dir_nm, filesep, file_nm));

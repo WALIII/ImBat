@@ -54,6 +54,7 @@ if video ==1;
     %[nblanks formatstring]=fb_progressbar(100);
     %fprintf(1,['Progress:  ' blanks(nblanks)]);
     
+    % Load in video data ( SPATIAL DOWNSAMPLE )
     for i=1:length(mov_listing)
         [path,file,ext]=fileparts(filenames{i});
         if i ==1;
