@@ -29,11 +29,11 @@ function ImBat_START(varargin)
 
   % Default Movie Paramaters:
   metadata.temporal_downsample = 4; % temporal downsampleing
-  metadata.spatial_downsample = 4; % spatial downsampling
+  metadata.spatial_downsample = 0.25; % spatial downsampling
   metadata.median_filter_kernal = 3; % median filtering
 
   % Default CNMFe Paramaters:
-  metadata.
+
 
 
 
@@ -114,7 +114,7 @@ function ImBat_START(varargin)
       if extract ==1;
         % Run processing script
         mkdir('processed');
-        ImBat_processVideos('downsample',1);
+        ImBat_processVideos('metadata',metadata);
         disp('processing!!');
       end
 
@@ -136,8 +136,8 @@ function ImBat_START(varargin)
       %%====[ CNMF-e ROI Extraction ]======%%
       if ROI_flag ==1;
         disp('extracting ROIs...')
-        nam = './Motion_corrected_Data_DS.mat'
-        CNMFe_extract(nam);
+        nam = './Motion_corrected_Data.mat'
+        CNMFe_extract2(nam);
       end
 
 

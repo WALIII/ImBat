@@ -24,9 +24,7 @@ function video =  ImBat_denoise(video,varargin);% % Video recon
 			maxItter = varargin{i+1};
 			case 'smth_frames' % temporal downsample
 			smth_frames = varargin{i+1};
-            case 'metadata' % temporal downsample
-               metadata = varargin{i+1};
-              smth_frames =  metadata.median_filter_kernal;
+            case 'smth_frames' % temporal downsample
 		end
 	end
 
