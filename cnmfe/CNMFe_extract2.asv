@@ -386,15 +386,14 @@ figure();   set(gcf, 'units','normalized','outerposition',[0.1 0.05 0.3 0.4]);
 r = corrcoef(FC_raw');   imagesc(r); colorbar;
 
 %% Show spatial footprints and thresholds on activity traces
-mkdir('ROI_Images/images');
+
 figure();   set(gcf, 'units','normalized','outerposition',[0 0 1 1]);
 for i = 1:size(neuron.C_raw,1)
     subplot(3,2,1); neuron.image(neuron.A(:,i)); colorbar;  title(['ROI' num2str(i)]);
     subplot(3,2,2); surf(reshape(A(i,:,:),size(A,2),size(A,3)));    zlim([0 max(max(max(A)))]);
     subplot(3,2,[3 4]); plot(FC_raw(i,:));        hold on;    refline(0,thr(i));  hold off;     %ylim([-0.1 1]);
     subplot(3,2,[5 6]); plot(noise_F(i,:));       hold on;    refline(0,thr(i));  hold off;     %ylim([-0.01 0.1]);
-  fname_sv = ['ROI_Images/images/ROI_',num2str(i)];
-    print(fname_sv,'-dpng')
+  print('BarPlot','-dpng')
     %  w = waitforbuttonpress;
   pause(0.1)
 end
