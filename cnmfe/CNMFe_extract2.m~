@@ -408,7 +408,6 @@ for i = 1:size(neuron.C_raw,1)
   pause(0.1)
 end
 
-close all
 % Save data:
 
 %% save results

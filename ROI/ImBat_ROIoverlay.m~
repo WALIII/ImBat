@@ -17,7 +17,7 @@ sessionType = [];
 % User inputs overrides
 nparams=length(varargin);
 if mod(nparams,2)>0
-    error('Parameters must be specified as parameter/value pairs');
+	error('Parameters must be specified as parameter/value pairs');
 end
 for i=1:2:nparams
     switch lower(varargin{i})
@@ -75,8 +75,8 @@ col = jet(length(ROI_coords));
 %plot centroid over top of max projection
 if centroidFlag == 1
     figure();
-    hold on;
-    
+        hold on;
+
     imagesc(imresize(results.Cn,8)); colormap(gray);
     for i = 1:length(ROI_coords)
         try
@@ -93,14 +93,12 @@ axis 'tight' 'equal'
 if binaryMaskFlag == 1
     figure();
     subplot(2,2,1)
-    imagesc(imresize(results.Cn,8)); colormap(gray);
-    axis 'tight' 'equal'
-    title('Correlation Image');
-    
-    
-    subplot(2,2,2)
-    imagesc(imresize(results.Cn,8)); colormap(gray);
-    
+        imagesc(imresize(results.Cn,8)); colormap(gray);
+        axis 'tight' 'equal'
+
+            subplot(2,2,2)
+        imagesc(imresize(results.Cn,8)); colormap(gray);
+
     hold on
     for i = 1:length(ROI_coords)
         try
@@ -112,31 +110,6 @@ if binaryMaskFlag == 1
     hold off
 end
 axis 'tight' 'equal'
-title('Binary ROI Masks');
-
-
-%
-%
-% %plot heat maps of all ROI
-% if roiHeatFlag == 1
-%     subplot(2,2,3);
-%     roiHeatMax = max(ROI2plot,[],3); %plot all of the ROI heat maps
-%     roiHeatMax = imresize(roiHeatMax, scaling);
-%     imagesc(roiHeatMax);
-%     hold on
-%     %set(gca,'YDir','normal');
-%     xticks = get(gca,'xtick');
-%     yticks = get(gca,'ytick');
-%     scaling  = 1.1; %1.1um per pixel
-%     newlabelsX = arrayfun(@(ax) sprintf('%g', scaling * ax), xticks, 'un', 0);
-%     newlabelsY = arrayfun(@(ay) sprintf('%g', scaling * ay), yticks, 'un', 0);
-%     set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
-%     title(['Max Projection ROI: ' batName ' ' dateSesh ' ' sessionType]);
-%     xlabel('um'); ylabel('um');
-% end
-
-
-
 
 
 %% Color overlay Image:
@@ -151,30 +124,49 @@ for i = 1: size(ROI2plot,3)
         while abs(rand_col-rand_col_prev)<0.05 % get distinct colors
             rand_col = randi(100)./100;
         end
-        
+
         RGBim(:,:,ii,i) = imresize(ROI2plot(:,:,i),scaling)*rand_col;
     end
 end
 RGBim2 = squeeze(max(RGBim,[],4));
 
-
-subplot(2,2,3);
+figure(); 
+subplot(1,2,1);
 imagesc(RGBim2)
-title('ROI Watershed');
 
 A = RGBim2;
-B = imresize(mat2gray(results.Cn.^4),scaling);
+B = mat2gray(results.Cn.^4);
 
-B(imbinarize(roiHeatMax)) =0;
+B(imbinarize(roiHeatMax)) =0; 
 
 alpha = 0.6;
 C =  A + B;
-subplot(2,2,4);
+subplot(1,2,2);
 imagesc(C);
-title('ROI Watershed overlain on Correlation Image');
+
+
+
+
+%plot heat maps of all ROI
+if roiHeatFlag == 1
+    subplot(2,2,3);
+    roiHeatMax = max(ROI2plot,[],3); %plot all of the ROI heat maps
+    roiHeatMax = imresize(roiHeatMax, scaling);
+    imagesc(roiHeatMax);
+    hold on
+    %set(gca,'YDir','normal');
+    xticks = get(gca,'xtick');
+    yticks = get(gca,'ytick');
+    scaling  = 1.1; %1.1um per pixel
+    newlabelsX = arrayfun(@(ax) sprintf('%g', scaling * ax), xticks, 'un', 0);
+    newlabelsY = arrayfun(@(ay) sprintf('%g', scaling * ay), yticks, 'un', 0);
+    set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
+    title(['Max Projection ROI: ' batName ' ' dateSesh ' ' sessionType]);
+    xlabel('um'); ylabel('um');
+end
+
+axis 'tight' 'equal'
 set(gcf, 'Position', get(0, 'Screensize')/1.5);
-
-
 
 %plot heat maps of individual ROI
 if roiHeatFlagIndiv == 1
