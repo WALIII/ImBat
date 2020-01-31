@@ -1,14 +1,12 @@
 function [flightTransitions] = ImBat_transition_flights(flightPaths)
 
-% %this is to merge specific clusters if 2 or more of them are the same but
-% %were separated by the flight k-means
-% flightPaths.clusterIndex{1}=cat(2,flightPaths.clusterIndex{1},flightPaths.clusterIndex{2},flightPaths.clusterIndex{4});
-% flightPaths.clusterIndex{2} =[];
-% flightPaths.clusterIndex{4} =[];
-% % flightPaths.clusterIndex{2}=cat(2,flightPaths.clusterIndex{4},flightPaths.clusterIndex{5});
-% % flightPaths.clusterIndex{4} =[];
-% % flightPaths.clusterIndex{5} =[];
-% flightPaths.clusterIndex= flightPaths.clusterIndex(~cellfun('isempty',flightPaths.clusterIndex));
+%this is to merge specific clusters if 2 or more of them are the same but
+%were separated by the flight k-means
+flightPaths.clusterIndex{1}=cat(2,flightPaths.clusterIndex{1},flightPaths.clusterIndex{2},flightPaths.clusterIndex{3});
+flightPaths.clusterIndex{3} =[];
+flightPaths.clusterIndex{2} =[];
+flightPaths.clusterIndex{2}=cat(2,flightPaths.clusterIndex{4},flightPaths.clusterIndex{5},flightPaths.clusterIndex{3});
+flightPaths.clusterIndex= flightPaths.clusterIndex(~cellfun('isempty',flightPaths.clusterIndex));
 
 %initialize the cluster order
 clustOrder = zeros(length(flightPaths.flight_starts_idx(1,:)),1);
