@@ -100,7 +100,7 @@ if histAtoBFlag == 1
     ylabel('Num flights');
     xlabel('Time between flights (sec)');
     
-    sgtitle(['Flight timing/jitter for A/B flights: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
+    sgtitle(['Flight timing/jitter for A/B flights: ' batName ' ' dateSesh ' ' sessionType]);
     if saveFlag ==1
         saveas(hist_flightTiming_AtoB, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_flightTiming_AtoB.svg']);
         saveas(hist_flightTiming_AtoB, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_hist_flightTiming_AtoB.tif']);
@@ -142,7 +142,7 @@ if boxplotAtoBFlag == 1
     title('Timing End Flight B to Start Flight A');
     ylabel('Time between flights (s)');
     
-    sgtitle(['Flight timing/jitter for A/B flights: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
+    sgtitle(['Flight timing/jitter for A/B flights: ' batName ' ' dateSesh ' ' sessionType]);
     if saveFlag ==1
         saveas(boxplot_flightTiming_AtoB, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_boxplot_flightTiming_AtoB.svg']);
         saveas(boxplot_flightTiming_AtoB, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_boxplot_flightTiming_AtoB.tif']);
@@ -197,5 +197,5 @@ flightTiming.diffSBtoSA = diffSBtoSA;
 flightTiming.diffEBtoSA = diffEBtoSA;
 
 if saveFlag ==1
-    save([pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_flightTiming.mat'],'flightTiming');
+    save([pwd '/' batName '_' dateSesh '_' sessionType '_flightTiming.mat'],'flightTiming');
 end

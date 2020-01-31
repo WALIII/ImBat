@@ -1,7 +1,7 @@
 function [flightPaths] = ImBat_plotFlights(trackData,varargin)
 
 nclusters = 6; %nIumber of clusters for kmeans clustering of flight trajectories
-ntrajectories = 8; %number of output trajectories from kmeans that you want to look at
+ntrajectories = 12; %number of output trajectories from kmeans that you want to look at
 clusterInd = 12; %number of different cluster indices to initiate
 
 batName = [];
@@ -74,7 +74,7 @@ Vy = gradient(myFull, 1/trackData.VideoFrameRate);
 Vz = gradient(mzFull, 1/trackData.VideoFrameRate);
 batSpeed = sqrt(Vx.^2 + Vy.^2 + Vz.^2)/1000; %in m/s
 
-nonflying = find(batSpeed < 0.3);
+nonflying = find(batSpeed < 1.5);
 toofast = find(batSpeed > 35);
 
 %set low speed points to zero
@@ -196,7 +196,7 @@ end
 [~, ssf] = sort(nflights,'descend'); %sort clustered flights
 %plot clustered flights
 plotFlightPathsClusterEach = figure();
-jj = jet(ntrajectories*200);
+jj = jet(1500);
 for traj = 1 : clusterInd
     try
         if traj<ntrajectories + 1 % Only plot the first ntrajectories...
@@ -227,7 +227,7 @@ hold off
 
 %plot all the clusters in 1 figure in different colors
 plotFlightPathsClusterAll = figure();
-jj = jet(ntrajectories*200);
+jj = jet(1500);
 for traj = 1 : ntrajectories
     for nf = allflights{ssf(traj)}
         %plot(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
