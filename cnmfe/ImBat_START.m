@@ -22,10 +22,12 @@ function ImBat_START(varargin)
 
 % Default extraction Params
 ROI_flag = 1; % run ROI extraction
-reROI_extract = 0; %rerun ROI extraction
+reROI_extract = 1; %rerun ROI extraction
 Analysis_flag = 1; % run basic ROI analysis...
 extract  = 1; % extract the basic ROI timeseries
-reExtract = 0; % re-extract, in the event that things have been extracted already.
+reExtract = 1; % re-extract, in the event that things have been extracted already.
+ROI_flag_reset = 1;
+
 
 % Default Movie Paramaters:
 metadata.temporal_downsample = 5; % temporal downsampleing
@@ -44,6 +46,7 @@ vin=varargin;
 for i=1:length(vin)
     if isequal(vin{i},'roi') % manually inputing a sort order
         ROI_flag=vin{i+1};
+        ROI_flag_reset = ROI_flag;
     elseif isequal(vin{i},'place');
         analysis_flag = vin{i+1};
     elseif isequal(vin{i},'metadata');  % pass along metadata file if need be...
@@ -95,8 +98,18 @@ for i = 1:length(subFolders);
             disp('Folder already extracted..');
             if reExtract ==1
                 disp('Re-Extracting...');
+                fname = [flight_subFolders(ii).name,'/','processed'];
+                try
+                rmdir(fname);
+                catch
+                     cmd_rmdir( fname ) 
+                end
+                
+                mkdir(fname);
             else
                 disp('Moving to the next folder...');
+                ROI_flag = 0 ;
+                
                 extract = 0 ;
             end
         end
@@ -119,6 +132,7 @@ for i = 1:length(subFolders);
             disp('processing!!');
         end
         
+        
         cd('processed') % move to processed folder...
         
         % Check if roi extraction folder exists
@@ -127,9 +141,10 @@ for i = 1:length(subFolders);
             
             if reROI_extract ==1
                 disp('Re-Extracting ROIs...');
+                ROI_flag = 1 ;
+
             else
                 disp('Moving to the next folder...');
-                ROI_flag = 0 ;
             end
         end
         
@@ -140,15 +155,16 @@ for i = 1:length(subFolders);
             nam = './Motion_corrected_Data.mat'
             CNMFe_extract2(nam,'metadata',metadata);
             
+            
+            
+            ROI_flag = ROI_flag_reset;
+            
+            %%====[ Aligning Time Stamps ]======%%
+            % to do: add logfile
+            disp('Aligning Timestamps...');
+            load('AV_data.mat');
+            [out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
         end
-        
-        
-        %%====[ Aligning Time Stamps ]======%%
-        % to do: add logfile
-        disp('Aligning Timestamps...');
-        load('AV_data.mat');
-        [out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
-        
         clear video audio Markers AnalogSignals out % Clear vars from RAM
         extract =1;
     end

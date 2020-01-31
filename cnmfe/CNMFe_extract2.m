@@ -100,7 +100,7 @@ bg_ssub = 2;                                    % downsample background for a fa
 % -------------------------  INITIALIZATION   -------------------------  %
 K = [];                         % maximum number of neurons per patch. when K=[], take as many as possible.
 metadata.cnmfe.min_corr = 0.9;                 % minimum local correlation for a seeding pixel
-metadata.cnmfe.min_pnr = 40;                  % minimum peak-to-noise ratio for a seeding pixel (low values are discouraged)
+metadata.cnmfe.min_pnr = 50;                  % minimum peak-to-noise ratio for a seeding pixel (low values are discouraged)
 metadata.cnmfe.min_pixel = metadata.cnmfe.gSig^2;             % minimum number of nonzero pixels for each neuron (was gSig^2)
 bd = 6;                         % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
 frame_range = [];               % when [], uses all frames
@@ -292,7 +292,7 @@ end
 
 %% save the workspace for future analysis
 neuron.orderROIs('snr');
-cnmfe_path = neuron.save_workspace();
+%cnmfe_path = neuron.save_workspace();
 
 %% show neuron contours
 Coor = neuron.show_contours(0.6);

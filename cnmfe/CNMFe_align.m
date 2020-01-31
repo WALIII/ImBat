@@ -20,16 +20,16 @@ end
 %% perform some sort of deblurring/high pass filtering
 
 if (0)
-    hLarge = fspecial('average', 40);
-    hSmall = fspecial('average', 2);
-    for t = 1:T
-        Y(:,:,t) = filter2(hSmall,Yf(:,:,t)) - filter2(hLarge, Yf(:,:,t));
-    end
-    %Ypc = Yf - Y;
-    bound = size(hLarge,1);
+%     hLarge = fspecial('average', 40);
+%     hSmall = fspecial('average', 2);
+%     for t = 1:T
+%         Y(:,:,t) = filter2(hSmall,Yf(:,:,t)) - filter2(hLarge, Yf(:,:,t));
+%     end
+%     %Ypc = Yf - Y;
+%     bound = size(hLarge,1);
 else
-    gSig = 7;
-    gSiz = 17;
+    gSig = round(7/5);
+    gSiz = round(17/5);
     psf = fspecial('gaussian', round(2*gSiz), gSig);
     ind_nonzero = (psf(:)>=max(psf(:,1)));
     psf = psf-mean(psf(ind_nonzero));
