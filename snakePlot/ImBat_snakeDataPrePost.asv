@@ -96,12 +96,7 @@ for cell_i = 1:length(cellData.results.C(:,1))
                 sizeToTraceEnd = size(traceFlight(trace_i,:),2);
                 try
                 traceFlight(trace_i,:) = (cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end + postFlightPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
-                                speedFlight(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - preFlightPadSpeed:end + postFlightPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
-                catch
-                    traceFlight(trace_i,:) = cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end+(sizeToTraceEnd - sizeToRecordingEnd));
-                    speedFlight(trace_i,:) = flightPaths.batSpeed(closestIndexStart(trace_i) - preFlightPadSpeed:end +(sizeToTraceEnd - sizeToRecordingEnd));
-
-                end
+                speedFlight(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - preFlightPadSpeed:end + postFlightPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
                 disp('End of rec')
             end
         end

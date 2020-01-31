@@ -44,17 +44,17 @@ if loadFlag == 1
     load([pwd '/analysis/' label '_flightPaths.mat']);
 end
 %padding for during flight snake plot to include some time before and after flight
-prePad = 0; %number of seconds to plot before alignment point
-postPad = 0; %number of seconds to plot after alignment point
+prePad = 7; %number of seconds to plot before alignment point
+postPad = 7; %number of seconds to plot after alignment point
 prePadCalcium = prePad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postPadCalcium = postPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
-prePadSpeed = prePad*120; %add 2 seconds * FS of tracking data (120)
-postPadSpeed = postPad*120;%add 6 seconds * FS of tracking data (120)
+prePadSpeed = prePad*120/5; %add 2 seconds * FS of tracking data (120)
+postPadSpeed = postPad*120/5;%add 6 seconds * FS of tracking data (120)
 %padding for pre and post flight snakePlots
 preFlightPadCalcium = preFlightPad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postFlightPadCalcium = postFlightPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
-preFlightPadSpeed = preFlightPad*120; %add 2 seconds * FS of tracking data (120)
-postFlightPadSpeed = postFlightPad*120;%add 6 seconds * FS of tracking data (120)
+preFlightPadSpeed = preFlightPad*120/5; %add 2 seconds * FS of tracking data (120)
+postFlightPadSpeed = postFlightPad*120/5;%add 6 seconds * FS of tracking data (120)
 smoothSpeed = 100; %number of tracking frames to smooth the data by using mean smooth
 smoothTrace = 2; %number of calcium video frames to smooth the data
 
@@ -198,13 +198,20 @@ for data_i = 1:3
             end
             
             %calculate the mean neural activity across all flights in a cluster for each cell
-            meanTraceFlight{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(:,:,cell_i));
+            if length(traceFlight{clust_i}(:,1,cell_i)) <2
+                meanTraceFlight{clust_i}(cell_i,:) = traceFlight{clust_i}(:,:,cell_i);
+                meanTracePre{clust_i}(cell_i,:) = tracePre{clust_i}(:,:,cell_i);
+                meanTracePost{clust_i}(cell_i,:) = tracePost{clust_i}(:,:,cell_i);
+            else 
+                meanTraceFlight{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(:,:,cell_i));
+                meanTracePre{clust_i}(cell_i,:) = mean(tracePre{clust_i}(:,:,cell_i));
+                meanTracePost{clust_i}(cell_i,:) = mean(tracePost{clust_i}(:,:,cell_i));
+                
+            end
             sdTraceFlight{clust_i}(cell_i,:) = std(traceFlight{clust_i}(:,:,cell_i));
             meanTraceOdd{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(1:2:end,:,cell_i));
             meanTraceEven{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(2:2:end,:,cell_i));
-            meanTracePre{clust_i}(cell_i,:) = mean(tracePre{clust_i}(:,:,cell_i));
-            meanTracePost{clust_i}(cell_i,:) = mean(tracePost{clust_i}(:,:,cell_i));
-            meanSpeedFlight{clust_i} = mean(speedFlight{clust_i});
+         meanSpeedFlight{clust_i} = mean(speedFlight{clust_i});
             meanSpeedPre{clust_i} = mean(speedPre{clust_i});
             meanSpeedPost{clust_i} = mean(speedPost{clust_i});
             meanTracePreFlightPost{clust_i}(cell_i,:) = mean(tracePreFlightPost{clust_i}(:,:,cell_i));

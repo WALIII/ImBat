@@ -201,9 +201,7 @@ for i = 1:length(subFolders)
     if plotPlaceCellsFlag == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
        if exist flightPaths
        else 
-           load(['analysis/' batName '_' dateSesh '_' sessionType '_flightPaths.mat']);
-           load(['analysis/' batName '_' dateSesh '_' sessionType '_flightsToFromFeeders.mat']);
-
+           load('analysis/
        end
        mkdir('analysis/placeCells')
        cd([subFolders(i).folder,'/',subFolders(i).name,'/',imageFolders(kk).name,'/analysis/placeCells'])

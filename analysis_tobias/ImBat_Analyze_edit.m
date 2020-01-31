@@ -1,4 +1,4 @@
-function ImBat_Analyze
+function ImBat_Analyze_edit
 
 global topROI
 
@@ -26,11 +26,11 @@ centroidFlag = 0;
 roiHeatFlag = 0;
 binaryMaskFlag = 0;
 %flight plot flags
-plotFlightsFlag = 0;
-flightPathsAllFlag = 0;
-flightPathsFeederFlag = 0;
+plotFlightsFlag = 1;
+flightPathsAllFlag = 1;
+flightPathsFeederFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 1;
+plotPlaceCellsFlag = 0;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 
@@ -199,18 +199,15 @@ for i = 1:length(subFolders)
     %place cells
     %spike activity over flight trajectories
     if plotPlaceCellsFlag == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
-       if exist flightPaths
-       else 
            load(['analysis/' batName '_' dateSesh '_' sessionType '_flightPaths.mat']);
            load(['analysis/' batName '_' dateSesh '_' sessionType '_flightsToFromFeeders.mat']);
 
-       end
        mkdir('analysis/placeCells')
        cd([subFolders(i).folder,'/',subFolders(i).name,'/',imageFolders(kk).name,'/analysis/placeCells'])
        ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
-       savefig(flightPathsToFeeder,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.fig']);
-       saveas(flightPathsToFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.tif']);
-       saveas(flightPathsToFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.svg']);
+       %savefig(flightPathsToFeeder,[imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.fig']);
+       %saveas(flightPathsToFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.tif']);
+       %saveas(flightPathsToFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/analysis/flights/' fileName '_flightPathsToFeeder.svg']);
  
     end
 
