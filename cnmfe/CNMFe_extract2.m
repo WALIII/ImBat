@@ -6,6 +6,7 @@ function [metadata] = CNMFe_extract2(nam,varargin)
 close all;
 
 neuron = Sources2D();
+use_prev = 0; % use previous extraction?
 % nam = './Dsampled.tif';
 if exist('nam') ==1;
 nam = neuron.select_data(nam);         %if nam is [], then select data interactively
@@ -177,7 +178,7 @@ if choose_params
     [metadata.cnmfe.gSig, metadata.cnmfe.gSig, ring_radius, metadata.cnmfe.min_corr, metadata.cnmfe.min_pnr] = neuron.set_parameters();
 end
 
-[center, Cn, PNR] = neuron.initComponents_parallel(K, frame_range, save_initialization, use_parallel);
+[center, Cn, PNR] = neuron.initComponents_parallel(K, frame_range, save_initialization, use_parallel, use_prev);
 neuron.compactSpatial();
 if show_init
     figure();
