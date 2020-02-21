@@ -111,18 +111,19 @@ for ii = 1: size(v,1)
       temp = [];
 end
 
+
+%%%%%
  catch
         disp(' No audio found in file');
    v1 = VideoReader(FILE);
    k = 1;
-    while hasFrame(v1)
+    while(vidObj.CurrentTime(v1) <= vtimes(iii) && vidObj.CurrentTime(v1) <= vtimes(iii+1))
     temp  = readFrame(v1);
     if k ==1;
+        
         % Format VIDEO DATA
         [video.height, video.width, video.channels] = size(temp);
         
-        
-     
         
 if video.height/video.width == 9/16;
    aspect_update =1;
@@ -153,7 +154,7 @@ end
     v_ts = 0;
      clear k V1;
     end
-
+%%%%%
 
 
 video.times = v_ts;% 0.1703*(day-1);
