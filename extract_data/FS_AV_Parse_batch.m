@@ -148,7 +148,7 @@ for i=1:length(mov_listing)
                     end
                 end
                 temp = squeeze(mean(temp,3));
-                temp = imresize(temp,[240, 300]); % hard code the resize 
+                temp = imresize(temp,[240, 320]); % hard code the resize 
                 video.frames(:,:,k) = temp;
                 k = k+1;
             end
