@@ -118,7 +118,7 @@ for i=1:length(mov_listing)
             v1 = VideoReader(FILE);
             k = 1;
             v1.CurrentTime = vtimes(iii);
-            while(v1.CurrentTime <= vtimes(iii+1))
+            while(v1.CurrentTime < vtimes(iii+1))
                 %   if v1.CurrentTime <= vtimes(iii+1);
                 %break
                 % end
@@ -126,6 +126,7 @@ for i=1:length(mov_listing)
                 temp  = readFrame(v1);
                 catch
                     disp(' no more readble frames');
+                    continue
                 end
                 if k ==1;
                     
