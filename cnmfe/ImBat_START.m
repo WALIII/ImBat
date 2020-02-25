@@ -27,7 +27,7 @@ Analysis_flag = 1; % run basic ROI analysis...
 extract  = 1; % extract the basic ROI timeseries
 reExtract = 1; % re-extract, in the event that things have been extracted already.
 ROI_flag_reset = 1;
-
+extract_track = 0;
 
 % Default Movie Paramaters:
 metadata.temporal_downsample = 5; % temporal downsampleing
@@ -116,10 +116,12 @@ for i = 1:length(subFolders);
 %         
         
         % load tracking data
+        if extract_track ==1;
         track_fname = flight_subFolders(ii).name;
         track_fname = extractBefore( track_fname,'_extraction');
         track_fname = [track_fname,'_track.mat'];
         load(track_fname);
+        end
         
         
         %%====[ Motion Correction ]======%%
@@ -161,10 +163,12 @@ for i = 1:length(subFolders);
             
             %%====[ Aligning Time Stamps ]======%%
             % to do: add logfile
+            if extract_track ==1;
             disp('Aligning Timestamps...');
             load('AV_data.mat');
             [out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
-        end
+            end
+            end
         clear video audio Markers AnalogSignals out % Clear vars from RAM
         extract =1;
     end
