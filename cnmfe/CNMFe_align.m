@@ -1,4 +1,4 @@
-function CNMFe_align(Yf)
+function CNMFe_align(Yf,metadata)
 % CNMFe_align.m
 
 % Wrapper for NoRMCorre rigid and non-rigid motion correction
@@ -205,11 +205,11 @@ clear Mpr;
 %[Y] = ImBat_Filter(Y);
 
 disp('Saving corrected data...');
-save('processed/Motion_corrected_Data.mat','all_shifts','Y','Ysiz','-v7.3');
+save([metadata.processed_FN,'/Motion_corrected_Data.mat'],'all_shifts','Y','Ysiz','-v7.3');
 
 
 % Saving Downsampled video
 Y = imresize(Y,0.5);
 Ysiz = size(Y);
 disp('Saving corrected downsampled data...');
-save('processed/Motion_corrected_Data_DS.mat','all_shifts','Y','Ysiz','-v7.3');
+save([metadata.processed_FN,'/Motion_corrected_Data_DS.mat'],'all_shifts','Y','Ysiz','-v7.3');

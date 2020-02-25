@@ -37,7 +37,7 @@ metadata.artifact_reject = 0; % median filtering
 metadata.initial_median_filter_kernal = 11;
 % Default CNMFe Paramaters:
 
-
+processed_FN = ['processed_',datestr(now,'yyyy_mm_dd__hhMM')];
 
 
 
@@ -58,7 +58,7 @@ end
 
 % Housekeeping:
 metadata.Extraction_date = datestr(now);
-
+metadata.processed_FN = processed_FN;
 
 % Get all folders in directory
 files = dir(pwd);
@@ -93,27 +93,27 @@ for i = 1:length(subFolders);
     for ii = 1:length(flight_subFolders);
         cd([subFolders(i).folder,'/',subFolders(i).name]);
         
-        % Check if folder exists
-        if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed','/','Motion_corrected_Data_DS.mat'])>0;
-            disp('Folder already extracted..');
-            if reExtract ==1
-                disp('Re-Extracting...');
-                fname = [flight_subFolders(ii).name,'/','processed'];
-                try
-                rmdir(fname);
-                catch
-                     cmd_rmdir( fname ) 
-                end
-                
-                mkdir(fname);
-            else
-                disp('Moving to the next folder...');
-                ROI_flag = 0 ;
-                
-                extract = 0 ;
-            end
-        end
-        
+%         Check if folder exists
+%         if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/',processed_FN,'/','Motion_corrected_Data_DS.mat'])>0;
+%             disp('Folder already extracted..');
+%             if reExtract ==1
+%                 disp('Re-Extracting...');
+%                 fname = [flight_subFolders(ii).name,'/','processed'];
+%                 try
+%                 rmdir(fname);
+%                 catch
+%                      cmd_rmdir( fname ) 
+%                 end
+%                 
+%                 mkdir(fname);
+%             else
+%                 disp('Moving to the next folder...');
+%                 ROI_flag = 0 ;
+%                 
+%                 extract = 0 ;
+%             end
+%         end
+%         
         
         % load tracking data
         track_fname = flight_subFolders(ii).name;
@@ -127,16 +127,16 @@ for i = 1:length(subFolders);
         cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])% index into the flight_subfolder
         if extract ==1;
             % Run processing script
-            mkdir('processed');
+            mkdir(processed_FN);
             ImBat_processVideos('metadata',metadata);
             disp('processing!!');
         end
         
         
-        cd('processed') % move to processed folder...
+        cd(processed_FN) % move to processed folder...
         
         % Check if roi extraction folder exists
-        if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/','processed','/','Motio_corrected_Data_DS_neurons'])>0;
+        if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/',processed_FN,'/','Motion_corrected_Data_DS_neurons'])>0;
             disp('ROIs already extracted..');
             
             if reROI_extract ==1
