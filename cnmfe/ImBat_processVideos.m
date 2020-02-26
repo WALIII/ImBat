@@ -80,7 +80,7 @@ if video ==1;
     
     
     % Save and remove video from ram
-    CNMFe_align(Yf);
+    CNMFe_align(Yf,metadata);
     
     %FS_tiff(Yf,'fname','processed/RAW_Video.tif');
     clear Yf;
@@ -124,5 +124,5 @@ if audio == 1;
     audio = D.audio;
     video = D.video;
     
-    save('processed/AV_data','audio','video','-v7.3');
+    save([metadata.processed_FN,'/AV_data'],'audio','video','-v7.3');
 end
