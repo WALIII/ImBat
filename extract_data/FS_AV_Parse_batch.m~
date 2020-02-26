@@ -22,32 +22,35 @@ function FS_AV_Parse_batch(DIR,varargin)
 
 
 mat_dir=[pwd,'/mat'];
+gif_dir=[pwd,'/gif'];
 error_dir =[pwd,'/error'];
 plot_spectrogram =0;
+% resize_factor = 0.25;
 frames_per_file = 100;
 aspect_update =0;
 
 
-if exist(mat_dir,'dir') rmdir(mat_dir,'s'); end
+ if exist(mat_dir,'dir') rmdir(mat_dir,'s'); end
 % if exist(gif_dir,'dir') rmdir(gif_dir,'s'); end
 %if exist(error_dir,'dir') rmdir(error_dir,'s'); end
 
 
 vin=varargin;
 for i=1:length(vin)
-    if isequal(vin{i},'mat_dir') % manually inputing a sort order
-        mat_dir=[pwd,vin{i+1}]; % for manual mat_dir naming
-    elseif isequal(vin{i},'ri')
-        ri=vin{i+1};
-    end
+  if isequal(vin{i},'mat_dir') % manually inputing a sort order
+    show=vin{i+1};
+    man =1;
+  elseif isequal(vin{i},'ri')
+    ri=vin{i+1};
 end
 
 
-mkdir(mat_dir);
+
+% mkdir(mat_dir);
 % mkdir(gif_dir);
 % mkdir(error_dir);
 
-
+% mat_dir = cd;
 
 outlier_flag=0;
 if nargin<1 | isempty(DIR), DIR=pwd; end
@@ -131,7 +134,7 @@ for i=1:length(mov_listing)
                 %break
                 % end
                 try
-                    temp  = readFrame(v1);
+                temp  = readFrame(v1);
                 catch
                     disp(' no more readble frames');
                     continue
@@ -139,7 +142,7 @@ for i=1:length(mov_listing)
                 if k ==1;
                     
                     % Format VIDEO DATA
-                    [video.height, video.width, video.channels] = size(temp);
+                    [video.height, video.width, video.channels] = size(temp);           
                     
                     if video.height/video.width == 9/16;
                         aspect_update =1;
@@ -147,7 +150,7 @@ for i=1:length(mov_listing)
                         resize_factor = video.height/240;
                         resize_factor = 1/resize_factor;
                         video.resize_factor = resize_factor;
-                        resize_factor = 0.5; % this is the true resize
+                        resize_factor = 0.5; % this is the true resize                        
                     else
                         aspect_update =0;
                         % calculate resize factor
@@ -157,7 +160,7 @@ for i=1:length(mov_listing)
                     end
                 end
                 temp = squeeze(mean(temp,3));
-                temp = imresize(temp,[240, 320]); % hard code the resize
+                temp = imresize(temp,[240, 320]); % hard code the resize 
                 video.frames(:,:,k) = temp;
                 k = k+1;
             end
@@ -171,7 +174,7 @@ for i=1:length(mov_listing)
         video.nrFramesTotal = size(video.frames,3);
         video.FrameRate = 1/mean(diff(v_ts));
         
-        
+
         
         fname = [mat_dir,'/',file,'_',sprintf('%03d', iii)];
         FS_tiff(video.frames,'fname',fname);
