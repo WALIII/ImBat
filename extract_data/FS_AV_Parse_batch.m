@@ -173,7 +173,7 @@ for i=1:length(mov_listing)
         
         
         
-        fname = [mat_dir,'/',file,'_',sprintf('%03d', iii)];
+        fname = [mat_dir,'/',file,'_',sprintf('%03d', iii),'.tiff'];
         FS_tiff(video.frames,'fname',fname);
         
         %dont save video.frames ( its already a tif...
