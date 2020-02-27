@@ -1,5 +1,10 @@
 function ImBat_BatchExtract
-% extract c3D files and 
+% extract c3D files and ,mov files, then run ImBat_Start ( within a single
+% script)
+
+% 
+
+
 
 HomeDir = cd;
 % Get all folders in directory
@@ -55,17 +60,14 @@ for i = 1:length(subFolders);
             save([processed_dir fileName '_track' '.mat'],'AnalogFrameRate','AnalogSignals','Markers','VideoFrameRate');
             save([copy_dir fileName '_track' '.mat'],'AnalogFrameRate','AnalogSignals','Markers','VideoFrameRate');
         end 
-        % Run extraction
-        ImBat_Start;
         
+        % Run extraction
+        close all;
+        ImBat_Start;      
     end
 end
     
 cd(HomeDir);
-    
-    % FS_AV_Parse
-    
-    % check if tracking has been extracted
     
     
     
