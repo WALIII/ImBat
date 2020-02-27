@@ -48,9 +48,9 @@ mx=avgMarker(:,1);
 my=avgMarker(:,2);
 mz=avgMarker(:,3);
 
-%mx = trackData.Markers(:,1,1);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,1);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,1);
-%my = trackData.Markers(:,1,2);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,2);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,2);
-%mz = trackData.Markers(:,1,3);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,3);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,3);
+mx = trackData.Markers(:,1,1);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,1);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,1);
+my = trackData.Markers(:,1,2);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,2);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,2);
+mz = trackData.Markers(:,1,3);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,3);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,3);
 
 %set zeros to nan
 mx(find(mx == 0)) = nan;
@@ -64,9 +64,9 @@ trajPartial(3,:) = mz';
 %mxNan = find(mx == nan);
 mxNan = find(isnan(mx));
 
-mxFull = fillmissing(mx,'nearest');
-myFull = fillmissing(my,'nearest');
-mzFull = fillmissing(mz,'nearest');
+mxFull = mx;%fillmissing(mx,'nearest');
+myFull = my;%fillmissing(my,'nearest');
+mzFull = mz;%fillmissing(mz,'nearest');
 
 %threshold based on speed
 Vx = gradient(mxFull, 1/trackData.VideoFrameRate);

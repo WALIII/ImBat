@@ -187,8 +187,12 @@ video.FrameRate = 1/mean(diff(v_ts));
 % filtering video:
 % disp('remove artifacts');
 % video.frames =  ImBat_denoise(video.frames);
-
-fname = [mat_dir,'/',file,'_',sprintf('%03d', iii), '.tif'];
+if macFlag ==1
+    fname = [processedDir,'/',file,'_',sprintf('%03d', iii), '.tif'];
+    
+else
+    fname = [mat_dir,'/',file,'_',sprintf('%03d', iii), '.tif'];
+end
 FS_tiff(video.frames,'fname',fname);
 
 %dont save video.frames ( its already a tif...
