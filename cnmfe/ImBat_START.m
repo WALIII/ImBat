@@ -9,10 +9,32 @@ function ImBat_START(varargin)
 
 
 ROI_flag = 1; % run ROI extraction
+<<<<<<< Updated upstream
 reROI_extract = 0; %rerun ROI extraction
 Analysis_flag = 0; % run basic ROI analysis...
 extract  = 1;
 reExtract =1;
+=======
+reROI_extract = 1; %rerun ROI extraction
+Analysis_flag = 1; % run basic ROI analysis...
+extract  = 1; % extract the basic ROI timeseries
+reExtract = 1; % re-extract, in the event that things have been extracted already.
+ROI_flag_reset = 1;
+extract_track = 0;
+Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
+
+% Default Movie Paramaters:
+metadata.temporal_downsample = 5; % temporal downsampleing
+metadata.spatial_downsample = 0.4; % spatial downsampling
+metadata.median_filter_kernal = 3; % median filtering
+metadata.artifact_reject = 0; % median filtering
+metadata.initial_median_filter_kernal = 11;
+% Default CNMFe Paramaters:
+
+processed_FN = ['processed_',datestr(now,'yyyy_mm_dd__hhMM')];
+
+
+>>>>>>> Stashed changes
 
 % Manual inputs
 vin=varargin;
