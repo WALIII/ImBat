@@ -43,7 +43,7 @@ end
 % Load in all Tiffs, and concatonate them
 if video ==1;
     
-    mov_listing=dir(fullfile(pwd,'*.tif'));
+    mov_listing= [ dir(fullfile(pwd,'*.tif'));  dir(fullfile(pwd,'*.tiff'))];
     mov_listing={mov_listing(:).name};
     
     filenames=mov_listing;
