@@ -1,7 +1,7 @@
-function ImBat_Markov(ROI_Data)
+function [out_markov] = ImBat_Markov(ROI_Data,day2use)
 
 % Segregate Flights:
-day2use = 12;
+%day2use = 12;
 Sim = 0;
 
 [out] =  ImBat_SegTrajectories(ROI_Data{1,day2use}.Alignment.out.flights,ROI_Data{1,day2use}.Alignment.out.Location_time);
@@ -115,10 +115,20 @@ end
 T = find_patterns(VA);
 %...  find specific interesting transition
 
+
+
 % Single element transitions- get the lengths of each cell 
 L = cellfun(@length,T);
 %%extract cells of length 5 
 iwant = T(L==2);
+
+
+% Output variables:
+out_markov.T =T; 
+out_markov.VA = VA; % vector of flight identities
+out_markov.FL_clust = out; % segregated flights
+out_markov.day = day2use; % segregated flights
+
 
 
 
