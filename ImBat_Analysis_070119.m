@@ -3,7 +3,7 @@ function [CutCells, Ydata, ClustFlight,CutCells2, CutFlights,Velocity] = ImBat_A
 %% align ROI data to the cut out flight data...
 
 % Which day
-day = 13;
+day = 12;
 clust = 1;
 LoadY =0;
 fs = 30; % video fs
