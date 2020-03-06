@@ -18,7 +18,7 @@ for i=1:length(vin)
         plotROI =1;
     elseif isequal(vin{i},'Indirect')
         ri=vin{i+1};
-    elseif isequal(vin{i},'hl')
+    elseif isequal(vin{i},'HL')
         HL = vin{i+1};
     end
 end

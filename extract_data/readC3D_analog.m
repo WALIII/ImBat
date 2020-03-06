@@ -286,7 +286,7 @@ NvideoFrames=EndFrame - StartFrame + 1;
 
 if Scale < 0
     for i=1:NvideoFrames
-        NvideoFrames-i;
+        NvideoFrames-i
         for j=1:Nmarkers
 %              mdata = single(fread(fid,3,'float32')')
 %             if isempty(mdata)    

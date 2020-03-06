@@ -41,16 +41,9 @@ end
 %might want to use raw c3d to keep track of each marker (this could be
 %useful for when not all 3 markers are present, which is often the case
 %when the animal is at a wall)
-idx = trackData.Markers == 0;
-trackData.Markers(idx) = NaN;
-avgMarker = squeeze(nanmean(trackData.Markers,2));
-mx=avgMarker(:,1);
-my=avgMarker(:,2);
-mz=avgMarker(:,3);
-
-%mx = trackData.Markers(:,1,1);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,1);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,1);
-%my = trackData.Markers(:,1,2);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,2);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,2);
-%mz = trackData.Markers(:,1,3);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,3);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,3);
+mx = trackData.Markers(:,1,1);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,1);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,1);
+my = trackData.Markers(:,1,2);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,2);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,2);
+mz = trackData.Markers(:,1,3);%trackData.Markers(1:length(trackData.Markers(:,1,1))/2,1,3);%trackData.Markers(length(trackData.Markers(:,1,1))/2+1:length(trackData.Markers(:,1,1)),1,3);
 
 %set zeros to nan
 mx(find(mx == 0)) = nan;
@@ -64,9 +57,9 @@ trajPartial(3,:) = mz';
 %mxNan = find(mx == nan);
 mxNan = find(isnan(mx));
 
-mxFull = mx;%fillmissing(mx,'nearest');
-myFull = my;%fillmissing(my,'nearest');
-mzFull = mz;%fillmissing(mz,'nearest');
+mxFull = fillmissing(mx,'nearest');
+myFull = fillmissing(my,'nearest');
+mzFull = fillmissing(mz,'nearest');
 
 %threshold based on speed
 Vx = gradient(mxFull, 1/trackData.VideoFrameRate);
@@ -90,15 +83,8 @@ trajectories_continuous(3,:) = mzFull';
 
 %plot all flights in black
 plotFlightPathsAll = figure();
-%plot3(mxFull,myFull,mzFull,'LineWidth',2,'Color','k')
-%scatter3(mxFull,myFull,mzFull,'.','k')
+plot3(mxFull,myFull,mzFull,'LineWidth',2,'Color','k')
 hold on
-
-col  = jet(100);
-for i = 2:length(trackData.Markers(:,1,:))
-plot3(mxFull(i), myFull(i), mzFull(i), 'color',col(vecnorm([mxFull(i),myFull(i),mzFull(i) - mxFull(i-1),myFull(i-1),mzFull(i-1)], 2, 2)))
-hold on
-end
 % % modify labels for tick marks
 % xticks = get(gca,'xtick');
 % yticks = get(gca,'ytick');

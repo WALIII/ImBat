@@ -9,7 +9,7 @@ function  [out] =  ImBat_SegTrajectories(Location,Location_times,varargin)
 
 
 FS = 120;
-nclusters = 5;
+nclusters = 3;
 day_index = ones(size(Location_times));
 
 % Manual inputs

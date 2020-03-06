@@ -1,4 +1,4 @@
-function [out, metrics] = ImBat_alignTimeStamps(audio,video,TS,Markers);
+function [out] = ImBat_alignTimeStamps(audio,video,TS,Markers);
 % ImBat_alignTimeStamps
 
 % Align the Freedomscope analog input with 'Cortex' software timestamps,
@@ -8,9 +8,6 @@ function [out, metrics] = ImBat_alignTimeStamps(audio,video,TS,Markers);
 % d05/10/2019
 
 
-
-% core fucntions:
-%            ImBat_formatTracking.m
 
 %paramss
 fs = audio.rate;% audio framerate
@@ -22,7 +19,7 @@ DS_factor = round(fs/Tsfs); % should be '400'
 % get tracking data
 disp('extracting tracking data');
 [Location, Location2] = ImBat_formatTracking(Markers); % formated location data
-Rewards = TS(:,1);
+
 TS = TS(:,2);
 
 % TO DO: check which channel the audio is. Currenlty hard coded at ch2:
@@ -47,10 +44,10 @@ TS2 = TS;
 
 audio_z = zscore(smooth(abs(audio_data)))-min(zscore(smooth(abs(audio_data))));
 TS_z = zscore(smooth(TS2,10));
-try
+try 
 [Apks,Alocs] = findpeaks(audio_z,'MinPeakProminence',4,'MinPeakDistance',60);
 [Bpks,Blocs] = findpeaks(TS_z,'MinPeakProminence',1,'MinPeakDistance',6);
-catch
+catch 
 Apks = 1;
 Alocs = 1;
 Bpks = 1;
@@ -74,8 +71,7 @@ audio_tv_offset = audio_tv - audio_tv(offsetA); % subtract this value
 TS_tv_offset = TS_tv-TS_tv(offsetB);
 
 
-% Get discrete reward signals
-[~,rewardLocs] = findpeaks(Rewards,'MinPeakProminence',2);
+%ur = resample(u,3,2);
 
 % Align to first peak
 figure();
@@ -96,28 +92,26 @@ title('inferred offsets');
 
 
 
+% find the offset frame value, and subtact it
+
+% Make offset relative to the audio ( audio starts at 0)
+
+
+
 % explort the markers:
+
 out.Location = Location;
 out.Location_time = TS_tv_offset';
 % out.markers_resampled % to the frame rate of the video
 % out.markers_resampled_time
 out.video_times = video.times;
 out.Location2 = Location2;
-out.RewardVector = Rewards;
-out.RewardTime = rewardLocs;
-
-% metrics for plotting later
-metrics.audio_tv_offset = audio_tv_offset;
-metrics.audio_infer = audio_infer;
-metrics.TS_tv_offset = TS_tv_offset;
-metrics.TS_infer = TS_infer;
-
 
 % Smooth Location data
  for i = 1:3
      out.Location3(:,i) = movmean(out.Location(:,i),30);
  end
-
+ 
 out.flights = out.Location3; % take out the rest data...
 % getting location data:
 disp('finalizing cursor')
@@ -144,4 +138,4 @@ for i = 1:(size(out.Location,1))-20
 end
 
 
-save('Alignment.mat','out','metrics','-v7.3');
+save('Alignment.mat','out','-v7.3');
