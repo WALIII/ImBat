@@ -53,16 +53,16 @@ for i = 1:length(subFolders)
     cd([subFolders(i).folder,'/',subFolders(i).name]);
     
     % index every subfolder...
-    trackFiles = dir('*Bat_Cluster_track.mat');
+    trackFiles = dir('*track.mat');
     imageFolders = dir('*_extraction');
     %print image data folder names
     for kk = 1 : length(imageFolders)
         fprintf('Image data folder #%d = %s\n', kk, imageFolders(kk).name);
         %check that track data matches image data
-%         if strcmp(imageFolders(kk).name(1:end-10),trackFiles(kk).name(1:end-9)) == 0
-%             fprintf('Tracking and image data do not match');
-%             analysisFlag = 0;
-%         end
+        if strcmp(imageFolders(kk).name(1:end-10),trackFiles(kk).name(1:end-9)) == 0
+            fprintf('Tracking and image data do not match');
+            analysisFlag = 0;
+        end
         
         % Check if folder exists
         if exist([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','analysis'])>0;
@@ -75,16 +75,12 @@ for i = 1:length(subFolders)
             end
         end
         
-        processedFolders = dir([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','processed*']);
-        processedNewest = sort({processedFolders(end).name});
-        processedNewest = char(processedNewest);
-        
         % load tracking and cell data
         if analysisFlag == 1
             trackData = load([trackFiles(kk).folder,'/',trackFiles(kk).name]);
-            cellData = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',processedNewest,'/','results.mat']);%'Motion_corrected_Data_DS_results.mat']);
-            videoData = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',processedNewest,'/','Motion_corrected_Data_DS.mat']);
-            alignment = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',processedNewest,'/','Alignment.mat']);
+            cellData = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','processed','/','Motion_corrected_Data_DS_results.mat']);
+            videoData = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','processed','/','Motion_corrected_Data_DS.mat']);
+            alignment = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','processed','/','Alignment.mat']);
             fileName = extractBefore(imageFolders(kk).name,'_extraction'); %get filename for titles
             dateSesh = imageFolders(kk).folder(end-5:end);
             batName = extractBefore(fileName,['_' dateSesh]);
