@@ -32,12 +32,13 @@ reExtract = 1; % re-extract, in the event that things have been extracted alread
 ROI_flag_reset = 1;
 extract_track = 1;
 Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
+Bat_Cluster =0; % extract the bat_cluster tracking
 
 % Default Movie Paramaters:
 metadata.temporal_downsample = 5; % temporal downsampleing
 metadata.spatial_downsample = 0.4; % spatial downsampling
 metadata.median_filter_kernal = 3; % median filtering
-metadata.artifact_reject = 0; % median filtering
+metadata.artifact_reject = 1; % median filtering
 metadata.initial_median_filter_kernal = 11;
 % Default CNMFe Paramaters:
 
@@ -60,6 +61,12 @@ for i=1:length(vin)
     end
 end
 
+
+if Bat_Cluster ==1;
+    metadata.tracking_file_type =  'Bat_Cluster';
+else
+    metadata.tracking_file_type = '_track';
+end
 
 if Mov_extract_flag  ==1;
     disp(' %===========[ EXTRACTING  .mov  FILES  ] ===========% ');
@@ -104,34 +111,40 @@ for i = 1:length(subFolders);
     for ii = 1:length(flight_subFolders);
         cd([subFolders(i).folder,'/',subFolders(i).name]);
         
-%         Check if folder exists
-%         if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/',processed_FN,'/','Motion_corrected_Data_DS.mat'])>0;
-%             disp('Folder already extracted..');
-%             if reExtract ==1
-%                 disp('Re-Extracting...');
-%                 fname = [flight_subFolders(ii).name,'/','processed'];
-%                 try
-%                 rmdir(fname);
-%                 catch
-%                      cmd_rmdir( fname ) 
-%                 end
-%                 
-%                 mkdir(fname);
-%             else
-%                 disp('Moving to the next folder...');
-%                 ROI_flag = 0 ;
-%                 
-%                 extract = 0 ;
-%             end
-%         end
-%         
+        %         Check if folder exists
+        %         if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/',processed_FN,'/','Motion_corrected_Data_DS.mat'])>0;
+        %             disp('Folder already extracted..');
+        %             if reExtract ==1
+        %                 disp('Re-Extracting...');
+        %                 fname = [flight_subFolders(ii).name,'/','processed'];
+        %                 try
+        %                 rmdir(fname);
+        %                 catch
+        %                      cmd_rmdir( fname )
+        %                 end
+        %
+        %                 mkdir(fname);
+        %             else
+        %                 disp('Moving to the next folder...');
+        %                 ROI_flag = 0 ;
+        %
+        %                 extract = 0 ;
+        %             end
+        %         end
+        %
         
         % load tracking data
         if extract_track ==1;
-        track_fname = flight_subFolders(ii).name;
-        track_fname = extractBefore( track_fname,'_extraction');
-        track_fname = [track_fname,'_track.mat'];
-        load(track_fname);
+            track_fname = flight_subFolders(ii).name;
+            track_fname = extractBefore( track_fname,'_extraction');
+            if strcmp(metadata.tracking_file_type, 'Bat_Cluster')
+                track_fname = [track_fname,'-Bat_Cluster_track'];
+                load(track_fname);
+            else
+                track_fname = [track_fname,'_track'];
+                load(track_fname);
+                metadata.tracking_file_type = 'track';
+            end
         end
         
         
@@ -155,7 +168,7 @@ for i = 1:length(subFolders);
             if reROI_extract ==1
                 disp('Re-Extracting ROIs...');
                 ROI_flag = 1 ;
-
+                
             else
                 disp('Moving to the next folder...');
             end
@@ -167,7 +180,7 @@ for i = 1:length(subFolders);
             disp('extracting ROIs...')
             nam = './Motion_corrected_Data.mat'
             try
-            CNMFe_extract2(nam,'metadata',metadata);
+                CNMFe_extract2(nam,'metadata',metadata);
             catch
             end
             
@@ -178,11 +191,11 @@ for i = 1:length(subFolders);
             %%====[ Aligning Time Stamps ]======%%
             % to do: add logfile
             if extract_track ==1;
-            disp('Aligning Timestamps...');
-            load('AV_data.mat');
-            [out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
+                disp('Aligning Timestamps...');
+                load('AV_data.mat');
+                [out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
             end
-            end
+        end
         clear video audio Markers AnalogSignals out % Clear vars from RAM
         extract =1;
     end

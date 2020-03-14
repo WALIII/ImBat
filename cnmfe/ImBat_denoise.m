@@ -48,9 +48,12 @@ end
 
 % Median filter:
 % % smooth video:
+video = single(video);
+ [video, lost_frames] = ImBat_DroppedFrames(video);
+ 
 disp('Initial median filtering of video');
 tic
-[video] = ImBat_Filter(single(video),smth_frames);
+[video] = ImBat_Filter((video),smth_frames);
 toc
 
 if metadata.artifact_reject ==1;
@@ -58,9 +61,9 @@ if metadata.artifact_reject ==1;
     for i = 1:maxItter; % 100 itterations...
         
         % remove large offsets
-        siga = squeeze(mean(mean(video(:,[1:20 (end-20):end],:),1),2));
-        sigb = squeeze(mean(mean(video([1:20 (end-20):end],:,:),1),2));
-        sig = (siga+sigb)/2;
+        sig = squeeze(mean(mean(video([1:20 (end-20):end],[1:20 (end-20):end],:),1),2));
+       % sigb = squeeze(mean(mean(video([1:30 (end-30):end],:,:),1),2));
+       % sig = (siga+sigb)/2;
         % sig_base = smooth(sig,50);
         % sig_base = sig_base-mean(sig_base);
         sig = zscore(sig);
