@@ -32,13 +32,13 @@ reExtract = 1; % re-extract, in the event that things have been extracted alread
 ROI_flag_reset = 1;
 extract_track = 1;
 Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
-Bat_Cluster =1; % extract the bat_cluster tracking
+Bat_Cluster =0; % extract the bat_cluster tracking
 
 % Default Movie Paramaters:
 metadata.temporal_downsample = 5; % temporal downsampleing
 metadata.spatial_downsample = 0.4; % spatial downsampling
 metadata.median_filter_kernal = 3; % median filtering
-metadata.artifact_reject = 0; % median filtering
+metadata.artifact_reject = 1; % median filtering
 metadata.initial_median_filter_kernal = 11;
 % Default CNMFe Paramaters:
 
@@ -64,6 +64,8 @@ end
 
 if Bat_Cluster ==1;
     metadata.tracking_file_type =  'Bat_Cluster';
+else
+    metadata.tracking_file_type = '_track';
 end
 
 if Mov_extract_flag  ==1;
