@@ -1,6 +1,6 @@
 function  [out_mov] = ImBat_Filter(mov,smth_frames);
 %
-b = 3; %(smoothing )
+b = 1; %(smoothing )
 % FiltB = mat2gray(FiltA-FBM);
 % Scale data:
 
