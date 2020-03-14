@@ -6,7 +6,7 @@ function [Im] = ImBat_MotionImage(Y);
 % d03/12/2020
 
 Last = size(Y,3)-3000;
-numFrames = 1000; % frames from begining to end..
+numFrames = 2000; % frames from begining to end..
 Ydff = Y-mean(Y,3);
 BB = squeeze(mean(Ydff(:,:,Last-numFrames:Last-1),3));
 AA = squeeze(mean(Ydff(:,:,1:numFrames),3));
@@ -17,11 +17,17 @@ figure();
 subplot(131);
 imagesc(Im(:,:,1),[0 1]);
 grid on;
+title('First 1000 frames');
+
 subplot(132);
 imagesc(Im(:,:,2),[0 1]);
 grid on;
+title('Last 1000 frames');
+
 subplot(1,3,3);
 imagesc(imfilter(Im*1.4,1));
+title('overlay');
+
 grid on;
 
 

@@ -201,7 +201,7 @@ Ysiz = size(Y);
 clear Mpr;
 
 [Im] = ImBat_MotionImage(Y);
-saveas(gcf,[metadata.processed_FN,'/motion_correction_image.jpg'])
+saveas(fig,[metadata.processed_FN,'/Motion_corrected_Data.mat'])
 %disp('Smoothing corrected data...');
 % smooth motion corrected data...
 %[Y] = ImBat_Filter(Y);
