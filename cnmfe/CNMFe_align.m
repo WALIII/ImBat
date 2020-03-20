@@ -28,6 +28,9 @@ if (0)
 %     %Ypc = Yf - Y;
 %     bound = size(hLarge,1);
 else
+    
+
+    
     gSig = round(7/5);
     gSiz = round(17/5);
     psf = fspecial('gaussian', round(2*gSiz), gSig);
@@ -200,8 +203,12 @@ end
 Ysiz = size(Y);
 clear Mpr;
 
+try
 [Im] = ImBat_MotionImage(Y);
 saveas(gcf,[metadata.processed_FN,'/motion_correction_image.jpg'])
+catch
+    disp('not enough frames to plot');
+end
 %disp('Smoothing corrected data...');
 % smooth motion corrected data...
 %[Y] = ImBat_Filter(Y);

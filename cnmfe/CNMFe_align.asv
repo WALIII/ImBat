@@ -200,8 +200,12 @@ end
 Ysiz = size(Y);
 clear Mpr;
 
+try
 [Im] = ImBat_MotionImage(Y);
-saveas(fig,[metadata.processed_FN,'/Motion_corrected_Data.mat'])
+saveas(gcf,[metadata.processed_FN,'/motion_correction_image.jpg'])
+catch
+    disp('not enough frames to plot');
+end
 %disp('Smoothing corrected data...');
 % smooth motion corrected data...
 %[Y] = ImBat_Filter(Y);
