@@ -43,6 +43,9 @@ metadata.initial_median_filter_kernal = 11;
 % Default CNMFe Paramaters:
 metadata.cnmfe.min_corr = 0.8;     % minimum local correlation for a seeding pixel
 metadata.cnmfe.min_pnr = 30;       % minimum peak-to-noise ratio for a seeding pixel
+% defualt alignment params:
+metadata.moco.itter = 10;
+metadata.moco.bin_width = 200;
 
 processed_FN = ['processed_',datestr(now,'yyyy_mm_dd__hhMM')];
 
