@@ -1,4 +1,4 @@
-function CNMFe_extract(nam)
+function CNMFe_extract(nam,metadata)
 
 
 rmpath(genpath('C:\Users\WAL3\Documents\MATLAB\CaImAn-MATLAB'));
@@ -7,7 +7,7 @@ rmpath(genpath('C:\Users\WAL3\Documents\MATLAB\CaImAn-MATLAB'));
 nam = nam;
 %% clear workspace
 clc; close all;
-global  d1 d2 numFrame metadata sframe num2read neuron neuron_ds ...
+global  d1 d2 numFrame sframe num2read neuron neuron_ds ...
     neuron_full Ybg_weights ssub tsub; %#ok<NUSED> % global variables, don't change them manually
 
 %% select data and map it to the RAM
@@ -54,7 +54,7 @@ num2read= numFrame;             % user input: how many frames to read   (optiona
 
 tic;
 ssub = metadata.cnmfe.ssub;           % spatial downsampling factor
-tsub = metadata.cnmfe.tsub; 
+tsub = metadata.cnmfe.tsub;
 cnmfe_load_data;
 fprintf('Time cost in downsapling data:     %.2f seconds\n', toc);
 
@@ -71,8 +71,8 @@ save_avi = false;   %save the initialization procedure as an avi movie.
 patch_par = [1,1]*1; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large
 K = []; % maximum number of neurons to search within each patch. you can use [] to search the number automatically
 
-metadata.cnmfe.min_corr = 0.8;     % minimum local correlation for a seeding pixel
-metadata.cnmfe.min_pnr = 30;       % minimum peak-to-noise ratio for a seeding pixel
+%metadata.cnmfe.min_corr = 0.8;     % minimum local correlation for a seeding pixel
+%metadata.cnmfe.min_pnr = 30;       % minimum peak-to-noise ratio for a seeding pixel
 metadata.cnmfe.min_pixel = metadata.cnmfe.gSig^2;      % minimum number of nonzero pixels for each neuron
 metadata.cnmfe.bd = 2;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
 neuron.updateParams('min_corr', metadata.cnmfe.min_corr, 'min_pnr', metadata.cnmfe.min_pnr, ...

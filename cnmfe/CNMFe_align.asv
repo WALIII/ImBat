@@ -28,9 +28,6 @@ if (0)
 %     %Ypc = Yf - Y;
 %     bound = size(hLarge,1);
 else
-    
-
-    
     gSig = round(7/5);
     gSiz = round(17/5);
     psf = fspecial('gaussian', round(2*gSiz), gSig);
