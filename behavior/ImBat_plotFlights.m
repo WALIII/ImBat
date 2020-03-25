@@ -90,15 +90,15 @@ trajectories_continuous(3,:) = mzFull';
 
 %plot all flights in black
 plotFlightPathsAll = figure();
-%plot3(mxFull,myFull,mzFull,'LineWidth',2,'Color','k')
+plot3(mxFull,myFull,mzFull,'LineWidth',2,'Color','k')
 %scatter3(mxFull,myFull,mzFull,'.','k')
 hold on
 
-col  = jet(100);
-for i = 2:length(trackData.Markers(:,1,:))
-plot3(mxFull(i), myFull(i), mzFull(i), 'color',col(vecnorm([mxFull(i),myFull(i),mzFull(i) - mxFull(i-1),myFull(i-1),mzFull(i-1)], 2, 2)))
-hold on
-end
+% col  = jet(100);
+% for i = 2:length(trackData.Markers(:,1,:))
+% plot3(mxFull(i), myFull(i), mzFull(i), 'color',col(vecnorm([mxFull(i),myFull(i),mzFull(i) - mxFull(i-1),myFull(i-1),mzFull(i-1)], 2, 2)))
+% hold on
+% end
 % % modify labels for tick marks
 % xticks = get(gca,'xtick');
 % yticks = get(gca,'ytick');
@@ -172,13 +172,13 @@ rng(2) %control random number generation
 try
     kstart = kmeans(fstartxyz,nclusters);
 catch
-    kstart = kmeans(fstartxyz,nclusters/2);
+    kstart = kmeans(fstartxyz,round(nclusters/2));
 end
 rng(2)
 try
     kend = kmeans(fendxyz,nclusters);
 catch
-    kend = kmeans(fendxyz,nclusters/2);
+    kend = kmeans(fendxyz,round(nclusters/2));
 end
 nflights = [];
 allflights = [];
