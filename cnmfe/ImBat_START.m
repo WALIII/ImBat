@@ -32,7 +32,7 @@ reExtract = 1; % re-extract, in the event that things have been extracted alread
 ROI_flag_reset = 1;
 extract_track = 1;
 Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
-Bat_Cluster =0; % extract the bat_cluster tracking
+Bat_Cluster =1; % extract the bat_cluster tracking
 
 % Default Movie Paramaters:
 metadata.temporal_downsample = 5; % temporal downsampleing
