@@ -72,12 +72,11 @@ smoothAvgSpiking = zscore(smooth(mean((full(cellData.results.C_raw(1:topROILocal
     %plot smoothed z-scored average firing rate of #cells
     a2 = subplot(topROILocal+11,1,6:9);%topROILocal+3:topROILocal+6);
     hold on
-    if length(alignment.out.video_timesDS) == length(smoothAvgSpiking)
-        plot(alignment.out.video_timesDS,smoothAvgSpiking)
+    if length(alignment.out.video_timesDS) = length(smoothAvgSpiking)
+    plot(alignment.out.video_timesDS,smoothAvgSpiking)
     else
         diffTimes = length(alignment.out.video_timesDS) - length(smoothAvgSpiking);
-        plot(alignment.out.video_timesDS(1:end-diffTimes),smoothAvgSpiking)
-    end
+        plot(alignment.out.video_timesDS(1:end-diffTimes,smoothAvgSpiking)
     ylim([-1 8])
     xlim([0 alignment.out.video_timesDS(end)])%xlim([0 alignment.out.video_timesDS(end)])
     title('Avg Cell Response')

@@ -1,4 +1,4 @@
-function [ROIoverlay,goodCellIndex,badCellIndex] = ImBat_ROIoverlay(results,varargin)
+function [ROIoverlay] = ImBat_ROIoverlay(results,varargin)
 
 global topROI
 
@@ -21,19 +21,19 @@ if mod(nparams,2)>0
 end
 for i=1:2:nparams
     switch lower(varargin{i})
-        case 'batName'
+        case 'batname'
             batName=varargin{i+1};
-        case 'dateSesh'
+        case 'datesesh'
             dateSesh = varargin{i+1};
-        case 'sessionType'
+        case 'sessiontype'
             sessionType = varargin{i+1};
         case 'roiheatflagindiv'
             roiHeatFlagIndiv = varargin{i+1};
         case 'centroid'
             centroidFlag = varargin{i+1};
-        case 'binaryMask'
+        case 'binarymask'
             binaryMaskFlag = varargin{i+1};
-        case 'roiHeat'
+        case 'roiheat'
             roiHeatFlag = varargin{i+1};
     end
 end
@@ -91,7 +91,7 @@ axis 'tight' 'equal'
 
 %plot binary mask over top of max projection
 if binaryMaskFlag == 1
-    figure();
+    ROIoverlay = figure();
     subplot(2,2,1)
     imagesc(imresize(results.Cn,8)); colormap(gray);
     axis 'tight' 'equal'

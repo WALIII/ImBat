@@ -64,9 +64,9 @@ trajPartial(3,:) = mz';
 %mxNan = find(mx == nan);
 mxNan = find(isnan(mx));
 
-mxFull = mx;%fillmissing(mx,'nearest');
-myFull = my;%fillmissing(my,'nearest');
-mzFull = mz;%fillmissing(mz,'nearest');
+mxFull = fillmissing(mx,'nearest');
+myFull = fillmissing(my,'nearest');
+mzFull = fillmissing(mz,'nearest');
 
 %threshold based on speed
 Vx = gradient(mxFull, 1/trackData.VideoFrameRate);
@@ -78,9 +78,9 @@ nonflying = find(batSpeed < 1.5);
 toofast = find(batSpeed > 35);
 
 %set low speed points to zero
-%mx([nonflying]) = nan;%mx(nonflying) = nan; %mx([nonflying; toofast]) = nan;
-%my([nonflying]) = nan;%my(nonflying) = nan;%my([nonflying; toofast]) = nan;
-%mz([nonflying]) = nan;%mz(nonflying) = nan;%mz([nonflying; toofast]) = nan;
+mxFull([nonflying]) = nan;%mx(nonflying) = nan; %mx([nonflying; toofast]) = nan;
+myFull([nonflying]) = nan;%my(nonflying) = nan;%my([nonflying; toofast]) = nan;
+mzFull([nonflying]) = nan;%mz(nonflying) = nan;%mz([nonflying; toofast]) = nan;
 
 
 
@@ -90,16 +90,16 @@ trajectories_continuous(3,:) = mzFull';
 
 %plot all flights in black
 plotFlightPathsAll = figure();
-%plot3(mxFull,myFull,mzFull,'LineWidth',2,'Color','k')
+plot3(mxFull,myFull,mzFull,'LineWidth',2,'Color','k')
 %scatter3(mxFull,myFull,mzFull,'.','k')
 hold on
 
-col  = jet(100);
-for i = 2:length(trackData.Markers(:,1,:))
-plot3(mxFull(i), myFull(i), mzFull(i), 'color',col(vecnorm([mxFull(i),myFull(i),mzFull(i) - mxFull(i-1),myFull(i-1),mzFull(i-1)], 2, 2)))
-hold on
-end
-% % modify labels for tick marks
+% col  = jet(100);
+% for i = 2:length(trackData.Markers(:,1,:))
+% plot3(mxFull(i), myFull(i), mzFull(i), 'color',col(vecnorm([mxFull(i),myFull(i),mzFull(i) - mxFull(i-1),myFull(i-1),mzFull(i-1)], 2, 2)))
+% hold on
+% end
+% % % modify labels for tick marks
 % xticks = get(gca,'xtick');
 % yticks = get(gca,'ytick');
 % zticks = get(gca,'ztick');

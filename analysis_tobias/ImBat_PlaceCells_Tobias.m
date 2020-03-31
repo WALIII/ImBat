@@ -51,8 +51,8 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
 
     
     [~,xy] = find(cellData.results.S(ii,:)>spikeThresh);  % get time neuron is active
-    xy = xy(xy<length(alignment.out.video_times));
-    Spike_times = alignment.out.video_times(xy)-offset; % convert this to 'spike time'
+    xy = xy(xy<length(alignment.out.video_timesDS));
+    Spike_times = alignment.out.video_timesDS(xy)-offset; % convert this to 'spike time'
     peak_heights = cellData.results.S(ii,xy);
     
     LX = zeros(1,length(Spike_times(:,1)));
