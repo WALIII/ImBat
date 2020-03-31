@@ -99,7 +99,8 @@ hold on
 % plot3(mxFull(i), myFull(i), mzFull(i), 'color',col(vecnorm([mxFull(i),myFull(i),mzFull(i) - mxFull(i-1),myFull(i-1),mzFull(i-1)], 2, 2)))
 % hold on
 % end
-% % % modify labels for tick marks
+
+% % modify labels for tick marks
 % xticks = get(gca,'xtick');
 % yticks = get(gca,'ytick');
 % zticks = get(gca,'ztick');
@@ -172,13 +173,13 @@ rng(2) %control random number generation
 try
     kstart = kmeans(fstartxyz,nclusters);
 catch
-    kstart = kmeans(fstartxyz,nclusters/2);
+    kstart = kmeans(fstartxyz,round(nclusters/2));
 end
 rng(2)
 try
     kend = kmeans(fendxyz,nclusters);
 catch
-    kend = kmeans(fendxyz,nclusters/2);
+    kend = kmeans(fendxyz,round(nclusters/2));
 end
 nflights = [];
 allflights = [];
@@ -245,7 +246,7 @@ title(['Flight Clusters start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType
 view(0,90)
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
-
+   
 flightPaths.clusterIndex = clusterIndex;
 % catch
 % flightPathsClusterEach = figure();
