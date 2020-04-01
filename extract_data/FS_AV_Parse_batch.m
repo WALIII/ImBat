@@ -39,6 +39,8 @@ for i=1:length(vin)
         mat_dir=[pwd,vin{i+1}]; % for manual mat_dir naming
     elseif isequal(vin{i},'ri')
         ri=vin{i+1};
+    elseif isequal(vin{i},'frames_per_file')
+        frames_per_file=vin{i+1};
     end
 end
 

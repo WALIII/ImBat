@@ -1,0 +1,39 @@
+function ImBat_Create_Master_Track
+
+% run in folder with calibration .c3d files 
+
+
+
+% STEP 1: get all .c3d files in folder:
+
+mov_listing=dir(fullfile(DIR,'*.c3d'));
+mov_listing={mov_listing(:).name};
+
+
+for i=1:length(mov_listing)
+
+% STEP 2: extract Markers
+
+[Markers,~,~,~,~,~,~,~,~]=readC3D_analog(FullFileName)
+
+out.Markers_Raw{i};
+out.date{i} = date;
+
+
+% STEP 3: Align Markers to first day
+
+out.ReferenceDate = X;
+[tform] = ImBat_AlignPoints(Markers_311,Markers_313);
+
+
+% STEP 4: Use tform to adjust markers ( for reference)
+
+TEMP = pointCloud(Location_D2);
+ptCloudTformed = pctransform(TEMP,tform_D1_D2);
+Location_D2_t = ptCloudTformed.Location;
+
+out.Markers_Adjusted
+
+
+clear ptCloudTformed TEMP
+

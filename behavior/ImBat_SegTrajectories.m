@@ -211,3 +211,6 @@ ylim([-2500 2500]);
 zlim([-500 2000]);
 grid on;
 
+out.Loc_clean(:,1) = mx;
+out.Loc_clean(:,2) = my;
+out.Loc_clean(:,3) = mz;

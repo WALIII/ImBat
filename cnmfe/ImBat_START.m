@@ -30,9 +30,9 @@ Analysis_flag = 1; % run basic ROI analysis...
 extract  = 1; % extract the basic ROI timeseries
 reExtract = 1; % re-extract, in the event that things have been extracted already.
 ROI_flag_reset = 1;
-extract_track = 1;
+extract_track = 0;
 Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
-Bat_Cluster =0; % extract the bat_cluster tracking
+Bat_Cluster =1; % extract the bat_cluster tracking
 
 % Default Movie Paramaters:
 metadata.temporal_downsample = 5; % temporal downsampleing
@@ -46,6 +46,11 @@ metadata.moco.itter = 1;
 metadata.moco.bin_width = 200;
 
 % Default CNMFe Paramaters:
+metadata.cnmfe.min_corr = 0.8;     % minimum local correlation for a seeding pixel
+metadata.cnmfe.min_pnr = 30;       % minimum peak-to-noise ratio for a seeding pixel
+% defualt alignment params:
+metadata.moco.itter = 10;
+metadata.moco.bin_width = 200;
 
 processed_FN = ['processed_',datestr(now,'yyyy_mm_dd__hhMM')];
 
@@ -104,19 +109,19 @@ end
 % For each folder ( extraction, and motion correction step)
 for i = 1:length(subFolders);
     disp(['entering folder', char(subFolders(i).name)])
-    
+
     cd([subFolders(i).folder,'/',subFolders(i).name]);
-    
+
     % index every subfolder...
     flight_files = dir(pwd);
     flight_files(ismember( {flight_files.name}, {'.', '..','Processed'})) = [];  %remove . and .. and Processed
     flight_dirFlags = [flight_files.isdir];% Get a logical vector that tells which is a directory.
     flight_subFolders = flight_files(flight_dirFlags);% Extract only those that are directories.
-    
-    
+
+
     for ii = 1:length(flight_subFolders);
         cd([subFolders(i).folder,'/',subFolders(i).name]);
-        
+
         %         Check if folder exists
         %         if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/',processed_FN,'/','Motion_corrected_Data_DS.mat'])>0;
         %             disp('Folder already extracted..');
@@ -138,7 +143,7 @@ for i = 1:length(subFolders);
         %             end
         %         end
         %
-        
+
         % load tracking data
         if extract_track ==1;
             track_fname = flight_subFolders(ii).name;
@@ -152,10 +157,10 @@ for i = 1:length(subFolders);
                 metadata.tracking_file_type = 'track';
             end
         end
-        
-        
+
+
         %%====[ Motion Correction ]======%%
-        
+
         cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])% index into the flight_subfolder
         if extract ==1;
             % Run processing script
@@ -163,24 +168,24 @@ for i = 1:length(subFolders);
             ImBat_processVideos('metadata',metadata);
             disp('processing!!');
         end
-        
-        
+
+
         cd(processed_FN) % move to processed folder...
-        
+
         % Check if roi extraction folder exists
         if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/',processed_FN,'/','Motion_corrected_Data_DS_neurons'])>0;
             disp('ROIs already extracted..');
-            
+
             if reROI_extract ==1
                 disp('Re-Extracting ROIs...');
                 ROI_flag = 1 ;
-                
+
             else
                 disp('Moving to the next folder...');
             end
         end
-        
-        
+
+
         %%====[ CNMF-e ROI Extraction ]======%%
         if ROI_flag ==1;
             disp('extracting ROIs...')
@@ -189,11 +194,11 @@ for i = 1:length(subFolders);
                 CNMFe_extract2(nam,'metadata',metadata);
             catch
             end
-            
-            
-            
+
+
+
             ROI_flag = ROI_flag_reset;
-            
+
             %%====[ Aligning Time Stamps ]======%%
             % to do: add logfile
             if extract_track ==1;
@@ -205,5 +210,5 @@ for i = 1:length(subFolders);
         clear video audio Markers AnalogSignals out % Clear vars from RAM
         extract =1;
     end
-    
+
 end
