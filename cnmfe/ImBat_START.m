@@ -40,10 +40,18 @@ metadata.spatial_downsample = 0.4; % spatial downsampling
 metadata.median_filter_kernal = 3; % median filtering
 metadata.artifact_reject = 1; % median filtering
 metadata.initial_median_filter_kernal = 11;
+
+% Motion ocrrection:
+metadata.moco.itter = 1;
+metadata.moco.bin_width = 200;
+
 % Default CNMFe Paramaters:
 
 processed_FN = ['processed_',datestr(now,'yyyy_mm_dd__hhMM')];
 
+% Housekeeping:
+metadata.Extraction_date = datestr(now);
+metadata.processed_FN = processed_FN;
 
 
 % Manual inputs
@@ -74,9 +82,7 @@ if Mov_extract_flag  ==1;
 end
 
 
-% Housekeeping:
-metadata.Extraction_date = datestr(now);
-metadata.processed_FN = processed_FN;
+
 
 % Get all folders in directory
 files = dir(pwd);
