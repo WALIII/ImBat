@@ -78,7 +78,8 @@ if video ==1;
     % temporal Downsample:
     [Yf] = ImBat_TemporalDownSample(Yf,TS);
     
-    
+    % Save un-aligned videos:
+    save([metadata.processed_FN,'/uncorrected_Data.mat'],'Yf','-v7.3');
     % Save and remove video from ram
     CNMFe_align(Yf,metadata);
     

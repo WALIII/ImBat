@@ -30,7 +30,7 @@ Analysis_flag = 1; % run basic ROI analysis...
 extract  = 1; % extract the basic ROI timeseries
 reExtract = 1; % re-extract, in the event that things have been extracted already.
 ROI_flag_reset = 1;
-extract_track = 1;
+extract_track = 0;
 Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
 Bat_Cluster =1; % extract the bat_cluster tracking
 
