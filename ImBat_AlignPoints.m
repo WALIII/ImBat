@@ -45,7 +45,11 @@ ylim([-4000 4000]);
 % turn XYZ matrix to pointcloud
 moving = pointCloud(M2);
 fixed = pointCloud(M1);
+try
 [tform,movingReg] = pcregistericp(moving,fixed)
+catch
+   disp('whoops'); 
+end
 
 ptCloudTformed = pctransform(moving,tform);
 

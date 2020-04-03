@@ -6,6 +6,8 @@ function out = ImBat_Create_Master_Track
 
 
 
+% Housekeeping:
+out.Creation_date = datestr(now);
 
 % STEP 1: get all .c3d files in folder:
 DIR = pwd;
