@@ -5,7 +5,7 @@ function [ROI_Data] = ImBat_MultiDayAnalysis
 % d190609
 
 % Bat ID:
-BAT = 'Ga';
+BAT = 'ca';
 
 % User input: processing steps to run ( t/f)
 ST1 = 1; % extract data

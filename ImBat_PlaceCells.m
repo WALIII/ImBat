@@ -7,6 +7,7 @@
 % output{i} = ImBat_PlaceCells(neuron, out1,'roi',roi_2_disp(i),'flights',flight_input_data);
 
 
+out.video_times = out.video_times2;
 
 plotting =1; % save in folder...
 ROI2Plot = 1:size(neuron.C_raw,1);
@@ -67,7 +68,7 @@ plot(out.Location_time(1:end-1),(abs(D)))
 
 a2 = subplot(10,1,2);
 hold on;
-plot(out.video_times(1:end-1),zscore(smooth(mean((full(neuron.S(1:50,1:end-1))),1),100)));
+plot(out.video_times(1:end-1),zscore(smooth(mean((full(neuron.S(1:20,1:end-1))),1),100)));
 ylim([0 5]);
 
 a3 = subplot(10,1,3:10);
