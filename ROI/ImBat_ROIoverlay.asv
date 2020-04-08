@@ -175,9 +175,8 @@ C =  A + B;
 subplot(2,2,4);
 imagesc(C);
 set(gca,'YDir','normal');
-title('ROI Watershed on Correlation Image');
+title('ROI Watershed overlain on Correlation Image');
 set(gcf, 'Position', get(0, 'Screensize')/1.5);
-xlabel('um'); ylabel('um');
 
 
 

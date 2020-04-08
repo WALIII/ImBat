@@ -212,14 +212,14 @@ end
 [~, ssf] = sort(nflights,'descend'); %sort clustered flights
 %% plot clustered flights
 plotFlightPathsClusterEach = figure();
-jj = jet(length(ntrajectories));
+jj = jet(ntrajectories);
 for traj = 1 : 10
     try
         if traj<ntrajectories + 1 % Only plot the first ntrajectories...
             subplot(3,2,traj)
             for nf = allflights{ssf(traj)}
                 %plot(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
-                plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*5,:))
+                plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj,:))
                 hold on
                 %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),50,'r','filled')
                 hold on
@@ -251,11 +251,11 @@ hold off
 
 %% plot all the clusters in 1 figure in different colors
 plotFlightPathsClusterAll = figure();
-jj = jet;%(length(ntrajectories));
+jj = jet(ntrajectories);
 for traj = 1 : ntrajectories
     for nf = allflights{ssf(traj)}
         %plot(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
-        plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+        plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj,:))
         hold on
         %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),25,'r','filled')
         hold on
@@ -278,9 +278,9 @@ set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY,'zticklabel',newlabelsZ)
 xlabel('m'); ylabel('m'); zlabel('m');
 view(0,90);
 xlim([-3000 3000]);
-ylim([-2750 2750]);
+ylim([-2800 2800]);
 hold off
-   
+%%   
 flightPaths.clusterIndex = clusterIndex;
 % catch
 % flightPathsClusterEach = figure();

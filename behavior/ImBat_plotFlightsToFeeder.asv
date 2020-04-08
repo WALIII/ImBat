@@ -26,8 +26,6 @@ for i=1:2:nparams
             sessionType = varargin{i+1};
         case 'saveflag'
             saveFlag = varargin{i+1};
-        case 'analysisfolder'
-            analysis_Folder = varargin{i+1};
     end
 end
 
@@ -38,7 +36,7 @@ if saveFlag == 1
     
     cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
     alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/' analysis_Folder '/' label '_flightPaths.mat']);
+    load([pwd '/' analysis_Fo/' label '_flightPaths.mat']);
 end
  
 

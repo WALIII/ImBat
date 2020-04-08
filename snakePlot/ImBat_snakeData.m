@@ -31,6 +31,8 @@ for i=1:2:nparams
             preFlightPad = varargin{i+1};
         case 'postflightpad'
             postFlightPad = varargin{i+1};
+        case 'analysisfolder'
+            analysis_Folder = varargin{i+1};
     end
 end
 
@@ -41,7 +43,7 @@ if loadFlag == 1
     
     cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
     alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/analysis/' label '_flightPaths.mat']);
+    load([pwd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
 %padding for during flight snake plot to include some time before and after flight
 prePad = 7; %number of seconds to plot before alignment point
@@ -535,9 +537,9 @@ if loadFlag ==1 && saveFlag == 1
     snakeTrace_c.label = label;
     snakeTrace_cRaw.label = label;
     snakeTrace_s.label = label;
-    save([pwd '/analysis/' label '_snakeTraceData_cRaw.mat'],'snakeTrace_cRaw');
-    save([pwd '/analysis/' label '_snakeTraceData_c.mat'],'snakeTrace_c');
-    save([pwd '/analysis/' label '_snakeTraceData_s.mat'],'snakeTrace_s');
+    save([pwd '/' analysis_Folder '/' label '_snakeTraceData_cRaw.mat'],'snakeTrace_cRaw');
+    save([pwd '/' analysis_Folder '/' label '_snakeTraceData_c.mat'],'snakeTrace_c');
+    save([pwd '/' analysis_Folder '/' label '_snakeTraceData_s.mat'],'snakeTrace_s');
 elseif loadFlag == 0 && saveFlag ==1
     save([pwd '/' batName '_' dateSesh '_' sessionType '_snakeTraceData_cRaw.mat'],'snakeTrace_cRaw');
     save([pwd '/' batName '_' dateSesh '_' sessionType '_snakeTraceData_c.mat'],'snakeTrace_c');

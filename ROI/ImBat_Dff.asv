@@ -48,14 +48,13 @@ Ymax = imresize(Ymax,scaling);
 maxFig = figure();
 colormap(gray);
 imagesc(Ymax);
-set(gca,'YDir','normal');
 hold on;
-%xticks = get(gca,'xtick');
-%yticks = get(gca,'ytick');
-%scaling_pixel  = 1.1; %1.1um per pixel
-%newlabelsX = arrayfun(@(ax) sprintf('%g', scaling_pixel * ax), xticks, 'un', 0);
-%newlabelsY = arrayfun(@(ay) sprintf('%g', scaling_pixel * ay), yticks, 'un', 0);
-%set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
+xticks = get(gca,'xtick');
+yticks = get(gca,'ytick');
+scaling_pixel  = 1.1; %1.1um per pixel
+newlabelsX = arrayfun(@(ax) sprintf('%g', scaling_pixel * ax), xticks, 'un', 0);
+newlabelsY = arrayfun(@(ay) sprintf('%g', scaling_pixel * ay), yticks, 'un', 0);
+set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
 title(['Max Projection dFF: ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('um'); ylabel('um');
 

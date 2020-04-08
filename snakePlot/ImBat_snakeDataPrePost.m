@@ -22,6 +22,8 @@ for i=1:2:nparams
             loadFlag = varargin{i+1};
         case 'saveflag'
             saveFlag = varargin{i+1};
+        case 'analysisfolder'
+            analysis_Folder = varargin{i+1};
     end
 end
 
@@ -32,7 +34,7 @@ if loadFlag == 1
     
     cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
     alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/analysis/' label '_flightPaths_6clusters.mat']);
+    load([pwd '/' analysis_Folder '/' label '_flightPaths_6clusters.mat']);
 end
 
 %padding for during flight snake plot to include some time before and after flight
@@ -239,5 +241,5 @@ snakeTracePrePost.normTraceFlightAll = normTraceFlightAll;
 
 if saveFlag == 1
     snakeTracePrePost.label = label;
-   save([pwd '/analysis/' label '_snakePlotDataPrePost.mat'],'snakeTracePrePost');
+   save([pwd '/' analysis_Folder '/' label '_snakePlotDataPrePost.mat'],'snakeTracePrePost');
 end

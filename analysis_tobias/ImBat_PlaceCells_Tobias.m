@@ -1,6 +1,5 @@
 function [plotFiringTrajectory] = ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,varargin)
 
-
 offset = 0.1; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
 spikeThresh = 0.1; %threshold for eliminating noise from the S matrix
 
@@ -21,6 +20,8 @@ for i=1:2:nparams
             sessionType = varargin{i+1};
         case 'loadflag'
             loadFlag = varargin{i+1};
+        case 'analysisfolder'
+            analysis_Folder = varargin{i+1};
     end
 end
 
@@ -31,7 +32,7 @@ if loadFlag == 1
     %label = [dateSesh '_' sessionType];
     cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
     alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/analysis/' label '_flightPaths.mat']);
+    load([pwd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
 
 % Remove that pesky first flight that starts at 0:0;

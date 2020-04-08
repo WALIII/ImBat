@@ -7,6 +7,8 @@ for i=1:2:nparams
     switch lower(varargin{i})
         case 'saveflag'
             saveFlag = varargin{i+1};
+        case 'analysisfolder'
+            analysis_Folder = varargin{i+1};
     end
 end
 
@@ -519,35 +521,35 @@ snakeTrace.snakePlot_prefEach = snakePlot_prefEach;
 snakeTrace.snakePlot_clustBy1PrePostFlight = snakePlot_clustBy1PrePostFlight;
 %% save figures and matlab variable
 if saveFlag == 1
-    saveas(snakePlot_prefEachPrePostFlight, [pwd '\analysis\snakePlots\' label '_snakePlot_prefEachPrePostFlight.svg']);
-    saveas(snakePlot_prefEachPrePostFlight, [pwd '\analysis\snakePlots\' label '_snakePlot_prefEachPrePostFlight.tif']);
-    savefig(snakePlot_prefEachPrePostFlight, [pwd '/analysis/snakePlots/' label '_snakePlot_prefEachPrePostFlight.fig']);
-    saveas(snakePlot_clust, [pwd '\analysis\snakePlots\' label '_snakePlots_clustAll.svg']);
-    saveas(snakePlot_clustOddEven, [pwd '\analysis\snakePlots\' label '_snakePlots_clustOddEven.svg']);
-    saveas(snakePlot_clustBy1, [pwd '\analysis\snakePlots\' label '_snakePlots_clustBy1.svg']);
-    saveas(snakePlot_prefEach, [pwd '\analysis\snakePlots\' label '_snakePlots_prefEach.svg']);
-    saveas(snakePlot_prefAll, [pwd '\analysis\snakePlots\' label '_snakePlots_prefAll.svg']);
-    saveas(snakePlot_prefEachPrePostFlight, [pwd '/analysis/snakePlots/' fileName '_snakePlot_prefEachPrePostFlight.svg']);
-    saveas(snakePlot_clust, [pwd '\analysis\snakePlots\' label '_snakePlots_clustAll.tif']);
-    saveas(snakePlot_clustOddEven, [pwd '\analysis\snakePlots\' label '_snakePlots_clustOddEven.tif']);
-    saveas(snakePlot_clustBy1, [pwd '\analysis\snakePlots\' label '_snakePlots_clustBy1.tif']);
-    saveas(snakePlot_prefEach, [pwd '\analysis\snakePlots\' label '_snakePlots_prefEach.tif']);
-    saveas(snakePlot_prefAll, [pwd '\analysis\snakePlots\' label '_snakePlots_prefAll.tif']);
-    saveas(snakePlot_prefEachPrePostFlight, [pwd '\analysis\snakePlots\' fileName '_snakePlot_prefEachPrePostFlight.tif']);
-    saveas(snakePlot_clustPrePostFlight, [pwd '/analysis/snakePlots/' fileName '_snakePlot_clustPrePostFlight.tif']);
-    saveas(snakePlot_clustPrePostFlight, [pwd  '/analysis/snakePlots/' fileName '_snakePlot_clustPrePostFlight.svg']);
-    saveas(snakePlot_prefAll, [pwd '/analysis/snakePlots/' fileName '_snakePlot_prefAll.tif']);
-    saveas(snakePlot_prefAll, [pwd '/analysis/snakePlots/' fileName '_snakePlot_prefAll.svg']);
-    saveas(snakePlot_clustBy1PrePostFlight, [pwd '/analysis/snakePlots/' fileName '_snakePlot_clustBy1PrePostFlight.tif']);
-    saveas(snakePlot_clustBy1PrePostFlight, [pwd '/analysis/snakePlots/' fileName '_snakePlot_clustBy1PrePostFlight.svg']);
+    saveas(snakePlot_prefEachPrePostFlight, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlot_prefEachPrePostFlight.svg']);
+    saveas(snakePlot_prefEachPrePostFlight, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlot_prefEachPrePostFlight.tif']);
+    savefig(snakePlot_prefEachPrePostFlight, [pwd '/' analysis_Folder '/snakePlots/' label '_snakePlot_prefEachPrePostFlight.fig']);
+    saveas(snakePlot_clust, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_clustAll.svg']);
+    saveas(snakePlot_clustOddEven, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_clustOddEven.svg']);
+    saveas(snakePlot_clustBy1, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_clustBy1.svg']);
+    saveas(snakePlot_prefEach, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_prefEach.svg']);
+    saveas(snakePlot_prefAll, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_prefAll.svg']);
+    saveas(snakePlot_prefEachPrePostFlight, [pwd '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_prefEachPrePostFlight.svg']);
+    saveas(snakePlot_clust, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_clustAll.tif']);
+    saveas(snakePlot_clustOddEven, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_clustOddEven.tif']);
+    saveas(snakePlot_clustBy1, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_clustBy1.tif']);
+    saveas(snakePlot_prefEach, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_prefEach.tif']);
+    saveas(snakePlot_prefAll, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_prefAll.tif']);
+    saveas(snakePlot_prefEachPrePostFlight, [pwd '\' analysis_Folder '\snakePlots\' fileName '_snakePlot_prefEachPrePostFlight.tif']);
+    saveas(snakePlot_clustPrePostFlight, [pwd '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_clustPrePostFlight.tif']);
+    saveas(snakePlot_clustPrePostFlight, [pwd  '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_clustPrePostFlight.svg']);
+    saveas(snakePlot_prefAll, [pwd '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_prefAll.tif']);
+    saveas(snakePlot_prefAll, [pwd '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_prefAll.svg']);
+    saveas(snakePlot_clustBy1PrePostFlight, [pwd '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_clustBy1PrePostFlight.tif']);
+    saveas(snakePlot_clustBy1PrePostFlight, [pwd '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_clustBy1PrePostFlight.svg']);
 
-    %save([pwd '/analysis/' label '_snakePlotData.mat'],'snakeTrace');
-    savefig(snakePlot_prefEachPrePostFlight, [pwd '\analysis\snakePlots\' label '_snakePlot_prefEachPrePostFlight.fig']);
-    savefig(snakePlot_clustOddEven, [pwd '\analysis\snakePlots\' label '_snakePlots_clustOddEven.fig']);
-    savefig(snakePlot_clustBy1, [pwd '\analysis\snakePlots\' label '_snakePlots_clustBy1.fig']);
-    savefig(snakePlot_prefEach, [pwd '\analysis\snakePlots\' label '_snakePlots_prefEach.fig']);
-    savefig(snakePlot_prefAll, [pwd '\analysis\snakePlots\' label '_snakePlots_prefAll.fig']);
-    savefig(snakePlot_clustPrePostFlight, [pwd '/analysis/snakePlots/' fileName '_snakePlot_clustPrePostFlight.fig']);
-    savefig(snakePlot_clustBy1PrePostFlight, [pwd '/analysis/snakePlots/' label '_snakePlot_clustBy1PrePostFlight.fig']);
+    %save([pwd '/' analysis_Folder '/' label '_snakePlotData.mat'],'snakeTrace');
+    savefig(snakePlot_prefEachPrePostFlight, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlot_prefEachPrePostFlight.fig']);
+    savefig(snakePlot_clustOddEven, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_clustOddEven.fig']);
+    savefig(snakePlot_clustBy1, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_clustBy1.fig']);
+    savefig(snakePlot_prefEach, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_prefEach.fig']);
+    savefig(snakePlot_prefAll, [pwd '\' analysis_Folder '\snakePlots\' label '_snakePlots_prefAll.fig']);
+    savefig(snakePlot_clustPrePostFlight, [pwd '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_clustPrePostFlight.fig']);
+    savefig(snakePlot_clustBy1PrePostFlight, [pwd '/' analysis_Folder '/snakePlots/' label '_snakePlot_clustBy1PrePostFlight.fig']);
 
 end

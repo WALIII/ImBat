@@ -1,4 +1,4 @@
-function [flightVsVelocity,smoothVelocity,smoothAvgSpiking] = ImBat_plotFlightsVsCells(cellData,alignment,flightPaths,varargin)
+function [flightVsVelocity,smoothVelocity,smoothAvgSpiking] = ImBat_plotFlightsVsCells(cellData,alignment,flightPaths,analysis_Folder,varargin)
 
 global topROI
 
@@ -25,6 +25,8 @@ for i=1:2:nparams
             saveFlag = varargin{i+1};
         case 'loadflag'
             loadFlag = varargin{i+1};
+        case 'analysisfolder'
+            analysis_Folder = varargin{i+1};
     end
 end
 
@@ -35,7 +37,7 @@ if loadFlag == 1
     
     cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
     alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/analysis/' label '_flightPaths.mat']);
+    load([pwd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
 
 if saveFlag ==1
@@ -63,9 +65,12 @@ smoothAvgSpiking = zscore(smooth(mean((full(cellData.results.C_raw(1:topROILocal
         try
             plot(alignment.out.video_timesDS,(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
         catch
+            diffVidTimes =  length(cellData.results.C_raw(i,:)) - length(alignment.out.video_timesDS)
+            eplot(alignment.out.video_timesDS,(zscore(smoothdata(cellData.results.C_raw(i,1:end-diffVidTimes),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
+            %plot(alignment.out.video_timesDS(1:end-1),(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
         end
     end 
-    title(['Velocity vs Cell Activity: ' batName ' ' dateSesh ' ' sessionType])
+    sgtitle(['Velocity vs Cell Activity: ' batName ' ' dateSesh ' ' sessionType])
     ylabel('z-score dff')
     xlim([0 alignment.out.video_timesDS(end)])%xlim([0 alignment.out.video_timesDS(end)])
     
@@ -83,22 +88,31 @@ smoothAvgSpiking = zscore(smooth(mean((full(cellData.results.C_raw(1:topROILocal
     title('Avg Cell Response')
     ylabel('z-score dff')
     
-    %plot the smoothed z-scored velocity of bat
+    %plot the smoothed z-scored velocity of bat & reward vector
+    [rewardR,rewardLT,rewardUT] = risetime(alignment.out.RewardVector);
     a3 = subplot(topROILocal+11,1,1:4);%topROILocal+8:topROILocal+11);
     hold on
     plot(alignment.out.Location_time(1:end),smoothVelocity,'color','r')
+    plot(alignment.out.Location_time(1:end),(alignment.out.RewardVector-min(alignment.out.RewardVector))/2,'color','b')
+    %for ii = 1:length(rewardLT)
+       %plot(rewardLT(ii)/120,max(smoothVelocity),'ob');
+       %hold on
+       %plot((rewardLT(ii)+rewardUT(ii))+10/240,max(smoothVelocity),'or');
+       %hold on
+       %plot(rewardUT(ii)+5/120,max(smoothVelocity),'ok');
+    %end
     title('Velocity')
     ylim([-1 8])
     xlim([0 alignment.out.video_timesDS(end)])
-    xlabel('Time (s)')
+    %xlabel('Time (s)')
     ylabel('z-score velocity')
     
     
     linkaxes([a1, a2, a3], 'x');
     if saveFlag == 1
-        saveas(flightVsVelocity, [pwd '\analysis\flights\' label '_flightVsVelocity_handPicked.svg']);
-        saveas(flightVsVelocity, [pwd '\analysis\flights\' label '_flightVsVelocity_handPicked.tif']);
-        savefig(flightVsVelocity, [pwd '\analysis\flights\' label '_flightVsVelocity_handPicked.fig']);
+        saveas(flightVsVelocity, [pwd '\' analysis_Folder '\flights\' label '_flightVsVelocity_handPicked.svg']);
+        saveas(flightVsVelocity, [pwd '\' analysis_Folder '\flights\' label '_flightVsVelocity_handPicked.tif']);
+        savefig(flightVsVelocity, [pwd '\' analysis_Folder '\flights\' label '_flightVsVelocity_handPicked.fig']);
     end
 
 
