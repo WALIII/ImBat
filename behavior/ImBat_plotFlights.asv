@@ -251,7 +251,7 @@ hold off
 
 %% plot all the clusters in 1 figure in different colors
 plotFlightPathsClusterAll = figure();
-jj = jet(ntrajectories);
+jj = jet(ntrajectories*100);
 for traj = 1 : ntrajectories
     for nf = allflights{ssf(traj)}
         %plot(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
