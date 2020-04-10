@@ -34,9 +34,11 @@ end
 if loadFlag == 1
     date = strcat(lower(batName(1:2)),dateSesh);
     label = [batName '_' dateSesh '_' sessionType];
-    
-    cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
-    alignment = load([pwd '/processed/Alignment.mat']);
+    processedFolders = dir('processed*');
+            processedNewest = sort({processedFolders(end).name});
+            processedNewest = char(processedNewest);
+    cellData = load([pwd processedNewest '/Motion_corrected_Data_DS_results.mat']);
+    alignment = load([pwd processedNewest '/Alignment.mat']);
     load([pwd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
 
@@ -66,8 +68,8 @@ smoothAvgSpiking = zscore(smooth(mean((full(cellData.results.C_raw(1:topROILocal
             plot(alignment.out.video_timesDS,(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
         catch
             diffVidTimes =  length(cellData.results.C_raw(i,:)) - length(alignment.out.video_timesDS)
-            eplot(alignment.out.video_timesDS,(zscore(smoothdata(cellData.results.C_raw(i,1:end-diffVidTimes),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
-            %plot(alignment.out.video_timesDS(1:end-1),(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
+            %plot(alignment.out.video_timesDS,(zscore(smoothdata(cellData.results.C_raw(i,1:end-diffVidTimes),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
+            plot(alignment.out.video_timesDS(1:end-1),(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
         end
     end 
     sgtitle(['Velocity vs Cell Activity: ' batName ' ' dateSesh ' ' sessionType])
