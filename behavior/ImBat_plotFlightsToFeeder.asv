@@ -2,12 +2,12 @@ function [flightPathsToFeeder, flightPathsFromFeeder, flightPathsClusterToFeeder
     = ImBat_plotFlightsToFeeder(trackData,varargin)
 
 %length of time for flight up until reaching feeder (s)
-preflightTime = 2;
+preflightTime = 4;
 %length of time to wait before bat leaves feeder for FlightFromFeeder track %(s)
 delay = 3;
 %number of clusters for kmeans clustering of flight trajectories
 nclusters = 6;
-ntrajectories = 2; %number of output trajectories from kmeans that you want to look at
+ntrajectories = 8; %number of output trajectories from kmeans that you want to look at
 
 batName = [];
 dateSesh = [];
@@ -26,6 +26,8 @@ for i=1:2:nparams
             sessionType = varargin{i+1};
         case 'saveflag'
             saveFlag = varargin{i+1};
+        case 'analysisfolder'
+            analysis_Folder = varargin{i+1};
     end
 end
 
@@ -36,7 +38,7 @@ if saveFlag == 1
     
     cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
     alignment = load([pwd '/processed/Alignment.mat']);
-    load([pwd '/' analysis_Fo/' label '_flightPaths.mat']);
+    load([pwd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
  
 
@@ -56,19 +58,19 @@ mx(find(mx == 0)) = nan;
 my(find(my == 0)) = nan;
 mz(find(mz == 0)) = nan;
 
-mx = fillmissing(mx,'nearest');
-my = fillmissing(my,'nearest');
-mz = fillmissing(mz,'nearest');
+mxFull = fillmissing(mx,'nearest');
+myFull = fillmissing(my,'nearest');
+mzFull = fillmissing(mz,'nearest');
 
 %threshold based on speed
-Vx = gradient(mx, 1/trackData.VideoFrameRate);
-Vy = gradient(my, 1/trackData.VideoFrameRate);
-Vz = gradient(mz, 1/trackData.VideoFrameRate);
+Vx = gradient(mxFull, 1/trackData.VideoFrameRate);
+Vy = gradient(myFull, 1/trackData.VideoFrameRate);
+Vz = gradient(mzFull, 1/trackData.VideoFrameRate);
 batSpeed = sqrt(Vx.^2 + Vy.^2 + Vz.^2)/1000; %in m/s
-
+batSpeedFilt = medfilt1(batSpeed,10);
 nonflying = find(batSpeed < 1.5);
 
-%plot flight paths of bat to feeder
+%% plot flight paths of bat to feeder
 flightPathsToFeeder = figure();
 CM = jet(length(LT));
 flightToFeederEnd = zeros(length(LT),1);
@@ -76,20 +78,20 @@ flightToFeederStart = zeros(length(LT),1);
 %try
 for i = 1:length(LT)
     flightToFeederEnd(i) = round(LT(i) * trackData.VideoFrameRate);
-    flightToFeederStart(i) = find(batSpeed(1:flightToFeederEnd(i))<1.5,1,'last'); %flightToFeederEnd(i) - (trackData.VideoFrameRate*preflightTime); %minus the preflight # of seconds
+    flightToFeederStart(i) = flightToFeederEnd(i) - find(batSpeedFilt(1:flightToFeederEnd(i))==0,1,'last'); %minus the preflight # of seconds %find(batSpeed(1:flightToFeederEnd(i))<1.5,1,'last');
     %scatter3(markerSet(flightStart:flightEnd,1,1),markerSet(flightStart:flightEnd,1,2),markerSet(flightStart:flightEnd,1,3))
-    plot3(mx(flightToFeederStart(i):flightToFeederEnd(i)),my(flightToFeederStart(i):flightToFeederEnd(i)),mz(flightToFeederStart(i):flightToFeederEnd(i)),'LineWidth',2,'color',CM(i,:))
+    plot3(mxFull(flightToFeederStart(i):flightToFeederEnd(i)),myFull(flightToFeederStart(i):flightToFeederEnd(i)),mzFull(flightToFeederStart(i):flightToFeederEnd(i)),'LineWidth',2,'color',CM(i,:))
     hold on
     %get start/stop xyz position of the flights to feeders
-    fFeedStartxyz(i,1) = round(nanmean(mx(flightToFeederStart(i):flightToFeederStart(i)+trackData.VideoFrameRate/2)));
-    fFeedStartxyz(i,2) = round(nanmean(my(flightToFeederStart(i):flightToFeederStart(i)+trackData.VideoFrameRate/2)));
-    fFeedStartxyz(i,3) = round(nanmean(mz(flightToFeederStart(i):flightToFeederStart(i)+trackData.VideoFrameRate/2)));
+    fFeedStartxyz(i,1) = round(nanmean(mxFull(flightToFeederStart(i):flightToFeederStart(i)+trackData.VideoFrameRate/2)));
+    fFeedStartxyz(i,2) = round(nanmean(myFull(flightToFeederStart(i):flightToFeederStart(i)+trackData.VideoFrameRate/2)));
+    fFeedStartxyz(i,3) = round(nanmean(mzFull(flightToFeederStart(i):flightToFeederStart(i)+trackData.VideoFrameRate/2)));
     
-    fFeedEndxyz(i,1) = round(nanmean(mx(flightToFeederEnd(i):flightToFeederEnd(i)+trackData.VideoFrameRate/2)));
-    fFeedEndxyz(i,2) = round(nanmean(my(flightToFeederEnd(i):flightToFeederEnd(i)+trackData.VideoFrameRate/2)));
-    fFeedEndxyz(i,3) = round(nanmean(mz(flightToFeederEnd(i):flightToFeederEnd(i)+trackData.VideoFrameRate/2)));
+    fFeedEndxyz(i,1) = round(nanmean(mxFull(flightToFeederEnd(i):flightToFeederEnd(i)+trackData.VideoFrameRate/2)));
+    fFeedEndxyz(i,2) = round(nanmean(myFull(flightToFeederEnd(i):flightToFeederEnd(i)+trackData.VideoFrameRate/2)));
+    fFeedEndxyz(i,3) = round(nanmean(mzFull(flightToFeederEnd(i):flightToFeederEnd(i)+trackData.VideoFrameRate/2)));
     
-    %scatter3(fFeedStartxyz(i,1),fFeedStartxyz(i,2),fFeedStartxyz(i,3),100,'r','filled')
+    scatter3(fFeedStartxyz(i,1),fFeedStartxyz(i,2),fFeedStartxyz(i,3),100,'r','filled')
     hold on
     scatter3(fFeedEndxyz(i,1),fFeedEndxyz(i,2),fFeedEndxyz(i,3),100,'k','filled')
 end
@@ -97,7 +99,7 @@ title(['Flights to feeder: ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
 
-%plot flight paths of bat from feeder
+%% plot flight paths of bat from feeder
 flightFromFeederEnd = zeros(length(LT));
 flightFromFeederStart = zeros(length(LT));
 flightPathsFromFeeder = figure();
@@ -105,10 +107,10 @@ for i = 1:length(LT)
     flightFromFeederStart(i) = round(LT(i) * trackData.VideoFrameRate);
     flightFromFeederEnd(i) = flightFromFeederStart(i) + delay + (trackData.VideoFrameRate*preflightTime);
     %check that the end of the flight does not occur after session finishes
-    if flightFromFeederEnd(i) > length(mx)
-        flightFromFeederEnd(i) = length(mx)
+    if flightFromFeederEnd(i) > length(mxFull)
+        flightFromFeederEnd(i) = length(mxFull)
     end
-    plot3(mx(flightFromFeederStart(i):flightFromFeederEnd(i)),my(flightFromFeederStart(i):flightFromFeederEnd(i)),mz(flightFromFeederStart(i):flightFromFeederEnd(i)),'LineWidth',2,'color',CM(i,:))
+    plot3(mxFull(flightFromFeederStart(i):flightFromFeederEnd(i)),myFull(flightFromFeederStart(i):flightFromFeederEnd(i)),mzFull(flightFromFeederStart(i):flightFromFeederEnd(i)),'LineWidth',2,'color',CM(i,:))
     hold on
     %pause(0.1)
 end
@@ -116,7 +118,7 @@ title(['Flights from feeder: ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('mm'); ylabel('mm'); zlabel('mm');
 hold off
 
-%k means cluster of flight trajectories into nclusters
+%% k means cluster of flight trajectories into nclusters
 %find pairs of start and endpoints with a high number of flights
 
 rng(2) %control random number generation
@@ -144,7 +146,7 @@ end
  
 [~, ssf] = sort(nflights,'descend'); %sort clustered flights
 
-%plot clustered flights individually by each cluster
+% plot clustered flights individually by each cluster
 flightPathsClusterToFeederEach = figure();
 jj = jet;
 for traj = 1 : 10
@@ -152,7 +154,7 @@ for traj = 1 : 10
     if traj<ntrajectories + 1 % Only plot the first ntrajectories...
     subplot(round(ntrajectories/2),2,traj)
     for nf = allflights{ssf(traj)}
-        plot3(mx(flightToFeederStart(nf):flightToFeederEnd(nf)),my(flightToFeederStart(nf):flightToFeederEnd(nf)),mz(flightToFeederStart(nf):flightToFeederEnd(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+        plot3(mxFull(flightToFeederStart(nf):flightToFeederEnd(nf)),myFull(flightToFeederStart(nf):flightToFeederEnd(nf)),mzFull(flightToFeederStart(nf):flightToFeederEnd(nf)),'LineWidth',1,'Color',jj(traj*10,:))
         hold on
         %scatter3(fFeedStartxyz(nf,1),fFeedStartxyz(nf,2),fFeedStartxyz(nf,3),100,'r','filled')
         %hold on
@@ -178,7 +180,7 @@ flightPathsClusterToFeederAll = figure();
 jj = jet;
 for traj = 1 : ntrajectories
     for nf = allflights{ssf(traj)}
-        plot3(mx(flightToFeederStart(nf):flightToFeederEnd(nf)),my(flightToFeederStart(nf):flightToFeederEnd(nf)),mz(flightToFeederStart(nf):flightToFeederEnd(nf)),'LineWidth',1,'Color',jj(traj*10,:))
+        plot3(mxFull(flightToFeederStart(nf):flightToFeederEnd(nf)),myFull(flightToFeederStart(nf):flightToFeederEnd(nf)),mzFull(flightToFeederStart(nf):flightToFeederEnd(nf)),'LineWidth',1,'Color',jj(traj*10,:))
         hold on
         %scatter3(fFeedStartxyz(nf,1),fFeedStartxyz(nf,2),fFeedStartxyz(nf,3),100,'r','filled')
         hold on

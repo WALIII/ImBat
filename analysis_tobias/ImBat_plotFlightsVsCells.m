@@ -34,9 +34,11 @@ end
 if loadFlag == 1
     date = strcat(lower(batName(1:2)),dateSesh);
     label = [batName '_' dateSesh '_' sessionType];
-    
-    cellData = load([pwd '/processed/Motion_corrected_Data_DS_results.mat']);
-    alignment = load([pwd '/processed/Alignment.mat']);
+    processedFolders = dir('processed*');
+            processedNewest = sort({processedFolders(end).name});
+            processedNewest = char(processedNewest);
+    cellData = load([pwd processedNewest '/Motion_corrected_Data_DS_results.mat']);
+    alignment = load([pwd processedNewest '/Alignment.mat']);
     load([pwd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
 

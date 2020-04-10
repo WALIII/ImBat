@@ -1,8 +1,8 @@
 function [flightPaths] = ImBat_plotFlights(trackData,varargin)
 
 
-nclusters = 5; %nIumber of clusters for kmeans clustering of flight trajectories
-ntrajectories = 5; %number of output trajectories from kmeans that you want to look at
+nclusters = 6; %nIumber of clusters for kmeans clustering of flight trajectories
+ntrajectories = 8; %number of output trajectories from kmeans that you want to look at
 
 
 batName = [];
@@ -221,7 +221,7 @@ for traj = 1 : 10
                 %plot(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj*10,:))
                 plot3(mxFull(flight_starts(nf):flight_ends(nf)),myFull(flight_starts(nf):flight_ends(nf)),mzFull(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj,:))
                 hold on
-                %scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),50,'r','filled')
+                scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),50,'r','filled')
                 hold on
                 %scatter(fendxyz(nf,1),fendxyz(nf,2),50,'k','filled')
                 scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),50,'k','filled')

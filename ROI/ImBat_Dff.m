@@ -27,7 +27,10 @@ scaling = 4;
 if loadFlag == 1
     date = strcat(lower(batName(1:2)),dateSesh);
     label = [batName '_' dateSesh '_' sessionType];
-    load([pwd '/processed/Motion_corrected_Data_DS.mat']);
+    processedFolders = dir('processed*');
+    processedNewest = sort({processedFolders(end).name});
+    processedNewest = char(processedNewest);
+    load([pwd processed_Newest '/Motion_corrected_Data_DS.mat']);
 end
 
 % Make df/f image
