@@ -31,9 +31,9 @@ plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
 flightPathsFeederFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 1 ;
+plotPlaceCellsFlag = 1;
 %snake/schnitz plot flags
-plotSnakesFlag = 1;
+plotSnakesFlag = 0;
 
 % Get all folders in directory
 files = dir(pwd);
@@ -104,7 +104,7 @@ for i = 1:length(subFolders)
             %         end
             
             % Check if folder exists
-            if exist([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','analysis'])>0;
+            if exist([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','analysis*'])>0;
                 disp('Folder already analyzed..');
                 if reAnalyze ==1
                     disp('Re-Analyzing...');
@@ -135,6 +135,8 @@ for i = 1:length(subFolders)
                 end
                 batName = extractBefore(fileName,['_' dateSesh]);
                 sessionType = extractAfter(fileName,[dateSesh '_']);
+                save([imageFolders(kk).folder '/' imageFolders(kk).name '/' processedNewest '/Alignment.mat'],'video_timesDS','-append');
+
                 % make new analysis directory for .fig and .tif files
                 cd([imageFolders(kk).folder,'/',imageFolders(kk).name]);
                 analysis_Folder = ['analysis_',datestr(now,'yyyy_mm_dd__hhMM')];
@@ -164,12 +166,12 @@ for i = 1:length(subFolders)
             savefig(maxFig,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/ROI/' fileName '_maxProject.fig']);
             saveas(maxFig, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/ROI/' fileName '_maxProject.tif']);
             % max projection with ROI overlay
-            [ROIoverlay] = ImBat_ROIoverlay(cellData.results,'centroid',centroidFlag,'binarymask',binaryMaskFlag,'roiheat',roiHeatFlag,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
+            [ROIoverlay,centroidMax] = ImBat_ROIoverlay(cellData.results,'centroid',centroidFlag,'binarymask',binaryMaskFlag,'roiheat',roiHeatFlag,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
             if centroidFlag == 1 || binaryMaskFlag == 1
                 %save fig and tif of max projection
-                set(findall(maxFig,'-property','FontSize'),'FontSize',20);
-                savefig(maxFig,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/ROI/' fileName '_maxProjectROI.fig']);
-                saveas(maxFig, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/ROI/' fileName '_maxProjectROI.tif']);
+                set(findall(centroidMax,'-property','FontSize'),'FontSize',20);
+                savefig(centroidMax,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/ROI/' fileName '_maxProjectROI.fig']);
+                saveas(centroidMax, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/ROI/' fileName '_maxProjectROI.tif']);
             end
             if roiHeatFlag == 1
                 set(findall(ROIoverlay,'-property','FontSize'),'FontSize',20);
@@ -253,7 +255,7 @@ for i = 1:length(subFolders)
             %load([subFolders(i).folder,'/',subFolders(i).name,'/',imageFolders(kk).name,'/' analysis_Folder '/',batName,'_',dateSesh,'_',sessionType,'_flightPaths.mat']);
             [snakeTrace] = ImBat_snakeData(cellData,flightPaths,alignment)
             [snakeTrace] = ImBat_plotSnake(snakeTrace)
-            saveas(snakeTrace.snakePlot_clust, [imageFolders(kk).folder filesep imageFolders(kk).name filesep 'analysis' filesep 'snakePlots' filesep fileName '_snakePlots_clust.svg']);
+            saveas(snakeTrace.snakePlot_clust, [imageFolders(kk).folder filesep imageFolders(kk).name filesep analysis_Folder filesep 'snakePlots' filesep fileName '_snakePlots_clust.svg']);
             saveas(snakeTrace.snakePlot_clustOddEven, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlots_clustOddEven.svg']);
             saveas(snakeTrace.snakePlot_clustBy1, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlots_clustBy1.svg']);
             saveas(snakeTrace.snakePlot_prefEachPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_prefEachPrePostFlight.svg']);

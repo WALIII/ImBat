@@ -1,8 +1,7 @@
 function [plotFiringTrajectory] = ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,varargin)
 
-offset = 0.1; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
-spikeThresh = 0.1; %threshold for eliminating noise from the S matrix
-
+offset = 0; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
+spikeThreshMult = 5; %number of times to multiply std of s vector for determining spike threshold
 batName = [];
 dateSesh = [];
 sessionType = [];
@@ -47,11 +46,11 @@ plotFiringTrajectory =  figure();
 
 for ii = 1:length(cellData.results.S(:,1)); % for each cell
     hold on;
-    %plot(alignment.out.flights(:,1),alignment.out.flights(:,2),'k','LineWidth',2);% plot the flight trajectory in space
-    plot3(alignment.out.flights(:,1),alignment.out.flights(:,2),alignment.out.flights(:,3),'k');%,'LineWidth',2);% plot the flight trajectory in space
+    plot(alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
+    %plot3(alignment.out.flights(:,1),alignment.out.flights(:,2),alignment.out.flights(:,3),'k');%,'LineWidth',2);% plot the flight trajectory in space
 
-    
-    [~,xy] = find(cellData.results.S(ii,:)>spikeThresh);  % get time neuron is active
+    spikeThresh(ii) = median(cellData.results.S(ii,:)) + std(cellData.results.S(ii,:))*spikeThreshMult; %threshold for eliminating noise from the S matrix
+    [~,xy] = find(cellData.results.S(ii,:)>spikeThresh(ii));  % get time neuron is active
     xy = xy(xy<length(alignment.out.video_timesDS));
     Spike_times = alignment.out.video_timesDS(xy)-offset; % convert this to 'spike time'
     peak_heights = cellData.results.S(ii,xy);
@@ -83,17 +82,27 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
         PH = mat2gray(PH);
         hold on
         %scatter(LX,LY,(PH*400)+1,'or','filled');
-        scatter3(LX,LY,LZ,(PH*400)+1,'or','filled');
+        scatter(LX,LY,'or','filled');
+        %scatter3(LX,LY,LZ,(PH*400)+1,'or','filled');
         %uistack(dots,'top');
-        title(['Cell no ',num2str(ii),'- ',num2str(size(LX_s)),' Bursts in flight: ' batName ' ' dateSesh ' ' sessionType]);
-        xlabel('mm'); ylabel('mm');
+        % % modify labels for tick marks
+        xlim([-3000 3000]);
+        ylim([-3000 3000]);        
+        xticks = get(gca,'xtick');
+        yticks = get(gca,'ytick');
+        newlabelsX = arrayfun(@(ax) sprintf('%g', ax/1000), xticks, 'un', 0);
+        newlabelsY = arrayfun(@(ay) sprintf('%g', ay/1000), yticks, 'un', 0);
+        set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
+        xlabel('m'); ylabel('m');
+
+        hold off
     catch % if cell was not active...
         disp('cell not active');
         continue
     end
     
     % Save 'place cells' as jpg and fig files..
-    set(findall(gcf,'-property','FontSize'),'FontSize',20);
+    %set(findall(gcf,'-property','FontSize'),'FontSize',20);
     saveas(gcf,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.tif']);
     savefig(gcf,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.fig']);
     saveas(gcf,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.svg']);

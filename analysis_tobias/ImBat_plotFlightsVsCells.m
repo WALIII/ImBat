@@ -73,7 +73,8 @@ smoothAvgSpiking = zscore(smooth(mean((full(cellData.results.C_raw(1:topROILocal
         end
     end 
     sgtitle(['Velocity vs Cell Activity: ' batName ' ' dateSesh ' ' sessionType])
-    ylabel('z-score dff')
+    ylabel(['z-score dff: ' num2str(length(cellData.results.C(:,1))) ' ROIs'])
+    set(gca,'yticklabel',[]);
     xlim([0 alignment.out.video_timesDS(end)])%xlim([0 alignment.out.video_timesDS(end)])
     
     %plot smoothed z-scored average firing rate of #cells
@@ -95,20 +96,17 @@ smoothAvgSpiking = zscore(smooth(mean((full(cellData.results.C_raw(1:topROILocal
     a3 = subplot(topROILocal+11,1,1:4);%topROILocal+8:topROILocal+11);
     hold on
     plot(alignment.out.Location_time(1:end),smoothVelocity,'color','r')
-    plot(alignment.out.Location_time(1:end),(alignment.out.RewardVector-min(alignment.out.RewardVector))/2,'color','b')
-    %for ii = 1:length(rewardLT)
-       %plot(rewardLT(ii)/120,max(smoothVelocity),'ob');
-       %hold on
-       %plot((rewardLT(ii)+rewardUT(ii))+10/240,max(smoothVelocity),'or');
-       %hold on
-       %plot(rewardUT(ii)+5/120,max(smoothVelocity),'ok');
-    %end
+    %plot(alignment.out.Location_time(1:end),(alignment.out.RewardVector-abs(min(alignment.out.RewardVector)))/2,'color','b')
+    for ii = 1:length(rewardLT)
+       plot(((alignment.out.Location_time(1)*120)+rewardLT(ii))/120,max(smoothVelocity),'ob');
+       hold on
+       legend('velocity','reward')
+    end
     title('Velocity')
     ylim([-1 8])
     xlim([0 alignment.out.video_timesDS(end)])
     %xlabel('Time (s)')
     ylabel('z-score velocity')
-    
     
     linkaxes([a1, a2, a3], 'x');
     if saveFlag == 1

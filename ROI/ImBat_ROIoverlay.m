@@ -1,9 +1,9 @@
-function [ROIoverlay] = ImBat_ROIoverlay(results,varargin)
+function [ROIoverlay,centroidMax] = ImBat_ROIoverlay(results,varargin)
 
 global topROI
 
 %manual inputs
-centroidFlag = 0;
+centroidFlag = 1;
 binaryMaskFlag = 1;
 roiHeatFlag = 1;
 roiHeatFlagIndiv = 0;
@@ -74,7 +74,7 @@ col = jet(length(ROI_coords));
 
 %plot centroid over top of max projection
 if centroidFlag == 1
-    figure();
+    centroidMax = figure();
     hold on;
     
     imagesc(imresize(results.Cn,scaling)); colormap(gray);
