@@ -31,9 +31,9 @@ plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
 flightPathsFeederFlag = 0;
 %place cells plot flags
-plotPlaceCellsFlag = 0;
+plotPlaceCellsFlag = 0 ;
 %snake/schnitz plot flags
-plotSnakesFlag = 1;
+plotSnakesFlag = 0;
 
 % Get all folders in directory
 files = dir(pwd);
