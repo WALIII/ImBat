@@ -9,10 +9,10 @@ metadata.median_filter_kernal = 3; % median filtering
 metadata.artifact_reject = 1; % median filtering
 metadata.initial_median_filter_kernal = 11;
 % Default CNMFe Paramaters:
-metadata.cnmfe.min_corr = 0.8;     % minimum local correlation for a seeding pixel
-metadata.cnmfe.min_pnr = 30;       % minimum peak-to-noise ratio for a seeding pixel
+metadata.cnmfe.min_corr = 0.9;     % minimum local correlation for a seeding pixel
+metadata.cnmfe.min_pnr = 50;       % minimum peak-to-noise ratio for a seeding pixel
 % defualt alignment params:
-metadata.moco.itter = 2;
+metadata.moco.itter = 5;
 metadata.moco.bin_width = 200;
 
 metadata.processed_FN = 'temp';
