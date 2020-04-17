@@ -94,7 +94,7 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
         newlabelsY = arrayfun(@(ay) sprintf('%g', ay/1000), yticks, 'un', 0);
         set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
         xlabel('m'); ylabel('m');
-        title([batName '_' dateSesh '_' sessionType ': ROI ' num2str(ii) ' : ' num2str(size(LX_s)) ' Bursts']);  
+        title([batName '_' dateSesh '_' sessionType ':
         hold off
     catch % if cell was not active...
         disp('cell not active');

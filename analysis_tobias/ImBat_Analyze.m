@@ -22,18 +22,20 @@ AngeloData = 1;
 analysisFlag = 1;
 reAnalyze = 1;
 %roi plot flags
-plotROIFlag = 0;
-centroidFlag = 0;
-roiHeatFlag = 0;
-binaryMaskFlag = 0;
+plotROIFlag = 1;
+centroidFlag = 1;
+roiHeatFlag = 1;
+binaryMaskFlag = 1;
 %flight plot flags
 plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
-flightPathsFeederFlag = 0;
+clustManualFlag = 1;
+flightPathsFeederFlag = 1;
+plotFlightvsCellsFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 0 ;
+plotPlaceCellsFlag = 1;
 %snake/schnitz plot flags
-plotSnakesFlag = 0;
+plotSnakesFlag = 1;
 
 % Get all folders in directory
 files = dir(pwd);
@@ -186,7 +188,7 @@ for i = 1:length(subFolders)
             mkdir([analysis_Folder filesep 'flights'])
             %plot all flights in 3D
             if flightPathsAllFlag == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
-                [flightPaths] = ImBat_plotFlights(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
+                [flightPaths] = ImBat_plotFlights(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType,'clustmanualflag',clustManualFlag);
                 save([imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/' fileName '_flightPaths.mat'],'flightPaths');
                 %set(findall(flightPaths.flightPathsAll,'-property','FontSize'),'FontSize',20);
                 savefig(flightPaths.flightPathsAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsAll.fig']);
@@ -220,12 +222,14 @@ for i = 1:length(subFolders)
                     'flightFeedersStartStop');
             end
             % plot flights over traces
+            if plotFlightvsCellsFlag == 1
             load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',analysis_Folder,'/',fileName '_flightPaths.mat']);
             [flightVsVelocity,smoothAvgSpiking,smoothVelocity] = ImBat_plotFlightsVsCells(cellData,alignment,flightPaths,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
             save([imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/' fileName '_flightPaths.mat'],'smoothVelocity','smoothAvgSpiking','-append');
             %set(findall(flightVsVelocity,'-property','FontSize'),'FontSize',20);
             savefig(flightVsVelocity,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightVsVelocity.fig']);
             saveas(flightVsVelocity, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightVsVelocity.tif']);
+            end
         end
         
         %number of total flights and rewarded flights
@@ -253,7 +257,7 @@ for i = 1:length(subFolders)
             mkdir('snakePlots')
             cd([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/snakePlots'])
             %load([subFolders(i).folder,'/',subFolders(i).name,'/',imageFolders(kk).name,'/' analysis_Folder '/',batName,'_',dateSesh,'_',sessionType,'_flightPaths.mat']);
-            [snakeTrace] = ImBat_snakeData(cellData,flightPaths,alignment)
+            [snakeTrace] = ImBat_snakeData(cellData,flightPaths,alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
             [snakeTrace] = ImBat_plotSnake(snakeTrace)
             saveas(snakeTrace.snakePlot_clust, [imageFolders(kk).folder filesep imageFolders(kk).name filesep analysis_Folder filesep 'snakePlots' filesep fileName '_snakePlots_clust.svg']);
             saveas(snakeTrace.snakePlot_clustOddEven, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlots_clustOddEven.svg']);

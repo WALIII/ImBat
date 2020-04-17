@@ -1,7 +1,7 @@
 function [flightPaths] = ImBat_plotFlights(trackData,varargin)
 
 
-nclusters = 6; %nIumber of clusters for kmeans clustering of flight trajectories
+nclusters = 12; %nIumber of clusters for kmeans clustering of flight trajectories
 ntrajectories = 6; %number of output trajectories from kmeans that you want to look at
 
 
@@ -27,6 +27,8 @@ for i=1:2:nparams
             loadFlag = varargin{i+1};
         case 'analysisfolder'
             analysis_Folder = varargin{i+1};
+        case 'clustmanualflag'
+            clustManualFlag = varargin{i+1};
     end
 end
 
@@ -249,6 +251,31 @@ for traj = 1 : 10
     end
 end
 hold off
+    % %this is to merge specific clusters if 2 or more of them are the same but
+    % %were separated by the flight k-means
+    if clustManualFlag == 1
+        prompt1 = 'Combine clusters?';
+        clustComb = input(prompt1);
+        prompt2 = 'Delete clusters?';
+        clustDelete = input(prompt2);
+        prompt3 = 'Replace deleted cluster?';
+        clustReplace = input(prompt3);
+        if ~isempty(clustComb)
+            clusterIndex{clustComb(1)}=cat(2,clusterIndex{clustComb(1)},clusterIndex{clustComb(2)});
+            clusterIndex{clustComb(2)} = [];
+        end
+        if ~isempty(clustDelete)
+            for i = 1:length(clustDelete)
+            clusterIndex{clustDelete(i)} = [];
+            end
+        end
+        if ~isempty(clustReplace)
+            for i = 1:length(clustReplace)
+            clusterIndex{clustDelete(i)} = clusterIndex{clustReplace(i)};
+            end
+        end
+        nClusters = ntrajectories - length(clustDelete) - round(length(clustComb)/2) + length(clustReplace);
+    end
 
 %% plot all the clusters in 1 figure in different colors
 plotFlightPathsClusterAll = figure();
@@ -295,6 +322,15 @@ flightPaths.flightPathsAll = plotFlightPathsAll;
 flightPaths.flightPathsClusterEach = plotFlightPathsClusterEach;
 flightPaths.flightPathsClusterAll = plotFlightPathsClusterAll;
 flightPaths.flightPathsStartStop = plotFlightPathsStartStop;
+flightPaths.nclusters = nclusters;
+flightPaths.ntrajectories = ntrajectories;
+if clustManualFlag ==1
+    flightPaths.nClusters = nClusters;
+    flightPaths.clustComb = clustComb;
+    flightPaths.clustDelete = clustDelete;
+    flightPaths.clustReplace = clustReplace;
+end
+
 
 
 if saveFlag == 1
