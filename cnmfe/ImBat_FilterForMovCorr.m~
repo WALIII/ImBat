@@ -10,10 +10,14 @@ G = mean(Y,3);
 % find bad spots
 BW = G<thresh;
 BW = single(BW);
-h = fspecial('gaussian',5, 5);
+h = fspecial('motion', 10, 1);
 BW2 = imfilter(BW,h);
-BW2 = BW2>0.01;
-BW = BW2;
+% BW2 = BW2>0.1;
+figure();
+subplot(1,2,1);
+imagesc(BW);
+subplot(1,2,2);
+imagesc(BW2);
 
 
 

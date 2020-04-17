@@ -211,7 +211,7 @@ for traj =1:7
     for nf = allflights{ssf(traj)}
         plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj,:))
         hold on
- arrow3([mx(flight_ends(nf)-1),my(flight_ends(nf)-1),mz(flight_ends(nf)-1)],[mx(flight_ends(nf)),my(flight_ends(nf)),mz(flight_ends(nf))],'cone');
+% arrow3([mx(flight_ends(nf)-1),my(flight_ends(nf)-1),mz(flight_ends(nf)-1)],[mx(flight_ends(nf)),my(flight_ends(nf)),mz(flight_ends(nf))],'cone');
 
 scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),100,'k','filled')
     end
