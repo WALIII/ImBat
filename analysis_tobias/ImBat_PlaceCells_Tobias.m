@@ -110,6 +110,7 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
     
     
     
+    
     % Clear the buffer for the next cell:
     clear LX LY LZ closestIndex Spike_times
     

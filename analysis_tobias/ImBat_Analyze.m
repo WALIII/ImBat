@@ -22,18 +22,18 @@ AngeloData = 1;
 analysisFlag = 1;
 reAnalyze = 1;
 %roi plot flags
-plotROIFlag = 0;
-centroidFlag = 0;
-roiHeatFlag = 0;
-binaryMaskFlag = 0;
+plotROIFlag = 1;
+centroidFlag = 1;
+roiHeatFlag = 1;
+binaryMaskFlag = 1;
 %flight plot flags
 plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
-flightPathsFeederFlag = 0;
+flightPathsFeederFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 0 ;
+plotPlaceCellsFlag = 1 ;
 %snake/schnitz plot flags
-plotSnakesFlag = 0;
+plotSnakesFlag = 1;
 
 % Get all folders in directory
 files = dir(pwd);
