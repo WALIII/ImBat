@@ -125,7 +125,6 @@ end
 plotFiringTrajectoryIndiv =  figure();
 %sgtitle([batName '_' dateSesh '_' sessionType ': Firing Fields']);
 for ii = 1:length(cellData.results.S(:,1)); % for each cell
-    subplot(ceil(length(cellData.results.S(:,1))/4),4,ii)
     hold on;
     plot(alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
     %plot3(alignment.out.flights(:,1),alignment.out.flights(:,2),alignment.out.flights(:,3),'k');%,'LineWidth',2);% plot the flight trajectory in space

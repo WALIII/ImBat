@@ -154,9 +154,9 @@ end
 %% Plot each of the flights as a star in a timeline with a different color for each traj cluster
 
 if plotFlightTimesFlag ==1
-    jj = jet(length(flightPaths.nClusters)); %make color vector
+    jj = jet(flightPaths.nClusters); %make color vector
     plotFlightTimes = figure('units','normalized','outerposition',[0 0 1 0.5]);
-    for clust_i = 1:length(flightPaths.nClusters)
+    for clust_i = 1:flightPaths.nClusters
         %make height vector for the plot
         ht = ones(1,length(flightPaths.clusterIndex{clust_i}));
         %plot each flight in the color of the trajectory
@@ -175,7 +175,7 @@ if plotFlightTimesFlag ==1
     set(gca,'XTick',xt,'XTickLabel',round(xt/120,1));
     xlabel('time (s)');
     set(gca,'yticklabel',{[]});
-    legend([l(1) l(2) l(3) l(4) l(5) l(6)],{'traj 1','traj 2','traj 3','traj 4','traj 5','traj 6'});
+    legend([l(1) l(2) l(3)],{'traj 1','traj 2','traj 3'});
     
     if saveFlag ==1
         saveas(plotFlightTimes, [pwd '/' snakeTrace.batName '_' snakeTrace.dateSesh '_' snakeTrace.sessionType '_plotFlightTimes.svg']);

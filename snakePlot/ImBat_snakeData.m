@@ -46,8 +46,8 @@ if loadFlag == 1
     load([pwd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
 %padding for during flight snake plot to include some time before and after flight
-prePad = 1; %number of seconds to plot before alignment point
-postPad = 1; %number of seconds to plot after alignment point
+prePad = 3; %number of seconds to plot before alignment point
+postPad = 5; %number of seconds to plot after alignment point
 prePadCalcium = prePad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postPadCalcium = postPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 prePadSpeed = prePad*120; %add 2 seconds * FS of tracking data (120)
@@ -67,8 +67,6 @@ if isfield(flightPaths,'nClusters')
 else
     nClusters = 4;
 end
-
- 
 
 % if ~isempty(clustDelete) & clustDelete <6
 %     flightPaths.clusterIndex{clustDelete} = [];
