@@ -14,6 +14,7 @@ global topROI
 
 % TAS
 % d07/24/2019
+% d04/19/2020
 
 %topROI is top% of cells you want to look at
 topROI = 60;
@@ -22,7 +23,7 @@ AngeloData = 1;
 analysisFlag = 1;
 reAnalyze = 1;
 %roi plot flags
-plotROIFlag = 1;
+plotROIFlag = 0;
 centroidFlag = 1;
 roiHeatFlag = 1;
 binaryMaskFlag = 1;
@@ -30,12 +31,12 @@ binaryMaskFlag = 1;
 plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
 clustManualFlag = 0;
-flightPathsFeederFlag = 1;
-plotFlightvsCellsFlag = 1;
+flightPathsFeederFlag = 0;
+plotFlightvsCellsFlag = 0;
 %place cells plot flags
 plotPlaceCellsFlag = 1;
 %snake/schnitz plot flags
-plotSnakesFlag = 1;
+plotSnakesFlag = 0;
 
 % Get all folders in directory
 files = dir(pwd);
