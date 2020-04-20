@@ -49,7 +49,7 @@ for p = 1:snakeTrace.nClusters
     set(gca,'XTick',xt,'XTickLabel',round(xt/6,1))
     %set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
     
-    p3 = subplot(12,snakeTrace.nClusters,p+20);
+    p3 = subplot(12,snakeTrace.nClusters,p+(4*snakeTrace.nClusters));
     plot(1:length(snakeTrace.smoothSpeedFlight{p}),snakeTrace.smoothSpeedFlight{p},'k');
     hold on
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawFlight{p},1)
@@ -60,13 +60,14 @@ for p = 1:snakeTrace.nClusters
     %else
         %set(gca,'XTickLabel',{[]},'YTickLabel',{[]});
     end
+    ylim([0 5]);
+    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
     yt = get(gca,'YTick');
     xt = get(gca,'XTick');
     set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
-    ylim([0 5]);
-    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
     
-    p4 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+20,2*snakeTrace.nClusters+p+20,3*snakeTrace.nClusters+p+20]);
+    
+    p4 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+(4*snakeTrace.nClusters),2*snakeTrace.nClusters+p+(4*snakeTrace.nClusters),3*snakeTrace.nClusters+p+(4*snakeTrace.nClusters)]);
     imagesc(snakeTrace.normMeanTraceEachFlight{p},[0.5 5.5]);
     colormap(hot);
     if p == 1
@@ -80,7 +81,7 @@ for p = 1:snakeTrace.nClusters
     hold off
     
     
-    p5 = subplot(12,snakeTrace.nClusters,p+40);
+    p5 = subplot(12,snakeTrace.nClusters,p+(8*snakeTrace.nClusters));
     plot(1:length(snakeTrace.smoothSpeedPost{p}),snakeTrace.smoothSpeedPost{p},'k');
     hold on
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawPost{p},1)
@@ -98,7 +99,7 @@ for p = 1:snakeTrace.nClusters
     xlim([0 length(snakeTrace.smoothSpeedPost{p})]);
     hold off
     
-    p6 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+40,2*snakeTrace.nClusters+p+40,3*snakeTrace.nClusters+p+40]);
+    p6 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+(8*snakeTrace.nClusters),2*snakeTrace.nClusters+p+(8*snakeTrace.nClusters),3*snakeTrace.nClusters+p+(8*snakeTrace.nClusters)]);
     imagesc(snakeTrace.normMeanTraceEachPost{p},[0.5 5.5]);
     colormap(hot);
     if p == 1
@@ -156,17 +157,17 @@ for p = 1:snakeTrace.nClusters
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawFlight{p},1)
         plot(1:length(snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:)),snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:));
     end
-    title(['Cluster ' num2str(p)]);
+    title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{p},1)) 'f']);
     if p == 1
         ylabel('velocity (m/s)');
     %else
         %set(gca,'XTickLabel',{[]},'YTickLabel',{[]});
     end
+    ylim([0 5]);
+    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
     yt = get(gca,'YTick');
     xt = get(gca,'XTick');
     set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
-    ylim([0 5]);
-    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
     
     p2 = subplot(4,snakeTrace.nClusters,[snakeTrace.nClusters+p,2*snakeTrace.nClusters+p,3*snakeTrace.nClusters+p]);
     imagesc(snakeTrace.normMeanTraceEachFlight{p},[0.5 5.5]);
@@ -227,25 +228,25 @@ for p = 1:snakeTrace.nClusters
     xt = get(gca, 'XTick');
     set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
     
-    p3 = subplot(12,snakeTrace.nClusters,p+20);
+    p3 = subplot(12,snakeTrace.nClusters,p+(4*snakeTrace.nClusters));
     plot(1:length(snakeTrace.smoothSpeedFlight{p}),snakeTrace.smoothSpeedFlight{p},'k');
     hold on
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawFlight{p},1)
         plot(1:length(snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:)),snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:));
     end
-    title(['Cluster ' num2str(p)]);
+    title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{p},1)) 'f']);
     if p == 1
         ylabel('velocity (m/s)');
     %else
         %set(gca,'XTickLabel',{[]},'YTickLabel',{[]});
     end
+    ylim([0 5]);
+    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
     yt = get(gca,'YTick');
     xt = get(gca,'XTick');
     set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
-    ylim([0 5]);
-    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
     
-    p4 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+20,2*snakeTrace.nClusters+p+20,3*snakeTrace.nClusters+p+20]);
+    p4 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+(4*snakeTrace.nClusters),2*snakeTrace.nClusters+p+(4*snakeTrace.nClusters),3*snakeTrace.nClusters+p+(4*snakeTrace.nClusters)]);
     imagesc(snakeTrace.normTraceFlight{p}(snakeTrace.IFlight{p},:));
     colormap(hot);
     %make labels for first left plot only
@@ -258,7 +259,7 @@ for p = 1:snakeTrace.nClusters
     set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
 
     
-    p5 = subplot(12,snakeTrace.nClusters,p+40);
+    p5 = subplot(12,snakeTrace.nClusters,p+(8*snakeTrace.nClusters));
     plot(1:length(snakeTrace.smoothSpeedPost{p}),snakeTrace.smoothSpeedPost{p},'k');
     hold on
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawPost{p},1)
@@ -276,7 +277,7 @@ for p = 1:snakeTrace.nClusters
     ylim([0 5]);
     xlim([0 length(snakeTrace.smoothSpeedPost{p})]);
     
-    p6 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+40,2*snakeTrace.nClusters+p+40,3*snakeTrace.nClusters+p+40]);
+    p6 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+(8*snakeTrace.nClusters),2*snakeTrace.nClusters+p+(8*snakeTrace.nClusters),3*snakeTrace.nClusters+p+(8*snakeTrace.nClusters)]);
     imagesc(snakeTrace.normTracePost{p}(snakeTrace.IPost{p},:));
     colormap(hot);
     %make labels for first left plot only
@@ -326,25 +327,25 @@ for p = 1:snakeTrace.nClusters
     xt = get(gca, 'XTick');
     set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
     
-    p3 = subplot(12,snakeTrace.nClusters,p+20);
+    p3 = subplot(12,snakeTrace.nClusters,p+(4*snakeTrace.nClusters));
     plot(1:length(snakeTrace.smoothSpeedFlight{p}),snakeTrace.smoothSpeedFlight{p},'k');
     hold on
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawFlight{p},1)
         plot(1:length(snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:)),snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:));
     end
-    title(['Cluster ' num2str(p)]);
+    title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{p},1)) 'f']);
     if p == 1
         ylabel('velocity (m/s)');
     %else
         %set(gca,'XTickLabel',{[]},'YTickLabel',{[]});
     end
+    ylim([0 5]);
+    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
     yt = get(gca,'YTick');
     xt = get(gca,'XTick');
     set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
-    ylim([0 5]);
-    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
     
-    p4 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+20,2*snakeTrace.nClusters+p+20,3*snakeTrace.nClusters+p+20]);
+    p4 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+(4*snakeTrace.nClusters),2*snakeTrace.nClusters+p+(4*snakeTrace.nClusters),3*snakeTrace.nClusters+p+(4*snakeTrace.nClusters)]);
     imagesc(snakeTrace.normTraceFlight{p}(snakeTrace.I1Flight{p},:));
     colormap(hot);
     %make labels for first left plot only
@@ -356,7 +357,7 @@ for p = 1:snakeTrace.nClusters
     xt = get(gca, 'XTick');
     set(gca,'XTick',xt,'XTickLabel',round(xt/6,1)); 
 
-    p5 = subplot(12,snakeTrace.nClusters,p+40);
+    p5 = subplot(12,snakeTrace.nClusters,p+(8*snakeTrace.nClusters));
     plot(1:length(snakeTrace.smoothSpeedPost{p}),snakeTrace.smoothSpeedPost{p},'k');
     hold on
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawPost{p},1)
@@ -374,7 +375,7 @@ for p = 1:snakeTrace.nClusters
     ylim([0 5]);
     xlim([0 length(snakeTrace.smoothSpeedPost{p})]);
     
-    p6 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+40,2*snakeTrace.nClusters+p+40,3*snakeTrace.nClusters+p+40]);
+    p6 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p+(8*snakeTrace.nClusters),2*snakeTrace.nClusters+p+(8*snakeTrace.nClusters),3*snakeTrace.nClusters+p+(8*snakeTrace.nClusters)]);
     imagesc(snakeTrace.normTracePost{p}(snakeTrace.I1Post{p},:));
     colormap(hot);
     %make labels for first left plot only
@@ -400,14 +401,18 @@ for p = 1:snakeTrace.nClusters
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawFlight{p},1)
         plot(1:length(snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:)),snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:));
     end
-    title(['Cluster ' num2str(p)]);
+    title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{p},1)) 'f']);
     if p == 1
-        ylabel('velocity (cm/s)');
-        yt = get(gca,'YTick');
-        set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
-    else
-        set(gca,'xticklabel',{[]},'yticklabel',{[]});
+        ylabel('velocity (m/s)');
+    %else
+        %set(gca,'XTickLabel',{[]},'YTickLabel',{[]});
     end
+    ylim([0 5]);
+    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
+    yt = get(gca,'YTick');
+    xt = get(gca,'XTick');
+    set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
+    
     p2 = subplot(4,snakeTrace.nClusters,[snakeTrace.nClusters+p,2*snakeTrace.nClusters+p,3*snakeTrace.nClusters+p]);
     imagesc(snakeTrace.normTraceFlight{p}(snakeTrace.IFlight{p},:));
     colormap(hot);
@@ -418,7 +423,7 @@ for p = 1:snakeTrace.nClusters
         set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
     xlabel('time (s)');
     %hold off
     sgtitle(['Spatial selectivity sort by peak: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
@@ -434,14 +439,18 @@ for p = 1:snakeTrace.nClusters
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawFlight{p},1)
         plot(1:length(snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:)),snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:));
     end
-    title(['Cluster ' num2str(p)]);
+    title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{p},1)) 'f']);
     if p == 1
-        ylabel('velocity (cm/s)');
-        yt = get(gca,'YTick');
-        set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
-    else
-        set(gca,'xticklabel',{[]},'yticklabel',{[]});
+        ylabel('velocity (m/s)');
+    %else
+        %set(gca,'XTickLabel',{[]},'YTickLabel',{[]});
     end
+    ylim([0 5]);
+    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
+    yt = get(gca,'YTick');
+    xt = get(gca,'XTick');
+    set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
+  
     p2 = subplot(4,snakeTrace.nClusters,[snakeTrace.nClusters+p,2*snakeTrace.nClusters+p,3*snakeTrace.nClusters+p]);
     imagesc(snakeTrace.normTraceFlight{p}(snakeTrace.I1Flight{p},:));
     colormap(hot);
@@ -452,7 +461,7 @@ for p = 1:snakeTrace.nClusters
         set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
     xlabel('time (s)');
     %hold off
     sgtitle(['Spatial selectivity sort by cluster 1: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
@@ -469,14 +478,18 @@ for p = 1:snakeTrace.nClusters
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawFlight{p},1)
         plot(1:length(snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:)),snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:));
     end
-    title(['Cluster ' num2str(p)]);
+    title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{p},1)) 'f']);
     if p == 1
-        ylabel('velocity (cm/s)');
-        yt = get(gca,'YTick');
-        set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
-    else
-        set(gca,'xticklabel',{[]},'yticklabel',{[]});
+        ylabel('velocity (m/s)');
+    %else
+        %set(gca,'XTickLabel',{[]},'YTickLabel',{[]});
     end
+    ylim([0 5]);
+    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
+    yt = get(gca,'YTick');
+    xt = get(gca,'XTick');
+    set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
+    
     p2 = subplot(4,2*snakeTrace.nClusters,[2*snakeTrace.nClusters+(2*p-1),4*snakeTrace.nClusters+(2*p-1),6*snakeTrace.nClusters+(2*p-1)]);
     imagesc(snakeTrace.normTraceOdd{p}(snakeTrace.Iodd{p},:));
     colormap(hot);
@@ -488,14 +501,15 @@ for p = 1:snakeTrace.nClusters
     end
     title(['Cluster ' num2str(p) ' Odd']);
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
     xlabel('time (s)'); %ylabel('cell number');
+    
     p3 = subplot(4,2*snakeTrace.nClusters,[2*snakeTrace.nClusters+(2*p),4*snakeTrace.nClusters+(2*p),6*snakeTrace.nClusters+(2*p)]);
     imagesc(snakeTrace.normTraceEven{p}(snakeTrace.Iodd{p},:));
     colormap(hot);
     title(['Cluster ' num2str(p) ' Even']);
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1),'yticklabel',{[]});
+    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1),'yticklabel',{[]});
     xlabel('time (s)'); %ylabel('cell number');
     sgtitle(['Spatial selectivity Odd (sorted) vs Even Trials: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
 end
@@ -511,14 +525,18 @@ for p = 1:snakeTrace.nClusters
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawFlight{p},1)
         plot(1:length(snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:)),snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:));
     end
-    title(['Cluster ' num2str(p)]);
+title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{p},1)) 'f']);
     if p == 1
-        ylabel('velocity (cm/s)');
-        yt = get(gca,'YTick');
-        set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
-    else
-        set(gca,'xticklabel',{[]},'yticklabel',{[]});
+        ylabel('velocity (m/s)');
+    %else
+        %set(gca,'XTickLabel',{[]},'YTickLabel',{[]});
     end
+    ylim([0 5]);
+    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
+    yt = get(gca,'YTick');
+    xt = get(gca,'XTick');
+    set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
+    
     p2 = subplot(4,snakeTrace.nClusters,[snakeTrace.nClusters+p,2*snakeTrace.nClusters+p,3*snakeTrace.nClusters+p]);
     imagesc(snakeTrace.normTraceFlightAll{p}(snakeTrace.InormFlightAll{p},:));
     colormap(hot);
@@ -529,7 +547,7 @@ for p = 1:snakeTrace.nClusters
         set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
     xlabel('time (s)');
     %hold off
     sgtitle(['Spatial selectivity (norm) sort by peak: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
@@ -545,14 +563,18 @@ for p = 1:snakeTrace.nClusters
     for cell_ii = 1:size(snakeTrace.smoothSpeedRawFlight{p},1)
         plot(1:length(snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:)),snakeTrace.smoothSpeedRawFlight{p}(cell_ii,:));
     end
-    title(['Cluster ' num2str(p)]);
+title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{p},1)) 'f']);
     if p == 1
-        ylabel('velocity (cm/s)');
-        yt = get(gca,'YTick');
-        set(gca,'YTick',yt,'YTickLabel',yt*100,'xticklabel',{[]});
-    else
-        set(gca,'xticklabel',{[]},'yticklabel',{[]});
+        ylabel('velocity (m/s)');
+    %else
+        %set(gca,'XTickLabel',{[]},'YTickLabel',{[]});
     end
+    yt = get(gca,'YTick');
+    xt = get(gca,'XTick');
+    set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
+    ylim([0 5]);
+    xlim([0 length(snakeTrace.smoothSpeedFlight{p})]);
+    
     p2 = subplot(4,snakeTrace.nClusters,[snakeTrace.nClusters+p,2*snakeTrace.nClusters+p,3*snakeTrace.nClusters+p]);
     imagesc(snakeTrace.normTraceFlightAll{p}(snakeTrace.I1normFlightAll{p},:));
     colormap(hot);
@@ -563,7 +585,7 @@ for p = 1:snakeTrace.nClusters
         set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
     xlabel('time (s)');
     %hold off
     sgtitle(['Spatial selectivity (norm) sort by cluster 1: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);

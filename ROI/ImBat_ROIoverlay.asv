@@ -95,7 +95,7 @@ title(['ROI Centroids: ' batName ' ' dateSesh ' ' sessionType]);
 %plot binary mask over top of max projection
 if binaryMaskFlag == 1
     ROIoverlay = figure();
-    sgtitle([batName ' ' dateSesh ' ' sessionType ': ' num2str(length(results.A(1,:))) ' ROI'])
+    sgtitle(['' batName ' ' dateSesh ' ' sessionType])
     subplot(2,2,1)
     imagesc(imresize(results.Cn,scaling)); colormap(gray);
     set(gca,'YDir','normal');
