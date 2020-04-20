@@ -1,8 +1,8 @@
 function [flightPaths] = ImBat_plotFlights(trackData,varargin)
 
 
-nclusters = 12; %nIumber of clusters for kmeans clustering of flight trajectories
-ntrajectories = 6; %number of output trajectories from kmeans that you want to look at
+nclusters = 8; %nIumber of clusters for kmeans clustering of flight trajectories
+ntrajectories = 4; %number of output trajectories from kmeans that you want to look at
 
 
 batName = [];
