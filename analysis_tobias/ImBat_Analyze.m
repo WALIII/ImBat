@@ -19,11 +19,11 @@ global topROI
 %topROI is top% of cells you want to look at
 topROI = 60;
 % Manual inputs
-AngeloData = 1;
+%AngeloData = 1;
 analysisFlag = 1;
 reAnalyze = 1;
 %roi plot flags
-plotROIFlag = 0;
+plotROIFlag = 1;
 centroidFlag = 1;
 roiHeatFlag = 1;
 binaryMaskFlag = 1;
