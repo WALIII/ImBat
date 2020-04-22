@@ -1,8 +1,8 @@
 function [flightPaths] = ImBat_plotFlights(trackData,varargin)
 
 
-nclusters = 6; %nIumber of clusters for kmeans clustering of flight trajectories
-ntrajectories = 6; %number of output trajectories from kmeans that you want to look at
+nclusters = 4; %nIumber of clusters for kmeans clustering of flight trajectories
+ntrajectories = 3; %number of output trajectories from kmeans that you want to look at
     
 batName = [];
 dateSesh = [];
@@ -328,6 +328,8 @@ if clustManualFlag ==1
     flightPaths.clustComb = clustComb;
     flightPaths.clustDelete = clustDelete;
     flightPaths.clustReplace = clustReplace;
+else
+    flightPaths.nClusters = nclusters;
 end
 
 
