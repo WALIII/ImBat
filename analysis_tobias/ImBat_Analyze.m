@@ -37,6 +37,8 @@ plotFlightvsCellsFlag = 1;
 plotPlaceCellsFlag = 1 ;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
+%align max projections of specific flights across trajectories
+plotROI3dayFlag = 1;
 
 % Get all folders in directory
 files = dir(pwd);
@@ -281,6 +283,17 @@ for i = 1:length(subFolders)
             savefig(snakeTrace.snakePlot_prefEachPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_prefEachPrePostFlight.fig']);
             savefig(snakeTrace.snakePlot_prefAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlots_prefAll.fig']);
             savefig(snakeTrace.snakePlot_clustBy1PrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_clustBy1PrePostFlight.fig']);
+            
+        end
+        
+        %snake plots: raw fluorescent traces for each cell sorted by timing of
+        %peak activity for the smoothed zscored mean across all trials in a cluster
+        if plotROI3dayFlag == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
+            cd([imageFolders(kk).folder ,'/',imageFolders(kk).name,'/' analysis_Folder])
+            mkdir('roi3day')
+            cd([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/roi3day'])
+            %load([subFolders(i).folder,'/',subFolders(i).name,'/',imageFolders(kk).name,'/' analysis_Folder '/',batName,'_',dateSesh,'_',sessionType,'_flightPaths.mat']);
+            [roi3day] = ImBat_roi3day(videoData,flightPaths,alignment)
             
         end
         

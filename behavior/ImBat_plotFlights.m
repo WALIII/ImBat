@@ -1,8 +1,8 @@
 function [flightPaths] = ImBat_plotFlights(trackData,varargin)
 
 
-nclusters = 4; %nIumber of clusters for kmeans clustering of flight trajectories
-ntrajectories = 3; %number of output trajectories from kmeans that you want to look at
+nclusters = 6; %nIumber of clusters for kmeans clustering of flight trajectories
+ntrajectories = 4; %number of output trajectories from kmeans that you want to look at
     
 batName = [];
 dateSesh = [];
@@ -36,7 +36,7 @@ if loadFlag == 1
     date = strcat(lower(batName(1:2)),dateSesh);
     label = [batName '_' dateSesh '_' sessionType];
     folderName = extractBefore(pwd,batName);
-    %trackData = load([folderName label '_track.mat']);
+    trackData = load([folderName label '_track.mat']);
 end
 %find ttl pulses for synching
 %event_ttls = trackData.AnalogSignals(:,2); %from motion data
