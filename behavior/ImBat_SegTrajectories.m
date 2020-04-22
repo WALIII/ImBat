@@ -11,7 +11,7 @@ function  [out] =  ImBat_SegTrajectories(Location,Location_times,varargin)
 FS = 120;
 nclusters = 5;
 day_index = ones(size(Location_times));
-
+pltting = 0;
 % Manual inputs
     vin=varargin;
     for i=1:length(vin)
@@ -75,9 +75,10 @@ trajectories_continuous(1,:) = mx;
 trajectories_continuous(2,:) = my;
 trajectories_continuous(3,:) = mz;
  
+if pltting ==1
 figure
 plot3(mx,my,mz,'LineWidth',2,'Color','k')
- 
+end
 %splice out individual flights
 batspeed = speed;
 batspeed(nonflying) = nan;
@@ -98,9 +99,12 @@ flight_ends = round(fLT);
  
 %cut out flights and save
 for nf = 1 : size(R,2)
+    if pltting ==1
+
     hold on
     plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color','r')
     hold on
+    end
     
     fstartxyz(nf,1) = round(nanmean(mx(flight_starts(nf):flight_starts(nf)+90)));
     fstartxyz(nf,2) = round(nanmean(my(flight_starts(nf):flight_starts(nf)+90)));
@@ -110,10 +114,13 @@ for nf = 1 : size(R,2)
     fendxyz(nf,2) = round(nanmean(my(flight_ends(nf):flight_ends(nf)+90)));
     fendxyz(nf,3) = round(nanmean(mz(flight_ends(nf):flight_ends(nf)+90)));
     
+    if pltting ==1
+
     scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),1000,'g','filled')
     hold on
     scatter3(fendxyz(nf,1),fendxyz(nf,2),fendxyz(nf,3),1000,'b','filled')
-%    pause
+    end
+    %    pause
 end
  
 %determine the xyz start and stop positions
@@ -128,12 +135,14 @@ out.fendxyz = fendxyz;
 % cd(daydir)
 out.day = day_index(flight_starts);% this is the day index...
  
+kstart = kmeans(fstartxyz,nclusters);
+kend = kmeans(fendxyz,nclusters);
 
- 
+ if pltting ==1
+
 jj = jet(200);
 figure
 % rng(2)
-kstart = kmeans(fstartxyz,nclusters);
 for nf = 1 : size(R,2)
     plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(kstart(nf)*4,:))
     hold on
@@ -144,7 +153,6 @@ end
 
 figure
 rng(2)
-kend = kmeans(fendxyz,nclusters);
 for nf = 1 : size(R,2)
     plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(kend(nf)*4,:))
     hold on
@@ -152,7 +160,7 @@ for nf = 1 : size(R,2)
     hold on
 end
  
- 
+ end
  
 %find pairs of start and endpoints with a high number of flights
 rng(2)
@@ -188,11 +196,13 @@ for traj = 1 : 10;
         hold on 
     end
     end
-        out.ClusterIndex{traj}(:) = allflights{ssf(traj)};
-
     catch
         disp(' no more flights...');
     end
+end
+
+for i = 1:size(ssf,2);
+            out.ClusterIndex{i}(:) = allflights{ssf(i)};
 end
  
 figure
@@ -201,7 +211,7 @@ for traj =1:7
     for nf = allflights{ssf(traj)}
         plot3(mx(flight_starts(nf):flight_ends(nf)),my(flight_starts(nf):flight_ends(nf)),mz(flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',jj(traj,:))
         hold on
- arrow3([mx(flight_ends(nf)-1),my(flight_ends(nf)-1),mz(flight_ends(nf)-1)],[mx(flight_ends(nf)),my(flight_ends(nf)),mz(flight_ends(nf))],'cone');
+% arrow3([mx(flight_ends(nf)-1),my(flight_ends(nf)-1),mz(flight_ends(nf)-1)],[mx(flight_ends(nf)),my(flight_ends(nf)),mz(flight_ends(nf))],'cone');
 
 scatter3(fstartxyz(nf,1),fstartxyz(nf,2),fstartxyz(nf,3),100,'k','filled')
     end
@@ -211,3 +221,6 @@ ylim([-2500 2500]);
 zlim([-500 2000]);
 grid on;
 
+out.Loc_clean(:,1) = mx;
+out.Loc_clean(:,2) = my;
+out.Loc_clean(:,3) = mz;

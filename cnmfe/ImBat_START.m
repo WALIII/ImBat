@@ -24,13 +24,14 @@ function ImBat_START(varargin)
 
 
 % Default extraction Params
-ROI_flag = 1; % run ROI extraction
-reROI_extract = 1; %rerun ROI extraction
+ROI_flag = 0; % run ROI extraction
+ROI_flag_reset = 0;
+reROI_extract = 0; %rerun ROI extraction
+
 Analysis_flag = 1; % run basic ROI analysis...
 extract  = 1; % extract the basic ROI timeseries
 reExtract = 1; % re-extract, in the event that things have been extracted already.
-ROI_flag_reset = 1;
-extract_track = 1;
+extract_track = 0;
 Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
 Bat_Cluster =1; % extract the bat_cluster tracking
 
@@ -40,6 +41,11 @@ metadata.spatial_downsample = 0.4; % spatial downsampling
 metadata.median_filter_kernal = 3; % median filtering
 metadata.artifact_reject = 1; % median filtering
 metadata.initial_median_filter_kernal = 11;
+
+% Motion ocrrection:
+metadata.moco.itter = 1;
+metadata.moco.bin_width = 200;
+
 % Default CNMFe Paramaters:
 metadata.cnmfe.min_corr = 0.8;     % minimum local correlation for a seeding pixel
 metadata.cnmfe.min_pnr = 30;       % minimum peak-to-noise ratio for a seeding pixel
@@ -49,6 +55,9 @@ metadata.moco.bin_width = 200;
 
 processed_FN = ['processed_',datestr(now,'yyyy_mm_dd__hhMM')];
 
+% Housekeeping:
+metadata.Extraction_date = datestr(now);
+metadata.processed_FN = processed_FN;
 
 
 % Manual inputs
@@ -79,9 +88,7 @@ if Mov_extract_flag  ==1;
 end
 
 
-% Housekeeping:
-metadata.Extraction_date = datestr(now);
-metadata.processed_FN = processed_FN;
+
 
 % Get all folders in directory
 files = dir(pwd);

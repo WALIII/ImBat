@@ -31,8 +31,8 @@ else
     
 
     
-    gSig = round(7/5);
-    gSiz = round(17/5);
+    gSig = round(1);
+    gSiz = round(3);
     psf = fspecial('gaussian', round(2*gSiz), gSig);
     ind_nonzero = (psf(:)>=max(psf(:,1)));
     psf = psf-mean(psf(ind_nonzero));
@@ -41,13 +41,15 @@ else
     %bound = 2*ceil(gSiz/2);
     Y = imfilter(Yf,psf,'symmetric');
     [Y] = ImBat_FilterForMovCorr(Y);
-    bound = 10;
+    % take onnly center of image:
+    Y = Y(8:end-8,8:end-8,:);
+    bound = 1;
 end
 %% first try out rigid motion correction
 % exclude boundaries due to high pass filtering effects
 if type ==1;
 
-    options_r = NoRMCorreSetParms('d1',d1-bound,'d2',d2-bound,'bin_width',10,'max_shift',20,'iter',10,'correct_bidir',false);
+    options_r = NoRMCorreSetParms('d1',d1-bound,'d2',d2-bound,'bin_width',metadata.moco.bin_width,'max_shift',20,'iter',metadata.moco.itter,'correct_bidir',false);
 
     %% register using the high pass filtered data and apply shifts to original data
     tic; [M1,shifts1,template1] = normcorre_batch(Y(bound/2+1:end-bound/2,bound/2+1:end-bound/2,:),options_r); toc % register filtered data

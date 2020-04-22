@@ -1,10 +1,10 @@
-function [out_markov] = ImBat_Markov(ROI_Data,day2use)
+function [out_markov] = ImBat_Markov(ROI_Data,day2use,nclust)
 
 % Segregate Flights:
 %day2use = 12;
 Sim = 0;
 
-[out] =  ImBat_SegTrajectories(ROI_Data{1,day2use}.Alignment.out.flights,ROI_Data{1,day2use}.Alignment.out.Location_time);
+[out] =  ImBat_SegTrajectories(ROI_Data{1,day2use}.Alignment.out.flights,ROI_Data{1,day2use}.Alignment.out.Location_time,'nclusters',nclust);
 close all
 
 % Plot flights
@@ -47,7 +47,7 @@ end
 figure();
 hold on;
 colorC = hsv(size(out.ClusterIndex,2));
-for i = 1:size(out.ClusterIndex,2)
+for i = 1:10%size(out.ClusterIndex,2)
     subplot(5,2,i);
     hold on;
     for ii = 1: size(out.ClusterIndex{i},2)
