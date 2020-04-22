@@ -35,4 +35,5 @@ if loadFlag == 1
     analysisNewest = sort({processedFolders(end).name});
     analysisNewest = char(processedNewest);
     load([pwd processed_Newest '/Motion_corrected_Data_DS.mat']);
+    disp('')
 end
