@@ -4,6 +4,7 @@ batName = [];
 dateSesh = [];
 sessionType = [];
 loadFlag = 0;
+plotting = 0;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -11,11 +12,13 @@ for i=1:2:nparams
     switch lower(varargin{i})
         case 'batname'
             batName=varargin{i+1};
+        case 'plotting'
+            plotting = varargin{i+1};
         case 'datesesh'
             dateSesh = varargin{i+1};
         case 'sessiontype'
             sessionType = varargin{i+1};
-                    case 'loadflag'
+        case 'loadflag'
             loadFlag = varargin{i+1};
     end
 end
@@ -34,30 +37,33 @@ end
 
 % Filter movie
 
-Y = (convn(Y, single(reshape([1 1 1] /10, 1, 1, [])), 'same'));
+Y = (convn(Y, double(reshape([1 1 1] /10, 1, 1, [])), 'same'));
 
 % Take median of movie
 Y_med = median(Y,3);
 
 % Subtract median
-Y = Y-Y_med;
+Y = double(Y-Y_med);
 
 % take max
 Ymax = max(Y,[],3);
 Ymax = imresize(Ymax,scaling);
-maxFig = figure();
-colormap(gray);
-imagesc(Ymax);
-hold on;
-xticks = get(gca,'xtick');
-yticks = get(gca,'ytick');
-scaling  = 1.1; %1.1um per pixel
-newlabelsX = arrayfun(@(ax) sprintf('%g', scaling * ax), xticks, 'un', 0);
-newlabelsY = arrayfun(@(ay) sprintf('%g', scaling * ay), yticks, 'un', 0);
-set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
-title(['Max Projection dFF: ' batName ' ' dateSesh ' ' sessionType]);
-xlabel('um'); ylabel('um');
 
+if plotting == 1
+    maxFig = figure();
+    colormap(gray);
+    imagesc(Ymax);
+    hold on;
+    xticks = get(gca,'xtick');
+    yticks = get(gca,'ytick');
+    scaling  = 1.1; %1.1um per pixel
+    newlabelsX = arrayfun(@(ax) sprintf('%g', scaling * ax), xticks, 'un', 0);
+    newlabelsY = arrayfun(@(ay) sprintf('%g', scaling * ay), yticks, 'un', 0);
+    set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
+    title(['Max Projection dFF: ' batName ' ' dateSesh ' ' sessionType]);
+    xlabel('um'); ylabel('um');
+    
+end
 
 
 
