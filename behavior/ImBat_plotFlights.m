@@ -9,6 +9,7 @@ dateSesh = [];
 sessionType = [];
 saveFlag = 0;
 loadFlag = 0;
+clustManualFlag = 0;
 
 % User inputs overrides
 nparams=length(varargin);
