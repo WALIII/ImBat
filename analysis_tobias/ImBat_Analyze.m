@@ -38,7 +38,7 @@ plotPlaceCellsFlag = 1 ;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 %align max projections of specific flights across trajectories
-plotROI3dayFlag = 1;
+plotROI3dayFlag = 0;
 
 % Get all folders in directory
 files = dir(pwd);
