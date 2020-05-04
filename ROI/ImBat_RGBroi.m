@@ -3,7 +3,7 @@ function ImBat_RGBroi
 % Load in Data:
 mat1 = imresize(results10.results.Cn,4);
 mat2 = imresize(results12.results.Cn,4);
-mat3 = imresize(results15.results.Cn,4);
+mat3 = imresize(results13.results.Cn,4);
 IM1 = mat2gray(mat1);
 IM2 = mat2gray(mat2);
 IM3 = mat2gray(mat3);

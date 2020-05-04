@@ -31,14 +31,14 @@ binaryMaskFlag = 1;
 plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
 clustManualFlag = 1;
-flightPathsFeederFlag = 0;
+flightPathsFeederFlag = 1;
 plotFlightvsCellsFlag = 1;
 %place cells plot flags
 plotPlaceCellsFlag = 1 ;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 %align max projections of specific flights across trajectories
-plotROI3dayFlag = 0;
+plotROI3dayFlag = 1;
 
 % Get all folders in directory
 files = dir(pwd);
@@ -191,8 +191,8 @@ for i = 1:length(subFolders)
             mkdir([analysis_Folder filesep 'flights'])
             %plot all flights in 3D
             if flightPathsAllFlag == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
-                [flightPaths] = ImBat_plotFlights(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType,'clustmanualflag',clustManualFlag);
-                %[flightPaths] = ImBat_flightsAng(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
+                %[flightPaths] = ImBat_plotFlights(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType,'clustmanualflag',clustManualFlag);
+                [flightPaths] = ImBat_flightsAng(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
                 save([imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/' fileName '_flightPaths.mat'],'flightPaths');
                 %set(findall(flightPaths.flightPathsAll,'-property','FontSize'),'FontSize',20);
                 savefig(flightPaths.flightPathsAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsAll.fig']);
