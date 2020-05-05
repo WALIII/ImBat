@@ -93,8 +93,15 @@ for bf = 1 : size(bflying,1)-tracking_Fs
 end
 
 % Detect flight starts and stops
-[R,rLT,rUT,rLL,rUL] = risetime(allsums);    flight_starts = round(rLT+tracking_Fs/2);
-[F,fLT,fUT,fLL,fUL] = falltime(allsums);    flight_ends = round(fLT+tracking_Fs/2);       %... +Fs is a sistematic correction, useful
+[R,rLT,rUT,rLL,rUL] = risetime(allsums);    
+[F,fLT,fUT,fLL,fUL] = falltime(allsums);           
+if length(R) ~= length(F)
+fLT(length(R)) = length(allsums);
+fUT(length(R)) = length(allsums);
+F(length(R)) = F(length(F));
+end
+flight_starts = round(rLT+tracking_Fs/2);
+flight_ends = round(fLT+tracking_Fs/2); %... +Fs is a sistematic correction, useful
 num_flights = size(R,2);
 ref = ones(size(flight_starts));
 avg_flight_time = mean((flight_ends-flight_starts)./tracking_Fs);

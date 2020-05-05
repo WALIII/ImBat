@@ -30,11 +30,11 @@ binaryMaskFlag = 1;
 %flight plot flags
 plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
-clustManualFlag = 1;
+clustManualFlag = 0;
 flightPathsFeederFlag = 0;
 plotFlightvsCellsFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 0;
+plotPlaceCellsFlag = 1;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 %align max projections of specific flights across trajectories
