@@ -65,7 +65,7 @@ smoothTrace = 2; %number of calcium video frames to smooth the data
 if isfield(flightPaths,'nClusters')
     nClusters = flightPaths.nClusters;
 else
-    nClusters = 3;
+    nClusters = length(flightPaths.clusterIndex);
 end
 
 % if ~isempty(clustDelete) & clustDelete <6

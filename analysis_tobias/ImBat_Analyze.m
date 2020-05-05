@@ -34,7 +34,7 @@ clustManualFlag = 1;
 flightPathsFeederFlag = 0;
 plotFlightvsCellsFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 1 ;
+plotPlaceCellsFlag = 0;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 %align max projections of specific flights across trajectories
@@ -57,97 +57,97 @@ end
 for i = 1:length(subFolders)
     disp(['entering folder ', char(subFolders(i).name)])
     cd([subFolders(i).folder,'/',subFolders(i).name]);
-%     if AngeloData == 1
-%         trackFiles = dir('*track.mat');
-%         cnmfeFiles = dir('CNMFe*');
-%         % load tracking and cell data
-%         if analysisFlag == 1
-%             trackData = load([trackFiles(1).folder,'/',trackFiles(1).name]);
-%             cellData = load([cnmfeFiles(1).folder,'/',cnmfeFiles(1).name]);
-%             videoData = load('Motion_corrected_Data.mat');
-%             alignment = load('Alignment.mat');
-%             alignment.out.video_timesDS = alignment.out.video_times(1:5:end);
-%             fileName = extractBefore(trackFiles(1).name,'_track'); %get filename for titles
-%             dateSesh = trackFiles(1).name(5:10);
-%             batName = trackFiles(1).name(1:3);
-%             sessionType = extractAfter(fileName,[dateSesh '_']);
-%             % make new analysis directory for .fig and .tif files
-%             cd([imageFolders(kk).folder,'/',imageFolders(kk).name]);
-%             mkdir('analysis');
-%             disp('Analyzing!!');
-%         end
-%     else
-        extractedFolderFlag = 0;
-        % Check if this folder is in the newer extracted version with an extracted folder or older version of cnmfe/extraction
-        subFolderFiles = dir(pwd);
-        subFolderFiles(ismember( {subFolderFiles.name}, {'.', '..','.DS_Store','Thumbs.db'})) = [];  %remove . and .. and DS_Store
-        % Get a logical vector that tells which is a directory.
-        subDirFlags = [subFolderFiles.isdir];
-        % Extract only those that are directories.
-        subDirFolders = subFolderFiles(subDirFlags);
-        % Print folder names to command window.
-        for k = 1 : length(subDirFolders)
-            fprintf('Sub folder #%d = %s\n', k, subDirFolders(k).name);
-            if strcmp(subDirFolders(k).name,'extracted') == 1
-                cd([subDirFolders(k).folder,'/',subDirFolders(k).name]);
-                extractedFolderFlag = 1;
-                break
+    %     if AngeloData == 1
+    %         trackFiles = dir('*track.mat');
+    %         cnmfeFiles = dir('CNMFe*');
+    %         % load tracking and cell data
+    %         if analysisFlag == 1
+    %             trackData = load([trackFiles(1).folder,'/',trackFiles(1).name]);
+    %             cellData = load([cnmfeFiles(1).folder,'/',cnmfeFiles(1).name]);
+    %             videoData = load('Motion_corrected_Data.mat');
+    %             alignment = load('Alignment.mat');
+    %             alignment.out.video_timesDS = alignment.out.video_times(1:5:end);
+    %             fileName = extractBefore(trackFiles(1).name,'_track'); %get filename for titles
+    %             dateSesh = trackFiles(1).name(5:10);
+    %             batName = trackFiles(1).name(1:3);
+    %             sessionType = extractAfter(fileName,[dateSesh '_']);
+    %             % make new analysis directory for .fig and .tif files
+    %             cd([imageFolders(kk).folder,'/',imageFolders(kk).name]);
+    %             mkdir('analysis');
+    %             disp('Analyzing!!');
+    %         end
+    %     else
+    extractedFolderFlag = 0;
+    % Check if this folder is in the newer extracted version with an extracted folder or older version of cnmfe/extraction
+    subFolderFiles = dir(pwd);
+    subFolderFiles(ismember( {subFolderFiles.name}, {'.', '..','.DS_Store','Thumbs.db'})) = [];  %remove . and .. and DS_Store
+    % Get a logical vector that tells which is a directory.
+    subDirFlags = [subFolderFiles.isdir];
+    % Extract only those that are directories.
+    subDirFolders = subFolderFiles(subDirFlags);
+    % Print folder names to command window.
+    for k = 1 : length(subDirFolders)
+        fprintf('Sub folder #%d = %s\n', k, subDirFolders(k).name);
+        if strcmp(subDirFolders(k).name,'extracted') == 1
+            cd([subDirFolders(k).folder,'/',subDirFolders(k).name]);
+            extractedFolderFlag = 1;
+            break
+        end
+    end
+    
+    % index every subfolder...
+    trackFiles = dir('*track.mat');
+    trackFiles(ismember( {trackFiles.name}, {'_track.mat'})) = [];  %'_track.mat'
+    imageFolders = dir('*_extraction');
+    %print image data folder names
+    for kk = 1 : length(imageFolders)
+        fprintf('Image data folder #%d = %s\n', kk, imageFolders(kk).name);
+        %check that track data matches image data
+        %         if strcmp(imageFolders(kk).name(1:end-10),trackFiles(kk).name(1:end-9)) == 0
+        %             fprintf('Tracking and image data do not match');
+        %             analysisFlag = 0;
+        %         end
+        
+        % Check if folder exists
+        if exist([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','analysis*'])>0;
+            disp('Folder already analyzed..');
+            if reAnalyze ==1
+                disp('Re-Analyzing...');
+            else
+                disp('Moving to the next folder...');
+                analysisFlag = 0 ;
             end
         end
         
-        % index every subfolder...
-        trackFiles = dir('*track.mat');
-        trackFiles(ismember( {trackFiles.name}, {'_track.mat'})) = [];  %'_track.mat'
-        imageFolders = dir('*_extraction');
-        %print image data folder names
-        for kk = 1 : length(imageFolders)
-            fprintf('Image data folder #%d = %s\n', kk, imageFolders(kk).name);
-            %check that track data matches image data
-            %         if strcmp(imageFolders(kk).name(1:end-10),trackFiles(kk).name(1:end-9)) == 0
-            %             fprintf('Tracking and image data do not match');
-            %             analysisFlag = 0;
-            %         end
-            
-            % Check if folder exists
-            if exist([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','analysis*'])>0;
-                disp('Folder already analyzed..');
-                if reAnalyze ==1
-                    disp('Re-Analyzing...');
-                else
-                    disp('Moving to the next folder...');
-                    analysisFlag = 0 ;
-                end
+        processedFolders = dir([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','processed*']);
+        processedNewest = sort({processedFolders(end).name});
+        processedNewest = char(processedNewest);
+        
+        
+        
+        % load tracking and cell data
+        if analysisFlag == 1
+            trackData = load([trackFiles(kk).folder,'/',trackFiles(kk).name]);
+            cellData = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',processedNewest,'/','results.mat']);%'Motion_corrected_Data_DS_results.mat']);
+            videoData = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',processedNewest,'/','Motion_corrected_Data_DS.mat']);
+            alignment = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',processedNewest,'/','Alignment.mat']);
+            video_timesDS = alignment.out.video_times(1:5:end);
+            alignment.out.video_timesDS = video_timesDS;
+            fileName = extractBefore(imageFolders(kk).name,'_extraction'); %get filename for titles
+            if extractedFolderFlag == 1
+                dateSesh = imageFolders(kk).folder(end-15:end-10);
+            else
+                dateSesh = imageFolders(kk).folder(end-5:end);
             end
-            
-            processedFolders = dir([imageFolders(kk).folder,'/',imageFolders(kk).name,'/','processed*']);
-            processedNewest = sort({processedFolders(end).name});
-            processedNewest = char(processedNewest);
-            
-            
-            
-            % load tracking and cell data
-            if analysisFlag == 1
-                trackData = load([trackFiles(kk).folder,'/',trackFiles(kk).name]);
-                cellData = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',processedNewest,'/','results.mat']);%'Motion_corrected_Data_DS_results.mat']);
-                videoData = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',processedNewest,'/','Motion_corrected_Data_DS.mat']);
-                alignment = load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',processedNewest,'/','Alignment.mat']);
-                video_timesDS = alignment.out.video_times(1:5:end);
-                alignment.out.video_timesDS = video_timesDS;
-                fileName = extractBefore(imageFolders(kk).name,'_extraction'); %get filename for titles
-                if extractedFolderFlag == 1
-                    dateSesh = imageFolders(kk).folder(end-15:end-10);
-                else
-                    dateSesh = imageFolders(kk).folder(end-5:end);
-                end
-                batName = extractBefore(fileName,['_' dateSesh]);
-                sessionType = extractAfter(fileName,[dateSesh '_']);
-                save([imageFolders(kk).folder '/' imageFolders(kk).name '/' processedNewest '/Alignment.mat'],'video_timesDS','-append');
-                % make new analysis directory for .fig and .tif files
-                cd([imageFolders(kk).folder,'/',imageFolders(kk).name]);
-                analysis_Folder = ['analysis_',datestr(now,'yyyy_mm_dd__hhMM')];
-                mkdir(analysis_Folder);
-                disp('Analyzing!!');
-            end
+            batName = extractBefore(fileName,['_' dateSesh]);
+            sessionType = extractAfter(fileName,[dateSesh '_']);
+            save([imageFolders(kk).folder '/' imageFolders(kk).name '/' processedNewest '/Alignment.mat'],'video_timesDS','-append');
+            % make new analysis directory for .fig and .tif files
+            cd([imageFolders(kk).folder,'/',imageFolders(kk).name]);
+            analysis_Folder = ['analysis_',datestr(now,'yyyy_mm_dd__hhMM')];
+            mkdir(analysis_Folder);
+            disp('Analyzing!!');
+        end
         %end
         %         if strcmp(extractBefore(sessionType,'-'),'fly')
         %             plotFlightsFlag = 1;
@@ -191,21 +191,30 @@ for i = 1:length(subFolders)
             mkdir([analysis_Folder filesep 'flights'])
             %plot all flights in 3D
             if flightPathsAllFlag == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
-                [flightPaths] = ImBat_plotFlights(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType,'clustmanualflag',clustManualFlag);
-                %[flightPaths] = ImBat_flightsAng(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
+                %[flightPaths] = ImBat_plotFlights(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType,'clustmanualflag',clustManualFlag);
+                [flightPaths] = ImBat_flightsAng(trackData,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
                 save([imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/' fileName '_flightPaths.mat'],'flightPaths');
                 %set(findall(flightPaths.flightPathsAll,'-property','FontSize'),'FontSize',20);
                 savefig(flightPaths.flightPathsAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsAll.fig']);
                 saveas(flightPaths.flightPathsAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsAll.tif']);
+                saveas(flightPaths.flightPathsAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsAll.svg']);
                 %set(findall(flightPaths.flightPathsStartStop,'-property','FontSize'),'FontSize',20);
                 savefig(flightPaths.flightPathsStartStop,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsAllStartStop.fig']);
                 saveas(flightPaths.flightPathsStartStop, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsAllStartStop.tif']);
+                saveas(flightPaths.flightPathsStartStop, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsAllStartStop.svg']);
                 %set(findall(flightPaths.flightPathsClusterEach,'-property','FontSize'),'FontSize',20);
                 savefig(flightPaths.flightPathsClusterEach,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsClusterEach.fig']);
                 saveas(flightPaths.flightPathsClusterEach, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsClusterEach.tif']);
+                saveas(flightPaths.flightPathsClusterEach, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsClusterEach.svg']);
+                savefig(flightPaths.flightTimeline,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightTimeline.fig']);
+                saveas(flightPaths.flightTimeline, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightTimeline.tif']);
+                saveas(flightPaths.flightTimeline, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightTimeline.svg']);
+                savefig(flightPaths.clusterDistance,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_clusterDistance.fig']);
+                saveas(flightPaths.clusterDistance, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_clusterDistance.tif']);
+                saveas(flightPaths.clusterDistance, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_clusterDistance.svg']);
                 %set(findall(flightPaths.flightPathsClusterAll,'-property','FontSize'),'FontSize',20);
-                savefig(flightPaths.flightPathsClusterAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsClusterAll.fig']);
-                saveas(flightPaths.flightPathsClusterAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsClusterAll.tif']);
+                %savefig(flightPaths.flightPathsClusterAll,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsClusterAll.fig']);
+                %saveas(flightPaths.flightPathsClusterAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsClusterAll.tif']);
             end
             %plot flights to/from feeder in 3D
             if flightPathsFeederFlag == 1 && strcmp(extractBefore(sessionType,'-'),'fly')

@@ -42,12 +42,14 @@ save_data = false;                                                           %sa
 save_img = false;                                                            %save cluster image
 
 % Clustering params
-ds_clus = 6;                                                                %number of 3D-points/flight for clustering
+ds_clus = 6;                                                                %number of 3D-points/flight for clustering 
+%madeleine 25 splines, PCA+, 1m linkage
+%angelo 6 splines, PCA-, 0.7m linakge, min 5 
 pca_features = false;                                                       %if using PCA
 k_means = false;                                                            %if using k-means
 dist = 0.7;                                                                 %linkage distance
 reassign = true;                                                            %re-order clusters according to density
-N_min = 4;                                                                  %min number of flights for being a cluster
+N_min = 5;                                                                  %min number of flights for being a cluster
 
 % Flight Room references (provvisory)
 xR = +2.85; xL = -2.85; yF = 2.50;  yB = -2.50;  zT = 2.20;                 %Flight volume coordinates
@@ -165,13 +167,8 @@ end
 title(['All flights start(r)/stop(b): ' batName ' ' dateSesh ' ' sessionType]);
 % modify labels for tick marks
 view(0,90)
-xlim([-3000 3000])
-ylim([-3000 3000])
-xticks = get(gca,'xtick');
-yticks = get(gca,'ytick');
-newlabelsX = arrayfun(@(ax) sprintf('%g', ax/1000), xticks, 'un', 0);
-newlabelsY = arrayfun(@(ay) sprintf('%g', ay/1000), yticks, 'un', 0);
-set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
+xlim([-3 3])
+ylim([-3 3])
 xlabel('m'); ylabel('m');
 
 hold off
@@ -210,11 +207,11 @@ end
 if k_means
     n_clusters = 15;    idx = kmeans(X,n_clusters);
 else
-    figure();
+    plotClusterDistance = figure();
     Y = pdist(X,'euclidean');   Z = linkage(Y);
     hLines = dendrogram(Z,0);  hold on;    refline(0,dist);    hold off;
     idx = cluster(Z,'Cutoff',dist,'Criterion','distance');
-    title([num2str(length(unique(idx))) ' clusters']);
+    title([num2str(length(unique(idx))) ' clusters: ' batName ' ' dateSesh ' ' sessionType]);
     ylim([0 10]);
 end
 
@@ -295,10 +292,14 @@ for i = 1:length(flightPaths.pos(1,1,:))
         flightPaths.flight_ends_xyz(i,:) = flightPaths.pos(:,end,i);
     end
 end
-
+flightPaths.flightTimeline = plotFlightTimeline;
+flightPaths.flightPathsAll = plotFlightPathsAll;
+flightPaths.flightPathsStartStop = plotFlightPathsStartStop;
+flightPaths.clusterDistance = plotClusterDistance;
 %% Visualize
-figure();   set(gcf, 'units','normalized','outerposition',[0 0 1 1]);
+plotFlightPathsClusterEach = figure();   set(gcf, 'units','normalized','outerposition',[0 0 1 1]);
 col = hsv(n_surv_clusters);
+sgtitle(['Flight clusters: ' batName ' ' dateSesh ' ' sessionType]);
 for jj=1:n_surv_clusters;
     id = find(flightPaths.id==jj);
     
@@ -339,4 +340,32 @@ for jj=1:n_surv_clusters;
     subplot(3,n_surv_clusters,n_surv_clusters*2+jj);
     histogram(flightPaths.dur(id));
     xlim([0 15]);   xlabel('Duration(s)');  ylabel('Counts');
+end
+
+flightPaths.flightPathsClusterEach = plotFlightPathsClusterEach;
+
+%% save
+if saveFlag == 1
+    analysis_folder = [pwd '\analysis_' datestr(now,'yyyy_mm_dd__hhMM')];
+    mkdir([analysis_folder '\flights']);
+    %set(findall(plotFlightPathsAll,'-property','FontSize'),'FontSize',20);
+    saveas(plotFlightPathsAll,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.tif']);
+    savefig(plotFlightPathsAll,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.fig']);
+    saveas(plotFlightPathsAll,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.svg']);
+    %set(findall(plotFlightPathsClusterEach,'-property','FontSize'),'FontSize',20);
+    saveas(plotFlightPathsClusterEach,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.tif']);
+    savefig(plotFlightPathsClusterEach,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.fig']);
+    saveas(plotFlightPathsClusterEach,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.svg']);
+    %set(findall(plotFlightPathsClusterAll,'-property','FontSize'),'FontSize',20);
+    saveas(plotFlightPathsStartStop,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.tif']);
+    savefig(plotFlightPathsStartStop,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.fig']);
+    saveas(plotFlightPathsStartStop,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.svg']);
+    saveas(plotFlightTimeline,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.tif']);
+    savefig(plotFlightTimeline,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.fig']);
+    saveas(plotFlightTimeline,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.svg']);
+    saveas(plotClusterDistance,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.tif']);
+    savefig(plotClusterDistance,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.fig']);
+    saveas(plotClusterDistance,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.svg']);
+
+    save([analysis_folder '\' batName '_' dateSesh '_' sessionType '_flightPaths.mat'],'flightPaths')
 end

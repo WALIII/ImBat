@@ -505,7 +505,7 @@ for p = 2:snakeTrace.nClusters+1
     set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
     xlabel('time (s)'); %ylabel('cell number');
     
-    p3 = subplot(4,2*snakeTrace.nClusters,[2*snakeTrace.nClusters+(2*(p-1)),4*snakeTrace.nClusters+(2*(p-1)),6*snakeTrace.nClusters+(2*(p-1))]);
+    p3 = subplot(4,2*snakeTrace.nClusters,[2*snakeTrace.nClusters+(2*p),4*snakeTrace.nClusters+(2*p),6*snakeTrace.nClusters+(2*p)]);
     imagesc(snakeTrace.normTraceEven{p}(snakeTrace.Iodd{p},:));
     colormap(hot);
     title(['Cluster ' num2str(p) ' Even']);
