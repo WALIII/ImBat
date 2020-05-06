@@ -46,14 +46,14 @@ if loadFlag == 1
     load([pewd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
 %padding for during flight snake plot to include some time before and after flight
-prePad = 3; %number of seconds to plot before alignment point
-postPad = 5; %number of seconds to plot after alignment point
+prePad = 2; %number of seconds to plot before alignment point
+postPad = 2; %number of seconds to plot after alignment point
 prePadCalcium = prePad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postPadCalcium = postPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 prePadSpeed = prePad*120; %add 2 seconds * FS of tracking data (120)
 postPadSpeed = postPad*120;%add 6 seconds * FS of tracking data (120)
 %padding for pre and post flight snakePlots
-preFlightPad = 3; %number of seconds to include before flight starts
+preFlightPad = 5; %number of seconds to include before flight starts
 postFlightPad = 5; %of of seconds to include after flight ends
 preFlightPadCalcium = preFlightPad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postFlightPadCalcium = postFlightPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
@@ -257,9 +257,9 @@ for data_i = 1:3
         [BFlight{clust_i},IFlight{clust_i}] = sort(maxnormTraceFlight{clust_i});
         [BPre{clust_i},IPre{clust_i}] = sort(maxnormTracePre{clust_i});
         [BPost{clust_i},IPost{clust_i}] = sort(maxnormTracePost{clust_i});
-        [B1Flight{clust_i},I1Flight{clust_i}] = sort(maxnormTraceFlight{1}); %sort by cluster 1
-        [B1Pre{clust_i},I1Pre{clust_i}] = sort(maxnormTracePre{1}); %sort by cluster 1
-        [B1Post{clust_i},I1Post{clust_i}] = sort(maxnormTracePost{1}); %sort by cluster 1
+        [B1Flight{clust_i},I1Flight{clust_i}] = sort(maxnormTraceFlight{2}); %sort by cluster 2
+        [B1Pre{clust_i},I1Pre{clust_i}] = sort(maxnormTracePre{2}); %sort by cluster 2
+        [B1Post{clust_i},I1Post{clust_i}] = sort(maxnormTracePost{2}); %sort by cluster 2
         [Bodd{clust_i},Iodd{clust_i}] = sort(maxNormTraceOdd{clust_i});
         %split dataset into even and odd for comparing 2 halves
         %     normTraceOdd{clust_i} = normTraceFlight{clust_i}(1:2:end,:);
@@ -327,18 +327,18 @@ for data_i = 1:3
         end
         %sort each cell by the timing of its peak firing
         [BnormFlightAll{clust_iii},InormFlightAll{clust_iii}] = sort(maxNormFlightAll{clust_iii});
-        [B1normFlightAll{clust_iii},I1normFlightAll{clust_iii}] = sort(maxNormFlightAll{1}); %sort by cluster 1
+        [B1normFlightAll{clust_iii},I1normFlightAll{clust_iii}] = sort(maxNormFlightAll{2}); %sort by cluster 2
         [BnormPreAll{clust_iii},InormPreAll{clust_iii}] = sort(maxNormPreAll{clust_iii});
-        [B1normPreAll{clust_iii},I1normPreAll{clust_iii}] = sort(maxNormPreAll{1}); %sort by cluster 1
+        [B1normPreAll{clust_iii},I1normPreAll{clust_iii}] = sort(maxNormPreAll{2}); %sort by cluster 2
         [BnormPostAll{clust_iii},InormPostAll{clust_iii}] = sort(maxNormPostAll{clust_iii});
-        [B1normPostAll{clust_iii},I1normPostAll{clust_iii}] = sort(maxNormPostAll{1}); %sort by cluster 1
+        [B1normPostAll{clust_iii},I1normPostAll{clust_iii}] = sort(maxNormPostAll{2}); %sort by cluster 2
         
         [BnormPreClustAll{clust_iii},InormPreClustAll{clust_iii}] = sort(maxNormPreClustAll{clust_iii});
-        [B1normPreClustAll{clust_iii},I1normPreClustAll{clust_iii}] = sort(maxNormPreClustAll{1}); %sort by cluster 1
+        [B1normPreClustAll{clust_iii},I1normPreClustAll{clust_iii}] = sort(maxNormPreClustAll{2}); %sort by cluster 2
         [BnormFlightClustAll{clust_iii},InormFlightClustAll{clust_iii}] = sort(maxNormFlightClustAll{clust_iii});
-        [B1FlightClustAll{clust_iii},I1FlightClustAll{clust_iii}] = sort(maxNormFlightClustAll{1}); %sort by cluster 1
+        [B1FlightClustAll{clust_iii},I1FlightClustAll{clust_iii}] = sort(maxNormFlightClustAll{2}); %sort by cluster 2
         [BnormPostClustAll{clust_iii},InormPostClustAll{clust_iii}] = sort(maxNormPostClustAll{clust_iii});
-        [B1normPostClustAll{clust_iii},I1normPostClustAll{clust_iii}] = sort(maxNormPostClustAll{1}); %sort by cluster 1
+        [B1normPostClustAll{clust_iii},I1normPostClustAll{clust_iii}] = sort(maxNormPostClustAll{2}); %sort by cluster 2
         
         
         

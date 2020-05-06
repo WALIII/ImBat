@@ -5,7 +5,6 @@ dateSesh = [];
 sessionType = [];
 saveFlag = 0;
 loadFlag = 0;
-clustManualFlag = 0;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -42,10 +41,10 @@ save_data = false;                                                           %sa
 save_img = false;                                                            %save cluster image
 
 % Clustering params
-ds_clus = 6;                                                                %number of 3D-points/flight for clustering 
+ds_clus = 25;                                                                %number of 3D-points/flight for clustering 
 %madeleine 25 splines, PCA+, 1m linkage
 %angelo 6 splines, PCA-, 0.7m linakge, min 5 
-pca_features = false;                                                       %if using PCA
+pca_features = true;                                                       %if using PCA
 k_means = false;                                                            %if using k-means
 dist = 0.7;                                                                 %linkage distance
 reassign = true;                                                            %re-order clusters according to density
@@ -303,6 +302,10 @@ flightPaths.flightTimeline = plotFlightTimeline;
 flightPaths.flightPathsAll = plotFlightPathsAll;
 flightPaths.flightPathsStartStop = plotFlightPathsStartStop;
 flightPaths.clusterDistance = plotClusterDistance;
+flightPaths.ds_clus = ds_clus;                                                                %number of 3D-points/flight for clustering 
+flightPaths.pca_features = pca_features;                                                       %if using PCA
+flightPaths.linkDist = dist;                                                                 %linkage distance
+flightPaths.N_min = N_min;
 %% Visualize
 plotFlightPathsClusterEach = figure();   set(gcf, 'units','normalized','outerposition',[0 0 1 1]);
 col = hsv(n_surv_clusters);
