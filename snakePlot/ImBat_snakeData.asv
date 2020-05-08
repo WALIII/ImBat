@@ -258,9 +258,9 @@ for data_i = 1:3
         [BPre{clust_i},IPre{clust_i}] = sort(maxnormTracePre{clust_i});
         [BPost{clust_i},IPost{clust_i}] = sort(maxnormTracePost{clust_i});
         if clust_i == 1
-            [B1Flight{clust_i},I1Flight{clust_i}] = sort(maxnormTraceFlight{1}); %sort by cluster 1
-            [B1Pre{clust_i},I1Pre{clust_i}] = sort(maxnormTracePre{1}); %sort by cluster 1
-            [B1Post{clust_i},I1Post{clust_i}] = sort(maxnormTracePost{1}); %sort by cluster 1
+            [B1Flight{clust_i},I1Flight{clust_i}] = sort(maxnormTraceFlight{1}); %sort by cluster 2
+            [B1Pre{clust_i},I1Pre{clust_i}] = sort(maxnormTracePre{1}); %sort by cluster 2
+            [B1Post{clust_i},I1Post{clust_i}] = sort(maxnormTracePost{1}); %sort by cluster 2
         else
             [B1Flight{clust_i},I1Flight{clust_i}] = sort(maxnormTraceFlight{2}); %sort by cluster 2
             [B1Pre{clust_i},I1Pre{clust_i}] = sort(maxnormTracePre{2}); %sort by cluster 2
@@ -341,10 +341,10 @@ for data_i = 1:3
         if clust_iii == 1
             [B1normPostAll{clust_iii},I1normPostAll{clust_iii}] = sort(maxNormPostAll{1}); %sort by cluster 1
             [B1normPreAll{clust_iii},I1normPreAll{clust_iii}] = sort(maxNormPreAll{1}); %sort by cluster 1
-            [B1normFlightAll{clust_iii},I1normFlightAll{clust_iii}] = sort(maxNormFlightAll{1}); %sort by cluster 1
-            [B1normPostClustAll{clust_iii},I1normPostClustAll{clust_iii}] = sort(maxNormPostClustAll{1}); %sort by cluster 1
-            [B1normPreClustAll{clust_iii},I1normPreClustAll{clust_iii}] = sort(maxNormPreClustAll{1}); %sort by cluster 1
-            [B1FlightClustAll{clust_iii},I1FlightClustAll{clust_iii}] = sort(maxNormFlightClustAll{1}); %sort by cluster 1
+            [B1normFlightAll{clust_iii},I1normFlightAll{clust_iii}] = sort(maxNormFlightAll{1}); %sort by cluster 2
+            [B1normPostClustAll{clust_iii},I1normPostClustAll{clust_iii}] = sort(maxNormPostClustAll{1}); %sort by cluster 2
+            [B1normPreClustAll{clust_iii},I1normPreClustAll{clust_iii}] = sort(maxNormPreClustAll{1}); %sort by cluster 2
+            [B1FlightClustAll{clust_iii},I1FlightClustAll{clust_iii}] = sort(maxNormFlightClustAll{1}); %sort by cluster 2
         else
             [B1normPostAll{clust_iii},I1normPostAll{clust_iii}] = sort(maxNormPostAll{2}); %sort by cluster 2
             [B1normPreAll{clust_iii},I1normPreAll{clust_iii}] = sort(maxNormPreAll{2}); %sort by cluster 2
