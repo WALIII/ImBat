@@ -41,14 +41,14 @@ save_data = false;                                                           %sa
 save_img = false;                                                            %save cluster image
 
 % Clustering params
-ds_clus = 25;                                                                %number of 3D-points/flight for clustering 
+ds_clus = 6;                                                                %number of 3D-points/flight for clustering 
 %madeleine 25 splines, PCA+, 1m linkage
 %angelo 6 splines, PCA-, 0.7m linakge, min 5 
-pca_features = true;                                                       %if using PCA
+pca_features = false;                                                       %if using PCA
 k_means = false;                                                            %if using k-means
 dist = 0.7;                                                                 %linkage distance
 reassign = true;                                                            %re-order clusters according to density
-N_min = 5;                                                                  %min number of flights for being a cluster
+N_min = 3;                                                                  %min number of flights for being a cluster
 
 % Flight Room references (provvisory)
 xR = +2.85; xL = -2.85; yF = 2.50;  yB = -2.50;  zT = 2.20;                 %Flight volume coordinates
@@ -250,7 +250,7 @@ n_surv_clusters = size(id_surv_clusters,1);
 clear flightPaths;
 flightPaths.id = flight_sorted.id;
 flightPaths.flight_starts_idx = flight_sorted.strt_frame';
-flightPaths.flight_ends_idx = flight_sorted.stop_frame;
+flightPaths.flight_ends_idx = flight_sorted.stop_frame';
 flightPaths.pos = flight_sorted.pos;
 flightPaths.vel = flight_sorted.vel;
 flightPaths.Fs = flight_sorted.Fs;

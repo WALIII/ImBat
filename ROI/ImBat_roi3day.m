@@ -40,22 +40,10 @@ for i = 1:length(days1to3)
     batName{i} = trackDir.name(1:3);
     seshTemp = extractAfter(trackDir.name,[batName{i} '_' days1to3{i} '_']);
     sessionType{i} = extractBefore(seshTemp,'_flightPaths.mat');
-    if i == 1
-        results1 = load([flyFolders{i}.folder filesep flyFolders{i}.name filesep processedNewest filesep 'results.mat']);
-        load([flyFolders{i}.folder filesep flyFolders{i}.name filesep analysisNewest filesep trackDir.name]);
-         track1 = flightPaths;
-        video1 = load([pwd filesep days1to3{i} filesep 'Motion_corrected_Data.mat']);
-    elseif i == 2
-        results2 = load([flyFolders{i}.folder filesep flyFolders{i}.name filesep processedNewest filesep 'results.mat']);
-        load([flyFolders{i}.folder filesep flyFolders{i}.name filesep analysisNewest filesep trackDir.name]);
-        track2 = flightPaths;
-        video2 = load([pwd filesep days1to3{i} filesep 'Motion_corrected_Data.mat']);
-    elseif i ==3
-        results3 = load([flyFolders{i}.folder filesep flyFolders{i}.name filesep processedNewest filesep 'results.mat']);
-        load([flyFolders{i}.folder filesep flyFolders{i}.name filesep analysisNewest filesep trackDir.name]);
-        track3 = flightPaths; 
-        video3 = load([pwd filesep days1to3{i} filesep 'Motion_corrected_Data.mat']);
-    end
+    results(i) = load([flyFolders{i}.folder filesep flyFolders{i}.name filesep processedNewest filesep 'results.mat']);
+    track(i) = load([flyFolders{i}.folder filesep flyFolders{i}.name filesep analysisNewest filesep trackDir.name]);
+    video(i) = load([pwd filesep days1to3{i} filesep 'Motion_corrected_Data.mat']);
+    alignment(i) = load([pwd filesep days1to3{i} filesep 'Alignment.mat']);
     close all;
 end
 
@@ -66,5 +54,15 @@ end
 
 % ImBat_Dff
 scaling = 4;
+
+for i = 1:length(track)
+    for p = 1:length(track(i).flightPaths.clusterIndex{2})
+        %get imaging times of start and stop index converting from tracking to video times
+        [minValueStart(p),closestIndexStart(p)] = min(abs(alignment(i).out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(dur_i))));
+        [minValueEnd(dur_i),closestIndexEnd(dur_i)] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(dur_i))));
+        
+        frames{i}(p) = video(i).Y(:,:,track(i).flightPaths.flight
+    end
+end
 
 
