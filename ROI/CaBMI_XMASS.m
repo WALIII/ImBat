@@ -5,10 +5,11 @@ function [RGB1 RGB2] = CaBMI_XMASS(GG1,GG2,GG3,varargin);
 
 
 
-HL = [0.15 .60];
+HL = [0.0001 .9999];
 T = 1:size(GG1,2);
 F = 1:size(GG1,1);
 movie = 0;
+normalize = 1;
 
 % Manual inputs
 vin=varargin;
@@ -20,7 +21,10 @@ for i=1:length(vin)
         ri=vin{i+1};
     elseif isequal(vin{i},'hl')
         HL = vin{i+1};
+    elseif isequal(vin{i},'normalize')
+        normalize = vin{i+1};
     end
+
 end
 
 
@@ -31,9 +35,21 @@ Hlim = HL(2);
 % im1(:,:,:,2)=  (GG2 - min(GG2(:))) / (max(GG2(:)) - min(GG2(:)));
 % im1(:,:,:,3)=  (GG3 - min(GG3(:))) / (max(GG3(:)) - min(GG3(:)));
 
+if normalize ==1;
 im1(:,:,:,1)=  mat2gray(GG1);
 im1(:,:,:,2)=  mat2gray(GG2);
 im1(:,:,:,3)=  mat2gray(GG3);
+elseif normalize == 2;
+[s1 s2 s3] = size(GG1);
+
+    temp = cat(2,GG1,GG2);
+    temp2 = cat(2,temp,GG3);
+    temp2 = mat2gray(temp2);
+    
+im1(:,:,:,1)=  temp2(:,1:s2);
+im1(:,:,:,2)=  temp2(:,s2+1:s2*2);
+im1(:,:,:,3)=  temp2(:,(s2*2)+1:s2*3);
+end
 
 % Mean subtracted/Normalized
 for ii = 1:3
