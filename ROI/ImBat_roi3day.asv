@@ -54,6 +54,10 @@ frames = cell(length(track),1);
 framesCat = cell(length(track),1);
 framesCat4 = cell(length(track),1);
 framesLength =[];
+minValueStart = [];
+minValueEnd = [];
+closestIndexStart = [];
+closestIndexEnd = [];
 randInd = cell(length(track),1);
 flightNums = cell(length(track),1);
 %find min number of flights in each day to subsample later
@@ -66,32 +70,49 @@ for i = 1:length(track)
     randInd{i} = randperm(flightNumsLength(i),minFlightNums); %generate random list with minlength of flights for random selection %flightNumsLength(i));
     for p = 1:minFlightNums %for each flight within cluster #2 %length(randInd)
         %get imaging times of start and stop index converting from tracking to video times
-        [minValueStart(p),closestIndexStart(p)] = min(abs(alignment(i).video_timesDS-alignment(i).out.Location_time(track(i).flightPaths.flight_starts_idx(track(i).flightPaths.clusterIndex{i}(randInd{i}(p))))));
-        [minValueEnd(p),closestIndexEnd(p)] = min(abs(alignment(i).video_timesDS-alignment(i).out.Location_time(track(i).flightPaths.flight_ends_idx(track(i).flightPaths.flight_ends_idx{i}(randInd{i}(p))))));
-        framesLength{i}(p) = closestIndexEnd(p) - closestIndexStart(p);
-        %framesLength{i}(p) = size(frames{i}{p},3);
+        [minValueStart{i}(p),closestIndexStart{i}(p)] = min(abs(alignment(i).video_timesDS-alignment(i).out.Location_time(track(i).flightPaths.flight_starts_idx(track(i).flightPaths.clusterIndex{2}(randInd{i}(p))))));
+        [minValueEnd{i}(p),closestIndexEnd{i}(p)] = min(abs(alignment(i).video_timesDS-alignment(i).out.Location_time(track(i).flightPaths.flight_ends_idx(track(i).flightPaths.clusterIndex{2}(randInd{i}(p))))));
+        framesLength{i}(p) = closestIndexEnd{i}(p) - closestIndexStart{i}(p);
     end
-    framesMax{i} = max(framesLength{i}); %find max # frames across all flights
+    framesMax(i) = max(framesLength{i}); %find max # frames across all flights
+end
+    framesMaxAll = max(framesMax);
+for i = 1:length(track)
     frames{i} = cell(length(track(i).flightPaths.clusterIndex{2}),1); 
     for p = 1:minFlightNums %length(randInd)
-        framesDiff{i}(p) = framesMax{i} - framesLength{i}(p);
+        framesDiff{i}(p) = framesMaxAll - framesLength{i}(p);
         %add to frames vector and concatenate
-        frames{i}{p} = video(i).Y(:,:,closestIndexStart(p):(closestIndexEnd(p)+framesDiff{i}(p)));
+        frames{i}{p} = video(i).Y(:,:,closestIndexStart{i}(p):(closestIndexEnd{i}(p)+framesDiff{i}(p)));
         framesCat{i} = cat(3,framesCat{i},frames{i}{p});
         framesCat4{i} = cat(4,framesCat4{i},frames{i}{p});
         subplot(4,3,i);
-        plot3(track(i).flightPaths.pos(1,:,randInd{i}(p)),track(i).flightPaths.pos(2,:,randInd{i}(p)),track(i).flightPaths.pos(3,:,randInd{i}(p)));
+        plot3(track(i).flightPaths.pos(1,:,track(i).flightPaths.clusterIndex{2}(randInd{i}(p))),track(i).flightPaths.pos(2,:,track(i).flightPaths.clusterIndex{2}(randInd{i}(p))),track(i).flightPaths.pos(3,:,track(i).flightPaths.clusterIndex{2}(randInd{i}(p))));
         hold on;
     end
+    framesCat4_mean{i} = mean(framesCat4{i},4);
+    %make gaussian filter based on normcorre function
+    gSig = 2; 
+    gSiz = 5*gSig; 
+    psf = fspecial('gaussian', round(2*gSiz), gSig);
+    ind_nonzero = (psf(:)>=max(psf(:,1)));
+    psf = psf-mean(psf(ind_nonzero));
+    psf(~ind_nonzero) = 0;   % only use pixels within the center disk
     % Filter movie for max projection
-    framesCat_conv{i} = (convn(framesCat{i}, single(reshape([1 1 1] /10, 1, 1, [])), 'same'));
-    % Take median of movie
-    framesCat_med{i} = median(framesCat_conv{i},3);
-    % Subtract median
-    framesCat_medNorm{i} = framesCat_conv{i}-framesCat_med{i};
+    framesCat_conv{i} = imfilter(framesCat{i},psf,'symmetric');
+    framesCat4_conv{i} = imfilter(framesCat4_mean{i},psf,'symmetric');
+    
+%     framesCat_conv{i} = (convn(framesCat{i}, single(reshape([1 1 1] /10, 1, 1, [])), 'same'));
+     % Take median of movie
+     framesCat_med{i} = median(framesCat_conv{i},3);
+     framesCat4_med{i} = median(framesCat4_conv{i},3);
+     % Subtract median
+     framesCat_medNorm{i} = framesCat_conv{i}-framesCat_med{i};
+     framesCat4_medNorm{i} = framesCat4_conv{i}-framesCat4_med{i};
     % take max
     Ymax{i} = max(framesCat_medNorm{i},[],3);
     Ymax{i} = imresize(Ymax{i},scaling);
+    framesCat4_Ymax{i} = max(framesCat4_medNorm{i},[],3);
+    framesCat4_Ymax{i} = imresize(framesCat4_medNorm{i},scaling);
     
     subplot(4,3,3+i)
     imagesc(Ymax{i});
@@ -102,15 +123,17 @@ for i = 1:length(track)
     
     %filter movie for PNR
     [metadata] = ImBat_defaults;
-    [Cn{i}, PNR{i}, PNR_mov{i}] = ImBat_correlation_image(framesCat{i},metadata);
+    [Cn{i}, PNR{i}, PNR_mov{i}] = ImBat_correlation_image(framesCat_medNorm{i},metadata);
+    [Cn4{i}, PNR4{i}, PNR_mov4{i}] = ImBat_correlation_image(framesCat4_mean{i},metadata);
     subplot(4,3,i+6)
-    imagesc(PNR{i});
+    imagesc(framesCat4_Ymax{i});
     colormap('gray');
     set(gca,'YDir','normal');
     hold on;
     title(['PNR ' batName{i} ' ' days1to3{i} ' ' sessionType{i}]);
     
 end
+%% align and overlay
 %align all 3 days
 [Ymax_aligned{1},Ymax_aligned{2},Ymax_aligned{3}] = ImBat_imageAlign(Ymax{1},Ymax{2},Ymax{3});
 [PNR_aligned{1},PNR_aligned{2},PNR_aligned{3}] = ImBat_imageAlign(PNR{1},PNR{2},PNR{3});
@@ -144,6 +167,7 @@ framesData.frames = frames;
 framesData.framesCat = framesCat;
 framesData.framesCat4 = framesCat4;
 framesData.Ymax = Ymax; 
+framesData.framesCat4_Ymax = framesCat4_Ymax;
 framesData.randInd = randInd;
 framesData.flightNums = flightNums;
 framesData.Ymax_aligned = Ymax_aligned;
@@ -154,7 +178,9 @@ framesData.RGB_PNR1 = RGB_PNR1;
 framesData.Cn = Cn;
 framesData.PNR = PNR;
 framesData.PNR_mov = PNR_mov;
-
+framesData.Cn4 = Cn4;
+framesData.PNR4 = PNR4;
+framesData.PNR_mov4 = PNR_mov4;
 
 
 
