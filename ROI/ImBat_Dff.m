@@ -6,6 +6,9 @@ sessionType = [];
 loadFlag = 0;
 plotting = 0;
 
+filt_rad = 1;
+filt_alpha = 1;
+
 % User inputs overrides
 nparams=length(varargin);
 for i=1:2:nparams
@@ -20,8 +23,16 @@ for i=1:2:nparams
             sessionType = varargin{i+1};
         case 'loadflag'
             loadFlag = varargin{i+1};
+        case 'filt_rad'
+            filt_rad = varargin{i+1};
+            filt_alpha = filt_rad;        
     end
 end
+
+% filtering
+h=fspecial('gaussian',filt_rad,filt_alpha);
+Y=imfilter(Y,h,'circular');
+
 
 % ImBat_Dff
 scaling = 8;
