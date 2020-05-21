@@ -3,6 +3,8 @@ function [Ymax, Y, maxFig] = ImBat_Dff(Y,varargin);
 batName = [];
 dateSesh = [];
 sessionType = [];
+filt_rad = 1;
+filt_alpha = 1;
 loadFlag = 0;
 
 % User inputs overrides
@@ -15,8 +17,11 @@ for i=1:2:nparams
             dateSesh = varargin{i+1};
         case 'sessiontype'
             sessionType = varargin{i+1};
-                    case 'loadflag'
+        case 'loadflag'
             loadFlag = varargin{i+1};
+        case 'filt_rad'
+            filt_rad = varargin{i+1};
+            filt_alpha = filt_rad;        
     end
 end
 
@@ -36,7 +41,9 @@ end
 % Make df/f image
 
 % Filter movie
-
+% filtering
+h=fspecial('gaussian',filt_rad,filt_alpha);
+Y=imfilter(Y,h,'circular');
 Y = (convn(Y, single(reshape([1 1 1] /10, 1, 1, [])), 'same'));
 
 % Take median of movie
