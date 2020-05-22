@@ -190,7 +190,7 @@ for i = 1:length(subFolders);
             disp('extracting ROIs...')
             nam = './Motion_corrected_Data.mat'
             try
-                CNMFe_extract2(nam,'metadata',metadata);
+                CNMFe_extract3(nam,'metadata',metadata);
             catch
             end
 
