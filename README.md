@@ -10,7 +10,8 @@ Handling functions for wireless miniscope data
 
     ## Walkthrough for manual extraction and alignment
 
-    1. Extract .mov file:
+    1. Extract .mov files. This must be run on a mac computer
+
 
   ```
     >>  FS_AV_Parse_Batch
