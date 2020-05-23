@@ -281,7 +281,7 @@ r = corrcoef(neuron.C');   imagesc(r); colorbar;
 %% -------------Save Data----------------
 
 
-results = neuron_4.obj2struct();
+results = neuron.obj2struct();
 results.metadata = metadata;
 save('results.mat','results');
 
