@@ -24,14 +24,14 @@ function ImBat_START(varargin)
 
 
 % Default extraction Params
-ROI_flag = 0; % run ROI extraction
+ROI_flag = 1; % run ROI extraction
 ROI_flag_reset = 0;
 reROI_extract = 0; %rerun ROI extraction
 
 Analysis_flag = 1; % run basic ROI analysis...
 extract  = 1; % extract the basic ROI timeseries
 reExtract = 1; % re-extract, in the event that things have been extracted already.
-extract_track = 0;
+extract_track = 1;
 Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
 Bat_Cluster =1; % extract the bat_cluster tracking
 
