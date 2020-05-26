@@ -174,10 +174,13 @@ subplot(133);   imagesc(Cn.*PNR, [0,max(PNR(:))*0.98]); colorbar;
 axis equal off tight;   title('Cn*PNR');
 
 % save PNR and correlation images as tiff
+
+% save PNR and correlation images as tiff
 options.overwrite = true;
-movie_name = cell2mat(extractBetween(nam,pwd,".tif"));  movie_name = movie_name(2:end);
-saveastiff(uint16(PNR),['PNR_',movie_name,'.tif'],options);
-saveastiff(uint8(Cn*255),['Cn_',movie_name,'.tif'],options);
+mkdir('ROI_Images');
+saveastiff(uint16(PNR),'ROI_Images/PNR.tif',options);
+saveastiff(uint8(Cn*255),'ROI_Images/Cn.tif',options);
+
 
 %% estimate the background components
 neuron.update_background_parallel(use_parallel);
