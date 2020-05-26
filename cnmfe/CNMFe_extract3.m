@@ -17,7 +17,28 @@ nam = neuron.select_data(nam);         %if nam is [], then select data interacti
 else
     nam = neuron.select_data;         %if nam is [], then select data interactively
 end
+
 %% parameters
+
+% % Pass  Manual inputs
+vin=varargin;
+for i=1:length(vin)
+    if isequal(vin{i},'roi') % manually inputing a sort order
+        ROI_flag=vin{i+1};
+    elseif isequal(vin{i},'place');
+        analysis_flag = vin{i+1};
+      elseif isequal(vin{i},'metadata');  % pass along metadata.cnmfe.file if need be...
+          metadata = vin{i+1};
+          disp('Loading in metadata.cnmfe...')
+    elseif isequal(vin{i},'rextract');
+        reExtract=vin{i+1};
+    end
+end
+
+
+
+
+
 % -------------------------    COMPUTATION    -------------------------  %
 pars_envs = struct('memory_size_to_use', 20, ...  % GB, memory space you allow to use in MATLAB
     'memory_size_per_patch', 20, ...              % GB, space for loading data within one patch
