@@ -148,7 +148,7 @@ neuron.updateParams('gSig', metadata.cnmfe.gSig, ...       % -------- spatial --
     'bd', bd, ...
     'noise_method','logmexp',...
     'center_psf', center_psf);
-neuron.Fs = Fs;
+neuron.Fs = metadata.cnmfe.Fs;
 
 %% distribute data and be ready to run source extraction
 neuron.getReady(pars_envs);
