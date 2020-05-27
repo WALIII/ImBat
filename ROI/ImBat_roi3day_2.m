@@ -170,26 +170,34 @@ end
 [Ymax_aligned{1},Ymax_aligned{2},Ymax_aligned{3}] = ImBat_imageAlign(Ymax3_resize{1},Ymax3_resize{2},Ymax3_resize{3});
 [PNR_aligned{1},PNR_aligned{2},PNR_aligned{3}] = ImBat_imageAlign(PNR_mean{1},PNR_mean{2},PNR_mean{3});
 %change into RGB and overlay colors
-[RGB1,RGB2] = CaBMI_XMASS(Ymax3_resize{1},Ymax3_resize{2},Ymax3_resize{3},'normalize',2,'hl',[0.2,0.6]);
-[RGB3,RGB4] = CaBMI_XMASS(Ymax_aligned{1},Ymax_aligned{2},Ymax_aligned{3},'normalize',2,'hl',[0.2,0.6]);
-[RGB_PNR1,RGB_PNR2] = CaBMI_XMASS(PNR_aligned{1},PNR_aligned{2},PNR_aligned{3},'normalize',2,'hl',[0.2,0.6]);
+[RGB1,RGB2] = CaBMI_XMASS(Ymax3_resize{1},Ymax3_resize{2},Ymax3_resize{3},'normalize',2,'hl',[0.05,0.6]);
+[RGB3,RGB4] = CaBMI_XMASS(Ymax_aligned{1},Ymax_aligned{2},Ymax_aligned{3},'normalize',2,'hl',[0.05,0.6]);
+[RGB_PNR1,RGB_PNR2] = CaBMI_XMASS(PNR_aligned{1},PNR_aligned{2},PNR_aligned{3},'normalize',2,'hl',[0.05,0.6]);
 
-%RGB of nonaligned max projections
+%RGB of nonaligned max projections 
 subplot(5,3,13)
 image((RGB1(:,:,:)));
 set(gca,'YDir','normal');
 title([batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
+colorbar;
 %RGB of aligned max projections
 subplot(5,3,14)
 image((RGB3(:,:,:)));
 set(gca,'YDir','normal');
 title(['Aligned ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
+colorbar;
 %RGB of aligned PNR
 subplot(5,3,15)
 image((RGB_PNR1(:,:,:)));
 set(gca,'YDir','normal');
 title(['Aligned PNR ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
+colorbar;
 
+
+%% time plots
+filt2use = 5;
+exp2use = 2;
+[im1_rgb norm_max_proj,I,idx_img] = CABMI_allpxs(Y,'filt_rad',filt2use,'exp',exp2use);
 %% add to final data structure
 
 framesData.framesLength = framesLength;
