@@ -41,7 +41,7 @@ for p = 2:snakeTrace.nClusters + 1
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        %ylabel('cell number');
+        %ylabel('ROI number');
         ylabel('pre-flight');
     %else
         %set(gca,'yticklabel',{[]},'xticklabel',{[]});
@@ -72,7 +72,7 @@ for p = 2:snakeTrace.nClusters + 1
     imagesc(snakeTrace.normMeanTraceEachFlight{p},[0.5 5.5]);
     colormap(hot);
     if p == 1
-        %ylabel('cell number');
+        %ylabel('ROI number');
         ylabel('during flight');
     %else
         %set(gca,'yticklabel',{[]});
@@ -104,7 +104,7 @@ for p = 2:snakeTrace.nClusters + 1
     imagesc(snakeTrace.normMeanTraceEachPost{p},[0.5 5.5]);
     colormap(hot);
     if p == 1
-        %ylabel('cell number');
+        %ylabel('ROI number');
         ylabel('post-flight');
     %else
         %set(gca,'yticklabel',{[]});
@@ -175,7 +175,7 @@ for p = 2:snakeTrace.nClusters+1
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
    %else
         %set(gca,'yticklabel',{[]});
     end
@@ -190,7 +190,7 @@ end
 snakePlot_prefAll = figure();
 imagesc(snakeTrace.normMeanTraceSortFlight);
 colormap(hot);
-ylabel('cell number');
+ylabel('ROI number');
 set(gca,'yticklabel',{[]});
 title(['Spatial selectivity sort by flight preference: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
 xt = get(gca, 'XTick');
@@ -222,7 +222,7 @@ for p = 2:snakeTrace.nClusters+1
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
    %else
         %set(gca,'yticklabel',{[]});
     end
@@ -252,7 +252,7 @@ for p = 2:snakeTrace.nClusters+1
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
    %else
         %set(gca,'yticklabel',{[]});
     end
@@ -283,7 +283,7 @@ for p = 2:snakeTrace.nClusters+1
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
    %else
         %set(gca,'yticklabel',{[]});
     end
@@ -321,7 +321,7 @@ for p = 2:snakeTrace.nClusters+1
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
    %else
         %set(gca,'yticklabel',{[]});
     end
@@ -351,7 +351,7 @@ for p = 2:snakeTrace.nClusters+1
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
    %else
         %set(gca,'yticklabel',{[]});
     end
@@ -381,7 +381,7 @@ for p = 2:snakeTrace.nClusters+1
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
    %else
         %set(gca,'yticklabel',{[]});
     end
@@ -419,7 +419,7 @@ for p = 2:snakeTrace.nClusters+1
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
     else
         set(gca,'yticklabel',{[]});
     end
@@ -457,7 +457,7 @@ for p = 2:snakeTrace.nClusters+1
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
     else
         set(gca,'yticklabel',{[]});
     end
@@ -496,14 +496,14 @@ for p = 2:snakeTrace.nClusters+1
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
     else
         set(gca,'yticklabel',{[]});
     end
     title(['Cluster ' num2str(p) ' Odd']);
     xt = get(gca, 'XTick');
     set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
-    xlabel('time (s)'); %ylabel('cell number');
+    xlabel('time (s)'); %ylabel('ROI number');
     
     p3 = subplot(4,2*snakeTrace.nClusters,[2*snakeTrace.nClusters+(2*(p-1)),4*snakeTrace.nClusters+(2*(p-1)),6*snakeTrace.nClusters+(2*(p-1))]);
     imagesc(snakeTrace.normTraceEven{p}(snakeTrace.Iodd{p},:));
@@ -511,7 +511,7 @@ for p = 2:snakeTrace.nClusters+1
     title(['Cluster ' num2str(p) ' Even']);
     xt = get(gca, 'XTick');
     set(gca,'XTick',xt,'XTickLabel',round(xt/6,1),'yticklabel',{[]});
-    xlabel('time (s)'); %ylabel('cell number');
+    xlabel('time (s)'); %ylabel('ROI number');
     sgtitle(['Spatial selectivity Odd (sorted) vs Even Trials: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
 end
 
@@ -543,7 +543,7 @@ title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
     else
         set(gca,'yticklabel',{[]});
     end
@@ -581,7 +581,7 @@ title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{
     colormap(hot);
     %make labels for first left plot only
     if p == 1
-        ylabel('cell number');
+        ylabel('ROI number');
     else
         set(gca,'yticklabel',{[]});
     end

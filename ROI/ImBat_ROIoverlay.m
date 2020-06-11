@@ -7,7 +7,7 @@ centroidFlag = 1;
 binaryMaskFlag = 1;
 roiHeatFlag = 1;
 roiHeatFlagIndiv = 0;
-scaling = 4; %depends on size of frame and downsampling from extraction step
+scaling = 5; %depends on size of frame and downsampling from extraction step
 topROILocal = topROI * 0.01; %look at first x% of ROIs
 
 batName = [];

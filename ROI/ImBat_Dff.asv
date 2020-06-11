@@ -3,13 +3,9 @@ function [Ymax, Y, maxFig] = ImBat_Dff(Y,varargin);
 batName = [];
 dateSesh = [];
 sessionType = [];
+filt_rad = 1;
+filt_alpha = 1;
 loadFlag = 0;
-% ImBat_Dff
-scaling = 10;
-minLimMult = 3; %min limit multiplier for max projections
-maxLimMult = 0.6; %max limit multiplier for max projections
-filt_rad = 10;
-filt_alpha = 4;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -29,7 +25,10 @@ for i=1:2:nparams
     end
 end
 
-
+% ImBat_Dff
+scaling = 4;
+minLimMult = 3; %min limit multiplier for max projections
+maxLimMult = 0.6; %max limit multiplier for max projections
 
 
 %labels for loading and saving data if running independent fromImBat_analyze
@@ -50,8 +49,8 @@ end
 % Y=imfilter(Y,h,'circular');
 % Y = (convn(Y, single(reshape([1 1 1] /10, 1, 1, [])), 'same'));
  %make gaussian filter based on normcorre function
-    gSig = 1; 
-    gSiz = 7*gSig; 
+    gSig = 2; 
+    gSiz = 5*gSig; 
     psf = fspecial('gaussian', round(2*gSiz), gSig);
     ind_nonzero = (psf(:)>=max(psf(:,1)));
     psf = psf-mean(psf(ind_nonzero));
@@ -69,7 +68,7 @@ Ymax = max(Y,[],3);
 Ymax = imresize(Ymax,scaling);
 maxFig = figure();
 colormap(gray);
-imagesc(Ymax,[min(min(Ymax))*minLimMult max(max(Ymax))*maxLimMult]);
+imagesc(Ymax,[min(min(Ymax))*minLimMult max(max(movFull_Ymax{i}))*maxLimMult]);
 set(gca,'YDir','normal');
 hold on;
 %xticks = get(gca,'xtick');

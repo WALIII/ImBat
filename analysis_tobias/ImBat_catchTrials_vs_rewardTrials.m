@@ -1,7 +1,7 @@
 
 fs = 120;
 batName = 'Gen';
-dateSesh = '200528';
+dateSesh = '200530';
 sessionType = 'fly-1';
 [rewardR,rewardLT,rewardUT] = risetime(out.RewardVector);
 rewardYes_idx = find(bhv_data.trials(:,9)==1);

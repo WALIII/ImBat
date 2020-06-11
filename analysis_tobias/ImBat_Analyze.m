@@ -34,7 +34,7 @@ clustManualFlag = 0;
 flightPathsFeederFlag = 0;
 plotFlightvsCellsFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 1;
+plotPlaceCellsFlag = 0;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 %align max projections of specific flights across trajectories
@@ -236,7 +236,7 @@ for i = 1:length(subFolders)
             end
             % plot flights over traces
             if plotFlightvsCellsFlag == 1
-                load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',analysis_Folder,'/',fileName '_flightPaths.mat']);
+                %load([imageFolders(kk).folder,'/',imageFolders(kk).name,'/',analysis_Folder,'/',fileName '_flightPaths.mat']);
                 [flightVsVelocity,smoothAvgSpiking,smoothVelocity] = ImBat_plotFlightsVsCells(cellData,alignment,flightPaths,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
                 save([imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/' fileName '_flightPaths.mat'],'smoothVelocity','smoothAvgSpiking','-append');
                 %set(findall(flightVsVelocity,'-property','FontSize'),'FontSize',20);

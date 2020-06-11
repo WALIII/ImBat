@@ -48,7 +48,7 @@ for i = 1:length(days1to3)
     close all;
 end
 %% concatenate, filter, max project, and mean 
-figure();
+figure('units','normalized','outerposition',[0 0 0.85 0.85]);
 sgtitle([batName{1} ': cluster 2']);
 scaling = 4; %scaling for resizing the pixel/frame
 %initialize frame vectors for video chunks
@@ -127,7 +127,7 @@ for i = 1:length(track)
         [Cn4{i}(:,:,p), PNR4{i}(:,:,p), PNR_mov4{i}(:,:,:,p)] = ImBat_correlation_image(framesCat4{i}(:,:,:,p),metadata);      
         
         % plot flights
-        subplot(7,3,i);
+        subplot(6,5,i);
         plot3(track(i).flightPaths.pos(1,:,track(i).flightPaths.clusterIndex{2}(randInd{i}(p))),track(i).flightPaths.pos(2,:,track(i).flightPaths.clusterIndex{2}(randInd{i}(p))),track(i).flightPaths.pos(3,:,track(i).flightPaths.clusterIndex{2}(randInd{i}(p))));
         hold on;
     end
@@ -150,79 +150,103 @@ for i = 1:length(track)
     filt2use = 5;
     exp2use = 2;
     [im1_rgb{i} norm_max_proj{i},I{i},idx_img{i}] = CABMI_allpxs(framesCat4_mean{i},'filt_rad',filt2use,'exp',exp2use);
-    subplot(7,3,i+15)
+    subplot(6,5,25+i)
     imagesc(I{i});
     set(gca,'YDir','normal');
-    colorbar;
+    %colorbar;
     title(['Across time ' batName{i} ' ' days1to3{i} ' ' sessionType{1}]);
 
 %% max projection plots
     %full day max projection
-    subplot(7,3,3+i)
+    subplot(6,5,5+i)
     imagesc(movFull_Ymax{i},[min(min(movFull_Ymax{1}))*minLimMult max(max(movFull_Ymax{i}))*maxLimMult]);
     colormap('gray');
     set(gca,'YDir','normal');
     hold on;
     title(['Max Full Day ' batName{i} ' ' days1to3{i} ' ' sessionType{i}]);
-    colorbar;
+    %colorbar;
     
-    %max projection with data filter>max project>mean
-    subplot(7,3,6+i)
-    imagesc(Ymax_mean{i},[min(min(Ymax_mean{1}))*minLimMult max(max(Ymax_mean{1}))*maxLimMult]);%[0.75 1.9]);
-    colormap('gray');
-    set(gca,'YDir','normal');
-    hold on;
-    title(['Max(mean) ' batName{i} ' ' days1to3{i} ' ' sessionType{i}]);
-    colorbar;
-    
-    %PNR data PNR>mean
-    subplot(7,3,9+i)
-    %imagesc(framesCat4_Ymax{i});
-    imagesc(PNR_mean{i},[min(min(PNR_mean{1}))*minLimMult max(max(PNR_mean{1}))*maxLimMult]);
-    colormap('gray');
-    set(gca,'YDir','normal');
-    hold on;
-    title(['PNR ' batName{i} ' ' days1to3{i} ' ' sessionType{1}]);
-    colorbar;
-    
-    %max projection with data concat>filter>maxProject
-    subplot(7,3,12+i)
+    %max projection with data concat>filter>maxProject max(max)
+    subplot(6,5,10+i)
     %imagesc(framesCat4_Ymax{i});
     imagesc(Ymax3_resize{i},[min(min(Ymax3_resize{1}))*minLimMult max(max(Ymax3_resize{1}))*maxLimMult]);
     colormap('gray');
     set(gca,'YDir','normal');
     hold on;
     title(['Max(max) ' batName{i} ' ' days1to3{i} ' ' sessionType{i}]);
-    colorbar;
+    %colorbar;
     hold off;
+    
+    %max projection with data filter>max project>mean max(mean)
+    subplot(6,5,15+i)
+    imagesc(Ymax_mean{i},[min(min(Ymax_mean{1}))*minLimMult max(max(Ymax_mean{1}))*maxLimMult]);%[0.75 1.9]);
+    colormap('gray');
+    set(gca,'YDir','normal');
+    hold on;
+    title(['Max(mean) ' batName{i} ' ' days1to3{i} ' ' sessionType{i}]);
+    %colorbar;
+    
+    %PNR data PNR>mean
+    subplot(6,5,20+i)
+    %imagesc(framesCat4_Ymax{i});
+    imagesc(PNR_mean{i},[min(min(PNR_mean{1}))*minLimMult max(max(PNR_mean{1}))*maxLimMult]);
+    colormap('gray');
+    set(gca,'YDir','normal');
+    hold on;
+    title(['PNR ' batName{i} ' ' days1to3{i} ' ' sessionType{1}]);
+    %colorbar;
+   
 end
 %% align and overlay 3 days
 %align all 3 days
-[Ymax_aligned{1},Ymax_aligned{2},Ymax_aligned{3}] = ImBat_imageAlign(Ymax3_resize{1},Ymax3_resize{2},Ymax3_resize{3});
-[PNR_aligned{1},PNR_aligned{2},PNR_aligned{3}] = ImBat_imageAlign(PNR_mean{1},PNR_mean{2},PNR_mean{3});
+[Ymax_aligned{1},Ymax_aligned{2},Ymax_aligned{3}] = ImBat_imageAlign(Ymax3_resize{1},Ymax3_resize{2},Ymax3_resize{3}); %max(max)
+[PNR_aligned{1},PNR_aligned{2},PNR_aligned{3}] = ImBat_imageAlign(PNR_mean{1},PNR_mean{2},PNR_mean{3}); %max(PNR)
+[YmaxFull_aligned{1},YmaxFull_aligned{2},YmaxFull_aligned{3}] = ImBat_imageAlign(movFull_Ymax{1},movFull_Ymax{2},movFull_Ymax{3}); %max(max)
 %change into RGB and overlay colors
-[RGB1,RGB2] = CaBMI_XMASS(Ymax3_resize{1},Ymax3_resize{2},Ymax3_resize{3},'normalize',2,'hl',[0.05,0.6]);
-[RGB3,RGB4] = CaBMI_XMASS(Ymax_aligned{1},Ymax_aligned{2},Ymax_aligned{3},'normalize',2,'hl',[0.05,0.6]);
-[RGB_PNR1,RGB_PNR2] = CaBMI_XMASS(PNR_aligned{1},PNR_aligned{2},PNR_aligned{3},'normalize',2,'hl',[0.05,0.6]);
+[RGB_Ymax1,RGB_Ymax2] = CaBMI_XMASS(Ymax3_resize{1},Ymax3_resize{2},Ymax3_resize{3},'normalize',2,'hl',[0.05,0.6]);
+[RGB_YmaxAligned1,RGB_YmaxAligned2] = CaBMI_XMASS(Ymax_aligned{1},Ymax_aligned{2},Ymax_aligned{3},'normalize',2,'hl',[0.05,0.6]);
+[RGB_PNR1,RGB_PNR2] = CaBMI_XMASS(PNR_mean{1},PNR_mean{2},PNR_mean{3},'normalize',2,'hl',[0.05,0.6]);
+[RGB_PNRAligned1,RGB_PNRAligned2] = CaBMI_XMASS(PNR_aligned{1},PNR_aligned{2},PNR_aligned{3},'normalize',2,'hl',[0.05,0.6]);
+[RGB_full1,RGB_full2] = CaBMI_XMASS(movFull_Ymax{1},movFull_Ymax{2},movFull_Ymax{3},'normalize',2,'hl',[0.05,0.6]);
+[RGB_fullAlign1,RGB_fullAlign2] = CaBMI_XMASS(YmaxFull_aligned{1},YmaxFull_aligned{2},YmaxFull_aligned{3},'normalize',2,'hl',[0.05,0.6]);
+
+%RGB of full video max projection
+subplot(6,5,9)
+image((RGB_full1(:,:,:)));
+set(gca,'YDir','normal');
+title(['Full max(max) ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]); 
+%colorbar;
+%RGB of full video max projection aligned
+subplot(6,5,10)
+image((RGB_fullAlign1(:,:,:)));
+set(gca,'YDir','normal');
+title(['Full aligned ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]); 
+%colorbar;
 
 %RGB of nonaligned max projections 
-subplot(7,3,19)
-image((RGB1(:,:,:)));
+subplot(6,5,14)
+image((RGB_Ymax1(:,:,:)));
 set(gca,'YDir','normal');
 title(['Max(max) ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
-colorbar;
+%colorbar;
 %RGB of aligned max projections
-subplot(7,3,20)
-image((RGB3(:,:,:)));
+subplot(6,5,15)
+image((RGB_YmaxAligned1(:,:,:)));
 set(gca,'YDir','normal');
 title(['Aligned Max(max) ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
-colorbar;
-%RGB of aligned PNR
-subplot(7,3,21)
-image((RGB_PNR1(:,:,:)));
+
+%RGB of nonaligned PNR
+subplot(6,5,24)
+image((RGB_PNRAligned1(:,:,:)));
 set(gca,'YDir','normal');
 title(['Aligned PNR ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
-colorbar;
+%colorbar;
+%RGB of aligned PNR
+subplot(6,5,25)
+image((RGB_PNRAligned1(:,:,:)));
+set(gca,'YDir','normal');
+title(['Aligned PNR ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
+%colorbar;
 
 
 %% add to final data structure
@@ -238,9 +262,9 @@ framesData.randInd = randInd;
 framesData.flightNums = flightNums;
 framesData.Ymax_aligned = Ymax_aligned;
 framesData.PNR_aligned = PNR_aligned;
-framesData.RGB1 = RGB1;
-framesData.RGB3 = RGB3;
-framesData.RGB_PNR1 = RGB_PNR1;
+framesData.RGB1 = RGB_Ymax1;
+framesData.RGB3 = RGB_YmaxAligned1;
+framesData.RGB_PNR1 = RGB_PNRAligned1;
 %framesData.Cn = Cn;
 %framesData.PNR = PNR;
 %framesData.PNR_mov = PNR_mov;

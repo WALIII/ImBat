@@ -76,7 +76,6 @@ smoothVelocity = zscore(smooth(flightPaths.batSpeed,100));
     end 
     sgtitle(['Velocity vs Cell Activity: ' batName ' ' dateSesh ' ' sessionType])
     ylabel(['z-score dff: ' num2str(length(cellData.results.C(:,1))) ' ROIs'])
-    xlabel('Time (s)')
     set(gca,'yticklabel',[]);
     xlim([0 alignment.out.video_timesDS(end)])%xlim([0 alignment.out.video_timesDS(end)])
     
@@ -95,9 +94,8 @@ smoothVelocity = zscore(smooth(flightPaths.batSpeed,100));
     end
     ylim([0 max(smoothAvgSpiking)+0.3])
     xlim([0 alignment.out.video_timesDS(end)])%xlim([0 alignment.out.video_timesDS(end)])
-    %title('Avg Cell Response')
-    ylabel('Avg dff')
-    set(gca,'xticklabel',{[]})
+    title('Avg Cell Response')
+    ylabel('z-score dff')
     
     %plot the smoothed z-scored velocity of bat & reward vector
     [rewardR,rewardLT,rewardUT] = risetime(alignment.out.RewardVector);
@@ -109,15 +107,14 @@ smoothVelocity = zscore(smooth(flightPaths.batSpeed,100));
        plot(((alignment.out.Location_time(1)*120)+rewardLT(ii))/120,max(smoothVelocity),'ob');
        hold on
        lh = legend('velocity','reward','Location','east')
-       set(lh,'position',[.86 .925 .03 .03])
+       set(lh,'position',[.85 .9 .05 .05])
     end
-    %title('Velocity')
+    title('Velocity')
     ylim([-1 8])
     xlim([0 alignment.out.video_timesDS(end)])
     %xlabel('Time (s)')
-    ylabel('v (m/s)')
-    set(gca,'xticklabel',{[]})
-
+    ylabel('z-score velocity')
+    
     linkaxes([a1, a2, a3], 'x');
     if saveFlag == 1
         saveas(flightVsVelocity, [pwd '\' analysis_Folder '\flights\' label '_flightVsVelocity_handPicked.svg']);
