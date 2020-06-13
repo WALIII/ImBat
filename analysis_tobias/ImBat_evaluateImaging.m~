@@ -1,0 +1,43 @@
+dirBat = dir('G*');
+goodlist = strings(length(dirBat),1);
+badlist = strings(length(dirBat),1);
+
+for i = 1:length(dirBat)
+   cd(dirBat(i).name);
+   dirSession = dir('*fly-*extraction');
+   goodlist(i) = char.empty;
+   badlist(i) = char.empty;
+   for ii = 1:length(dirSession)
+        cd(dirSession(ii).name);
+        try
+        dirAnalysis = dir('analysis*');
+        analysisNewest = sort({dirAnalysis(end).name});
+        analysisNewest = char(analysisNewest);
+        %cd(analysisNewest);
+        try
+        uiopen([dirAnalysis(1).folder filesep analysisNewest filesep 'flights' filesep '*_flightVsVelocity.fig']);
+        catch
+            disp(['No cell data ' dirBat(i).name])
+        end
+        try
+            uiopen([dirAnalysis(1).folder filesep analysisNewest filesep 'ROI' filesep '*_maxProjectROI.fig']);
+        catch
+            disp(['No ROI data' dirBat(i).name])
+        end
+        prompt = 'Is the imaging data good quality?';
+        x = input(prompt)
+        if x == 1
+            goodlist(i,ii) = dirSession(i).name; 
+            badlist(i,ii) = [];
+        else
+            badlist(i,ii) = dirSession(i).name;
+            goodlist(i,ii) = [];
+        end
+        catch
+        end
+        close all;
+        cd('../');
+        
+   end
+   cd('../');
+end
