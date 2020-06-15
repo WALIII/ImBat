@@ -250,7 +250,7 @@ neuron_4 = neuron.copy();
 
 %% Last merging
 %Merge neurons
-neuron.updateParams('merge_thr', 0.60,'dmin', 0.7*metadata.cnmfe.gSiz);
+neuron.updateParams('merge_thr', 0.65,'dmin', 3*metadata.cnmfe.gSiz);
 neuron.merge_neurons_dist_corr(false);  %(..., temporal correlation, min distance)
 
 neuron.compactSpatial();
