@@ -6,10 +6,12 @@ sessionType = [];
 loadFlag = 0;
 % ImBat_Dff
 scaling = 10;
-minLimMult = 3; %min limit multiplier for max projections
-maxLimMult = 0.6; %max limit multiplier for max projections
-filt_rad = 10;
-filt_alpha = 4;
+minLimMult = 5; %min limit multiplier for max projections
+maxLimMult = 20; %max limit multiplier for max projections
+%filt_rad = 10;
+%filt_alpha = 2;
+    gSig = 1; 
+    gSiz = 4.5*gSig; 
 
 % User inputs overrides
 nparams=length(varargin);
@@ -50,8 +52,6 @@ end
 % Y=imfilter(Y,h,'circular');
 % Y = (convn(Y, single(reshape([1 1 1] /10, 1, 1, [])), 'same'));
  %make gaussian filter based on normcorre function
-    gSig = 1; 
-    gSiz = 7*gSig; 
     psf = fspecial('gaussian', round(2*gSiz), gSig);
     ind_nonzero = (psf(:)>=max(psf(:,1)));
     psf = psf-mean(psf(ind_nonzero));
@@ -59,17 +59,17 @@ end
     Y = imfilter(Y,psf,'symmetric');
 
 % Take median of movie
-Y_min = min(Y,3);
+Y_med = median(Y,3);
 
 % Subtract median
-Y = Y-Y_min;
+Y = Y-Y_med;
 
 % take max
 Ymax = max(Y,[],3);
 Ymax = imresize(Ymax,scaling);
 maxFig = figure();
 colormap(gray);
-imagesc(Ymax,[min(min(Ymax))*minLimMult max(max(Ymax))*maxLimMult]);
+imagesc(Ymax,[abs(min(min(Ymax)))*minLimMult abs(min(min(Ymax)))*maxLimMult]);% max(max(Ymax))*maxLimMult]);
 set(gca,'YDir','normal');
 hold on;
 %xticks = get(gca,'xtick');

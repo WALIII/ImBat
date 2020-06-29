@@ -100,17 +100,17 @@ smoothVelocity = zscore(smooth(flightPaths.batSpeed,100));
     set(gca,'xticklabel',{[]})
     
     %plot the smoothed z-scored velocity of bat & reward vector
-    [rewardR,rewardLT,rewardUT] = risetime(alignment.out.RewardVector);
+    %[rewardR,rewardLT,rewardUT] = risetime(alignment.out.RewardVector);
     a3 = subplot(topROILocal+11,1,1:4);%topROILocal+8:topROILocal+11);
     hold on
     plot(alignment.out.Location_time(1:end),smoothVelocity,'color','r')
     %plot(alignment.out.Location_time(1:end),(alignment.out.RewardVector-abs(min(alignment.out.RewardVector)))/2,'color','b')
-    for ii = 1:length(rewardLT)
-       plot(((alignment.out.Location_time(1)*120)+rewardLT(ii))/120,max(smoothVelocity),'ob');
-       hold on
-       lh = legend('velocity','reward','Location','east')
-       set(lh,'position',[.86 .925 .03 .03])
-    end
+%     for ii = 1:length(rewardLT)
+%        plot(((alignment.out.Location_time(1)*120)+rewardLT(ii))/120,max(smoothVelocity),'ob');
+%        hold on
+%        lh = legend('velocity','reward','Location','east');
+%        set(lh,'position',[.86 .925 .03 .03]);
+%     end
     %title('Velocity')
     ylim([-1 8])
     xlim([0 alignment.out.video_timesDS(end)])
