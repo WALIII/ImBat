@@ -13,7 +13,7 @@ neuron = Sources2D();
 use_prev = 0; % use previous extraction?
 % nam = './Dsampled.tif';
 if exist('nam') ==1;
-nam = neuron.select_data(nam);         %if nam is [], then select data interactively
+    nam = neuron.select_data(nam);         %if nam is [], then select data interactively
 else
     nam = neuron.select_data;         %if nam is [], then select data interactively
 end
@@ -27,9 +27,9 @@ for i=1:length(vin)
         ROI_flag=vin{i+1};
     elseif isequal(vin{i},'place');
         analysis_flag = vin{i+1};
-      elseif isequal(vin{i},'metadata');  % pass along metadata.cnmfe.file if need be...
-          metadata = vin{i+1};
-          disp('Loading in metadata.cnmfe...')
+    elseif isequal(vin{i},'metadata');  % pass along metadata.cnmfe.file if need be...
+        metadata = vin{i+1};
+        disp('Loading in metadata.cnmfe...')
     elseif isequal(vin{i},'rextract');
         reExtract=vin{i+1};
     end
@@ -61,7 +61,7 @@ spatial_algorithm = 'hals_thresh';
 
 % -------------------------      TEMPORAL     -------------------------  %
 try
-metadata.cnmfe.Fs = 30./metadata.temporal_downsample;             % frame rate
+    metadata.cnmfe.Fs = 30./metadata.temporal_downsample;             % frame rate
 catch
     disp(' no metadata, assuming 6fps...')
     metadata.cnmfe.Fs = 6;             % frame rate
@@ -89,8 +89,8 @@ metadata.cnmfe.bg_ssub = 2;                                    % downsample back
 
 % -------------------------  INITIALIZATION   -------------------------  %
 K = [];                         % maximum number of neurons per patch. when K=[], take as many as possible.
-metadata.cnmfe.min_corr = 0.85;                % minimum local correlation for a seeding pixel
-metadata.cnmfe.min_pnr = 40;                   % minimum peak-to-noise ratio for a seeding pixel (low values are discouraged)
+% metadata.cnmfe.min_corr = 0.85;                % minimum local correlation for a seeding pixel
+% metadata.cnmfe.min_pnr = 40;                   % minimum peak-to-noise ratio for a seeding pixel (low values are discouraged)
 metadata.cnmfe.min_pixel = 6*metadata.cnmfe.gSig^2;           % minimum number of nonzero pixels for each neuron (was gSig^2)
 bd = 8;                         % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
 frame_range = [];               % when [], uses all frames
@@ -136,6 +136,7 @@ neuron.updateParams('gSig', metadata.cnmfe.gSig, ...       % -------- spatial --
     'detrend_method', detrend_method, ...
     'background_model', bg_model, ...       % -------- background --------
     'nb', nb, ...
+    'save_intermediate  ' ,true, ... % save intermediate results or not
     'ring_radius', ring_radius, ...
     'num_neighbors', num_neighbors, ...
     'bg_ssub', metadata.cnmfe.bg_ssub, ...
@@ -205,10 +206,10 @@ neuron.merge_high_corr(show_merge, metadata.cnmfe.merge_thr_spatial);
 for m=1:2
     % update temporal
     neuron.update_temporal_parallel(use_parallel);
-
+    
     % delete bad neurons
     neuron.remove_false_positives();
-
+    
     % merge neurons based on temporal correlation + distances
     neuron.merge_neurons_dist_corr(show_merge);
 end
