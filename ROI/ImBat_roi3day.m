@@ -112,7 +112,7 @@ for i = 1:length(track)
     Ymax{i} = max(framesCat_medNorm{i},[],3);
     Ymax{i} = imresize(Ymax{i},scaling);
     framesCat4_Ymax{i} = max(framesCat4_medNorm{i},[],3);
-    framesCat4_Ymax{i} = imresize(framesCat4_medNorm{i},scaling);
+    framesCat4_Ymax{i} = imresize(framesCat4_Ymax{i},scaling);
     
     subplot(4,3,3+i)
     imagesc(Ymax{i});

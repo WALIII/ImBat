@@ -36,7 +36,7 @@ plotFlightvsCellsFlag = 1;
 %place cells plot flags
 plotPlaceCellsFlag = 0;
 %snake/schnitz plot flags
-plotSnakesFlag = 0;
+plotSnakesFlag = 1;
 %align max projections of specific flights across trajectories
 plotROI3dayFlag = 0;
 

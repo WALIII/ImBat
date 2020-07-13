@@ -23,39 +23,62 @@ for i=1:2:nparams
             saveFlag = varargin{i+1};
     end
 end
-
+%% load data for each of the days
+for i = 1:length(days1to3)
+   datadir = dir([days1to3{i} '\extracted\'  '*fly*']);
+   dirFlags = [datadir.isdir];
+    % Extract only those that are directories.
+    flyFolders{i} = datadir(dirFlags);
+    %enter newest processed folder
+    processedFolders = dir([flyFolders{i}.folder,'/',flyFolders{i}.name,'/','processed*']);
+    processedNewest = sort({processedFolders(end).name});
+    processedNewest = char(processedNewest);
+    analysisFolders = dir([flyFolders{i}.folder,'/',flyFolders{i}.name,'/','analysis*']);
+    analysisNewest = sort({analysisFolders(end).name});
+    analysisNewest = char(analysisNewest);
+    %load data
+    trackDir = dir([flyFolders{i}.folder filesep flyFolders{i}.name filesep analysisNewest filesep '*_flightPaths.mat']);
+    batName{i} = trackDir.name(1:3);
+    seshTemp = extractAfter(trackDir.name,[batName{i} '_' days1to3{i} '_']);
+    sessionType{i} = extractBefore(seshTemp,'_flightPaths.mat');
+    results(i) = load([flyFolders{i}.folder filesep flyFolders{i}.name filesep processedNewest filesep 'results.mat']);
+    track(i) = load([flyFolders{i}.folder filesep flyFolders{i}.name filesep analysisNewest filesep trackDir.name]);
+    video(i) = load([pwd filesep days1to3{i} filesep 'Motion_corrected_Data.mat']);
+    alignment(i) = load([flyFolders{i}.folder filesep flyFolders{i}.name filesep processedNewest filesep 'Alignment.mat']);
+    close all;
+end
 %% concatenate, filter, max project, and mean 
 figure('units','normalized','outerposition',[0 0 0.85 0.85]);
-sgtitle([data_3day.batName{1} ': cluster 2']);
+sgtitle([batName{1} ': cluster 2']);
 scaling = 4; %scaling for resizing the pixel/frame
 %initialize frame vectors for video chunks
-frames = cell(length(data_3day.track),1);
-framesCat = cell(length(data_3day.track),1);
-framesCat4 = cell(length(data_3day.track),1);
-framesCat4_conv = cell(length(data_3day.track),1);
-framesCat4_minNorm = cell(length(data_3day.track),1);
-framesCat4_min = cell(length(data_3day.track),1);
-Ymax = cell(length(data_3day.track),1);
+frames = cell(length(track),1);
+framesCat = cell(length(track),1);
+framesCat4 = cell(length(track),1);
+framesCat4_conv = cell(length(track),1);
+framesCat4_minNorm = cell(length(track),1);
+framesCat4_min = cell(length(track),1);
+Ymax = cell(length(track),1);
 framesLength =[];
 minValueStart = [];
 minValueEnd = [];
 closestIndexStart = [];
 closestIndexEnd = [];
-randInd = cell(length(data_3day.track),1);
-flightNums = cell(length(data_3day.track),1);
+randInd = cell(length(track),1);
+flightNums = cell(length(track),1);
 
 %find min number of flights in each day to subsample later
-for i = 1:length(data_3day.track)
-    flightNums{i} = data_3day.track(i).flightPaths.clusterIndex{2}'; %get the indices for the flights in the cluster
+for i = 1:length(track)
+    flightNums{i} = track(i).flightPaths.clusterIndex{2}'; %get the indices for the flights in the cluster
     flightNumsLength(i) = length(flightNums{i}); %number of flights on each day
 end
 minFlightNums = min(flightNumsLength); %least number of flights across the 3 days
-for i = 1:length(data_3day.track)
+for i = 1:length(track)
     randInd{i} = randperm(flightNumsLength(i),minFlightNums); %generate random list with minlength of flights for random selection %flightNumsLength(i));
     for p = 1:minFlightNums %for each flight within cluster #2 %length(randInd)
         %get imaging times of start and stop index converting from tracking to video times
-        [minValueStart{i}(p),closestIndexStart{i}(p)] = min(abs(data_3day.alignment(i).video_timesDS-data_3day.alignment(i).out.Location_time(data_3day.track(i).flightPaths.flight_starts_idx(data_3day.track(i).flightPaths.clusterIndex{2}(randInd{i}(p))))));
-        [minValueEnd{i}(p),closestIndexEnd{i}(p)] = min(abs(data_3day.alignment(i).video_timesDS-data_3day.alignment(i).out.Location_time(data_3day.track(i).flightPaths.flight_ends_idx(data_3day.track(i).flightPaths.clusterIndex{2}(randInd{i}(p))))));
+        [minValueStart{i}(p),closestIndexStart{i}(p)] = min(abs(alignment(i).video_timesDS-alignment(i).out.Location_time(track(i).flightPaths.flight_starts_idx(track(i).flightPaths.clusterIndex{2}(randInd{i}(p))))));
+        [minValueEnd{i}(p),closestIndexEnd{i}(p)] = min(abs(alignment(i).video_timesDS-alignment(i).out.Location_time(track(i).flightPaths.flight_ends_idx(track(i).flightPaths.clusterIndex{2}(randInd{i}(p))))));
         framesLength{i}(p) = closestIndexEnd{i}(p) - closestIndexStart{i}(p);
     end
     framesMax(i) = max(framesLength{i}); %find max # frames across all flights
@@ -72,9 +95,9 @@ end
     %filt_rad = 20;
     %filt_alpha = 2;
     %h=fspecial('gaussian',filt_rad,filt_alpha);
-for i = 1:length(data_3day.track)
+for i = 1:length(track)
     %filter whole day for full day stability max projection
-    movFull_conv{i} = imfilter(data_3day.video(i).Y,psf,'symmetric'); %filter
+    movFull_conv{i} = imfilter(video(i).Y,psf,'symmetric'); %filter
     movFull_min{i} = min(movFull_conv{i},[],3); %take min
     movFull_minNorm{i} = movFull_conv{i} - movFull_min{i}; %normalize by subtracting min
     movFull_Ymax{i} = max(movFull_minNorm{i},[],3); %take max
@@ -83,7 +106,7 @@ for i = 1:length(data_3day.track)
     for p = 1:minFlightNums %length(randInd)
         framesDiff{i}(p) = framesMaxAll - framesLength{i}(p);
         %add to frames vector and concatenate
-        frames{i}(:,:,:,p) = data_3day.video(i).Y(:,:,closestIndexStart{i}(p):(closestIndexEnd{i}(p)+framesDiff{i}(p)));
+        frames{i}(:,:,:,p) = video(i).Y(:,:,closestIndexStart{i}(p):(closestIndexEnd{i}(p)+framesDiff{i}(p)));
         %max(max) concatenate all frames together in 1 long vector
         framesCat{i} = cat(3,framesCat{i},frames{i}(:,:,:,p));        
         %max(mean)
@@ -105,7 +128,7 @@ for i = 1:length(data_3day.track)
         
         % plot flights
         subplot(6,5,i);
-        plot3(data_3day.track(i).flightPaths.pos(1,:,data_3day.track(i).flightPaths.clusterIndex{2}(randInd{i}(p))),data_3day.track(i).flightPaths.pos(2,:,data_3day.track(i).flightPaths.clusterIndex{2}(randInd{i}(p))),data_3day.track(i).flightPaths.pos(3,:,data_3day.track(i).flightPaths.clusterIndex{2}(randInd{i}(p))));
+        plot3(track(i).flightPaths.pos(1,:,track(i).flightPaths.clusterIndex{2}(randInd{i}(p))),track(i).flightPaths.pos(2,:,track(i).flightPaths.clusterIndex{2}(randInd{i}(p))),track(i).flightPaths.pos(3,:,track(i).flightPaths.clusterIndex{2}(randInd{i}(p))));
         hold on;
     end
     %take average across all trials
@@ -131,7 +154,7 @@ for i = 1:length(data_3day.track)
     imagesc(I{i});
     set(gca,'YDir','normal');
     %colorbar;
-    title(['Across time ' data_3day.batName{i} ' ' days1to3{i} ' ' data_3day.sessionType{1}]);
+    title(['Across time ' batName{i} ' ' days1to3{i} ' ' sessionType{1}]);
 
 %% max projection plots
     %full day max projection
@@ -140,7 +163,7 @@ for i = 1:length(data_3day.track)
     colormap('gray');
     set(gca,'YDir','normal');
     hold on;
-    title(['Max Full Day ' data_3day.batName{i} ' ' days1to3{i} ' ' data_3day.sessionType{i}]);
+    title(['Max Full Day ' batName{i} ' ' days1to3{i} ' ' sessionType{i}]);
     %colorbar;
     
     %max projection with data concat>filter>maxProject max(max)
@@ -150,7 +173,7 @@ for i = 1:length(data_3day.track)
     colormap('gray');
     set(gca,'YDir','normal');
     hold on;
-    title(['Max(max) ' data_3day.batName{i} ' ' days1to3{i} ' ' data_3day.sessionType{i}]);
+    title(['Max(max) ' batName{i} ' ' days1to3{i} ' ' sessionType{i}]);
     %colorbar;
     hold off;
     
@@ -160,7 +183,7 @@ for i = 1:length(data_3day.track)
     colormap('gray');
     set(gca,'YDir','normal');
     hold on;
-    title(['Max(mean) ' data_3day.batName{i} ' ' days1to3{i} ' ' data_3day.sessionType{i}]);
+    title(['Max(mean) ' batName{i} ' ' days1to3{i} ' ' sessionType{i}]);
     %colorbar;
     
     %PNR data PNR>mean
@@ -170,7 +193,7 @@ for i = 1:length(data_3day.track)
     colormap('gray');
     set(gca,'YDir','normal');
     hold on;
-    title(['PNR ' data_3day.batName{i} ' ' days1to3{i} ' ' data_3day.sessionType{1}]);
+    title(['PNR ' batName{i} ' ' days1to3{i} ' ' sessionType{1}]);
     %colorbar;
    
 end
@@ -191,38 +214,38 @@ end
 subplot(6,5,9)
 image((RGB_full1(:,:,:)));
 set(gca,'YDir','normal');
-title(['Full max(max) ' data_3day.batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]); 
+title(['Full max(max) ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]); 
 %colorbar;
 %RGB of full video max projection aligned
 subplot(6,5,10)
 image((RGB_fullAlign1(:,:,:)));
 set(gca,'YDir','normal');
-title(['Full aligned ' data_3day.batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]); 
+title(['Full aligned ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]); 
 %colorbar;
 
 %RGB of nonaligned max projections 
 subplot(6,5,14)
 image((RGB_Ymax1(:,:,:)));
 set(gca,'YDir','normal');
-title(['Max(max) ' data_3day.batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
+title(['Max(max) ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
 %colorbar;
 %RGB of aligned max projections
 subplot(6,5,15)
 image((RGB_YmaxAligned1(:,:,:)));
 set(gca,'YDir','normal');
-title(['Aligned Max(max) ' data_3day.batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
+title(['Aligned Max(max) ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
 
 %RGB of nonaligned PNR
 subplot(6,5,24)
 image((RGB_PNRAligned1(:,:,:)));
 set(gca,'YDir','normal');
-title(['Aligned PNR ' data_3day.batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
+title(['Aligned PNR ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
 %colorbar;
 %RGB of aligned PNR
 subplot(6,5,25)
 image((RGB_PNRAligned1(:,:,:)));
 set(gca,'YDir','normal');
-title(['Aligned PNR ' data_3day.batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
+title(['Aligned PNR ' batName{1} ': ' days1to3{1} ' ' days1to3{2} ' ' days1to3{3}]);
 %colorbar;
 
 
