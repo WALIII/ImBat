@@ -1,4 +1,4 @@
-function [Ymax, Y, maxFig] = ImBat_Dff(Y,varargin);
+function [Ymax, Y, maxFig] = ImBat_Dff_forMY_200714(Y,varargin);
 
 batName = [];
 dateSesh = [];
@@ -6,8 +6,8 @@ sessionType = [];
 loadFlag = 0;
 % ImBat_Dff
 scaling = 10;
-minLimMult = 5; %0 5 min limit multiplier for max projections
-maxLimMult = 20; %32 20 max limit multiplier for max projections
+minLimMult = 0; %0 5 min limit multiplier for max projections
+maxLimMult = 28; %28 20 max limit multiplier for max projections
 %filt_rad = 10;
 %filt_alpha = 2;
     gSig = 1; 
@@ -80,8 +80,9 @@ hold on;
 %newlabelsY = arrayfun(@(ay) sprintf('%g', scaling_pixel * ay), yticks, 'un', 0);
 %set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
 title(['Max Projection dFF: ' batName ' ' dateSesh ' ' sessionType]);
-xlabel('um'); ylabel('um');
-
+%xlabel('um'); ylabel('um');
+%axis off
+colorbar('southoutside')
 
 
 
