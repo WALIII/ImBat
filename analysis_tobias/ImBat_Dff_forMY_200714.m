@@ -7,7 +7,7 @@ loadFlag = 0;
 % ImBat_Dff
 scaling = 10;
 minLimMult = 0; %0 5 min limit multiplier for max projections
-maxLimMult = 28; %28 20 max limit multiplier for max projections
+maxLimMult = 10; %28 20 max limit multiplier for max projections
 %filt_rad = 10;
 %filt_alpha = 2;
     gSig = 1; 
@@ -82,7 +82,7 @@ hold on;
 title(['Max Projection dFF: ' batName ' ' dateSesh ' ' sessionType]);
 %xlabel('um'); ylabel('um');
 %axis off
-colorbar('southoutside')
+colorbar%('southoutside')
 
 
 
