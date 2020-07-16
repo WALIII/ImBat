@@ -68,7 +68,6 @@ catch
     disp(' no metadata, assuming 6fps...')
     metadata.cnmfe.Fs = 6;             % frame rate
 end
-metadata.cnmfe.tsub = 1;           % temporal downsampling factor
 deconv_flag = true; % run deconvolution or not
 
 % %--foopsi deconvolution

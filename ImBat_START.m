@@ -36,7 +36,7 @@ Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
 Bat_Cluster =1; % extract the bat_cluster tracking
 
 % Default Movie Paramaters:
-metadata.temporal_downsample = 5; % temporal downsampleing
+metadata.temporal_downsample = 1; % temporal downsampleing
 metadata.spatial_downsample = 0.4; % spatial downsampling
 metadata.median_filter_kernal = 3; % median filtering
 metadata.artifact_reject = 1; % median filtering
@@ -49,6 +49,7 @@ metadata.moco.bin_width = 200;
 % Default CNMFe Paramaters:
 metadata.cnmfe.min_corr = 0.9;     % minimum local correlation for a seeding pixel
 metadata.cnmfe.min_pnr = 10;       % minimum peak-to-noise ratio for a seeding pixel
+metadata.cnmfe.tsub = 5;           % temporal downsampling factor
 
 % Mergting thesholds:
 %metadata.cnmfe.min_pnr = 10;       % minimum peak-to-noise ratio for a seeding pixel
