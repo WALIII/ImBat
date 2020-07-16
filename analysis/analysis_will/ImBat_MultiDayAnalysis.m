@@ -1,11 +1,11 @@
-function [ROI_Data] = ImBat_MultiDayAnalysis
+function [ROI_Data] = ImBat_MultiDayAnalysis(BAT);
 % First-pass Multi-day analysis function
 
 % WAL3
 % d190609
 
 % Bat ID:
-BAT = 'Ga';
+% BAT = 'Ga';
 
 % User input: processing steps to run ( t/f)
 ST1 = 1; % extract data
