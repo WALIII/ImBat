@@ -113,9 +113,9 @@ center_psf = true;              % set the value as true when the background fluc
 
 % -------------------------      MERGING      -------------------------  %
 show_merge = false;                      % if true, manually verify the merging step
-metadata.cnmfe.merge_thr = 0.7;                         % temporal correlation threshold for merging neurons;
+metadata.cnmfe.merge_thr = 0.65;                         % temporal correlation threshold for merging neurons;
 method_dist = 'mean';                    % method for computing neuron distances {'mean', 'max'}
-dmin = metadata.cnmfe.gSig;                             % minimum distances between two neurons. it is used together with merge_thr
+dmin = metadata.cnmfe.gSig*2;                             % minimum distances between two neurons. it is used together with merge_thr
 dmin_only = metadata.cnmfe.gSig;                        % merge neurons if their distances are smaller than dmin_only.
 metadata.cnmfe.merge_thr_spatial = [0.9, 0.6, -inf];    % merge components with highly correlated spatial shapes and temporal shapes
 

@@ -47,8 +47,12 @@ metadata.moco.itter = 10;
 metadata.moco.bin_width = 200;
 
 % Default CNMFe Paramaters:
-metadata.cnmfe.min_corr = 0.8;     % minimum local correlation for a seeding pixel
-metadata.cnmfe.min_pnr = 30;       % minimum peak-to-noise ratio for a seeding pixel
+metadata.cnmfe.min_corr = 0.9;     % minimum local correlation for a seeding pixel
+metadata.cnmfe.min_pnr = 10;       % minimum peak-to-noise ratio for a seeding pixel
+
+% Mergting thesholds:
+%metadata.cnmfe.min_pnr = 10;       % minimum peak-to-noise ratio for a seeding pixel
+
 
 
 processed_FN = ['processed_',datestr(now,'yyyy_mm_dd__hhMM')];
@@ -198,7 +202,7 @@ for i = 1:length(subFolders);
             disp('extracting ROIs...')
             nam = './Motion_corrected_Data.mat'
             try
-                CNMFe_extract3(nam,'metadata',metadata);
+                CNMFe_extract2(nam,'metadata',metadata);
             catch
                 disp('ll');
             end
