@@ -34,7 +34,7 @@ if loadFlag == 1
 end
 
 % General Params
-CNMF_Fs = 6;                                                                %Acquisition frequency (Hz) Ca-imaging (after CNMF-e)
+CNMF_Fs = 30;%6;                                                                %Acquisition frequency (Hz) Ca-imaging (after CNMF-e)
 use_bat_cluster = true;                                                     %If using bat_cluster
 dwn_sample = false;                                                         %down-sample to CNMF-e
 save_data = false;                                                           %save after extraction
@@ -68,9 +68,9 @@ else
 end
 
 % Filter and interpolate
-x_filt = medfilt1(x_mean,trackData.VideoFrameRate/2,[],2,'omitnan','truncate');
-x_intr = fillmissing(x_filt,'next',2,'EndValues','nearest');
-x_spl = csaps(t, x_intr, 0.9, t);
+x_intr = fillmissing(x_mean,'next',2,'EndValues','nearest');
+x_filt = medfilt1(x_intr,trackData.VideoFrameRate/2,[],2,'omitnan','truncate'); %filter after interpolating
+x_spl = csaps(t, x_filt, 0.9, t);
 
 %Frame rate
 new_t = t;
@@ -285,7 +285,7 @@ for i = 1:max(flightPaths.id)
 end
 
 %add Tobias specific variables for future plots
-flightPaths.trajectoriesContinous = x_intr;
+flightPaths.trajectoriesContinous = x_filt;
 flightPaths.trajectoriesSpline = x_spl;
 flightPaths.tracjectoriesRaw = x_mean;
 flightPaths.batSpeed = v_abs';
