@@ -202,11 +202,9 @@ for i = 1:length(subFolders);
         if ROI_flag ==1;
             disp('extracting ROIs...')
             nam = './Motion_corrected_Data.mat'
-            try
+           
                 CNMFe_extract2(nam,'metadata',metadata);
-            catch
-                disp('ll');
-            end
+     
             
             
             
