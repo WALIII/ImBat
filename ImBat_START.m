@@ -50,6 +50,7 @@ metadata.moco.bin_width = 200;
 metadata.cnmfe.min_corr = 0.9;     % minimum local correlation for a seeding pixel
 metadata.cnmfe.min_pnr = 10;       % minimum peak-to-noise ratio for a seeding pixel
 metadata.cnmfe.tsub = 5;           % temporal downsampling factor
+metadata.cnmfe.ssub = 1;           % temporal downsampling factor
 
 % Mergting thesholds:
 %metadata.cnmfe.min_pnr = 10;       % minimum peak-to-noise ratio for a seeding pixel
