@@ -6,8 +6,8 @@ sessionType = [];
 loadFlag = 0;
 % ImBat_Dff
 scaling = 10;
-minLimMult = 5; %0 5 min limit multiplier for max projections
-maxLimMult = 20; %32 20 max limit multiplier for max projections
+minLimMult = 0; %0 5 min limit multiplier for max projections
+maxLimMult = 25; %32 20 max limit multiplier for max projections
 %filt_rad = 10;
 %filt_alpha = 2;
     gSig = 1; 
@@ -59,10 +59,10 @@ end
     Y = imfilter(Y,psf,'symmetric');
 
 % Take median of movie
-Y_med = median(Y,3);
+Y_min = min(Y,3);
 
 % Subtract median
-Y = Y-Y_med;
+Y = Y-Y_min;
 
 % take max
 Ymax = max(Y,[],3);
