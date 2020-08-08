@@ -1,4 +1,4 @@
-function [ROIoverlay,centroidMax] = ImBat_ROIoverlay(results,varargin)
+function [ROIoverlay,correlationImage,centroidMax] = ImBat_ROIoverlay(results,varargin)
 
 global topROI
 
@@ -71,8 +71,15 @@ title(['Max Projection: ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('um'); ylabel('um');
 col = jet(length(ROI_coords));
 
+%plot correlation image
+correlationImage = figure();
+hold on;    
+imagesc(imresize(results.Cn,scaling)); colormap(gray);
+title(['Correlation image: ' batName ' ' dateSesh ' ' sessionType]);
+xlabel('um'); ylabel('um');
+hold off;
 
-%plot centroid over top of max projection
+%plot centroid over top of correlation image
 if centroidFlag == 1
     centroidMax = figure();
     hold on;

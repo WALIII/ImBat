@@ -34,7 +34,7 @@ clustManualFlag = 0;
 flightPathsFeederFlag = 0;
 plotFlightvsCellsFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 0;
+plotPlaceCellsFlag = 1;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 %align max projections of specific flights across trajectories
@@ -171,7 +171,12 @@ for i = 1:length(subFolders)
             savefig(maxFig,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/ROI/' fileName '_maxProject.fig']);
             saveas(maxFig, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/ROI/' fileName '_maxProject.tif']);
             % max projection with ROI overlay
-            [ROIoverlay,centroidMax] = ImBat_ROIoverlay(cellData.results,'centroid',centroidFlag,'binarymask',binaryMaskFlag,'roiheat',roiHeatFlag,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
+            [ROIoverlay,correlationImage,centroidMax] = ImBat_ROIoverlay(cellData.results,'centroid',centroidFlag,'binarymask',binaryMaskFlag,'roiheat',roiHeatFlag,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
+            %save fig and tif of max projection
+            %set(findall(maxFig,'-property','FontSize'),'FontSize',20);
+            savefig(correlationImage,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/ROI/' fileName '_correlationImage.fig']);
+            saveas(correlationImage, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/ROI/' fileName '_correlationImage.tif']);
+            
             if centroidFlag == 1 || binaryMaskFlag == 1
                 %save fig and tif of max projection
                 %set(findall(centroidMax,'-property','FontSize'),'FontSize',20);

@@ -47,7 +47,7 @@ for p = 2:snakeTrace.nClusters + 1
         %set(gca,'yticklabel',{[]},'xticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1))
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1))
     %set(gca,'XTick',xt,'XTickLabel',round(xt/cellData.results.Fs,1));
     
     p3 = subplot(12,snakeTrace.nClusters,p-1+(4*snakeTrace.nClusters));
@@ -78,7 +78,7 @@ for p = 2:snakeTrace.nClusters + 1
         %set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     hold off
     
     
@@ -110,7 +110,7 @@ for p = 2:snakeTrace.nClusters + 1
         %set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     hold off
     xlabel('time (s)');
     
@@ -125,7 +125,7 @@ colormap(hot);
 ylabel('pre-flight');
 set(gca,'yticklabel',{[]});
 xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
 hold on
 
 subplot(3,1,2)
@@ -134,7 +134,7 @@ colormap(hot);
 ylabel('during flight');
 set(gca,'yticklabel',{[]});
 xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
 
 subplot(3,1,3)
 imagesc(snakeTrace.normMeanTraceSortPost);
@@ -142,7 +142,7 @@ colormap(hot);
 ylabel('post-flight');
 set(gca,'yticklabel',{[]});
 xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
 xlabel('time (s)');
 sgtitle(['Spatial selectivity sort by flight preference (pre/post/flight): ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
 
@@ -180,7 +180,7 @@ for p = 2:snakeTrace.nClusters+1
         %set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     xlabel('time (s)');
     %hold off
     sgtitle(['Spatial selectivity sort by flight preference: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
@@ -194,7 +194,7 @@ ylabel('ROI number');
 set(gca,'yticklabel',{[]});
 title(['Spatial selectivity sort by flight preference: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
 xt = get(gca, 'XTick');
-set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
 xlabel('time (s)');
 %% plot the cells according to their peak for each cluster with velocity on top (pre/post/flight)
 snakePlot_clustPrePostFlight = figure('units','normalized','outerposition',[0 0 0.5 1]);
@@ -227,7 +227,7 @@ for p = 2:snakeTrace.nClusters+1
         %set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     
     p3 = subplot(12,snakeTrace.nClusters,p-1+(4*snakeTrace.nClusters));
     plot(1:length(snakeTrace.smoothSpeedFlight{p}),snakeTrace.smoothSpeedFlight{p},'k');
@@ -257,7 +257,7 @@ for p = 2:snakeTrace.nClusters+1
         %set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
 
     
     p5 = subplot(12,snakeTrace.nClusters,p-1+(8*snakeTrace.nClusters));
@@ -288,7 +288,7 @@ for p = 2:snakeTrace.nClusters+1
         %set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     xlabel('time (s)');
     
     sgtitle(['Spatial selectivity sort by peak (pre/post/flight): ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
@@ -326,7 +326,7 @@ for p = 2:snakeTrace.nClusters+1
         %set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     
     p3 = subplot(12,snakeTrace.nClusters,p-1+(4*snakeTrace.nClusters));
     plot(1:length(snakeTrace.smoothSpeedFlight{p}),snakeTrace.smoothSpeedFlight{p},'k');
@@ -356,7 +356,7 @@ for p = 2:snakeTrace.nClusters+1
         %set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1)); 
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1)); 
 
     p5 = subplot(12,snakeTrace.nClusters,p-1+(8*snakeTrace.nClusters));
     plot(1:length(snakeTrace.smoothSpeedPost{p}),snakeTrace.smoothSpeedPost{p},'k');
@@ -386,7 +386,7 @@ for p = 2:snakeTrace.nClusters+1
         %set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     xlabel('time (s)');
     sgtitle(['Spatial selectivity sort by cluster 1 Pre/post/flight: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
     
@@ -424,7 +424,7 @@ for p = 2:snakeTrace.nClusters+1
         set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     xlabel('time (s)');
     %hold off
     sgtitle(['Spatial selectivity sort by peak: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
@@ -462,7 +462,7 @@ for p = 2:snakeTrace.nClusters+1
         set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     xlabel('time (s)');
     %hold off
     sgtitle(['Spatial selectivity sort by cluster 1: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
@@ -502,7 +502,7 @@ for p = 2:snakeTrace.nClusters+1
     end
     title(['Cluster ' num2str(p) ' Odd']);
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     xlabel('time (s)'); %ylabel('ROI number');
     
     p3 = subplot(4,2*snakeTrace.nClusters,[2*snakeTrace.nClusters+(2*(p-1)),4*snakeTrace.nClusters+(2*(p-1)),6*snakeTrace.nClusters+(2*(p-1))]);
@@ -510,7 +510,7 @@ for p = 2:snakeTrace.nClusters+1
     colormap(hot);
     title(['Cluster ' num2str(p) ' Even']);
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1),'yticklabel',{[]});
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1),'yticklabel',{[]});
     xlabel('time (s)'); %ylabel('ROI number');
     sgtitle(['Spatial selectivity Odd (sorted) vs Even Trials: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
 end
@@ -548,7 +548,7 @@ title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{
         set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     xlabel('time (s)');
     %hold off
     sgtitle(['Spatial selectivity (norm) sort by peak: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);
@@ -586,7 +586,7 @@ title(['Cluster ' num2str(p)   ':' num2str(size(snakeTrace.smoothSpeedRawFlight{
         set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
-    set(gca,'XTick',xt,'XTickLabel',round(xt/6,1));
+    set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     xlabel('time (s)');
     %hold off
     sgtitle(['Spatial selectivity (norm) sort by cluster 1: ' snakeTrace.batName ' ' snakeTrace.dateSesh ' ' snakeTrace.sessionType]);

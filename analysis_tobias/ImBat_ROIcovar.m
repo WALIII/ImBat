@@ -1,3 +1,10 @@
+dir
+
+batName = 'Gio';
+dateSesh = '200407';
+sessionType = 'fly-1';
+distThresh = 10; %number of pixels to check if the cells are close enough to be considered same cell
+corrThresh = 0.7; %max correlation of time series if cells are very close
 
 distThresh = 10; %number of pixels to check if the cells are close enough to be considered same cell
 corrThresh = 0.65; %max correlation of time series if cells are very close
@@ -218,6 +225,32 @@ for d = 1:length(dirTop)-2
     cd(dirTop(d).folder);
 end
 
+for u = 1:round(length(results.A(1,:)))
+    if ismember(u,ROI_duplicate) == 0
+        ROI_unique = [ROI_unique u];
+    end
+end
+
+figure();
+   imagesc(imresize(results.Cn,scaling)); colormap(gray);
+   set(gca,'YDir','normal');
+    hold on
+    for f = 1:length(ROI_unique)
+        try
+            p = plot(ROI_coords{ROI_unique(f),1},ROI_coords{ROI_unique(f),2},'b','LineWidth',4);
+            p.Color(4) = 0.2;
+        catch
+        end
+    end
+    for p = 1:length(ROI_duplicate)
+        try
+            p = plot(ROI_coords{ROI_duplicate(p),1},ROI_coords{ROI_duplicate(p),2},'r','LineWidth',4);
+            p.Color(4) = 0.2;
+        catch
+        end
+    end
+    hold off 
+    title([batName ' ' dateSesh ' ' sessionType ': d(' num2str(distThresh) '), c(' num2str(corrThresh) ')']);
 ROI_refined.ROI_duplicate = ROI_duplicate;
 ROI_refined.ROI_unique = ROI_unique;
 ROI_refined.distance = distance;

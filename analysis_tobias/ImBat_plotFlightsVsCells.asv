@@ -69,8 +69,8 @@ smoothVelocity = zscore(smooth(flightPaths.batSpeed,100));
         try
             plot(alignment.out.video_times,(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',3)))+i*6) %may have to tweak the +i*6 at the end
         catch
-            diffVidTimes =  length(cellData.results.C_raw(i,:)) - length(alignment.out.video_times);
-            %plot(alignment.out.video_times,(zscore(smoothdata(cellData.results.C_raw(i,1:end-diffVidTimes),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
+            diffVidTimes =  length(cellData.results.C_raw(i,:)) - length(alignment.out.video_timesDS);
+            %plot(alignment.out.video_timesDS,(zscore(smoothdata(cellData.results.C_raw(i,1:end-diffVidTimes),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
             plot(alignment.out.video_times(1:end-1),(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',3)))+i*6) %may have to tweak the +i*6 at the end
         end
     end 
@@ -78,7 +78,7 @@ smoothVelocity = zscore(smooth(flightPaths.batSpeed,100));
     ylabel(['z-score dff: ' num2str(length(cellData.results.C(:,1))) ' ROIs'])
     xlabel('Time (s)')
     set(gca,'yticklabel',[]);
-    xlim([0 alignment.out.video_times(end)])%xlim([0 alignment.out.video_times(end)])
+    xlim([0 alignment.out.video_timesDS(end)])%xlim([0 alignment.out.video_timesDS(end)])
     
     meanSmoothAvgSpiking = mean(normSmoothData,1); %take average of the normalized smoothed data
     minSmoothAvgSpiking = min(meanSmoothAvgSpiking);
@@ -87,14 +87,14 @@ smoothVelocity = zscore(smooth(flightPaths.batSpeed,100));
     %plot smoothed z-scored average firing rate of #cells
     a2 = subplot(topROILocal+11,1,6:9);%topROILocal+3:topROILocal+6);
     hold on
-    if length(alignment.out.video_times) == length(smoothAvgSpiking)
-        plot(alignment.out.video_times,smoothAvgSpiking)
+    if length(alignment.out.video_timesDS) == length(smoothAvgSpiking)
+        plot(alignment.out.video_timesDS,smoothAvgSpiking)
     else
-        diffTimes = length(alignment.out.video_times) - length(smoothAvgSpiking);
-        plot(alignment.out.video_times(1:end-diffTimes),smoothAvgSpiking)
+        diffTimes = length(alignment.out.video_timesDS) - length(smoothAvgSpiking);
+        plot(alignment.out.video_timesDS(1:end-diffTimes),smoothAvgSpiking)
     end
     ylim([0 max(smoothAvgSpiking)+0.3])
-    xlim([0 alignment.out.video_times(end)])%xlim([0 alignment.out.video_times(end)])
+    xlim([0 alignment.out.video_timesDS(end)])%xlim([0 alignment.out.video_timesDS(end)])
     %title('Avg Cell Response')
     ylabel('Avg dff')
     set(gca,'xticklabel',{[]})
@@ -113,7 +113,7 @@ smoothVelocity = zscore(smooth(flightPaths.batSpeed,100));
 %     end
     %title('Velocity')
     ylim([-1 8])
-    xlim([0 alignment.out.video_times(end)])
+    xlim([0 alignment.out.video_timesDS(end)])
     %xlabel('Time (s)')
     ylabel('v (m/s)')
     set(gca,'xticklabel',{[]})
