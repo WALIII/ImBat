@@ -77,6 +77,7 @@ hold on;
 imagesc(imresize(results.Cn,scaling)); colormap(gray);
 title(['Correlation image: ' batName ' ' dateSesh ' ' sessionType]);
 xlabel('um'); ylabel('um');
+axis 'tight' 'equal'
 hold off;
 
 %plot centroid over top of correlation image
