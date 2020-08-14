@@ -1,8 +1,4 @@
-dir
-
-batName = 'Gio';
-dateSesh = '200407';
-sessionType = 'fly-1';
+function ImBat_ROIcovar
 distThresh = 10; %number of pixels to check if the cells are close enough to be considered same cell
 corrThresh = 0.7; %max correlation of time series if cells are very close
 
@@ -20,34 +16,36 @@ dirTop = vertcat(g,z); %find all folders in top quality directory
 ROI_duplicate = cell(length(dirTop),1); %make cell for indices of duplicated ROIS
 ROI_unique = cell(length(dirTop),1); %make cell for unique indices
 distance = cell(length(dirTop),1); %make cell for recording pairwise distances of ROIS
-timeCorr = cell(length(dirTop),1);%make cell for recording correlation between time series of nearby ROIs
+timeCorrClose = cell(length(dirTop),1);%make cell for recording correlation between time series of nearby ROIs
 ROI_coords = cell(length(dirTop),1);
 centroid = cell(length(dirTop),1);
+timeCorrAll = cell(length(dirTop),1); %correlation coefficients between all ROIs pairwise
+corrIndClose =  cell(length(dirTop),1); %make cell for indices of correlations between close cells
+corrIndAll = cell(length(dirTop),1); %make cell for indices of correlations across all pairwise cells
 
 
-plot_ROI_refined = figure('units','normalized','outerposition',[0 0 0.9 0.9]);
-for d = 1:length(dirTop)-2
-
+for d = 1:4%length(dirTop)-2
+    plot_ROI_refined = figure('units','normalized','outerposition',[0 0 0.9 0.9]);
     try %extract metadata names and enter processed folder
-        cd([dirTop(d).name filesep 'extracted']);
+        cd([dirTop(d).name filesep 'extracted'])
         flyFolders = dir('*fly*extraction');
-        batName = flyFolders(end).name(1:3);
-        dateSesh = flyFolders(end).name(5:10);
-        sessionType = flyFolders(end).name(12:16);
+        batName{d} = flyFolders(end).name(1:3);
+        dateSesh{d} = flyFolders(end).name(5:10);
+        sessionType{d} = flyFolders(end).name(12:16);
         
         cd(flyFolders(end).name);
         dirProcessed = dir('processed_*');
-        if strcmp(batName(1),'G')
-            cd(dirProcessed(1).name);
+        if strcmp(batName{d}(1),'G')
+            cd(dirProcessed(3).name);
         else
             cd(dirProcessed(end).name);
         end
     catch
         cd(dirTop(d).name);
         flyFolders = dir('*fly*extraction');
-        batName = flyFolders(end).name(1:3);
-        dateSesh = flyFolders(end).name(5:10);
-        sessionType = flyFolders(end).name(12:16);
+        batName{d} = flyFolders(end).name(1:3);
+        dateSesh{d} = flyFolders(end).name(5:10);
+        sessionType{d} = flyFolders(end).name(12:16);
         
         cd(flyFolders(end).name);
         dirProcessed = dir('processed_*');
@@ -80,14 +78,17 @@ for d = 1:length(dirTop)-2
     %compare euclidian distance between centroids and the timeseries correlation between
     %close ROIS
     distance{d} = zeros(round(length(results.A(1,:))));
-    timeCorr{d} = zeros(round(length(results.A(1,:)))); 
+    timeCorrAll{d} = zeros(round(length(results.A(1,:))));
+    timeCorrClose{d} = zeros(round(length(results.A(1,:)))); 
     for ii = 1:round(length(results.A(1,:)))
         for iii = ii+1:round(length(results.A(1,:)))
             distance{d}(ii,iii) = sqrt((centroid{d}(iii,1)-centroid{d}(ii,1))^2 + (centroid{d}(iii,2)-centroid{d}(ii,2))^2);   %find distance between centroids
+            R1 = corrcoef(results.C_raw(ii,:),results.C_raw(iii,:)); %take correlation between two time series
+            timeCorrAll{d}(ii,iii) = R1(1,2);
             if distance{d}(ii,iii) < distThresh %if closer than 10 pixels
                 R = corrcoef(results.C_raw(ii,:),results.C_raw(iii,:)); %take correlation between two time series
-                timeCorr{d}(ii,iii) = R(1,2);
-                if timeCorr{d}(ii,iii) > corrThresh %if correlation is greater than 0.8
+                timeCorrClose{d}(ii,iii) = R(1,2);
+                if timeCorrClose{d}(ii,iii) > corrThresh %if correlation is greater than 0.8
                     if snr(zscore(smoothdata(results.C_raw(ii,:),'movmedian',3)),results.Fs) > snr(zscore(smoothdata(results.C_raw(iii,:),'movmedian',3)),results.Fs) %unique index is the time series with higher snr
                         ROI_duplicate{d} = [ROI_duplicate{d} iii]; %duplicated index is low snr signal
                     else
@@ -110,7 +111,7 @@ for d = 1:length(dirTop)-2
     %subplot(length(results.C(:,1)),3,1:3:(length(results.C(:,1))*1.5)-2)
     imagesc(imresize(results.Cn,scaling),[minLim maxLim]); 
     colormap(ax1,gray);
-    title([batName ' ' dateSesh ' ' sessionType ': ' num2str(length(ROI_unique{d})) '/' num2str(length(results.A(1,:))) ' ROI'])
+    title([batName{d} ' ' dateSesh{d} ' ' sessionType{d} ': ' num2str(length(ROI_unique{d})) '/' num2str(length(results.A(1,:))) ' ROI'])
     set(gca,'YDir','normal');
     axis 'off'
     drawnow;
@@ -134,7 +135,7 @@ for d = 1:length(dirTop)-2
     %subplot(length(results.C(:,1)),3,round(length(results.C(:,1))*1.5)+2:3:length(results.C(:,1))*3)
     imagesc(imresize(results.Cn,scaling),[minLim maxLim]); 
     colormap(ax2,gray);
-    %title([batName ' ' dateSesh ' ' sessionType ': ' num2str(length(ROI_unique{d})) '/' num2str(length(results.A(1,:))) ' ROI'])
+    %title([batName{d} ' ' dateSesh{d} ' ' sessionType{d} ': ' num2str(length(ROI_unique{d})) '/' num2str(length(results.A(1,:))) ' ROI'])
     set(gca,'YDir','normal');
     axis 'off' %'tight' 'equal'
     hold on
@@ -173,7 +174,7 @@ for d = 1:length(dirTop)-2
     drawnow; 
     
     %plot time correlation covariance matrix
-    timeCorrFull{d} = timeCorr{d} + timeCorr{d}.';
+    timeCorrFull{d} = timeCorrClose{d} + timeCorrClose{d}.';
     ax4 = subplot(length(results.C(:,1))+2,4,round(length(results.C(:,1))*2)+adjust4:4:length(results.C(:,1))*4);
     %subplot(length(results.C(:,1)),3,round(length(results.C(:,1))*1.5)+9:3:length(results.C(:,1))*3)
     imagesc(timeCorrFull{d});
@@ -204,7 +205,7 @@ for d = 1:length(dirTop)-2
         catch
         end
     end 
-    title(['ROI Activity: ' batName ' ' dateSesh ' ' sessionType])
+    title(['ROI Activity: ' batName{d} ' ' dateSesh{d} ' ' sessionType{d}])
     ylabel(['z-score dff: ' num2str(length(results.C(:,1))) ' ROIs'])
     %yticklabel(gca,
     xlabel('Time (min)')
@@ -216,46 +217,77 @@ for d = 1:length(dirTop)-2
     hold off
     drawnow;
     
+    %find all correlation indices across all pairs and close pairs of cells
+    corrIndAll{d} = find(abs(timeCorrAll{d})>0);
+    corrIndClose{d} = find(abs(timeCorrClose{d})>0);  
+    %plot distributions of correlation coeffiecients for all and close ROIs
+    plot_corrDist = figure();
+    subplot(1,2,1);
+    histogram(timeCorrAll{d}(corrIndAll{d}));
+    hold on;
+    title(['Dist R ALL ROIs: ' batName{d} ' ' dateSesh{d} ' ' sessionType{d}]);
+    xlabel('Correlation coefficients');
+    ylabel('# ROI pairs');
+    
+    subplot(1,2,2);
+    histogram(timeCorrClose{d}(corrIndClose{d}),8,'FaceColor','r');
+    hold on;
+    title('Dist R CLOSE ROIs');
+    xlabel('Correlation coefficients');
+    ylabel('# ROI pairs');
+    hold off;
+    
     %save fig and tif of max projection
     %set(findall(maxFig,'-property','FontSize'),'FontSize',20);
-    savefig(plot_ROI_refined,['/Users/periscope/Desktop/analysis/ROI_refined/plot_ROIrefined_' batName dateSesh sessionType '_' datestr(now,'yymmdd-hhMMss') '.fig']);
-    saveas(plot_ROI_refined, ['/Users/periscope/Desktop/analysis/ROI_refined/plot_ROIrefined_' batName dateSesh sessionType '_' datestr(now,'yymmdd-hhMMss') '.tif']);
-    saveas(plot_ROI_refined, ['/Users/periscope/Desktop/analysis/ROI_refined/plot_ROIrefined_' batName dateSesh sessionType '_' datestr(now,'yymmdd-hhMMss') '.svg']);
-    clf;
+    savefig(plot_ROI_refined,['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_ROIrefined_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
+    saveas(plot_ROI_refined, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_ROIrefined_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
+    saveas(plot_ROI_refined, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_ROIrefined_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
+    
+    %save fig and tif of correlation distributions
+    %set(findall(maxFig,'-property','FontSize'),'FontSize',20);
+    savefig(plot_corrDist,['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
+    saveas(plot_corrDist, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
+    saveas(plot_corrDist, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
+    
+    close all;
     cd(dirTop(d).folder);
 end
 
-for u = 1:round(length(results.A(1,:)))
-    if ismember(u,ROI_duplicate) == 0
-        ROI_unique = [ROI_unique u];
-    end
-end
-
-figure();
-   imagesc(imresize(results.Cn,scaling)); colormap(gray);
-   set(gca,'YDir','normal');
-    hold on
-    for f = 1:length(ROI_unique)
-        try
-            p = plot(ROI_coords{ROI_unique(f),1},ROI_coords{ROI_unique(f),2},'b','LineWidth',4);
-            p.Color(4) = 0.2;
-        catch
-        end
-    end
-    for p = 1:length(ROI_duplicate)
-        try
-            p = plot(ROI_coords{ROI_duplicate(p),1},ROI_coords{ROI_duplicate(p),2},'r','LineWidth',4);
-            p.Color(4) = 0.2;
-        catch
-        end
-    end
-    hold off 
-    title([batName ' ' dateSesh ' ' sessionType ': d(' num2str(distThresh) '), c(' num2str(corrThresh) ')']);
+% for u = 1:round(length(results.A(1,:)))
+%     if ismember(u,ROI_duplicate) == 0
+%         ROI_unique = [ROI_unique u];
+%     end
+% end
+% 
+% figure();
+%    imagesc(imresize(results.Cn,scaling)); colormap(gray);
+%    set(gca,'YDir','normal');
+%     hold on
+%     for f = 1:length(ROI_unique)
+%         try
+%             p = plot(ROI_coords{ROI_unique(f),1},ROI_coords{ROI_unique(f),2},'b','LineWidth',4);
+%             p.Color(4) = 0.2;
+%         catch
+%         end
+%     end
+%     for p = 1:length(ROI_duplicate)
+%         try
+%             p = plot(ROI_coords{ROI_duplicate(p),1},ROI_coords{ROI_duplicate(p),2},'r','LineWidth',4);
+%             p.Color(4) = 0.2;
+%         catch
+%         end
+%     end
+%     hold off 
+%     title([batName{d} ' ' dateSesh{d} ' ' sessionType{d} ': d(' num2str(distThresh) '), c(' num2str(corrThresh) ')']);
+ROI_refined.batName = batName;
+ROI_refined.dateSesh = dateSesh;
+ROI_refined.sessionType = sessionType;
 ROI_refined.ROI_duplicate = ROI_duplicate;
 ROI_refined.ROI_unique = ROI_unique;
 ROI_refined.distance = distance;
 ROI_refined.distFull = distFull;
-ROI_refined.timeCorr = timeCorr;
+ROI_refined.timeCorrAll = timeCorrAll;
+ROI_refined.timeCorrClose = timeCorrClose;
 ROI_refined.timeCorrFull = timeCorrFull;
 ROI_refined.distThresh = distThresh/scaling; %number of pixels to check if the cells are close enough to be considered same cell
 ROI_refined.corrThresh = corrThresh; %max correlation of time series if cells are very close
@@ -265,5 +297,5 @@ ROI_refined.maxLim = maxLim;
 ROI_refined.ROI_coords = ROI_coords;
 ROI_refined.centroid = centroid;
 
-
-save(['/Users/periscope/Desktop/analysis/ROI_refined/ROI_refined_' num2str(distThresh/scaling) '_' num2str(corrThresh) '_' datestr(now,'yyMMdd-hhmmss') '.mat'],'ROI_refined');
+save(['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\ROI_refined_' num2str(distThresh/scaling) '_' num2str(corrThresh) '_' datestr(now,'yyMMdd-hhmmss') '.mat'],'ROI_refined');
+%save(['/Users/periscope/Desktop/analysis/ROI_refined/ROI_refined_' num2str(distThresh/scaling) '_' num2str(corrThresh) '_' datestr(now,'yyMMdd-hhmmss') '.mat'],'ROI_refined');
