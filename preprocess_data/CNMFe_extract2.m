@@ -44,7 +44,6 @@ pars_envs = struct('memory_size_to_use', 60,...  % GB, memory space you allow to
 % -------------------------      SPATIAL      -------------------------  %
 metadata.cnmfe.gSig = 4;           % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
 metadata.cnmfe.gSiz = 4*metadata.cnmfe.gSig+1;    % pixel, approximate neuron diameter
-metadata.cnmfe.ssub = 1;           % spatial downsampling factor
 
 with_dendrites = false;   % with dendrites or not, indicated with high-resolution/2p-movies
 if with_dendrites
@@ -68,7 +67,6 @@ catch
     disp(' no metadata, assuming 6fps...')
     metadata.cnmfe.Fs = 6;             % frame rate
 end
-metadata.cnmfe.tsub = 1;           % temporal downsampling factor
 deconv_flag = true; % run deconvolution or not
 
 % %--foopsi deconvolution
