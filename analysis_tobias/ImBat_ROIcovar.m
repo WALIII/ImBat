@@ -1,6 +1,7 @@
-function ImBat_ROIcovar
+function [ROI_refined] = ImBat_ROIcovar
 distThresh = 10; %number of pixels to check if the cells are close enough to be considered same cell
 corrThresh = 0.7; %max correlation of time series if cells are very close
+saveFlag = 0; %do you want to save the figures and output structure?
 
 distThresh = 10; %number of pixels to check if the cells are close enough to be considered same cell
 corrThresh = 0.65; %max correlation of time series if cells are very close
@@ -22,7 +23,11 @@ centroid = cell(length(dirTop),1);
 timeCorrAll = cell(length(dirTop),1); %correlation coefficients between all ROIs pairwise
 corrIndClose =  cell(length(dirTop),1); %make cell for indices of correlations between close cells
 corrIndAll = cell(length(dirTop),1); %make cell for indices of correlations across all pairwise cells
-
+timeCorrS = cell(length(dirTop),1); %make cell for indices of correlations across all pairwise cells with S matrix
+timeCorrCloseS = cell(length(dirTop),1); %make cell for indices of correlations across all close cells with S matrix
+corrIndCloseS =  cell(length(dirTop),1); %make cell for indices of correlations between close cells with S matrix
+corrIndAllS = cell(length(dirTop),1); %make cell for indices of correlations across all pairwise cells with S matrix
+spikeSmooth = cell(length(dirTop),1); %make cell for smoothed S matrix
 
 for d = 1:4%length(dirTop)-2
     plot_ROI_refined = figure('units','normalized','outerposition',[0 0 0.9 0.9]);
@@ -85,9 +90,17 @@ for d = 1:4%length(dirTop)-2
             distance{d}(ii,iii) = sqrt((centroid{d}(iii,1)-centroid{d}(ii,1))^2 + (centroid{d}(iii,2)-centroid{d}(ii,2))^2);   %find distance between centroids
             R1 = corrcoef(results.C_raw(ii,:),results.C_raw(iii,:)); %take correlation between two time series
             timeCorrAll{d}(ii,iii) = R1(1,2);
+            
+            w = gausswin(10); %smooth the S matrix by gaussian window of 10
+            spikeSmooth{d}(ii,:) = filter(w,1,full(results.S(ii,:)));
+            spikeSmooth{d}(iii,:) = filter(w,1,full(results.S(iii,:)));
+            RS = corrcoef(spikeSmooth{d}(ii,:),spikeSmooth{d}(iii,:)); %take correlation between two smooth close series
+            timeCorrS{d}(ii,iii) = RS(1,2);
             if distance{d}(ii,iii) < distThresh %if closer than 10 pixels
-                R = corrcoef(results.C_raw(ii,:),results.C_raw(iii,:)); %take correlation between two time series
-                timeCorrClose{d}(ii,iii) = R(1,2);
+                %R = corrcoef(results.C_raw(ii,:),results.C_raw(iii,:)); %take correlation between two time series
+                timeCorrClose{d}(ii,iii) = R1(1,2);
+                %RSclose = corrcoef(spikeSmooth,spikeSmooth); %take correlation between two smooth close series
+                timeCorrCloseS{d}(ii,iii) = RS(1,2);
                 if timeCorrClose{d}(ii,iii) > corrThresh %if correlation is greater than 0.8
                     if snr(zscore(smoothdata(results.C_raw(ii,:),'movmedian',3)),results.Fs) > snr(zscore(smoothdata(results.C_raw(iii,:),'movmedian',3)),results.Fs) %unique index is the time series with higher snr
                         ROI_duplicate{d} = [ROI_duplicate{d} iii]; %duplicated index is low snr signal
@@ -198,9 +211,9 @@ for d = 1:4%length(dirTop)-2
         normSmoothData(i,:) = zscore(smoothdata(results.C_raw(i,:),'movmedian',3)); %normalize each ROI trace
         try
             if sum(ismember(ROI_unique{d},i)) > 0
-            plot(1:length(results.C_raw(1,:)),(zscore(smoothdata(results.C_raw(i,:),'movmedian',3)))+i*6,'b') %may have to tweak the +i*6 at the end
+            plot(1:length(results.C_raw(1,:)),normSmoothData(i,:)+i*6,'b') %may have to tweak the +i*6 at the end
             else
-                         plot(1:length(results.C_raw(1,:)),(zscore(smoothdata(results.C_raw(i,:),'movmedian',3)))+i*6,'r') %may have to tweak the +i*6 at the end   
+            plot(1:length(results.C_raw(1,:)),normSmoothData(i,:)+i*6,'r') %may have to tweak the +i*6 at the end   
             end
         catch
         end
@@ -219,7 +232,9 @@ for d = 1:4%length(dirTop)-2
     
     %find all correlation indices across all pairs and close pairs of cells
     corrIndAll{d} = find(abs(timeCorrAll{d})>0);
-    corrIndClose{d} = find(abs(timeCorrClose{d})>0);  
+    corrIndClose{d} = find(abs(timeCorrClose{d})>0); 
+    corrIndAllS{d} = find(abs(timeCorrS{d})>0);
+    corrIndCloseS{d} = find(abs(timeCorrCloseS{d})>0);
     %plot distributions of correlation coeffiecients for all and close ROIs
     plot_corrDist = figure();
     subplot(1,2,1);
@@ -228,15 +243,31 @@ for d = 1:4%length(dirTop)-2
     title(['Dist R ALL ROIs: ' batName{d} ' ' dateSesh{d} ' ' sessionType{d}]);
     xlabel('Correlation coefficients');
     ylabel('# ROI pairs');
-    
     subplot(1,2,2);
     histogram(timeCorrClose{d}(corrIndClose{d}),8,'FaceColor','r');
     hold on;
-    title('Dist R CLOSE ROIs');
+    title('Dist R CLOSE ROIs (cRaw matrix)');
     xlabel('Correlation coefficients');
     ylabel('# ROI pairs');
     hold off;
     
+    %plot distributions of correlation coeffiecients for all and close ROIs
+    plot_corrDistS = figure();
+    subplot(1,2,1);
+    histogram(timeCorrS{d}(corrIndAllS{d}));
+    hold on;
+    title(['Dist R ALL ROIs: ' batName{d} ' ' dateSesh{d} ' ' sessionType{d}]);
+    xlabel('Correlation coefficients');
+    ylabel('# ROI pairs');
+    subplot(1,2,2);
+    histogram(timeCorrCloseS{d}(corrIndCloseS{d}),8,'FaceColor','r');
+    hold on;
+    title('Dist R CLOSE ROIs (S matrix)');
+    xlabel('Correlation coefficients');
+    ylabel('# ROI pairs');
+    hold off;
+    
+    if saveFlag == 1
     %save fig and tif of max projection
     %set(findall(maxFig,'-property','FontSize'),'FontSize',20);
     savefig(plot_ROI_refined,['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_ROIrefined_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
@@ -248,7 +279,13 @@ for d = 1:4%length(dirTop)-2
     savefig(plot_corrDist,['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
     saveas(plot_corrDist, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
     saveas(plot_corrDist, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
+    %save fig and tif of correlation distributions
+    %set(findall(maxFig,'-property','FontSize'),'FontSize',20);
+    savefig(plot_corrDistS,['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
+    saveas(plot_corrDistS, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
+    saveas(plot_corrDistS, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
     
+    end
     close all;
     cd(dirTop(d).folder);
 end
@@ -289,6 +326,12 @@ ROI_refined.distFull = distFull;
 ROI_refined.timeCorrAll = timeCorrAll;
 ROI_refined.timeCorrClose = timeCorrClose;
 ROI_refined.timeCorrFull = timeCorrFull;
+ROI_refined.timeCorrS = timeCorrS;
+ROI_refined.timeCorrCloseS = timeCorrCloseS;
+ROI_refined.corrIndAll = corrIndAll;
+ROI_refined.corrIndClose = corrIndClose;
+ROI_refined.corrIndAllS = corrIndAllS;
+ROI_refined.corrIndCloseS = corrIndCloseS;
 ROI_refined.distThresh = distThresh/scaling; %number of pixels to check if the cells are close enough to be considered same cell
 ROI_refined.corrThresh = corrThresh; %max correlation of time series if cells are very close
 ROI_refined.scaling = scaling; % 5x but depends on size of frame and downsampling from extraction step
@@ -297,5 +340,7 @@ ROI_refined.maxLim = maxLim;
 ROI_refined.ROI_coords = ROI_coords;
 ROI_refined.centroid = centroid;
 
+if saveFlag == 1
 save(['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\ROI_refined_' num2str(distThresh/scaling) '_' num2str(corrThresh) '_' datestr(now,'yyMMdd-hhmmss') '.mat'],'ROI_refined');
 %save(['/Users/periscope/Desktop/analysis/ROI_refined/ROI_refined_' num2str(distThresh/scaling) '_' num2str(corrThresh) '_' datestr(now,'yyMMdd-hhmmss') '.mat'],'ROI_refined');
+end

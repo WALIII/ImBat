@@ -145,8 +145,8 @@ for data_i = 1:3
         %for each trial in cluster, calculate the start/stop times and duration of the calcium videos
         for dur_i = 1:length(flightPaths.clusterIndex{clust_i})
             %get imaging times of start and stop index converting from tracking to video times
-            [minValueStart(dur_i),closestIndexStart(dur_i)] = min(abs(alignment.out.video_timesDS-alignment.out.Location_time(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(dur_i)))));
-            [minValueEnd(dur_i),closestIndexEnd(dur_i)] = min(abs(alignment.out.video_timesDS-alignment.out.Location_time(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(dur_i)))));
+            [minValueStart(dur_i),closestIndexStart(dur_i)] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(dur_i)))));
+            [minValueEnd(dur_i),closestIndexEnd(dur_i)] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(dur_i)))));
             %calculate duration of each flight in a particular cluster so
             %you can pad all flights to the longest flight in that cluster
             dur(dur_i) = closestIndexEnd(dur_i)-closestIndexStart(dur_i);
