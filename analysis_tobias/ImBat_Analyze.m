@@ -263,9 +263,13 @@ for i = 1:length(subFolders)
             mkdir([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCells']);
             cd([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCells']);
             ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
-            %savefig(flightPathsToFeeder,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsToFeeder.fig']);
-            %saveas(flightPathsToFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsToFeeder.tif']);
+        end
+        if plotPlaceCellsAng == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
+            mkdir([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCells']);
+            cd([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCells']);
+            ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
             
+        
         end
         
         %snake plots: raw fluorescent traces for each cell sorted by timing of
