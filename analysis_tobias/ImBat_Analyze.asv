@@ -280,11 +280,11 @@ for i = 1:9%length(subFolders)
             %load([subFolders(i).folder,'/',subFolders(i).name,'/',imageFolders(kk).name,'/' analysis_Folder '/',batName,'_',dateSesh,'_',sessionType,'_flightPaths.mat']);
             if plotSnakesManualFlag == 1
                 [snakeTrace_cRaw,snakeTrace_c,snakeTrace_s] = ImBat_snakeData_manualStable(cellData,flightPaths,alignment,'galdate',galDate)
+                [snakeTrace_stableROI] = ImBat_plotSnake_stableROI(snakeTrace_cRaw)
            
             else
                 [snakeTrace_cRaw,snakeTrace_c,snakeTrace_s] = ImBat_snakeData(cellData,flightPaths,alignment)
-            end
-                [snakeTrace] = ImBat_plotSnake(snakeTrace_s)
+                [snakeTrace] = ImBat_plotSnake(snakeTrace_cRaw)
             saveas(snakeTrace.snakePlot_clust, [imageFolders(kk).folder filesep imageFolders(kk).name filesep analysis_Folder filesep 'snakePlots' filesep fileName '_snakePlots_clust.svg']);
             saveas(snakeTrace.snakePlot_clustOddEven, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlots_clustOddEven.svg']);
             saveas(snakeTrace.snakePlot_clustBy1, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlots_clustBy1.svg']);
@@ -308,7 +308,7 @@ for i = 1:9%length(subFolders)
             savefig(snakeTrace.snakePlot_prefEachPrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_prefEachPrePostFlight.fig']);
             savefig(snakeTrace.snakePlot_prefAll, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlots_prefAll.fig']);
             savefig(snakeTrace.snakePlot_clustBy1PrePostFlight, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/snakePlots/' fileName '_snakePlot_clustBy1PrePostFlight.fig']);
-            
+            end
         end
         
         %snake plots: raw fluorescent traces for each cell sorted by timing of

@@ -1,4 +1,4 @@
-function [snakeTrace_cRaw,snakeTrace_c,snakeTrace_s] = ImBat_snakeData(cellData,flightPaths,alignment,varargin)
+function [snakeTrace_cRaw,snakeTrace_c,snakeTrace_s] = ImBat_snakeData_manualStable(cellData,flightPaths,alignment,varargin)
 
 batName = [];
 dateSesh = [];
@@ -33,6 +33,8 @@ for i=1:2:nparams
             postFlightPad = varargin{i+1};
         case 'analysisfolder'
             analysis_Folder = varargin{i+1};
+        case 'galdate'
+            galDate = varargin{i+1};
     end
 end
 
@@ -46,8 +48,8 @@ if loadFlag == 1
     load([pewd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
 %padding for during flight snake plot to include some time before and after flight
-prePad = 0.2; %number of seconds to plot before alignment point
-postPad = 0.2; %number of seconds to plot after alignment point
+prePad = 3; %number of seconds to plot before alignment point
+postPad = 3; %number of seconds to plot after alignment point
 prePadCalcium = prePad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postPadCalcium = postPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 prePadSpeed = prePad*120; %add 2 seconds * FS of tracking data (120)
@@ -77,7 +79,8 @@ ROIs_gal = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
     5 13 41 23 1 21 3 24 6 22 2 25 16 15 7;
     12 3 34 19 2 14 6 15 9 36 5 10 35 20 1;
     25 26 16 32 1 12 4 19 5 28 15 NaN 34 3 2;
-    32 34 29 51 7 10 6 40 16 45 5 8 42 26 43];  
+    32 34 29 51 7 10 6 40 16 45 5 8 42 26 43]; 
+
 % if ~isempty(clustDelete) & clustDelete <6
 %     flightPaths.clusterIndex{clustDelete} = [];
 % end
@@ -176,37 +179,19 @@ for data_i = 1:3
         tracePreFlightPost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),length(tracePre{clust_i}(1,:,1)) + length(traceFlight{clust_i}(1,:,1)) + length(tracePost{clust_i}(1,:,1)));
         speedPreFlightPost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),length(speedPre{clust_i}(1,:)) + length(speedFlight{clust_i}(1,:)) + length(speedPost{clust_i}(1,:)));
         %for each cell
-        for cell_i = 1:length(traceData(:,1))
+        cellCount = 1;
+        for cell_i = ROIs_gal(galDate,:)%1:length(traceData(:,1))
             %build the calcium and speed vectors for each flight within each cluster
             for trace_i = 1:length(flightPaths.clusterIndex{clust_i})
+                
+                traceFlightIdx{clust_i}(trace_i) = flightPaths.clusterIndex{clust_i}(trace_i);
                 try
-                    traceFlightIdx{clust_i}(trace_i) = flightPaths.clusterIndex{clust_i}(trace_i);
-                    traceFlight{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
-                    speedFlight{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePadSpeed:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postPadSpeed);
-                    smoothTraceRawFlight{clust_i}(trace_i,:,cell_i) = smooth(traceFlight{clust_i}(trace_i,:,cell_i),traceSmooth);
-                    normTraceRawFlight{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawFlight{clust_i}(trace_i,:,cell_i),0,smoothTrace);
-                    normTraceRawFlight{clust_i}(trace_i,:,cell_i) = normTraceRawFlight{clust_i}(trace_i,:,cell_i) - min(normTraceRawFlight{clust_i}(trace_i,:,cell_i));
-                    smoothSpeedRawFlight{clust_i}(trace_i,:) = smooth(speedFlight{clust_i}(trace_i,:),smoothSpeed);
-                    tracePre{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
-                    speedPre{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - preFlightPadSpeed:flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)));
-                    smoothTraceRawPre{clust_i}(trace_i,:,cell_i) = smooth(tracePre{clust_i}(trace_i,:,cell_i),traceSmooth);
-                    normTraceRawPre{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPre{clust_i}(trace_i,:,cell_i),0,smoothTrace);
-                    normTraceRawPre{clust_i}(trace_i,:,cell_i) = normTraceRawPre{clust_i}(trace_i,:,cell_i) - min(normTraceRawPre{clust_i}(trace_i,:,cell_i));
-                    smoothSpeedRawPre{clust_i}(trace_i,:) = smooth(speedPre{clust_i}(trace_i,:),smoothSpeed);
-                    tracePost{clust_i}(trace_i,:,cell_i) = traceData(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
-                    speedPost{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postFlightPadSpeed);
-                    smoothTraceRawPost{clust_i}(trace_i,:,cell_i) = smooth(tracePost{clust_i}(trace_i,:,cell_i),traceSmooth);
-                    normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,smoothTrace);
-                    normTraceRawPost{clust_i}(trace_i,:,cell_i) = normTraceRawPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPost{clust_i}(trace_i,:,cell_i));
-                    smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),smoothSpeed);
-                    tracePreFlightPost{clust_i}(trace_i,:,cell_i) = cat(2,tracePre{clust_i}(trace_i,:,cell_i),traceFlight{clust_i}(trace_i,:,cell_i),tracePost{clust_i}(trace_i,:,cell_i));
-                    speedPreFlightPost{clust_i}(trace_i,:) = horzcat(speedPre{clust_i}(trace_i,:),speedFlight{clust_i}(trace_i,:),speedPost{clust_i}(trace_i,:));
-                    smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = smooth(tracePreFlightPost{clust_i}(trace_i,:,cell_i),traceSmooth);
-                    normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i),0,smoothTrace);
-                    normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) = normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPreFlightPost{clust_i}(trace_i,:,cell_i));
-                    smoothSpeedRawPreFlightPost{clust_i}(trace_i,:) = smooth(speedPreFlightPost{clust_i}(trace_i,:),smoothSpeed);
-                    
-                    
+                    traceFlight{clust_i}(trace_i,:,cellCount) = traceData(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
+                    tracePre{clust_i}(trace_i,:,cellCount) = traceData(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
+                    tracePost{clust_i}(trace_i,:,cellCount) = traceData(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
+                    speedFlight{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePadSpeed:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postPadSpeed);                
+                                speedPre{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - preFlightPadSpeed:flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)));
+
                 catch
                     %                     tracePost{clust_i}(trace_i,:,cell_i) = [traceData(cell_i,closestIndexEnd(trace_i):end),zeros(1,size(tracePost{clust_i}(trace_i,:,cell_i),2) - size(traceData(cell_i,closestIndexEnd(trace_i):end),2))];
                     %                     speedPost{clust_i}(trace_i,:) = [flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):end),zeros(1,size(speedPost{clust_i}(trace_i,:),2)-size(flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):end,2)))];
@@ -214,55 +199,78 @@ for data_i = 1:3
                     %                     normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,2);
                     %                     normTraceRawPost{clust_i}(trace_i,:,cell_i) = normTraceRawPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPost{clust_i}(trace_i,:,cell_i));
                     %                     smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),speedSmooth);
+                    %traceFlight{clust_i}(trace_i,:,cellCount) = traceFlight{clust_i}(trace_i,:,
                     disp('End of rec')
+                
                 end
+                smoothTraceRawFlight{clust_i}(trace_i,:,cellCount) = smooth(traceFlight{clust_i}(trace_i,:,cellCount),traceSmooth);
+                normTraceRawFlight{clust_i}(trace_i,:,cellCount) = zscore(smoothTraceRawFlight{clust_i}(trace_i,:,cellCount),0,smoothTrace);
+                normTraceRawFlight{clust_i}(trace_i,:,cellCount) = normTraceRawFlight{clust_i}(trace_i,:,cellCount) - min(normTraceRawFlight{clust_i}(trace_i,:,cellCount));
+                smoothSpeedRawFlight{clust_i}(trace_i,:) = smooth(speedFlight{clust_i}(trace_i,:),smoothSpeed);
+                smoothTraceRawPre{clust_i}(trace_i,:,cellCount) = smooth(tracePre{clust_i}(trace_i,:,cellCount),traceSmooth);
+                normTraceRawPre{clust_i}(trace_i,:,cellCount) = zscore(smoothTraceRawPre{clust_i}(trace_i,:,cellCount),0,smoothTrace);
+                normTraceRawPre{clust_i}(trace_i,:,cellCount) = normTraceRawPre{clust_i}(trace_i,:,cellCount) - min(normTraceRawPre{clust_i}(trace_i,:,cellCount));
+                smoothSpeedRawPre{clust_i}(trace_i,:) = smooth(speedPre{clust_i}(trace_i,:),smoothSpeed);
+                speedPost{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postFlightPadSpeed);
+                smoothTraceRawPost{clust_i}(trace_i,:,cellCount) = smooth(tracePost{clust_i}(trace_i,:,cellCount),traceSmooth);
+                normTraceRawPost{clust_i}(trace_i,:,cellCount) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cellCount),0,smoothTrace);
+                normTraceRawPost{clust_i}(trace_i,:,cellCount) = normTraceRawPost{clust_i}(trace_i,:,cellCount) - min(normTraceRawPost{clust_i}(trace_i,:,cellCount));
+                smoothSpeedRawPost{clust_i}(trace_i,:) = smooth(speedPost{clust_i}(trace_i,:),smoothSpeed);
+                tracePreFlightPost{clust_i}(trace_i,:,cellCount) = cat(2,tracePre{clust_i}(trace_i,:,cellCount),traceFlight{clust_i}(trace_i,:,cellCount),tracePost{clust_i}(trace_i,:,cellCount));
+                speedPreFlightPost{clust_i}(trace_i,:) = horzcat(speedPre{clust_i}(trace_i,:),speedFlight{clust_i}(trace_i,:),speedPost{clust_i}(trace_i,:));
+                smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cellCount) = smooth(tracePreFlightPost{clust_i}(trace_i,:,cellCount),traceSmooth);
+                normTraceRawPreFlightPost{clust_i}(trace_i,:,cellCount) = zscore(smoothTraceRawPreFlightPost{clust_i}(trace_i,:,cellCount),0,smoothTrace);
+                normTraceRawPreFlightPost{clust_i}(trace_i,:,cellCount) = normTraceRawPreFlightPost{clust_i}(trace_i,:,cellCount) - min(normTraceRawPreFlightPost{clust_i}(trace_i,:,cellCount));
+                smoothSpeedRawPreFlightPost{clust_i}(trace_i,:) = smooth(speedPreFlightPost{clust_i}(trace_i,:),smoothSpeed);
+                
                 
             end
             
             %calculate the mean neural activity across all flights in a cluster for each cell
-            if length(traceFlight{clust_i}(:,1,cell_i)) <2
-                meanTraceFlight{clust_i}(cell_i,:) = traceFlight{clust_i}(:,:,cell_i);
-                meanTracePre{clust_i}(cell_i,:) = tracePre{clust_i}(:,:,cell_i);
-                meanTracePost{clust_i}(cell_i,:) = tracePost{clust_i}(:,:,cell_i);
+            if length(traceFlight{clust_i}(:,1,cellCount)) <2
+                meanTraceFlight{clust_i}(cellCount,:) = traceFlight{clust_i}(:,:,cellCount);
+                meanTracePre{clust_i}(cellCount,:) = tracePre{clust_i}(:,:,cellCount);
+                meanTracePost{clust_i}(cellCount,:) = tracePost{clust_i}(:,:,cellCount);
             else 
-                meanTraceFlight{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(:,:,cell_i));
-                meanTracePre{clust_i}(cell_i,:) = mean(tracePre{clust_i}(:,:,cell_i));
-                meanTracePost{clust_i}(cell_i,:) = mean(tracePost{clust_i}(:,:,cell_i));
+                meanTraceFlight{clust_i}(cellCount,:) = mean(traceFlight{clust_i}(:,:,cellCount));
+                meanTracePre{clust_i}(cellCount,:) = mean(tracePre{clust_i}(:,:,cellCount));
+                meanTracePost{clust_i}(cellCount,:) = mean(tracePost{clust_i}(:,:,cellCount));
                 
             end
-            sdTraceFlight{clust_i}(cell_i,:) = std(traceFlight{clust_i}(:,:,cell_i));
-            meanTraceOdd{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(1:2:end,:,cell_i));
-            meanTraceEven{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(2:2:end,:,cell_i));
+            sdTraceFlight{clust_i}(cellCount,:) = std(traceFlight{clust_i}(:,:,cellCount));
+            meanTraceOdd{clust_i}(cellCount,:) = mean(traceFlight{clust_i}(1:2:end,:,cellCount));
+            meanTraceEven{clust_i}(cellCount,:) = mean(traceFlight{clust_i}(2:2:end,:,cellCount));
             meanSpeedFlight{clust_i} = mean(speedFlight{clust_i});
             meanSpeedPre{clust_i} = mean(speedPre{clust_i});
             meanSpeedPost{clust_i} = mean(speedPost{clust_i});
-            meanTracePreFlightPost{clust_i}(cell_i,:) = mean(tracePreFlightPost{clust_i}(:,:,cell_i));
-            sdTracePreFlightPost{clust_i}(cell_i,:) = std(tracePreFlightPost{clust_i}(:,:,cell_i));
-            semTracePreFlightPost{clust_i}(cell_i,:) = std(tracePreFlightPost{clust_i}(:,:,cell_i))/sqrt(length(tracePreFlightPost{clust_i}(:,:,cell_i)));
+            meanTracePreFlightPost{clust_i}(cellCount,:) = mean(tracePreFlightPost{clust_i}(:,:,cellCount));
+            sdTracePreFlightPost{clust_i}(cellCount,:) = std(tracePreFlightPost{clust_i}(:,:,cellCount));
+            semTracePreFlightPost{clust_i}(cellCount,:) = std(tracePreFlightPost{clust_i}(:,:,cellCount))/sqrt(length(tracePreFlightPost{clust_i}(:,:,cellCount)));
             meanSpeedPreFlightPost{clust_i} = mean(speedPreFlightPost{clust_i});
             
             %smooth and zscore the neural data. subtract the min of the zscore so the
             %min is 0 rather than mean 0
-            normTraceFlight{clust_i}(cell_i,:) = zscore(smooth(meanTraceFlight{clust_i}(cell_i,:),traceSmooth));
-            normTraceFlight{clust_i}(cell_i,:) = normTraceFlight{clust_i}(cell_i,:) - min(normTraceFlight{clust_i}(cell_i,:));
+            normTraceFlight{clust_i}(cellCount,:) = zscore(smooth(meanTraceFlight{clust_i}(cellCount,:),traceSmooth));
+            normTraceFlight{clust_i}(cellCount,:) = normTraceFlight{clust_i}(cellCount,:) - min(normTraceFlight{clust_i}(cellCount,:));
             smoothSpeedFlight{clust_i} = smooth(meanSpeedFlight{clust_i},smoothSpeed);
-            normTraceOdd{clust_i}(cell_i,:) = zscore(smooth(meanTraceOdd{clust_i}(cell_i,:),traceSmooth));
-            normTraceOdd{clust_i}(cell_i,:) = normTraceOdd{clust_i}(cell_i,:) - min(normTraceOdd{clust_i}(cell_i,:));
-            normTraceEven{clust_i}(cell_i,:) = zscore(smooth(meanTraceEven{clust_i}(cell_i,:),traceSmooth));
-            normTraceEven{clust_i}(cell_i,:) = normTraceEven{clust_i}(cell_i,:) - min(normTraceEven{clust_i}(cell_i,:));
-            normTracePre{clust_i}(cell_i,:) = zscore(smooth(meanTracePre{clust_i}(cell_i,:),traceSmooth));
-            normTracePre{clust_i}(cell_i,:) = normTracePre{clust_i}(cell_i,:) - min(normTracePre{clust_i}(cell_i,:));
+            normTraceOdd{clust_i}(cellCount,:) = zscore(smooth(meanTraceOdd{clust_i}(cellCount,:),traceSmooth));
+            normTraceOdd{clust_i}(cellCount,:) = normTraceOdd{clust_i}(cellCount,:) - min(normTraceOdd{clust_i}(cellCount,:));
+            normTraceEven{clust_i}(cellCount,:) = zscore(smooth(meanTraceEven{clust_i}(cellCount,:),traceSmooth));
+            normTraceEven{clust_i}(cellCount,:) = normTraceEven{clust_i}(cellCount,:) - min(normTraceEven{clust_i}(cellCount,:));
+            normTracePre{clust_i}(cellCount,:) = zscore(smooth(meanTracePre{clust_i}(cellCount,:),traceSmooth));
+            normTracePre{clust_i}(cellCount,:) = normTracePre{clust_i}(cellCount,:) - min(normTracePre{clust_i}(cellCount,:));
             smoothSpeedPre{clust_i} = smooth(meanSpeedPre{clust_i},smoothSpeed);
-            normTracePost{clust_i}(cell_i,:) = zscore(smooth(meanTracePost{clust_i}(cell_i,:),traceSmooth));
-            normTracePost{clust_i}(cell_i,:) = normTracePost{clust_i}(cell_i,:) - min(normTracePost{clust_i}(cell_i,:));
+            normTracePost{clust_i}(cellCount,:) = zscore(smooth(meanTracePost{clust_i}(cellCount,:),traceSmooth));
+            normTracePost{clust_i}(cellCount,:) = normTracePost{clust_i}(cellCount,:) - min(normTracePost{clust_i}(cellCount,:));
             smoothSpeedPost{clust_i} = smooth(meanSpeedPost{clust_i},smoothSpeed);
             %find time index of max peaks
-            [~,maxnormTraceFlight{clust_i}(cell_i,1)] = max(normTraceFlight{clust_i}(cell_i,:));
-            [~,maxnormTracePre{clust_i}(cell_i,1)] = max(normTracePre{clust_i}(cell_i,:));
-            [~,maxnormTracePost{clust_i}(cell_i,1)] = max(normTracePost{clust_i}(cell_i,:));
-            [~,maxNormTraceOdd{clust_i}(cell_i,1)] = max(normTraceOdd{clust_i}(cell_i,:));
-            
+            [~,maxnormTraceFlight{clust_i}(cellCount,1)] = max(normTraceFlight{clust_i}(cellCount,:));
+            [~,maxnormTracePre{clust_i}(cellCount,1)] = max(normTracePre{clust_i}(cellCount,:));
+            [~,maxnormTracePost{clust_i}(cellCount,1)] = max(normTracePost{clust_i}(cellCount,:));
+            [~,maxNormTraceOdd{clust_i}(cellCount,1)] = max(normTraceOdd{clust_i}(cellCount,:));
+        cellCount = cellCount + 1; %add 1 to the cell index
         end
+        cellCount = cellCount -1; %subtract the last addition so the rest of the script uses the max Cells correctly
         %sort each cell by the timing of its peak firing
         [BFlight{clust_i},IFlight{clust_i}] = sort(maxnormTraceFlight{clust_i});
         [BPre{clust_i},IPre{clust_i}] = sort(maxnormTracePre{clust_i});
@@ -300,7 +308,7 @@ for data_i = 1:3
     
     %% this is to smooth, zscore, and sort the entire cell data by their preferred flight according to a homemade k-means (max dff across flights)
     %zscore the full data set and subtract min to start at 0
-    for cell_ii = 1:length(traceData(:,1))
+    for cell_ii = 1:cellCount
         normMeanTraceFlightAll(cell_ii,:) = zscore(smooth(meanTraceFlightAll(cell_ii,:),traceSmooth));
         normMeanTraceFlightAll(cell_ii,:) = normMeanTraceFlightAll(cell_ii,:) - min(normMeanTraceFlightAll(cell_ii,:));
         normMeanTracePreAll(cell_ii,:) = zscore(smooth(meanTracePreAll(cell_ii,:),traceSmooth));
@@ -333,7 +341,7 @@ for data_i = 1:3
         normTraceFlightClustAll{clust_iii} = normMeanTracePreFlightPostAll{clust_iii}(:,preFlightPadCalcium+1:preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:)));
         normTracePostClustAll{clust_iii} = normMeanTracePreFlightPostAll{clust_iii}(:,preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:))+1:preFlightPadCalcium+length(normTraceFlightAll{clust_iii}(1,:))+postFlightPadCalcium);
         %find the order of the maximum for each cluster within the regrouping
-        for cell_iii = 1:length(traceData(:,1))
+        for cell_iii = 1:cellCount%length(traceData(:,1))
             [~,maxNormFlightAll{clust_iii}(cell_iii,1)] = max(normTraceFlightAll{clust_iii}(cell_iii,:));
             [~,maxNormPreAll{clust_iii}(cell_iii,1)] = max(normTracePreAll{clust_iii}(cell_iii,:));
             [~,maxNormPostAll{clust_iii}(cell_iii,1)] = max(normTracePostAll{clust_iii}(cell_iii,:));

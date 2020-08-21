@@ -1,7 +1,16 @@
 function [ROI_refined] = ImBat_ROIcovar
-distThresh = 10; %number of pixels to check if the cells are close enough to be considered same cell
-corrThresh = 0.7; %max correlation of time series if cells are very close
+%this function checks distance between all pairs of ROIs and removes 
+
 saveFlag = 0; %do you want to save the figures and output structure?
+saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
+% Check if folder exists
+if exist([saveDir1 datestr(now,'yymmdd')])>0;
+    disp('Youve been working today..');
+else
+    mkdir([saveDir1 datestr(now,'yymmdd')])
+end
+saveDir = [saveDir1 datestr(now,'yymmdd') '\'];
+
 
 distThresh = 10; %number of pixels to check if the cells are close enough to be considered same cell
 corrThresh = 0.65; %max correlation of time series if cells are very close
@@ -10,8 +19,8 @@ minLim = 0.7; %limits for correlation imagesc
 maxLim = 1; %limits for correlation imagesc
 distThresh = distThresh * scaling;
 
-g = dir('G*');
-z = dir('Z*');
+g = dir('Ga*');
+z = dir('Z1*');
 dirTop = vertcat(g,z); %find all folders in top quality directory
 
 ROI_duplicate = cell(length(dirTop),1); %make cell for indices of duplicated ROIS
@@ -27,9 +36,9 @@ timeCorrS = cell(length(dirTop),1); %make cell for indices of correlations acros
 timeCorrCloseS = cell(length(dirTop),1); %make cell for indices of correlations across all close cells with S matrix
 corrIndCloseS =  cell(length(dirTop),1); %make cell for indices of correlations between close cells with S matrix
 corrIndAllS = cell(length(dirTop),1); %make cell for indices of correlations across all pairwise cells with S matrix
+spikeSmooth = cell(length(dirTop),1); %make cell for smoothed S matrix
 
-
-for d = 1:4%length(dirTop)-2
+for d = 1:length(dirTop)
     plot_ROI_refined = figure('units','normalized','outerposition',[0 0 0.9 0.9]);
     try %extract metadata names and enter processed folder
         cd([dirTop(d).name filesep 'extracted'])
@@ -41,7 +50,7 @@ for d = 1:4%length(dirTop)-2
         cd(flyFolders(end).name);
         dirProcessed = dir('processed_*');
         if strcmp(batName{d}(1),'G')
-            cd(dirProcessed(3).name);
+            cd(dirProcessed(end).name);
         else
             cd(dirProcessed(end).name);
         end
@@ -92,10 +101,10 @@ for d = 1:4%length(dirTop)-2
             timeCorrAll{d}(ii,iii) = R1(1,2);
             
             w = gausswin(10); %smooth the S matrix by gaussian window of 10
-            spikeSmooth{d)(ii,:) = filter(w,1,full(results.S(ii,:)));
-            RS = corrcoef(spikeSmooth,spikeSmooth); %take correlation between two smooth close series
+            spikeSmooth{d}(ii,:) = filter(w,1,full(results.S(ii,:)));
+            spikeSmooth{d}(iii,:) = filter(w,1,full(results.S(iii,:)));
+            RS = corrcoef(spikeSmooth{d}(ii,:),spikeSmooth{d}(iii,:)); %take correlation between two smooth close series
             timeCorrS{d}(ii,iii) = RS(1,2);
-            
             if distance{d}(ii,iii) < distThresh %if closer than 10 pixels
                 %R = corrcoef(results.C_raw(ii,:),results.C_raw(iii,:)); %take correlation between two time series
                 timeCorrClose{d}(ii,iii) = R1(1,2);
@@ -246,7 +255,7 @@ for d = 1:4%length(dirTop)-2
     subplot(1,2,2);
     histogram(timeCorrClose{d}(corrIndClose{d}),8,'FaceColor','r');
     hold on;
-    title('Dist R CLOSE ROIs');
+    title('Dist R CLOSE ROIs (cRaw matrix)');
     xlabel('Correlation coefficients');
     ylabel('# ROI pairs');
     hold off;
@@ -262,7 +271,7 @@ for d = 1:4%length(dirTop)-2
     subplot(1,2,2);
     histogram(timeCorrCloseS{d}(corrIndCloseS{d}),8,'FaceColor','r');
     hold on;
-    title('Dist R CLOSE ROIs');
+    title('Dist R CLOSE ROIs (S matrix)');
     xlabel('Correlation coefficients');
     ylabel('# ROI pairs');
     hold off;
@@ -270,15 +279,21 @@ for d = 1:4%length(dirTop)-2
     if saveFlag == 1
     %save fig and tif of max projection
     %set(findall(maxFig,'-property','FontSize'),'FontSize',20);
-    savefig(plot_ROI_refined,['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_ROIrefined_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
-    saveas(plot_ROI_refined, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_ROIrefined_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
-    saveas(plot_ROI_refined, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_ROIrefined_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
+    savefig(plot_ROI_refined,[saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
+    saveas(plot_ROI_refined, [saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
+    saveas(plot_ROI_refined, [saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
     
     %save fig and tif of correlation distributions
     %set(findall(maxFig,'-property','FontSize'),'FontSize',20);
-    savefig(plot_corrDist,['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
-    saveas(plot_corrDist, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
-    saveas(plot_corrDist, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
+    savefig(plot_corrDist,[saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
+    saveas(plot_corrDist, [saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
+    saveas(plot_corrDist, [saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
+    %save fig and tif of correlation distributions
+    %set(findall(maxFig,'-property','FontSize'),'FontSize',20);
+    savefig(plot_corrDistS,[saveDir 'plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
+    saveas(plot_corrDistS, [saveDir 'plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
+    saveas(plot_corrDistS, [saveDir 'plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
+    
     end
     close all;
     cd(dirTop(d).folder);
@@ -334,7 +349,7 @@ ROI_refined.maxLim = maxLim;
 ROI_refined.ROI_coords = ROI_coords;
 ROI_refined.centroid = centroid;
 
-if saveFlag == 1
-save(['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\ROI_refined_' num2str(distThresh/scaling) '_' num2str(corrThresh) '_' datestr(now,'yyMMdd-hhmmss') '.mat'],'ROI_refined');
+%if saveFlag == 1
+save([saveDir 'ROI_refined_c05' num2str(distThresh/scaling) '_' num2str(corrThresh) '_' datestr(now,'yyMMdd-hhmmss') '.mat'],'ROI_refined');
 %save(['/Users/periscope/Desktop/analysis/ROI_refined/ROI_refined_' num2str(distThresh/scaling) '_' num2str(corrThresh) '_' datestr(now,'yyMMdd-hhmmss') '.mat'],'ROI_refined');
-end
+%end

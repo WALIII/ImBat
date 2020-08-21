@@ -46,8 +46,8 @@ if loadFlag == 1
     load([pewd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
 %padding for during flight snake plot to include some time before and after flight
-prePad = 0.2; %number of seconds to plot before alignment point
-postPad = 0.2; %number of seconds to plot after alignment point
+prePad = 3; %number of seconds to plot before alignment point
+postPad = 3; %number of seconds to plot after alignment point
 prePadCalcium = prePad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postPadCalcium = postPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 prePadSpeed = prePad*120; %add 2 seconds * FS of tracking data (120)
