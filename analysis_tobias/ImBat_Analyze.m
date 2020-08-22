@@ -35,6 +35,7 @@ flightPathsFeederFlag = 0;
 plotFlightvsCellsFlag = 1;
 %place cells plot flags
 plotPlaceCellsFlag = 1;
+plotPlaceCellsAng = 1;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 %align max projections of specific flights across trajectories
@@ -265,11 +266,10 @@ for i = 1:length(subFolders)
             ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
         end
         if plotPlaceCellsAng == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
-            mkdir([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCells']);
-            cd([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCells']);
-            ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
+            mkdir([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCellsAng']);
+            cd([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCellsAng']);
+            ImBat_PlaceCells_Ang(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
             
-        
         end
         
         %snake plots: raw fluorescent traces for each cell sorted by timing of

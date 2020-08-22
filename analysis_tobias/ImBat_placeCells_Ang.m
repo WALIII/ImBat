@@ -48,11 +48,11 @@ F1 = [2.56; 1.23; 1.72];    F2 = [2.56; -1.04; 1.72];                       %Fee
 F3 = [2.56; 1.43; 0.72];    F4 = [2.56; -1.24; 0.72];                       %Feeders coordinates
 edges_d = {xL:(xR-xL)/10:xR yB:(yF-yB)/10:yF};                              %Edges for density histogram
 
-%Create analysis folder for storing the results
-analysis_directory=fullfile(pwd,['Analysis_',datestr(now, 'yymmdd_HHMM')]);
-if ~exist(analysis_directory,'dir')
-    mkdir(analysis_directory);
-end
+% %Create analysis folder for storing the results
+% analysis_directory=fullfile(pwd,['Analysis_',datestr(now, 'yymmdd_HHMM')]);
+% if ~exist(analysis_directory,'dir')
+%     mkdir(analysis_directory);
+% end
 %% Code in the middle
 
 
