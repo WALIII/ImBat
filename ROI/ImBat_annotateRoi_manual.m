@@ -19,10 +19,11 @@ save([ROI(1).batName '_ROI_' datestr(now,'YYmmDD_hhMM') '.mat'],'ROI');
 trackableROI = figure(); 
 sgtitle([ROI(1).batName ': stable cells across ' num2str(length(ROI)) ' days']);
 for iii = 1:length(ROI)
-    subplot(1,3,iii);%,length(ROI.coordinates),iii); 
+    subplot(4,3,iii);%,length(ROI.coordinates),iii); 
     hold on; 
     for p = 1:length(ROI(iii).data.coordinates) 
         plot(ROI(iii).data.coordinates{p}(:,1),ROI(iii).data.coordinates{p}(:,2)); 
+        txt = text(ROI(iii).data.coordinates{p}(ceil(end/2),1),ROI(iii).data.coordinates{p}(1,2),num2str(p));
     end
     set(gca, 'YDir','reverse')
     title([ROI(iii).batName ' ' ROI(iii).dateSesh]);

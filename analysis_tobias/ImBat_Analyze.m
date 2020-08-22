@@ -34,7 +34,8 @@ clustManualFlag = 0;
 flightPathsFeederFlag = 0;
 plotFlightvsCellsFlag = 0;
 %place cells plot flags
-plotPlaceCellsFlag = 0;
+plotPlaceCellsFlag = 1;
+plotPlaceCellsAng = 1;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 plotSnakesManualFlag = 1;
@@ -265,8 +266,11 @@ for i = 1:9%length(subFolders)
             mkdir([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCells']);
             cd([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCells']);
             ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
-            %savefig(flightPathsToFeeder,[imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsToFeeder.fig']);
-            %saveas(flightPathsToFeeder, [imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/flights/' fileName '_flightPathsToFeeder.tif']);
+        end
+        if plotPlaceCellsAng == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
+            mkdir([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCellsAng']);
+            cd([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCellsAng']);
+            ImBat_PlaceCells_Ang(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
             
         end
         
