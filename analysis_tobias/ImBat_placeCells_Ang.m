@@ -47,6 +47,7 @@ n_space_bins = 30;  %correlates with space resolution but good around 30 (20cm c
 N = size(cellData.results.C_raw,1); %number of ROIs
 T = size(cellData.results.C_raw,2); %length of each neural trace
 CNMFe_Fs = cellData.results.Fs; %imaging sampling rate
+dsFactor =4; %convert from 120hz behavior start frame to 30hz imaging start frame
 
 %Flight Room references (provvisory)
 xR = +2.85; xL = -2.85; yF = 2.50;  yB = -2.50;  zT = 2.20;                 %Flight volume coordinates
@@ -151,10 +152,13 @@ if p_val_analysis
                 for ii=1:size(id,1) %for all flights within the cluster, define the following vectors
                     %grabbing and binning the velocity and activity along
                     %with other variables
+                    %convert from behavior time to imaging time
+                    [minValueStart,closestIndexStart] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(id(ii)))));
+                    [minValueEnd,closestIndexEnd] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(id(ii)))));
                     Act_pre = [];   Act_dur = [];   Act_pst = [];   v_trj = [];
-                    Act_pre =  Rate_sh(round(flightPaths.flight_starts_idx(id(ii))/4)-pre_dur*CNMFe_Fs:round(flightPaths.flight_starts_idx(id(ii))/4)-1);
-                    Act_dur =  Rate_sh(round(flightPaths.flight_starts_idx(id(ii))/4):round(flightPaths.flight_ends_idx(id(ii))/4));
-                    Act_pst =  Rate_sh(round(flightPaths.flight_ends_idx(id(ii))/4)+1:round(flightPaths.flight_ends_idx(id(ii))/4)+pst_dur*CNMFe_Fs);
+                    Act_pre =  Rate_sh(closestIndexStart-pre_dur*CNMFe_Fs:closestIndexStart-1);
+                    Act_dur =  Rate_sh(closestIndexStart:closestIndexEnd);
+                    Act_pst =  Rate_sh(closestIndexEnd+1:closestIndexEnd+pst_dur*CNMFe_Fs);
                     
                     %Temporally binned activity for pre-during-post
                     flight_dur(1,ii) = flightPaths.dur(id(ii)); %this comes from the flightPaths output

@@ -96,7 +96,7 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
             PH = mat2gray(PH);
             hold on
             %scatter(LX,LY,(PH*75)+1,'or','filled');
-            scatter(LX,LY,(PH*75)+1,'or','filled');
+            scatter(,LX,LY,(PH*75)+1,'or','filled');
             %scatter3(LX,LY,LZ,(PH*75)+1,'or','filled');
             %uistack(dots,'top');
             % % modify labels for tick marks
@@ -119,13 +119,14 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
     
     % Plot the location in space that each cell is active in individual figures
     plotFiringTrajectoryIndiv =  figure();
+    a2 = axes;
     try
-        plot(alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
+        plot(a2,alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
         hold on;
         disp([num2str(size(LX_s)),' Bursts in flight'])
         PH = mat2gray(PH);
         %scatter(LX,LY,(PH*75)+1,'or','filled');
-        scatter(LX,LY,(PH*75)+1,'or','filled');
+        scatter(a2,LX,LY,(PH*75)+1,'or','filled');
         %scatter3(LX,LY,LZ,(PH*75)+1,'or','filled');
         %uistack(dots,'top');
         % % modify labels for tick marks

@@ -222,21 +222,18 @@ for data_i = 1:3
             end
             
             %calculate the mean neural activity across all flights in a cluster for each cell
-            if length(traceFlight{clust_i}(:,1,cell_i)) <2
-                meanTraceFlight{clust_i}(cell_i,:) = traceFlight{clust_i}(:,:,cell_i);
-                meanTracePre{clust_i}(cell_i,:) = tracePre{clust_i}(:,:,cell_i);
-                meanTracePost{clust_i}(cell_i,:) = tracePost{clust_i}(:,:,cell_i);
-            else 
-                meanTraceFlight{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(:,:,cell_i));
-                meanTracePre{clust_i}(cell_i,:) = mean(tracePre{clust_i}(:,:,cell_i));
-                meanTracePost{clust_i}(cell_i,:) = mean(tracePost{clust_i}(:,:,cell_i));
+                %meanTraceFlight{clust_i}(cell_i,:) = traceFlight{clust_i}(:,:,cell_i);
+                %meanTracePre{clust_i}(cell_i,:) = tracePre{clust_i}(:,:,cell_i);
+                %meanTracePost{clust_i}(cell_i,:) = tracePost{clust_i}(:,:,cell_i);
+                meanTraceFlight{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(:,:,cell_i),1);
+                meanTracePre{clust_i}(cell_i,:) = mean(tracePre{clust_i}(:,:,cell_i),1);
+                meanTracePost{clust_i}(cell_i,:) = mean(tracePost{clust_i}(:,:,cell_i),1);
                 
-            end
             sdTraceFlight{clust_i}(cell_i,:) = std(traceFlight{clust_i}(:,:,cell_i));
             sdTracePre{clust_i}(cell_i,:) = std(tracePre{clust_i}(:,:,cell_i));
             sdTracePost{clust_i}(cell_i,:) = std(tracePre{clust_i}(:,:,cell_i));
-            meanTraceOdd{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(1:2:end,:,cell_i));
-            meanTraceEven{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(2:2:end,:,cell_i));
+            meanTraceOdd{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(1:2:end,:,cell_i),1);
+            meanTraceEven{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(2:2:end,:,cell_i),1);
             meanSpeedFlight{clust_i} = mean(speedFlight{clust_i});
             meanSpeedPre{clust_i} = mean(speedPre{clust_i});
             meanSpeedPost{clust_i} = mean(speedPost{clust_i});

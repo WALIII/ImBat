@@ -23,10 +23,10 @@ AngeloData = 1;
 analysisFlag = 1;
 reAnalyze = 1;
 %roi plot flags
-plotROIFlag = 1;
-centroidFlag = 1;
-roiHeatFlag = 1;
-binaryMaskFlag = 1;
+plotROIFlag = 0;
+centroidFlag = 0;
+roiHeatFlag = 0;
+binaryMaskFlag = 0;
 %flight plot flags
 plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
@@ -34,13 +34,13 @@ clustManualFlag = 0;
 flightPathsFeederFlag = 0;
 plotFlightvsCellsFlag = 0;
 %place cells plot flags
-plotPlaceCellsFlag = 1;
+plotPlaceCellsFlag = 0;
 plotPlaceCellsAng = 0;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
-plotSnakesManualFlag = 0;
-plotPsthFlag = 1;
-plotPSTHstableFlag = 1;
+plotSnakesManualFlag = 1;
+plotPsthFlag = 0;
+plotPSTHstableFlag = 0;
 galDate = 0;
 %align max projections of specific flights across trajectories
 plotROI3dayFlag = 0;
@@ -269,7 +269,7 @@ for i = 1:9%length(subFolders)
             cd([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCells']);
             ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
         end
-        if plotPlaceCellsAng == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
+        if plotPlaceCellsAng == 1 && strcmp(extractBefore(sessionType,'-'),'Gal_200320_fly')
             mkdir([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCellsAng']);
             cd([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCellsAng']);
             ImBat_placeCells_Ang(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)

@@ -423,7 +423,7 @@ for day_i = 1:length(ROIs_gal(:,1))
     %plot all ROIs normalized to itself and plotted in 1-n numerical order
     %across all days
     subplot(3,length(ROIs_gal(:,1)), 2*length(ROIs_gal(:,1)) + day_i);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normMeanTraceEachPost{2}(:,:),[1 4.5]); %1:xlimCalciumPost),[1 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normMeanTraceEachPost{2}(:,1:xlimCalciumPost),[1 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -531,7 +531,7 @@ for day_i = 1:length(ROIs_gal(:,1))
     
     %plot all ROIs according to preferred sorting individually
     subplot(3,length(ROIs_gal(:,1)), 2*length(ROIs_gal(:,1)) + day_i);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTracePost{2}(snakeTraceT(1).snakeTrace.cRaw.IPost{2},:),[1 4.5]); %1:xlimCalciumPost),[1 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTracePost{2}(snakeTraceT(1).snakeTrace.cRaw.IPost{2},1:xlimCalciumPost),[1 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
