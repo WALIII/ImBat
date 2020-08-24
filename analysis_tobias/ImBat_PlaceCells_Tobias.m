@@ -47,12 +47,13 @@ end
 
 % Plot the location in space that each cell is active in 1 figure
 plotFiringTrajectory =  figure('units','normalized','outerposition',[0 0 0.5 1]);
+a1 = axes;
 sgtitle([batName '_' dateSesh '_' sessionType ': Firing Fields']);
 for ii = 1:length(cellData.results.S(:,1)); % for each cell
     set(0,'CurrentFigure',plotFiringTrajectory);
     subplot(ceil(length(cellData.results.S(:,1))/5),5,ii);
     hold on;
-    plot(alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
+    plot(a1,alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
     try
         %threshold for eliminating noise from the S matrix
         spikeThresh(ii) = median(cellData.results.S(ii,:)) + std(cellData.results.S(ii,:))*spikeThreshMult;
@@ -119,8 +120,9 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
     
     % Plot the location in space that each cell is active in individual figures
     plotFiringTrajectoryIndiv =  figure();
+    a2 = axes;
     try
-        plot(alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
+        plot(a2,alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
         hold on;
         disp([num2str(size(LX_s)),' Bursts in flight'])
         PH = mat2gray(PH);
