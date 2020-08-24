@@ -46,8 +46,8 @@ if loadFlag == 1
     load([pewd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
 %padding for during flight snake plot to include some time before and after flight
-prePad = 0.2; %number of seconds to plot before alignment point
-postPad = 0.2; %number of seconds to plot after alignment point
+prePad = 3; %number of seconds to plot before alignment point
+postPad = 7; %number of seconds to plot after alignment point
 prePadCalcium = prePad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
 postPadCalcium = postPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 prePadSpeed = prePad*120; %add 2 seconds * FS of tracking data (120)
@@ -115,6 +115,8 @@ for data_i = 1:3
     speedPost = cell(1,nClusters);
     meanTraceFlight = cell(1,nClusters);
     sdTraceFlight = cell(1,nClusters);
+    sdTracePre = cell(1,nClusters);
+    sdTracePost = cell(1,nClusters);
     meanTraceOdd = cell(1,nClusters);
     meanTraceEven = cell(1,nClusters);
     meanTracePreFlightPost = cell(1,nClusters);
@@ -231,6 +233,8 @@ for data_i = 1:3
                 
             end
             sdTraceFlight{clust_i}(cell_i,:) = std(traceFlight{clust_i}(:,:,cell_i));
+            sdTracePre{clust_i}(cell_i,:) = std(tracePre{clust_i}(:,:,cell_i));
+            sdTracePost{clust_i}(cell_i,:) = std(tracePre{clust_i}(:,:,cell_i));
             meanTraceOdd{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(1:2:end,:,cell_i));
             meanTraceEven{clust_i}(cell_i,:) = mean(traceFlight{clust_i}(2:2:end,:,cell_i));
             meanSpeedFlight{clust_i} = mean(speedFlight{clust_i});
@@ -538,6 +542,9 @@ for data_i = 1:3
         snakeTraceData.preFlightPad = preFlightPad;
         snakeTraceData.postFlightPad = postFlightPad;
         snakeTraceData.sdTracePreFlightPost = sdTracePreFlightPost;
+        snakeTraceData.sdTracePre = sdTracePre;
+        snakeTraceData.sdTraceFlight = sdTraceFlight;
+        snakeTraceData.sdTracePost = sdTracePost;
         snakeTraceData.semTracePreFlightPost = semTracePreFlightPost;
         snakeTraceData.smoothTraceRawPreFlightPost = smoothTraceRawPreFlightPost;
         snakeTraceData.smoothSpeedPre = smoothSpeedPre;

@@ -40,15 +40,15 @@ end
 %padding for during flight snake plot to include some time before and after flight
 prePad = 7; %number of seconds to plot before alignment point for during flight
 postPad = 7; %number of seconds to plot after alignment point for during flight
-prePadCalcium = prePad*cellData.Fs; %number of frames (seconds*freq) to include in the trace extraction
-postPadCalcium = postPad*cellData.Fs; %add 2 seconds to the end of the plots to include delay in peak time
+prePadCalcium = prePad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
+postPadCalcium = postPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 prePadSpeed = prePad*120; %add 2 seconds * FS of tracking data (120)
 postPadSpeed = postPad*120;%add 6 seconds * FS of tracking data (120)
 %padding for pre and post flight snakePlots
 preFlightPad = 7; %number of seconds to include before flight starts
 postFlightPad = 7; %of of seconds to include after flight ends
-preFlightPadCalcium = preFlightPad*cellData.Fs; %number of frames (seconds*freq) to include in the trace extraction
-postFlightPadCalcium = postFlightPad*cellData.Fs; %add 2 seconds to the end of the plots to include delay in peak time
+preFlightPadCalcium = preFlightPad*cellData.results.Fs; %number of frames (seconds*freq) to include in the trace extraction
+postFlightPadCalcium = postFlightPad*cellData.results.Fs; %add 2 seconds to the end of the plots to include delay in peak time
 preFlightPadSpeed = preFlightPad*120; %add 2 seconds * FS of tracking data (120)
 postFlightPadSpeed = postFlightPad*120;%add 6 seconds * FS of tracking data (120)
 
@@ -96,24 +96,24 @@ for cell_i = ROIs_gal(1,:)%1:length(C(:,1))
     %build the calcium and speed vectors for each flight within each cluster
         for trace_i = 1:length(flightPaths.flight_starts_idx)
             try
-                traceFlight(trace_i,:) = cellData.C_raw(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
+                traceFlight(trace_i,:) = cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
                 speedFlight(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(trace_i) - prePadSpeed:flightPaths.flight_ends_idx(trace_i) + (maxDurSpeed-durSpeed(trace_i)) + postPadSpeed);
                 smoothSpeedRawFlight(trace_i,:) = smooth(speedFlight(trace_i,:),100);
-                tracePre(trace_i,:) = cellData.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
+                tracePre(trace_i,:) = cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
                 speedPre(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(trace_i) - preFlightPadSpeed:flightPaths.flight_starts_idx(trace_i));
                 smoothSpeedRawPre(trace_i,:) = smooth(speedPre(trace_i,:),100);
-                tracePost(trace_i,:) = cellData.C_raw(cell_i,closestIndexEnd(trace_i)+postPadCalcium:closestIndexEnd(trace_i)+postPadCalcium + postFlightPadCalcium);
+                tracePost(trace_i,:) = cellData.results.C_raw(cell_i,closestIndexEnd(trace_i)+postPadCalcium:closestIndexEnd(trace_i)+postPadCalcium + postFlightPadCalcium);
                 speedPost(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(trace_i)+postPadCalcium:flightPaths.flight_ends_idx(trace_i)+postPadCalcium + postFlightPadSpeed);
                 smoothSpeedRawPost(trace_i,:) = smooth(speedPost(trace_i,:),100);
             catch
                 try
-                    sizeToRecordingEnd = size(cellData.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end),2);
+                    sizeToRecordingEnd = size(cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end),2);
                     sizeToTraceEnd = size(traceFlight(trace_i,:),2);
                     try
-                        traceFlight(trace_i,:) = (cellData.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end + postFlightPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                        traceFlight(trace_i,:) = (cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end + postFlightPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
                         speedFlight(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - preFlightPadSpeed:end + postFlightPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
                     catch
-                        traceFlight(trace_i,:) = cellData.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end+(sizeToTraceEnd - sizeToRecordingEnd));
+                        traceFlight(trace_i,:) = cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end+(sizeToTraceEnd - sizeToRecordingEnd));
                         speedFlight(trace_i,:) = flightPaths.batSpeed(closestIndexStart(trace_i) - preFlightPadSpeed:end +(sizeToTraceEnd - sizeToRecordingEnd));
                     end
                 catch
@@ -162,7 +162,7 @@ end
 
 %% this is to smooth, zscore, and sort the entire cell data by their preferred flight according to a homemade k-means (max dff across flights)
 %zscore the full data set and subtract min to start at 0
-for cell_ii = 1:cellCount%length(cellData.C(:,1))
+for cell_ii = 1:cellCount%length(cellData.results.C(:,1))
     normMeanTracePreFlightPostAll(cell_ii,:) = zscore(smooth(meanTracePreFlightPostAll(cell_ii,:),10));
     normMeanTracePreFlightPostAll(cell_ii,:) = normMeanTracePreFlightPostAll(cell_ii,:) - min(normMeanTracePreFlightPostAll(cell_ii,:));
 end
@@ -172,7 +172,7 @@ normTraceFlightAll = normMeanTracePreFlightPostAll(:,preFlightPadCalcium+1:preFl
 normTracePreAll = normMeanTracePreFlightPostAll(:,1:preFlightPadCalcium);
 normTracePostAll = normMeanTracePreFlightPostAll(:,preFlightPadCalcium+maxDur+1+prePadCalcium+postPadCalcium:preFlightPadCalcium++prePadCalcium+postPadCalcium+maxDur+postFlightPadCalcium);
 %find the order of the maximum for each flight group within the regrouping
-for cell_iii = 1:cellCount%length(cellData.C(:,1))
+for cell_iii = 1:cellCount%length(cellData.results.C(:,1))
     [~,maxNormFlightAll(cell_iii,1)] = max(normTraceFlightAll(cell_iii,:));
     [~,maxNormPreAll(cell_iii,1)] = max(normTracePreAll(cell_iii,:));
     [~,maxNormPostAll(cell_iii,1)] = max(normTracePostAll(cell_iii,:));

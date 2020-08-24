@@ -1,10 +1,11 @@
-function [plotFiringTrajectory] = ImBat_PlaceCells_Tobias(flightPaths, cellData, alignment,varargin)
+function ImBat_placeCells_Ang(flightPaths, cellData, alignment,varargin)
 
 batName = [];
 dateSesh = [];
 sessionType = [];
 loadFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
 p_val_analysis = 1;
+save_data = 0;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -42,11 +43,55 @@ pst_dur = 3;     %play with 3-5                                                 
 w = gausswin(1); %keep at 1 for no smoothing                                                           %witdh of the gaussian filter (number of bins), use odd values. 1=no filtering
 n_space_bins = 30;  %correlates with space resolution but good around 30 (20cm chunks)                                                        %number of spatial bins
 
+%converting Angelo's variables to mine
+N = size(cellData.results.C_raw,1); %number of ROIs
+T = size(cellData.results.C_raw,2); %length of each neural trace
+CNMFe_Fs = cellData.results.Fs; %imaging sampling rate
+
 %Flight Room references (provvisory)
 xR = +2.85; xL = -2.85; yF = 2.50;  yB = -2.50;  zT = 2.20;                 %Flight volume coordinates
 F1 = [2.56; 1.23; 1.72];    F2 = [2.56; -1.04; 1.72];                       %Feeders coordinates
 F3 = [2.56; 1.43; 0.72];    F4 = [2.56; -1.24; 0.72];                       %Feeders coordinates
 edges_d = {xL:(xR-xL)/10:xR yB:(yF-yB)/10:yF};                              %Edges for density histogram
+
+%% resample the neural data to account for lost frames
+%Extract variables from Alignment
+img_times = alignment.out.video_times';
+img_sampling = diff(img_times);
+img_sampl_interval = mean(img_sampling);
+img_Fs = 1/img_sampl_interval;
+ 
+%Calculate real sampling frequency 
+CNMF_Fs_real = round(T/(img_times(end)-img_times(1)));
+CNMF_time = downsample(img_times,round(img_Fs/CNMF_Fs_real));
+ 
+%Generate evenly spaced times
+t_even = linspace(img_times(1),img_times(end),length(img_times));
+CNMF_time_even = downsample(t_even,round(img_Fs/CNMF_Fs_real));
+%normalize firing rate by size of neuron 
+%A = reshape(cellData.results.A,size(cellData.results.A,2),2); A = permute(A, [3 1 2]);   %Spatial footprints: cell# x pixels x pixels
+%fr_area = sum(A,[2 3])./sum(A,'all');%sum(cellData.results.A,[2 3])./sum(cellData.results.A,'all');                               %Fractional area for each Spatial footprint
+FC_raw = cellData.results.C_raw;%.*fr_area;                                %Raw fluorescence (normalized)
+FC = cellData.results.C;%.*fr_area;                                        %Denoised fluorescence (normalized)
+S = cellData.results.S;%.*fr_area;                                         %Deconvolved spike trace (normalized)
+
+%Resample at even time intervals
+try
+    FC_raw_rs =    interp1(CNMF_time',FC_raw',CNMF_time_even','linear','extrap')';%cellData.results.C_raw',CNMF_time_even','linear','extrap')';
+    S_rs =     interp1(CNMF_time',S',CNMF_time_even','nearest','extrap')';%cellData.results.S',CNMF_time_even','nearest','extrap')';
+catch
+    recDiff = length(CNMF_time) - length(cellData.results.C_raw);
+    FC_raw_rs =    interp1(CNMF_time(1,1:end-recDiff)',full(cellData.results.C_raw)',CNMF_time_even(1,1:end-recDiff)','linear','extrap')';
+    S_rs =     interp1(CNMF_time(1,1:end-recDiff)',full(cellData.results.S)',CNMF_time_even(1,1:end-recDiff)','nearest','extrap')';
+end
+
+%Ca-activity and inferred spike-rate are constrained to zero for 5s at the beginning and end of the session and inferred spike-rate is normalized (SD units) and smoothed
+Activity = FC_raw_rs;
+Activity(:,[1:CNMF_Fs_real*5,end-CNMF_Fs_real*5-1:end])=0; 		%cut activity at the start and stop of the recording (5s)
+    
+Rate = normalize(S_rs,2,'scale');       Rate = movmean(Rate,CNMF_Fs_real*0.5,2);        %normalize by STD and smooth on 0.5s
+Rate(:,[1:CNMF_Fs_real*5,end-CNMF_Fs_real*5-1:end])=0; 		%cut activity at the start and stop of the recording (5s)
+
 
 % %Create analysis folder for storing the results
 % analysis_directory=fullfile(pwd,['Analysis_',datestr(now, 'yymmdd_HHMM')]);
@@ -63,17 +108,17 @@ edges_d = {xL:(xR-xL)/10:xR yB:(yF-yB)/10:yF};                              %Edg
 % normalized by standard deviation and smoothed on a 0.5s window
 
 if p_val_analysis
-    until_cluster = min(n_surv_clusters,100);   %change this if you want less clusters
+    until_cluster = min(length(flightPaths.clusterIndex),100);   %change this if you want less clusters
     
     %Create folder to store figures
-    figures_directory1=fullfile(analysis_directory,'Spatial_information');
+    figures_directory1=fullfile(pwd,'Spatial_information');
     delete([figures_directory1 '\*']);
     if exist(figures_directory1,'dir')~=7
         mkdir(figures_directory1);
     end
     
     %Initialization of matrices and arrays
-    frames_to_shift(1)=0;     frames_to_shift(2:n_rep) = randi([10*CNMF_Fs T-10*CNMF_Fs],1,n_rep-1);   %Shifting in time (longer than 10s)
+    frames_to_shift(1)=0;     frames_to_shift(2:n_rep) = randi([10*CNMFe_Fs T-10*CNMFe_Fs],1,n_rep-1);   %Shifting in time (longer than 10s)
     p_val = zeros(3,until_cluster,N); %pre(1),during(2),post(3)/#cluster/#nueron                       %p values for pre, during, post active neurons
     response = zeros(3,until_cluster,N); %sum of each phase                   %Integrated response during pre, during, post periods 'sum(median(Rate)'
     avg_bnd_act = zeros(3*n_bins,until_cluster,N);   %n_bins per section, for each pre/dur/post and for each cluster & cell       %Activity across bins from pre to post
@@ -83,7 +128,8 @@ if p_val_analysis
     %Binning in time and space, p values calculation
     figure();   set(gcf, 'units','normalized','outerposition',[0.2 0 0.5 1]);
     for id_cluster_SI = 1:until_cluster %for each cluster
-        id = [];    id = find(flight_clus.id==id_cluster_SI); %find all flights that belong to that cluster
+        id = [];    %id = find(flight_clus.id==id_cluster_SI); %find all flights that belong to that cluster
+        id = flightPaths.clusterIndex{id_cluster_SI};
         for cell_n = 1:N %for each cell, initialize the below matrices
             sgtitle(['ROI: ' num2str(cell_n) ' Cluster: ' num2str(id_cluster_SI)]);
             disp(['Cell number: ' num2str(cell_n) '  Trajectory number: ' num2str(id_cluster_SI)]);
@@ -106,12 +152,12 @@ if p_val_analysis
                     %grabbing and binning the velocity and activity along
                     %with other variables
                     Act_pre = [];   Act_dur = [];   Act_pst = [];   v_trj = [];
-                    Act_pre =  Rate_sh(flight_clus_ds.strt_frame(id(ii))-pre_dur*CNMF_Fs:flight_clus_ds.strt_frame(id(ii))-1);
-                    Act_dur =  Rate_sh(flight_clus_ds.strt_frame(id(ii)):flight_clus_ds.stop_frame(id(ii)));
-                    Act_pst =  Rate_sh(flight_clus_ds.stop_frame(id(ii))+1:flight_clus_ds.stop_frame(id(ii))+pst_dur*CNMF_Fs);
+                    Act_pre =  Rate_sh(round(flightPaths.flight_starts_idx(id(ii))/4)-pre_dur*CNMFe_Fs:round(flightPaths.flight_starts_idx(id(ii))/4)-1);
+                    Act_dur =  Rate_sh(round(flightPaths.flight_starts_idx(id(ii))/4):round(flightPaths.flight_ends_idx(id(ii))/4));
+                    Act_pst =  Rate_sh(round(flightPaths.flight_ends_idx(id(ii))/4)+1:round(flightPaths.flight_ends_idx(id(ii))/4)+pst_dur*CNMFe_Fs);
                     
                     %Temporally binned activity for pre-during-post
-                    flight_dur(1,ii) = flight_clus_ds.dur(id(ii)); %this comes from the flightPaths output
+                    flight_dur(1,ii) = flightPaths.dur(id(ii)); %this comes from the flightPaths output
                     bnd_act_pre(:,ii) = interp1(linspace(1,100,size(Act_pre,1)),Act_pre,linspace(1,100,n_bins),'linear')';
                     bnd_act_dur(:,ii) = interp1(linspace(1,100,size(Act_dur,1)),Act_dur,linspace(1,100,n_bins),'linear')';
                     bnd_act_pst(:,ii) = interp1(linspace(1,100,size(Act_pst,1)),Act_pst,linspace(1,100,n_bins),'linear')';
@@ -119,10 +165,11 @@ if p_val_analysis
                     %Spatially binned activity for spatial information
                     %during flight (spatial activity) and interpolating
                     %across the bins
-                    v_trj = flight_clus_ds.vel(1,~isnan(flight_clus_ds.pos(1,:,id(ii))),id(ii));
-                    sp_bnd_act(:,ii) = interp1(linspace(1,flight_clus_ds.length(id(ii)),size(Act_dur,1)),Act_dur,linspace(1,flight_clus_ds.length(id(ii)),n_space_bins),'linear')';
-                    sp_bnd_vel(:,ii) = interp1(linspace(1,flight_clus_ds.length(id(ii)),size(v_trj,2)),v_trj',linspace(1,flight_clus_ds.length(id(ii)),n_space_bins),'linear')';
-                    sp_bnd_path(:,ii) = linspace(1,flight_clus_ds.length(id(ii)),n_space_bins)';
+                    v_trj1 = flightPaths.vel(1,~isnan(flightPaths.pos(1,:,id(ii))),id(ii));
+                    v_trj = downsample(v_trj1,4);
+                    sp_bnd_act(:,ii) = interp1(linspace(1,flightPaths.length(id(ii)),size(Act_dur,1)),Act_dur,linspace(1,flightPaths.length(id(ii)),n_space_bins),'linear')';
+                    sp_bnd_vel(:,ii) = interp1(linspace(1,flightPaths.length(id(ii)),size(v_trj,2)),v_trj',linspace(1,flightPaths.length(id(ii)),n_space_bins),'linear')';
+                    sp_bnd_path(:,ii) = linspace(1,flightPaths.length(id(ii)),n_space_bins)';
                 end
                 
                 %Spatial information (CRITICAL CALCULATION!)
@@ -137,10 +184,10 @@ if p_val_analysis
                 subplot(4,4,[1 2 3 5 6 7 9 10 11]);
                 plot(linspace(1,100,3*n_bins),filter(w,1,median(bnd_act,2)),'k');  hold on;
                 if n ==  1 %save specific names for first rep to use for plotting with shaded area
-                    avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,median(bnd_act,2));
+                    avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,mean(bnd_act,2));
                     sp_bnd_response(:,id_cluster_SI,cell_n) = filter(w,1,lambda);
                     
-                    ciplot(filter(w,1,median(bnd_act,2))-std(bnd_act,[],2)./sqrt(size(id,1)),filter(w,1,median(bnd_act,2))+std(bnd_act,[],2)./sqrt(size(id,1)),linspace(1,100,3*n_bins));
+                    ciplot(filter(w,1,mean(bnd_act,2))-std(bnd_act,[],2)./sqrt(size(id,1)),filter(w,1,mean(bnd_act,2))+std(bnd_act,[],2)./sqrt(size(id,1)),linspace(1,100,3*n_bins));
                     alpha(0.3);
                     line([33,33], [-max(mean(bnd_act,2)),max(mean(bnd_act,2))],'Color', 'k','LineStyle','--');
                     line([66,66], [-max(mean(bnd_act,2)),max(mean(bnd_act,2))],'Color', 'k','LineStyle','--');
@@ -154,9 +201,9 @@ if p_val_analysis
                 %Integrated activity in the pre-during-post periods
                 %measure of average firing rate of cell in pre,dur, and
                 %post epochs
-                spikes(n,1) = sum(median(bnd_act_pre,2))/pre_dur;
-                spikes(n,2) = sum(median(bnd_act_dur,2))/mean(flight_dur); %uses average flight duration
-                spikes(n,3) = sum(median(bnd_act_pst,2))/pst_dur;
+                spikes(n,1) = sum(mean(bnd_act_pre,2))/pre_dur;
+                spikes(n,2) = sum(mean(bnd_act_dur,2))/mean(flight_dur); %uses average flight duration
+                spikes(n,3) = sum(mean(bnd_act_pst,2))/pst_dur;
             end
             
             fig_ord = get(gca,'Children');  set(gca,'Children',circshift(fig_ord,2,1)); hold off;
@@ -185,7 +232,7 @@ if p_val_analysis
             S_Info(1,id_cluster_SI,cell_n) = info(1);
             S_Info(2,id_cluster_SI,cell_n) = length(find(info>=info(1)))/n_rep;
             
-            drawnow();      saveas(gcf,[figures_directory1, '/', 'ROI_' num2str(cell_n) '_cluster_' num2str(id_cluster_SI) '.png']);
+            drawnow();      saveas(gcf,[figures_directory1, '/', batName '_' dateSesh '_' sessionType '_ROI_' num2str(cell_n) '_cluster_' num2str(id_cluster_SI) '.tif']);
         end
     end
     close all;
@@ -202,7 +249,7 @@ if p_val_analysis
     pp_cells_activity = round(normalize(sp_bnd_response(:,pp_cells),1,'range'),5)'; %normalize activity between 0-1 for putative place fields along 30 space fields
     [sorted_rows,~] = find(pp_cells_activity==1);   sorted_pp_fields = pp_cells_activity(sorted_rows,:);
     figure();   imagesc(sorted_pp_fields,[0 1]);         colormap(viridis); %plots the normalized activity sorted of putative place fields (cells sig/trajectory)
-    saveas(gcf,[analysis_directory, '/', batdate '_pfields_sorted.png']);
+    saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_pfields_sorted.tif']);
     
     %Visualize place fields and calculate centroids
     %outputs every place field as a centroid heatmap along each trajectory
@@ -214,13 +261,13 @@ if p_val_analysis
         %take each flight from a place cell cluster, take the shortest
         %flight, and generate an average trajectory based off the shortest
         %flight
-        id = find(flight_clus_ds.id==clus(i));
-        shortest_flight_i = min(squeeze(sum(~isnan(flight_clus_ds.pos(:,:,id)),2)),[],2);
-        ave_trajectory = nanmean(flight_clus_ds.pos(:,1:shortest_flight_i(1),id),3);
+        id = flightPaths.clusterIndex{i};%find(flight_clus_ds.id==clus(i));
+        shortest_flight_i = min(squeeze(sum(~isnan(flightPaths.pos(:,:,id)),2)),[],2);
+        ave_trajectory = nanmean(flightPaths.pos(:,1:shortest_flight_i(1),id),3);
         %ave_acceleratn = nanmean(flight_clus_ds.acc(1,1:shortest_flight_i(1),id),3);
         
         npo = size(ave_trajectory,2); %length of average trajectory
-        take_off = mean(squeeze(flight_clus.pos(:,1,id)),2);
+        take_off = mean(squeeze(flightPaths.pos(:,1,id)),2);
         map = interp1(linspace(1,100,size(sp_bnd_response(:,clus(i),cell(i)),1)),sp_bnd_response(:,clus(i),cell(i)),linspace(1,100,npo),'linear')';
         map_color = uint8(round(normalize(map,'range',[2 100]))); %make the mapping between activity and color
         
@@ -249,7 +296,7 @@ if p_val_analysis
         Place_field(i).cell = cell(i);
         Place_field(i).clus = clus(i);
         
-        saveas(gcf,[figures_directory, '/', 'Place_field' num2str(i) '.png']);
+        saveas(gcf,[figures_directory1, '/',batName '_' dateSesh '_' sessionType '_Place_field' num2str(i) '.tif']);
     end
     close all;
     
@@ -284,16 +331,16 @@ if p_val_analysis
     ax1.Title.String = 'Pre-Flight';        ax2.Title.String = 'During-Flight'; ax3.Title.String = 'Post-Flight';
     ax1.XLabel.String = 'Bin';              ax2.XLabel.String = 'Bin';          ax3.XLabel.String = 'Bin';
     ax1.YLabel.String = 'Neuron x Flight #';ax2.YTickLabel= [];                 ax3.YTickLabel= [];
-    saveas(gcf,[analysis_directory, '/', batdate '_activity_sorted.png']);
+    saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_activity_sorted.tif']);
     
 end
 
 %% Save (modify this to save only relevant variables)
-if save_data
-    a_filename = [analysis_directory,'/Extracted_trajectories_&_activity',datestr(now, 'yymmdd_HHMM'),'.mat'];
+if save_data == 1
+    a_filename = [pwd,'/Extracted_trajectories_&_activity',datestr(now, 'yymmdd_HHMM'),'.mat'];
     save(a_filename);
     if analyze_Ca
-        save([analysis_directory,'/A_', batdate, '.mat'],'A');      %save spatial footprints
+        save([pwd,'/A_', batdate, '.mat'],'A');      %save spatial footprints
     end
 end
 disp(datestr(now));

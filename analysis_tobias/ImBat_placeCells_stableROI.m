@@ -2,7 +2,7 @@ function ImBat_placeCells_stableROI
 %function to plot firing fields as red dots against the flight paths of the
 %bats for each day focusing only on the stable neurons from ROIs_gal
 
-saveFlag = 0; %do you want to save the figures and output structure?
+saveFlag = 1; %do you want to save the figures and output structure?
 saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
 % Check if folder exists
 if exist([saveDir1 datestr(now,'yymmdd')])>0;
@@ -13,6 +13,7 @@ end
 saveDir = [saveDir1 datestr(now,'yymmdd') '\'];
 
 offset = 0; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
+speedThresh = 0.7; %threshold for when to eliminate nonflying moments
 spikeThreshMult = 5; %number of times to multiply std of s vector for determining spike threshold
 ROIs_gal = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
     3 2 10 28 11 1 5 33 8 35 NaN 6 22 32 29;
@@ -100,45 +101,45 @@ for d = 1:length(dirTop)
             [~,xy] = find(cellData.results.S(ii,:)>spikeThresh(n));  % get time neuron is active
             xy = xy(xy<length(alignment.out.video_times));
             Spike_times = alignment.out.video_times(xy)-offset; % convert this to 'spike time'
+            
+            %only take data from when bat is flying
+            flightVect = alignment.out.flights; %make a new flight vector to eliminate the subthreshold flight_times
+            [yz,~] = find(flightPaths.batSpeed<speedThresh); %find when bat is not flying
+            flightVect(yz) = NaN; %set nonflying times to NaN
             peak_heights = cellData.results.S(ii,xy);
             
             LX = zeros(1,length(Spike_times(:,1)));
             LY = zeros(1,length(Spike_times(:,1)));
             LZ = zeros(1,length(Spike_times(:,1)));
             PH = zeros(1,length(Spike_times(:,1)));
-            %         catch
-            %             Spike_times = [];
-            %             peak_heights = [];
-            %             LX = [];
-            %             LY = [];
-            %             LZ = [];
-            %             PH = [];
-            %         end
             
             try % this 'try/catch' is to avoid crashing if cells are not active in plotting window...
                 for i = 1:size(Spike_times,1)
                     try
                         % Find the closest 'Location time' to the 'Spike time'
                         [minValue(:,i),closestIndex(:,i)] = min(abs(alignment.out.Location_time-Spike_times(i)));
-                        LX(i) = alignment.out.flights(closestIndex(:,i),1);
-                        LY(i) = alignment.out.flights(closestIndex(:,i),2);
-                        LZ(i) = alignment.out.flights(closestIndex(:,i),3);
-                        PH(i) = full(peak_heights(i));
+                        LX(i) = flightVect(closestIndex(:,i),1);%alignment.out.flights(closestIndex(:,i),1);
+                        LY(i) = flightVect(closestIndex(:,i),2);%alignment.out.flights(closestIndex(:,i),2);
+                        LZ(i) = flightVect(closestIndex(:,i),3);%alignment.out.flights(closestIndex(:,i),3);
+                        if isnan(LX(i))
+                            PH(i) = NaN; %make the peak into a NaN for scaling purposes
+                        else
+                            PH(i) = full(peak_heights(i));
+                        end
                     catch % we need this if Spiketime occurs before/after the location tracking was on..
                         disp('cell catch');
                         continue
                     end
                 end
-                
                 % display, in the title, how many bursts there were:
                 LX_s = LX;
                 LX_s(isnan(LX)) = [];
                 disp([num2str(size(LX_s)),' Bursts in flight'])
                 PH = mat2gray(PH);
                 hold on
-                %scatter(LX,LY,(PH*400)+1,'or','filled');
-                scatter(LX,LY,(PH*400)+1,'or','filled');
-                %scatter3(LX,LY,LZ,(PH*400)+1,'or','filled');
+                %scatter(LX,LY,(PH*75)+1,'or','filled');
+                scatter(LX,LY,(PH*75)+1,'or','filled');
+                %scatter3(LX,LY,LZ,(PH*75)+1,'or','filled');
                 %uistack(dots,'top');
                 % % modify labels for tick marks
                 xlim([-3000 3000]);
@@ -166,9 +167,9 @@ for d = 1:length(dirTop)
             hold on;
             disp([num2str(size(LX_s)),' Bursts in flight'])
             PH = mat2gray(PH);
-            %scatter(LX,LY,(PH*400)+1,'or','filled');
-            scatter(a2,LX,LY,(PH*400)+1,'or','filled');
-            %scatter3(LX,LY,LZ,(PH*400)+1,'or','filled');
+            %scatter(LX,LY,(PH*75)+1,'or','filled');
+            scatter(a2,LX,LY,(PH*75)+1,'or','filled');
+            %scatter3(LX,LY,LZ,(PH*75)+1,'or','filled');
             %uistack(dots,'top');
             % % modify labels for tick marks
             xlim([-3000 3000]);
@@ -198,7 +199,7 @@ for d = 1:length(dirTop)
         % Save 'place cells' as jpg and fig files..
         if saveFlag == 1
             %set(findall(gcf,'-property','FontSize'),'FontSize',20);
-            saveas(plotFiringTrajectoryIndiv,[saveDir '\' datestr(now,'yymmdd-HHMM') '_' batName{d} '_' dateSesh{d} '_' sessionType{d} '_placeCell_' num2str(n) '.tif']);
+            saveas(plotFiringTrajectoryIndiv,[saveDir filesep datestr(now,'yymmdd-HHMM') '_' batName{d} '_' dateSesh{d} '_' sessionType{d} '_placeCell_' num2str(n) '.tif']);
             savefig(plotFiringTrajectoryIndiv,[saveDir filesep datestr(now,'yymmdd-HHMM') '_' batName{d} '_' dateSesh{d} '_' sessionType{d} '_placeCell_' num2str(n) '.fig']);
             %saveas(gcf,[saveDir '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(n) '.svg']);
         end
