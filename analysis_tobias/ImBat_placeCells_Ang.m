@@ -265,7 +265,7 @@ if p_val_analysis
         %take each flight from a place cell cluster, take the shortest
         %flight, and generate an average trajectory based off the shortest
         %flight
-        id = flightPaths.clusterIndex{i};%find(flight_clus_ds.id==clus(i));
+        id = flightPaths.clusterIndex{clus(i)};%find(flight_clus_ds.id==clus(i));
         shortest_flight_i = min(squeeze(sum(~isnan(flightPaths.pos(:,:,id)),2)),[],2);
         ave_trajectory = nanmean(flightPaths.pos(:,1:shortest_flight_i(1),id),3);
         %ave_acceleratn = nanmean(flight_clus_ds.acc(1,1:shortest_flight_i(1),id),3);

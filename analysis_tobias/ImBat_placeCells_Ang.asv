@@ -154,10 +154,11 @@ if p_val_analysis
                     %with other variables
                     %convert from behavior time to imaging time
                     [minValueStart,closestIndexStart] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(id(ii)))));
+                    [minValueEnd,closestIndexEnd] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(id(ii)))));
                     Act_pre = [];   Act_dur = [];   Act_pst = [];   v_trj = [];
-                    Act_pre =  Rate_sh(closestIndexStart-pre_dur*CNMFe_Fs:round(flightPaths.flight_starts_idx(id(ii)/dsFactor))-1);
-                    Act_dur =  Rate_sh(round(flightPaths.flight_starts_idx(id(ii)/dsFactor)):round(flightPaths.flight_ends_idx(id(ii)/dsFactor)));
-                    Act_pst =  Rate_sh(round(flightPaths.flight_ends_idx(id(ii)/dsFactor))+1:round(flightPaths.flight_ends_idx(id(ii)/dsFactor))+pst_dur*CNMFe_Fs);
+                    Act_pre =  Rate_sh(closestIndexStart-pre_dur*CNMFe_Fs:closestIndexStart-1);
+                    Act_dur =  Rate_sh(closestIndexStart:closestIndexEnd);
+                    Act_pst =  Rate_sh(closestIndexEnd+1:closestIndexEnd+pst_dur*CNMFe_Fs);
                     
                     %Temporally binned activity for pre-during-post
                     flight_dur(1,ii) = flightPaths.dur(id(ii)); %this comes from the flightPaths output
@@ -264,7 +265,7 @@ if p_val_analysis
         %take each flight from a place cell cluster, take the shortest
         %flight, and generate an average trajectory based off the shortest
         %flight
-        id = flightPaths.clusterIndex{i};%find(flight_clus_ds.id==clus(i));
+        id = flightPaths.clusterIndex{clus(i)};%find(flight_clus_ds.id==clus(i));
         shortest_flight_i = min(squeeze(sum(~isnan(flightPaths.pos(:,:,id)),2)),[],2);
         ave_trajectory = nanmean(flightPaths.pos(:,1:shortest_flight_i(1),id),3);
         %ave_acceleratn = nanmean(flight_clus_ds.acc(1,1:shortest_flight_i(1),id),3);

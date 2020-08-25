@@ -5,7 +5,7 @@ function [ROI_refined] = ImBat_ROIcovar
 %duplicates. Plot the covariance matrices and the distribution of
 %correlation coefficients.
 
-saveFlag = 0; %do you want to save the figures and output structure?
+saveFlag = 1; %do you want to save the figures and output structure?
 saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
 % Check if folder exists
 if exist([saveDir1 datestr(now,'yymmdd')])>0;
@@ -23,7 +23,7 @@ minLim = 0.7; %limits for correlation imagesc
 maxLim = 1; %limits for correlation imagesc
 distThresh = distThresh * scaling;
 
-g = dir('Ga*');
+g = dir('Ge*');
 z = dir('Z1*');
 dirTop = vertcat(g,z); %find all folders in top quality directory
 
