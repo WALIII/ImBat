@@ -32,10 +32,10 @@ plotFlightsFlag = 1;
 flightPathsAllFlag = 1;
 clustManualFlag = 0;
 flightPathsFeederFlag = 0;
-plotFlightvsCellsFlag = 0;
+plotFlightvsCellsFlag = 1;
 %place cells plot flags
 plotPlaceCellsFlag = 1;
-plotPlaceCellsAng = 0;
+plotPlaceCellsAng = 1;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 plotSnakesManualFlag = 0;

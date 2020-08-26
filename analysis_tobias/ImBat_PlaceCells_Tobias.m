@@ -46,14 +46,15 @@ catch
 end
 
 % Plot the location in space that each cell is active in 1 figure
-plotFiringTrajectory =  figure('units','normalized','outerposition',[0 0 0.5 1]);
-a1 = axes;
-sgtitle([batName '_' dateSesh '_' sessionType ': Firing Fields']);
+plotFiringTrajectory =  figure('units','normalized','outerposition',[0 0 0.8 1]);
+sgtitle([batName ' ' dateSesh  ': Firing Fields']);
+ha = tight_subplot(ceil(length(cellData.results.S(:,1))/5),5,[.02 .01],[.01 .08],[.01 .01]);
 for ii = 1:length(cellData.results.S(:,1)); % for each cell
     set(0,'CurrentFigure',plotFiringTrajectory);
-    subplot(ceil(length(cellData.results.S(:,1))/5),5,ii);
+    axes(ha(ii));
+    %a1 = subplot(ceil(length(cellData.results.S(:,1))/5),5,ii);
     hold on;
-    plot(a1,alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
+    plot(alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
     try
         %threshold for eliminating noise from the S matrix
         spikeThresh(ii) = median(cellData.results.S(ii,:)) + std(cellData.results.S(ii,:))*spikeThreshMult;
@@ -97,6 +98,7 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
             PH = mat2gray(PH);
             hold on
             %scatter(LX,LY,(PH*75)+1,'or','filled');
+            axes(ha(ii));
             scatter(LX,LY,(PH*75)+1,'or','filled');
             %scatter3(LX,LY,LZ,(PH*75)+1,'or','filled');
             %uistack(dots,'top');
@@ -104,7 +106,7 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
             xlim([-3000 3000]);
             ylim([-3000 3000]);
             set(gca,'xticklabel',[],'yticklabel',[]);
-            title(['ROI ' num2str(n) '(' num2str(ii)  '): ' num2str(size(LX_s)) ' Bursts']);
+            title(['ROI ' num2str(ii) ': ' num2str(size(LX_s)) ' Bursts']);
             %hold off
         catch % if cell was not active...
             disp('cell not active');
@@ -114,15 +116,14 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
         xlim([-3000 3000]);
         ylim([-3000 3000]);
         set(gca,'xticklabel',[],'yticklabel',[]);
-        title(['ROI ' num2str(n) '(' num2str(ii)  '): Not Active']);
+        title(['ROI ' num2str(n) ': Not Active']);
     end
     
     
     % Plot the location in space that each cell is active in individual figures
     plotFiringTrajectoryIndiv =  figure();
-    a2 = axes;
     try
-        plot(a2,alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
+        plot(alignment.out.flights(:,1),alignment.out.flights(:,2),'k');% plot the flight trajectory in space
         hold on;
         disp([num2str(size(LX_s)),' Bursts in flight'])
         PH = mat2gray(PH);
@@ -139,7 +140,7 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
         newlabelsY = arrayfun(@(ay) sprintf('%g', ay/1000), yticks, 'un', 0);
         set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
         xlabel('m'); ylabel('m');
-        title([batName{d} ' ' dateSesh{d} ' ' sessionType{d} ':ROI ' num2str(n) '(' num2str(ii) '): ' num2str(size(LX_s)) ' Bursts']);
+        title([batName ' ' dateSesh ':ROI ' num2str(ii) ': ' num2str(size(LX_s)) ' Bursts']);
         hold off
         
     catch % if cell was not active...
@@ -152,23 +153,24 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
         newlabelsY = arrayfun(@(ay) sprintf('%g', ay/1000), yticks, 'un', 0);
         set(gca,'xticklabel',newlabelsX,'yticklabel',newlabelsY);
         xlabel('m'); ylabel('m');
-        title([batName{d} ' ' dateSesh{d} ' ' sessionType{d} ':ROI ' num2str(n) '(' num2str(ii) '): Not Active']);
+        title([batName ' ' dateSesh ' ' sessionType ':ROI ' num2str(ii) ': Not Active']);
         hold off
     end
     % Save 'place cells' as jpg and fig files..
     %set(findall(gcf,'-property','FontSize'),'FontSize',20);
     saveas(plotFiringTrajectoryIndiv,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.tif']);
     savefig(plotFiringTrajectoryIndiv,[pwd filesep batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.fig']);
-    saveas(plotFiringTrajectoryIndiv,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.svg']);
+   % saveas(plotFiringTrajectoryIndiv,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.svg']);
     
     % Clear the buffer for the next cell:
-    clear LX LY LZ closestIndex Spike_times
+    clear LX LY LZ closestIndex Spike_times;
+    close gcf;
 end
 
 % Save 'place cells' as jpg and fig files..
 %set(findall(gcf,'-property','FontSize'),'FontSize',20);
 saveas(plotFiringTrajectory,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_all.tif']);
 savefig(plotFiringTrajectory,[pwd filesep batName '_' dateSesh '_' sessionType '_placeCell_all.fig']);
-saveas(plotFiringTrajectory,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_all.svg']);
+%saveas(plotFiringTrajectory,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_all.svg']);
 
 close all;
