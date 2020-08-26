@@ -69,10 +69,12 @@ smoothVelocity = zscore(smooth(flightPaths.batSpeed,100));
         try
             plot(alignment.out.video_times,(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',3)))+i*6) %may have to tweak the +i*6 at the end
         catch %if the tracking recording was turned on before the imaging recording
-            diffVidTimes =  length(cellData.results.C_raw(i,:)) - length(alignment.out.video_times);
-            plot(alignment.out.video_times,(zscore(smoothdata(cellData.results.C_raw(i,1:end-diffVidTimes),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
-        catch %if the imaging data misaligned with tracking data by 1
-            plot(alignment.out.video_times(1:end-1),(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',3)))+i*6) %may have to tweak the +i*6 at the end
+            try
+                diffVidTimes =  length(cellData.results.C_raw(i,:)) - length(alignment.out.video_times);
+                plot(alignment.out.video_times,(zscore(smoothdata(cellData.results.C_raw(i,1:end-diffVidTimes),'movmedian',3)))+i*2) %may have to tweak the +i*6 at the end
+            catch %if the imaging data misaligned with tracking data by 1 due to dropped frames
+                plot(alignment.out.video_times(1:end-1),(zscore(smoothdata(cellData.results.C_raw(i,:),'movmedian',3)))+i*6) %may have to tweak the +i*6 at the end
+            end
         end
     end 
     sgtitle(['Velocity vs Cell Activity: ' batName ' ' dateSesh ' ' sessionType])

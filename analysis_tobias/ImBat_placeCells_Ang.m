@@ -157,7 +157,11 @@ if p_val_analysis
                     [minValueEnd,closestIndexEnd] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(id(ii)))));
                     Act_pre = [];   Act_dur = [];   Act_pst = [];   v_trj = [];
                     Act_pre =  Rate_sh(closestIndexStart-pre_dur*CNMFe_Fs:closestIndexStart-1);
+                    try
                     Act_dur =  Rate_sh(closestIndexStart:closestIndexEnd);
+                    catch %if flight is 0 frames?
+                    Act_dur =  Rate_sh(closestIndexStart:closestIndexEnd+1); 
+                    end
                     Act_pst =  Rate_sh(closestIndexEnd+1:closestIndexEnd+pst_dur*CNMFe_Fs);
                     
                     %Temporally binned activity for pre-during-post
