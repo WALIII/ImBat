@@ -124,6 +124,7 @@ if p_val_analysis
     response = zeros(3,until_cluster,N); %sum of each phase                   %Integrated response during pre, during, post periods 'sum(median(Rate)'
     avg_bnd_act = zeros(3*n_bins,until_cluster,N);   %n_bins per section, for each pre/dur/post and for each cluster & cell       %Activity across bins from pre to post
     sp_bnd_response = zeros(n_space_bins,until_cluster,N);  %Spatially binned activity along the trajectory
+    sp_bnd_vel = zeros(n_space_bins,until_cluster,
     S_Info = zeros(2,until_cluster,N); %2 b/c 1dim=actual info, 2dim=p-val                     %bits and p value for spatial information
     
     %Binning in time and space, p values calculation
@@ -149,31 +150,31 @@ if p_val_analysis
                 Rate_sh = circshift(Rate(cell_n,:),frames_to_shift(n),2)'; %take rate of cell after doing circular shift by frames_to_shift vector
                 flight_dur = zeros(1,size(id,1));
                 
-                for ii=1:size(id,1) %for all flights within the cluster, define the following vectors
+                for flight_i=1:size(id,1) %for all flights within the cluster, define the following vectors
                     %grabbing and binning the velocity and activity along
                     %with other variables
                     %convert from behavior time to imaging time
-                    [minValueStart,closestIndexStart] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(id(ii)))));
-                    [minValueEnd,closestIndexEnd] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(id(ii)))));
+                    [minValueStart,closestIndexStart] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(id(flight_i)))));
+                    [minValueEnd,closestIndexEnd] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(id(flight_i)))));
                     Act_pre = [];   Act_dur = [];   Act_pst = [];   v_trj = [];
                     Act_pre =  Rate_sh(closestIndexStart-pre_dur*CNMFe_Fs:closestIndexStart-1);
                     Act_dur =  Rate_sh(closestIndexStart:closestIndexEnd);
                     Act_pst =  Rate_sh(closestIndexEnd+1:closestIndexEnd+pst_dur*CNMFe_Fs);
                     
                     %Temporally binned activity for pre-during-post
-                    flight_dur(1,ii) = flightPaths.dur(id(ii)); %this comes from the flightPaths output
-                    bnd_act_pre(:,ii) = interp1(linspace(1,100,size(Act_pre,1)),Act_pre,linspace(1,100,n_bins),'linear')';
-                    bnd_act_dur(:,ii) = interp1(linspace(1,100,size(Act_dur,1)),Act_dur,linspace(1,100,n_bins),'linear')';
-                    bnd_act_pst(:,ii) = interp1(linspace(1,100,size(Act_pst,1)),Act_pst,linspace(1,100,n_bins),'linear')';
+                    flight_dur(1,flight_i) = flightPaths.dur(id(flight_i)); %this comes from the flightPaths output
+                    bnd_act_pre(:,flight_i) = interp1(linspace(1,100,size(Act_pre,1)),Act_pre,linspace(1,100,n_bins),'linear')';
+                    bnd_act_dur(:,flight_i) = interp1(linspace(1,100,size(Act_dur,1)),Act_dur,linspace(1,100,n_bins),'linear')';
+                    bnd_act_pst(:,flight_i) = interp1(linspace(1,100,size(Act_pst,1)),Act_pst,linspace(1,100,n_bins),'linear')';
                     
                     %Spatially binned activity for spatial information
                     %during flight (spatial activity) and interpolating
                     %across the bins
-                    v_trj1 = flightPaths.vel(1,~isnan(flightPaths.pos(1,:,id(ii))),id(ii));
+                    v_trj1 = flightPaths.vel(1,~isnan(flightPaths.pos(1,:,id(flight_i))),id(flight_i));
                     v_trj = downsample(v_trj1,4);
-                    sp_bnd_act(:,ii) = interp1(linspace(1,flightPaths.length(id(ii)),size(Act_dur,1)),Act_dur,linspace(1,flightPaths.length(id(ii)),n_space_bins),'linear')';
-                    sp_bnd_vel(:,ii) = interp1(linspace(1,flightPaths.length(id(ii)),size(v_trj,2)),v_trj',linspace(1,flightPaths.length(id(ii)),n_space_bins),'linear')';
-                    sp_bnd_path(:,ii) = linspace(1,flightPaths.length(id(ii)),n_space_bins)';
+                    sp_bnd_act(:,flight_i) = interp1(linspace(1,flightPaths.length(id(flight_i)),size(Act_dur,1)),Act_dur,linspace(1,flightPaths.length(id(flight_i)),n_space_bins),'linear')';
+                    sp_bnd_vel(:,flight_i) = interp1(linspace(1,flightPaths.length(id(flight_i)),size(v_trj,2)),v_trj',linspace(1,flightPaths.length(id(flight_i)),n_space_bins),'linear')';
+                    sp_bnd_path(:,flight_i) = linspace(1,flightPaths.length(id(flight_i)),n_space_bins)';
                 end
                 
                 %Spatial information (CRITICAL CALCULATION!)
@@ -190,6 +191,7 @@ if p_val_analysis
                 if n ==  1 %save specific names for first rep to use for plotting with shaded area
                     avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,mean(bnd_act,2));
                     sp_bnd_response(:,id_cluster_SI,cell_n) = filter(w,1,lambda);
+                    sp_bnd_velCel{id_cluster_SI} = sp_bnd_vel;
                     
                     ciplot(filter(w,1,mean(bnd_act,2))-std(bnd_act,[],2)./sqrt(size(id,1)),filter(w,1,mean(bnd_act,2))+std(bnd_act,[],2)./sqrt(size(id,1)),linspace(1,100,3*n_bins));
                     alpha(0.3);

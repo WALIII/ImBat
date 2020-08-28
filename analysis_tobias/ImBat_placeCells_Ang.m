@@ -124,6 +124,7 @@ if p_val_analysis
     response = zeros(3,until_cluster,N); %sum of each phase                   %Integrated response during pre, during, post periods 'sum(median(Rate)'
     avg_bnd_act = zeros(3*n_bins,until_cluster,N);   %n_bins per section, for each pre/dur/post and for each cluster & cell       %Activity across bins from pre to post
     sp_bnd_response = zeros(n_space_bins,until_cluster,N);  %Spatially binned activity along the trajectory
+    sp_bnd_velCel = cell(until_cluster,1);
     S_Info = zeros(2,until_cluster,N); %2 b/c 1dim=actual info, 2dim=p-val                     %bits and p value for spatial information
     
     %Binning in time and space, p values calculation
@@ -149,31 +150,31 @@ if p_val_analysis
                 Rate_sh = circshift(Rate(cell_n,:),frames_to_shift(n),2)'; %take rate of cell after doing circular shift by frames_to_shift vector
                 flight_dur = zeros(1,size(id,1));
                 
-                for ii=1:size(id,1) %for all flights within the cluster, define the following vectors
+                for flight_i=1:size(id,1) %for all flights within the cluster, define the following vectors
                     %grabbing and binning the velocity and activity along
                     %with other variables
                     %convert from behavior time to imaging time
-                    [minValueStart,closestIndexStart] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(id(ii)))));
-                    [minValueEnd,closestIndexEnd] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(id(ii)))));
+                    [minValueStart,closestIndexStart] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(id(flight_i)))));
+                    [minValueEnd,closestIndexEnd] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(id(flight_i)))));
                     Act_pre = [];   Act_dur = [];   Act_pst = [];   v_trj = [];
                     Act_pre =  Rate_sh(closestIndexStart-pre_dur*CNMFe_Fs:closestIndexStart-1);
                     Act_dur =  Rate_sh(closestIndexStart:closestIndexEnd);
                     Act_pst =  Rate_sh(closestIndexEnd+1:closestIndexEnd+pst_dur*CNMFe_Fs);
                     
                     %Temporally binned activity for pre-during-post
-                    flight_dur(1,ii) = flightPaths.dur(id(ii)); %this comes from the flightPaths output
-                    bnd_act_pre(:,ii) = interp1(linspace(1,100,size(Act_pre,1)),Act_pre,linspace(1,100,n_bins),'linear')';
-                    bnd_act_dur(:,ii) = interp1(linspace(1,100,size(Act_dur,1)),Act_dur,linspace(1,100,n_bins),'linear')';
-                    bnd_act_pst(:,ii) = interp1(linspace(1,100,size(Act_pst,1)),Act_pst,linspace(1,100,n_bins),'linear')';
+                    flight_dur(1,flight_i) = flightPaths.dur(id(flight_i)); %this comes from the flightPaths output
+                    bnd_act_pre(:,flight_i) = interp1(linspace(1,100,size(Act_pre,1)),Act_pre,linspace(1,100,n_bins),'linear')';
+                    bnd_act_dur(:,flight_i) = interp1(linspace(1,100,size(Act_dur,1)),Act_dur,linspace(1,100,n_bins),'linear')';
+                    bnd_act_pst(:,flight_i) = interp1(linspace(1,100,size(Act_pst,1)),Act_pst,linspace(1,100,n_bins),'linear')';
                     
                     %Spatially binned activity for spatial information
                     %during flight (spatial activity) and interpolating
                     %across the bins
-                    v_trj1 = flightPaths.vel(1,~isnan(flightPaths.pos(1,:,id(ii))),id(ii));
+                    v_trj1 = flightPaths.vel(1,~isnan(flightPaths.pos(1,:,id(flight_i))),id(flight_i));
                     v_trj = downsample(v_trj1,4);
-                    sp_bnd_act(:,ii) = interp1(linspace(1,flightPaths.length(id(ii)),size(Act_dur,1)),Act_dur,linspace(1,flightPaths.length(id(ii)),n_space_bins),'linear')';
-                    sp_bnd_vel(:,ii) = interp1(linspace(1,flightPaths.length(id(ii)),size(v_trj,2)),v_trj',linspace(1,flightPaths.length(id(ii)),n_space_bins),'linear')';
-                    sp_bnd_path(:,ii) = linspace(1,flightPaths.length(id(ii)),n_space_bins)';
+                    sp_bnd_act(:,flight_i) = interp1(linspace(1,flightPaths.length(id(flight_i)),size(Act_dur,1)),Act_dur,linspace(1,flightPaths.length(id(flight_i)),n_space_bins),'linear')';
+                    sp_bnd_vel(:,flight_i) = interp1(linspace(1,flightPaths.length(id(flight_i)),size(v_trj,2)),v_trj',linspace(1,flightPaths.length(id(flight_i)),n_space_bins),'linear')';
+                    sp_bnd_path(:,flight_i) = linspace(1,flightPaths.length(id(flight_i)),n_space_bins)';
                 end
                 
                 %Spatial information (CRITICAL CALCULATION!)
@@ -190,6 +191,7 @@ if p_val_analysis
                 if n ==  1 %save specific names for first rep to use for plotting with shaded area
                     avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,mean(bnd_act,2));
                     sp_bnd_response(:,id_cluster_SI,cell_n) = filter(w,1,lambda);
+                    sp_bnd_velCel{id_cluster_SI} = sp_bnd_vel;
                     
                     ciplot(filter(w,1,mean(bnd_act,2))-std(bnd_act,[],2)./sqrt(size(id,1)),filter(w,1,mean(bnd_act,2))+std(bnd_act,[],2)./sqrt(size(id,1)),linspace(1,100,3*n_bins));
                     alpha(0.3);
@@ -258,28 +260,28 @@ if p_val_analysis
     %Visualize place fields and calculate centroids
     %outputs every place field as a centroid heatmap along each trajectory
     figure();   set(gcf, 'units','normalized','outerposition',[0.2 0.3 0.5 0.45]);
-    [clus,cell] = find(pp_cells); %outputs which cells and which clusters have spatial selectivity
+    [clus,cellNum] = find(pp_cells); %outputs which cells and which clusters have spatial selectivity
     Place_field = struct([]);
-    for i = 1:length(clus) %for each cluster
+    for clus_i = 1:length(clus) %for each cluster
         
         %take each flight from a place cell cluster, take the shortest
         %flight, and generate an average trajectory based off the shortest
         %flight
-        id = flightPaths.clusterIndex{clus(i)};%find(flight_clus_ds.id==clus(i));
+        id = flightPaths.clusterIndex{clus(clus_i)};%find(flight_clus_ds.id==clus(i));
         shortest_flight_i = min(squeeze(sum(~isnan(flightPaths.pos(:,:,id)),2)),[],2);
         ave_trajectory = nanmean(flightPaths.pos(:,1:shortest_flight_i(1),id),3);
         %ave_acceleratn = nanmean(flight_clus_ds.acc(1,1:shortest_flight_i(1),id),3);
         
         npo = size(ave_trajectory,2); %length of average trajectory
         take_off = mean(squeeze(flightPaths.pos(:,1,id)),2);
-        map = interp1(linspace(1,100,size(sp_bnd_response(:,clus(i),cell(i)),1)),sp_bnd_response(:,clus(i),cell(i)),linspace(1,100,npo),'linear')';
+        map = interp1(linspace(1,100,size(sp_bnd_response(:,clus(clus_i),cellNum(clus_i)),1)),sp_bnd_response(:,clus(clus_i),cellNum(clus_i)),linspace(1,100,npo),'linear')';
         map_color = uint8(round(normalize(map,'range',[2 100]))); %make the mapping between activity and color
         
         %Determine location of the max activity 
-        [~,max_bin] = max(sp_bnd_response(:,clus(i),cell(i)),[],1,'linear');
+        [~,max_bin] = max(sp_bnd_velCel{clus_i}.*sp_bnd_response(:,clus(clus_i),cellNum(clus_i)),[],1,'linear');
         max_position = round(size(ave_trajectory,2)*max_bin/n_space_bins); %find centroid of place field
         %plot the firing activity along the average 
-        sgtitle(['ROI: ' num2str(cell(i)) ' Cluster: ' num2str(clus(i))]);
+        sgtitle(['ROI: ' num2str(cellNum(clus_i)) ' Cluster: ' num2str(clus(clus_i))]);
         subplot(121); cmap = viridis(100);
         p = plot3(ave_trajectory(1,:),ave_trajectory(2,:),ave_trajectory(3,:),'r', 'LineWidth',5);
         grid on;
@@ -293,26 +295,26 @@ if p_val_analysis
         drawnow();  hold off;
         
         subplot(122);
-        plot([1:1:n_space_bins],sp_bnd_response(:,clus(i),cell(i)),'LineWidth',3);   xlabel('Space along trajectory');    ylabel('Activity (SD units)');
+        plot([1:1:n_space_bins],sp_bnd_response(:,clus(clus_i),cellNum(clus_i)),'LineWidth',3);   xlabel('Space along trajectory');    ylabel('Activity (SD units)');
         xticks([1 n_space_bins]);   xticklabels({'Take-off','Landing'});
         %save info for each place field (position, cell num, clust num)
-        Place_field(i).pos = ave_trajectory(:,max_position);
-        Place_field(i).cell = cell(i);
-        Place_field(i).clus = clus(i);
+        Place_field(clus_i).pos = ave_trajectory(:,max_position);
+        Place_field(clus_i).cell = cellNum(clus_i);
+        Place_field(clus_i).clus = clus(clus_i);
         
-        saveas(gcf,[figures_directory1, '/',batName '_' dateSesh '_' sessionType '_Place_field' num2str(i) '.tif']);
+        saveas(gcf,[figures_directory1, '/',batName '_' dateSesh '_' sessionType '_Place_field' num2str(clus_i) '.tif']);
     end
     close all;
     
     %Calculate percentage of place cells
-    perc_place = length(unique(cell))./N;
+    perc_place = length(unique(cellNum))./N;
     
     %Evaluate distances between centroids for corresponding place fields, within a
     %single cell
     field_dist = [];
-    for i = 1:N
-        if length(find([Place_field.cell] == i))>1
-            cell_pairs = nchoosek(find([Place_field.cell] == i),2);
+    for cell_i = 1:N
+        if length(find([Place_field.cell] == cell_i))>1
+            cell_pairs = nchoosek(find([Place_field.cell] == cell_i),2);
             for n = 1:size(cell_pairs,1)
                 field_dist = [field_dist; norm([Place_field(cell_pairs(n,1)).pos]-[Place_field(cell_pairs(n,2)).pos])];
             end
