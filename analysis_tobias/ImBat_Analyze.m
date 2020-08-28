@@ -19,7 +19,6 @@ global topROI
 %topROI is top% of cells you want to look at
 topROI = 60;
 % Manual inputs
-AngeloData = 1;
 analysisFlag = 1;
 reAnalyze = 1;
 %roi plot flags
@@ -59,7 +58,7 @@ for k = 1 : length(subFolders)
 end
 
 %% Perform analysis on each folder
-for i = 1:9%length(subFolders)
+for i = 1:length(subFolders)
     disp(['entering folder ', char(subFolders(i).name)])
     cd([subFolders(i).folder,'/',subFolders(i).name]);
     %     if AngeloData == 1
