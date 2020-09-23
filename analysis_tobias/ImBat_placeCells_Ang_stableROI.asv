@@ -5,9 +5,6 @@ function ImBat_placeCells_Ang_stableROI
 p_val_analysis = 1; %run the pval analayis?
 saveFlag = 1; %do you want to save the figures and output structure?
 
-offset = 0; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
-speedThresh = 0.7; %threshold for when to eliminate nonflying moments
-spikeThreshMult = 5; %number of times to multiply std of s vector for determining spike threshold
 ROIs_gal = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
     3 2 10 28 11 1 5 33 8 35 NaN 6 22 32 29;
     4 5 11 24 5 1 16 10 2 18 14 8 25 19 9;
@@ -34,7 +31,7 @@ dirTop = vertcat(g,z); %find all folders in top quality directory
 %ROI_duplicate = cell(length(dirTop),1); %make cell for indices of duplicated ROIS
 
 
-for day_i = 5:length(dirTop)
+for day_i = 1:length(dirTop)
     %load results data
     try %extract metadata names and enter processed folder
         cd([dirTop(day_i).name filesep 'extracted'])
