@@ -38,8 +38,8 @@ plotPlaceCellsAng = 0;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 plotSnakesManualFlag = 0;
-plotPsthFlag = 0;
-plotPSTHstableFlag = 0;
+plotPsthFlag = 1;
+plotPSTHstableFlag = 1;
 batId = 'Gen';
 galDate = 0;
 %align max projections of specific flights across trajectories
@@ -328,7 +328,7 @@ for i = 1:length(subFolders)
             end
             %plot psth of only the pre-defined stable ROIs including across
             %all days overlaid
-            if plotPSTHstableFlag == 1 && strcmp(extractBefore(sessionType,'-'),'Gal_200320_fly') || plotPSTHstableFlag == 1 && strcmp(extractBefore(sessionType,'-'),'Gen_200324_fly')
+            if plotPSTHstableFlag == 1 && strcmp(extractBefore(sessionType,'-'),'Gal_200320_fly')
                 [psth_stableROI] = ImBat_psth_stableROI('batid',batId,'saveflag',1,'plotpsthclustflag',1);
                 save([imageFolders(kk).folder '/' imageFolders(kk).name '/' analysis_Folder '/' fileName '_psth_stableROIdata.mat'],'psth_stableROI');
                 

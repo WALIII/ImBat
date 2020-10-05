@@ -1,5 +1,9 @@
 saveFlag = 1;
-g = dir('Ga*');
+if strcmp(batId,'Gal')
+    g = dir('Ga*');
+elseif strcmp(batId,'Gen')
+    g = dir('Ge*');
+end
 z = dir('Z1*');
 dirTop = vertcat(g,z); %find all folders in top quality directory
 nDays = length(dirTop);
@@ -49,14 +53,18 @@ for day_i = 1:nDays
 end
 
 %% plot cluster 2 barcode of pre/dur/post cell classification
-clustList = [2 2 2 2 2 2 2 2 2; 3 5 3 3 3 3 3 3 5; 1 3 4 6 4 11 1 1 8];
+if strcmp(batId,'Gal')
+    clustList = [2 2 2 2 2 2 2 2 2; 3 5 3 3 3 3 3 3 5; 1 3 4 6 4 11 1 1 8]; %cluster conversion so all match for Gal
+elseif strcmp(batId,'Gen')
+    clustList = [2 2 2 2 2; 3 3 3 3 3]; %cluster conversion so all match for Gen
+end
 
 for clust_i = 1:size(clustList,1);
 
 categoricalStabilityBarcode = figure();
 set(gcf, 'units','normalized','outerposition',[0 0 1 1]);
-sgtitle(['Gal Pre (r)/Dur (g)/Post (b) Categorical Stability: Cluster ' num2str(clust_i+1)]);
-ha = tight_subplot(9,15,[.01 .01],[.03 .1],[.02 .02]);
+sgtitle(['Gen Pre (r)/Dur (g)/Post (b) Categorical Stability: Cluster ' num2str(clust_i+1)]);
+ha = tight_subplot(5,20,[.01 .01],[.03 .1],[.02 .02]);
 for day_ii = 1:nDays
     nROI = size(ppCells{1},2);
     for roi_i = 1:nROI
@@ -110,39 +118,42 @@ for day_ii = 1:nDays
 end
 
 if saveFlag == 1
-    saveas(categoricalStabilityBarcode,[saveDir filesep 'Gal_200311to20_categoricalStabilityBarcode_clust' num2str(clust_i+1) '_' datestr(now,'yymmdd-HHMMSS') '.tif']);
-    savefig(categoricalStabilityBarcode,[saveDir filesep 'Gal_200311to20_categoricalStabilityBarcode_clust' num2str(clust_i+1) '_' datestr(now,'yymmdd-HHMMSS') '.fig']);
-    
-end
-
-end 
-
-
-%% plot the functional stability of peak timings from beginning to end of recording session
-
-day1 = 1;
-dayEnd = nDays;
-
-day1Cells = cell(3,1); %3 cells for pre, dur, post
-day1Pks = cell(3,1);
-day1Locs = cell(3,1);
-day1Cells{1} = find(ppreCells{day1}(clust_i+1,:)); %preflight active cells
-day1Cells{2} = find(ppCells{day1}(clust_i+1,:)); %durflight active cells
-day1Cells{3} = find(ppostCells{day1}(clust_i+1,:)); %durflight active cells
-for p_i = 1:3
-    day1Pks{p_i} = zeros(length(day1Cells{p_i}),1);    
-    day1Locs{p_i} = zeros(length(day1Cells{p_i}),1);
-for roi_i = 1:length(day1Cells{p_i})
-    if p_i == 1
-    [day1Pks{p_i}(roi_i),day1Locs{p_i}(roi_i)] = findpeaks(placeCellsAngStable.ppre_cells_activity(roi_i,:));
-    elseif p_i == 2
-    [day1Pks{p_i}(roi_i),day1Locs{p_i}(roi_i)] = findpeaks(placeCellsAngStable.pp_cells_activity(roi_i,:));
-    elseif p_i == 3
-    [day1Pks{p_i}(roi_i),day1Locs{p_i}(roi_i)] = findpeaks(placeCellsAngStable.ppost_cells_activity(roi_i,:));
+    if strcmp(batId,'Gal')
+        saveas(categoricalStabilityBarcode,[saveDir filesep 'Gal_200311to20_categoricalStabilityBarcode_clust' num2str(clust_i+1) '_' datestr(now,'yymmdd-HHMMSS') '.tif']);
+        savefig(categoricalStabilityBarcode,[saveDir filesep 'Gal_200311to20_categoricalStabilityBarcode_clust' num2str(clust_i+1) '_' datestr(now,'yymmdd-HHMMSS') '.fig']);
+    elseif strcmp(batId,'Gen')
+        saveas(categoricalStabilityBarcode,[saveDir filesep 'Gen_200319to24_categoricalStabilityBarcode_clust' num2str(clust_i+1) '_' datestr(now,'yymmdd-HHMMSS') '.tif']);
+        savefig(categoricalStabilityBarcode,[saveDir filesep 'Gen_200319to24_categoricalStabilityBarcode_clust' num2str(clust_i+1) '_' datestr(now,'yymmdd-HHMMSS') '.fig']);
     end
 end
+
 end
 
+% %% plot the functional stability of peak timings from beginning to end of recording session
+% 
+% day1 = 1;
+% dayEnd = nDays;
+% 
+% day1Cells = cell(3,1); %3 cells for pre, dur, post
+% day1Pks = cell(3,1);
+% day1Locs = cell(3,1);
+% day1Cells{1} = find(ppreCells{day1}(clust_i+1,:)); %preflight active cells
+% day1Cells{2} = find(ppCells{day1}(clust_i+1,:)); %durflight active cells
+% day1Cells{3} = find(ppostCells{day1}(clust_i+1,:)); %durflight active cells
+% for p_i = 1:3
+%     day1Pks{p_i} = zeros(length(day1Cells{p_i}),1);    
+%     day1Locs{p_i} = zeros(length(day1Cells{p_i}),1);
+% for roi_i = 1:length(day1Cells{p_i})
+%     if p_i == 1
+%     [day1Pks{p_i}(roi_i),day1Locs{p_i}(roi_i)] = findpeaks(placeCellsAngStable.ppre_cells_activity(roi_i,:));
+%     elseif p_i == 2
+%     [day1Pks{p_i}(roi_i),day1Locs{p_i}(roi_i)] = findpeaks(placeCellsAngStable.pp_cells_activity(roi_i,:));
+%     elseif p_i == 3
+%     [day1Pks{p_i}(roi_i),day1Locs{p_i}(roi_i)] = findpeaks(placeCellsAngStable.ppost_cells_activity(roi_i,:));
+%     end
+% end
+% end
+% 
 
 % for clust_i = 1:size(clustList,1)
 %     day1Pre{clust_i} = find(ppreCells{day1}(clust_i+1,:));

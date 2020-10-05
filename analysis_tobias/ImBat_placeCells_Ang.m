@@ -286,7 +286,7 @@ if p_val_analysis
         map_color = uint8(round(normalize(map,'range',[2 100]))); %make the mapping between activity and color
         
         %Determine location of the max activity 
-        [~,max_bin] = max(sp_bnd_velCel{clus_i}.*sp_bnd_response(:,clus(clus_i),cellNum(clus_i)),[],1,'linear');
+        [~,max_bin] = max(sp_bnd_velCel{clus(clus_i)}.*sp_bnd_response(:,clus(clus_i),cellNum(clus_i)),[],1,'linear');
         max_position = round(size(ave_trajectory,2)*max_bin/n_space_bins); %find centroid of place field
         %plot the firing activity along the average 
         sgtitle(['ROI: ' num2str(cellNum(clus_i)) ' Cluster: ' num2str(clus(clus_i))]);
@@ -297,7 +297,7 @@ if p_val_analysis
         drawnow();  set(p.Edge, 'ColorBinding','interpolated', 'ColorData',cdata);
         hold on;
         textscatter3(take_off(1),take_off(2),take_off(3),"Take-off");
-        scatter3(ave_trajectory(1,max_position),ave_trajectory(2,max_position),ave_trajectory(3,max_position));
+        scatter3(ave_trajectory(1,max_position(1)),ave_trajectory(2,max_position(1)),ave_trajectory(3,max_position(1)));
         xlim([-3 3]); ylim([-3 3]); zlim([0 2.5]);
         xlabel('x');    ylabel('y');    zlabel('z');
         drawnow();  hold off;
@@ -306,7 +306,7 @@ if p_val_analysis
         plot([1:1:n_space_bins],sp_bnd_response(:,clus(clus_i),cellNum(clus_i)),'LineWidth',3);   xlabel('Space along trajectory');    ylabel('Activity (SD units)');
         xticks([1 n_space_bins]);   xticklabels({'Take-off','Landing'});
         %save info for each place field (position, cell num, clust num)
-        Place_field(clus_i).pos = ave_trajectory(:,max_position);
+        Place_field(clus_i).pos = ave_trajectory(:,max_position(1));
         Place_field(clus_i).cell = cellNum(clus_i);
         Place_field(clus_i).clus = clus(clus_i);
         

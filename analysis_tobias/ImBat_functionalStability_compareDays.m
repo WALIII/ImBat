@@ -1,16 +1,21 @@
-function ImBat_functionalStability_compareDays
+function ImBat_functionalStability_compareDays(batId)
 
 saveFlag = 1;
 
 %load first day placeCellStableROI data
 %cd([dirTop(day1).folder filesep 'plots\200911-preDurPost cells across days']);
-load('200311to200320_Gal_activity_allTrials_allClusts_sMat.mat'); %load s matrix activity data
+if strcmp(batId,'Gal')
+load('200311to200320_Gal_activity_allTrials_allClusts_sMat_vel.mat'); %load s matrix activity data
+dirDates = dir('Gal_*');
+elseif strcmp(batId,'Gen')
+load('200319to200324_Gen_activity_allTrials_allClusts_sMat_vel.mat'); %load s matrix activity data
+dirDates = dir('Gen_*');
+end
 %load('200311to200320_activity_allTrials_Gal.mat'); %load activity for pre,
 %dur, post with craw data
-dirGalDates = dir('Gal_*');
-nDays = length(dirGalDates);
+nDays = length(dirDates);
 day1 = 1;
-dayEnd = 7;
+dayEnd = 2;
 days = [day1 dayEnd];
 clusts = 2;
 preDur = 90;
@@ -29,18 +34,18 @@ if saveFlag == 1
     saveDir = [saveDir1 datestr(now,'yymmdd') filesep 'functionalStability' '\'];
 end
 
-cd(dirGalDates(day1).name);
+cd(dirDates(day1).name);
 dirExtracted = dir('*Extracted_trajectories*');
 load(dirExtracted(end).name);
 selectiveCells1 = placeCellsAngStable;
-cd(dirGalDates(day1).folder);
+cd(dirDates(day1).folder);
 
 %load last day PlaceCellStableROI data
-cd(dirGalDates(dayEnd).name);
+cd(dirDates(dayEnd).name);
 dirExtracted = dir('*Extracted_trajectories*');
 load(dirExtracted(end).name);
 selectiveCellsEnd = placeCellsAngStable;
-cd(dirGalDates(day1).folder);
+cd(dirDates(day1).folder);
 
 %pullout the selectively active cells
 selectiveCells{1,1} = selectiveCells1.ppre_cells;
@@ -218,9 +223,13 @@ for day_i = 1:size(selectiveCells,1)
 end
 
 if saveFlag == 1
+    if strcmp(batId,'Gal')
     saveas(functionalStabilityDotPlot,[saveDir filesep 'Gal_200311and20_functionalStability_dotPlot_selectiveCells_clust' num2str(clusts) '_' saveTag '_' datestr(now,'yymmdd-HHMMSS') '.tif']);
     savefig(functionalStabilityDotPlot,[saveDir filesep 'Gal_200311and20_functionalStability_dotPlot_selectiveCells_clust' num2str(clusts) '_' saveTag '_' datestr(now,'yymmdd-HHMMSS') '.fig']);
-    
+    elseif strcmp(batId,'Gen')
+    saveas(functionalStabilityDotPlot,[saveDir filesep 'Gen_200319and24_functionalStability_dotPlot_selectiveCells_clust' num2str(clusts) '_' saveTag '_' datestr(now,'yymmdd-HHMMSS') '.tif']);
+    savefig(functionalStabilityDotPlot,[saveDir filesep 'Gen_200319and24_functionalStability_dotPlot_selectiveCells_clust' num2str(clusts) '_' saveTag '_' datestr(now,'yymmdd-HHMMSS') '.fig']);
+    end
 end
 
 
@@ -319,7 +328,11 @@ end
 end
 
 if saveFlag == 1
-    saveas(functionalStabilityDotPlot_consistent,[saveDir filesep 'Gal_200311and20_functionalStability_dotPlot_selectiveCells_clust2_consistent_' saveTag '_' datestr(now,'yymmdd-HHMMSS') '.tif']);
-    savefig(functionalStabilityDotPlot_consistent,[saveDir filesep 'Gal_200311and20_functionalStability_dotPlot_selectiveCells_clust2_consistent_' saveTag '_' datestr(now,'yymmdd-HHMMSS') '.fig']);
-    
+    if strcmp(batId,'Gal')
+        saveas(functionalStabilityDotPlot_consistent,[saveDir filesep 'Gal_200311and20_functionalStability_dotPlot_selectiveCells_clust2_consistent_' saveTag '_' datestr(now,'yymmdd-HHMMSS') '.tif']);
+        savefig(functionalStabilityDotPlot_consistent,[saveDir filesep 'Gal_200311and20_functionalStability_dotPlot_selectiveCells_clust2_consistent_' saveTag '_' datestr(now,'yymmdd-HHMMSS') '.fig']);
+    elseif strcmp(batId,'Gen')
+        saveas(functionalStabilityDotPlot_consistent,[saveDir filesep 'Gen_200319and24_functionalStability_dotPlot_selectiveCells_clust2_consistent_' saveTag '_' datestr(now,'yymmdd-HHMMSS') '.tif']);
+        savefig(functionalStabilityDotPlot_consistent,[saveDir filesep 'Gen_200319and24_functionalStability_dotPlot_selectiveCells_clust2_consistent_' saveTag '_' datestr(now,'yymmdd-HHMMSS') '.fig']);
+    end
 end

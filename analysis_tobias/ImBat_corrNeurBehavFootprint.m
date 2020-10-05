@@ -45,6 +45,7 @@ imagesc(corrNeural);
 title('Neural data');
 xlabel('Days');
 ylabel('Days');
+axis(gca,'equal')
 colorbar('southoutside');
 
 subplot(1,3,2);
@@ -52,6 +53,10 @@ imagesc(corrBehav);
 title('Behavior data');
 xlabel('Days');
 ylabel('Days');
+axis(gca,'equal')
 colorbar('southoutside');
 
-
+if saveFlag == 1
+    saveas(figCorrNeuralBehaviorFootPrint,[saveDir filesep 'Gal_200311and20_corrNeurBehavFootprint_' saveTag '_clust' num2str(clust_i+1) '_' datestr(now,'yymmdd-HHMM') '.tif']);
+    savefig(figCorrNeuralBehaviorFootPrint,[saveDir filesep 'Gal_200311and20_corrNeurBehavFootprint_' saveTag '_clust' num2str(clust_i+1) '_' datestr(now,'yymmdd-HHMM') '.fig']);
+end

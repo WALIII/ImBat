@@ -5,7 +5,6 @@ dateSesh = [];
 sessionType = [];
 loadFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
 saveFlag = 0;
-batId = 'Gen';
 %offset = 0.1; % account for slow calcium estimation ~move locations back  0ms in time... This is the knob to turn for 'prospective' coding...
 %clusters = [1 2 4 6];
 %nClusters = 4;%length(clusters); %number of flight trajectories to look at and for k means clustering of whole time series by peak
@@ -71,9 +70,8 @@ else
     nClusters = length(flightPaths.clusterIndex);
 end
 
-if strcmp(batId,'Gal') 
 % 15 stable manually selected ROIs across 9 days for Gal
-ROIs_manual = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
+ROIs_manual{1} = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
     3 2 10 28 11 1 5 33 8 35 NaN 6 22 32 29;
     4 5 11 24 5 1 16 10 2 18 14 8 25 19 9;
     11 22 4 18 3 1 14 5 19 39 9 17 36 25 8;
@@ -82,14 +80,14 @@ ROIs_manual = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
     12 3 34 19 2 14 6 15 9 36 5 10 35 20 1;
     25 26 16 32 1 12 4 19 5 28 15 NaN 34 3 2;
     32 34 29 51 7 10 6 40 16 45 5 8 42 26 43]; 
-elseif strcmp(batId,'Gen') 
-% 20 stable manually selected ROIs across 5 days for Gen
-ROIs_manual = [NaN NaN 10 3 16 12 17 18 27 29 8 9 NaN NaN 21 11 31 15 20 25;
-    8 17 5 1 2 6 21 10 18 31 NaN 11 51 53 28 4 38 19 23 20;
+
+% 15 stable manually selected ROIs across 9 days for Gen
+ROIs_manual{2} = [NaN 32 10 3 16 12 17 18 27 29 8 9 NaN NaN 21 11 31 15 20 25;
+    8 17 5 1 2 6 21 10 18 31 NaN 11 51 53 28 4 38 19 2 20;
     50 54 12 3 48 18 27 15 31 34 NaN NaN 28 NaN 29 25 24 22 38 14;
     8 NaN 4 28 3 18 10 35 42 25 13 NaN 50 39 46 NaN 49 2 32 26;
     14 NaN 3 28 2 6 33 26 18 45 NaN NaN 25 NaN 32 NaN 37 8 28 11];
-end
+
 % if ~isempty(clustDelete) & clustDelete <6
 %     flightPaths.clusterIndex{clustDelete} = [];
 % end
@@ -279,7 +277,6 @@ for data_i = 1:3
             [~,maxNormTraceOdd{clust_i}(cellCount,1)] = max(normTraceOdd{clust_i}(cellCount,:));
         cellCount = cellCount + 1; %add 1 to the cell index
         end
-        
         cellCount = cellCount -1; %subtract the last addition so the rest of the script uses the max Cells correctly
         %sort each cell by the timing of its peak firing
         [BFlight{clust_i},IFlight{clust_i}] = sort(maxnormTraceFlight{clust_i});

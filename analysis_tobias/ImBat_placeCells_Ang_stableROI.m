@@ -1,11 +1,14 @@
 function ImBat_placeCells_Ang_stableROI
 %function to plot firing fields as red dots against the flight paths of the
-%bats for each day focusing only on the stable neurons from ROIs_gal
+%bats for each day focusing only on the stable neurons from ROIs_manual
 
 p_val_analysis = 1; %run the pval analayis?
 saveFlag = 1; %do you want to save the figures and output structure?
+batId = 'Gen';
 
-ROIs_gal = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
+if strcmp(batId,'Gal') 
+% 15 stable manually selected ROIs across 9 days for Gal
+ROIs_manual = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
     3 2 10 28 11 1 5 33 8 35 NaN 6 22 32 29;
     4 5 11 24 5 1 16 10 2 18 14 8 25 19 9;
     11 22 4 18 3 1 14 5 19 39 9 17 36 25 8;
@@ -13,8 +16,17 @@ ROIs_gal = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
     5 13 41 23 1 21 3 24 6 22 2 25 16 15 7;
     12 3 34 19 2 14 6 15 9 36 5 10 35 20 1;
     25 26 16 32 1 12 4 19 5 28 15 NaN 34 3 2;
-    32 34 29 51 7 10 6 40 16 45 5 8 42 26 43];  % 15 stable manually selected ROIs across 9 days for Gal
-
+    32 34 29 51 7 10 6 40 16 45 5 8 42 26 43]; 
+g = dir('Ga*');
+elseif strcmp(batId,'Gen') 
+% 20 stable manually selected ROIs across 5 days for Gen
+ROIs_manual = [NaN NaN 10 3 16 12 17 18 27 29 8 9 NaN NaN 21 11 31 15 20 25;
+    8 17 5 1 2 6 21 10 18 31 NaN 11 51 53 28 4 38 19 23 20;
+    50 54 12 3 48 18 27 15 31 34 NaN NaN 28 NaN 29 25 24 22 38 14;
+    8 NaN 4 28 3 18 10 35 42 25 13 NaN 50 39 46 NaN 49 2 32 26;
+    14 NaN 3 28 2 6 33 26 18 45 NaN NaN 25 NaN 32 NaN 37 8 28 11];
+g = dir('Ge*');
+end
  % P_value calculation params
     n_bins = 10;     %good around here                                                           %number of bins to divide the pre-during-post flight interval
     n_rep = 1000;    %can lower to 10 for debugging                                                           %number of shufflings
@@ -24,7 +36,7 @@ ROIs_gal = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
     w = gausswin(1); %keep at 1 for no smoothing                                                           %witdh of the gaussian filter (number of bins), use odd values. 1=no filtering
     n_space_bins = 30;  %correlates with space resolution but good around 30 (20cm chunks)                                                        %number of spatial bins
     
-g = dir('Ga*');
+%g = dir('Ga*');
 z = dir('Z1*');
 dirTop = vertcat(g,z); %find all folders in top quality directory
 
@@ -84,7 +96,7 @@ end
 saveDir = [saveDir1 datestr(now,'yymmdd') filesep batName{day_i} '_' dateSesh{day_i} '_preDurPostCells' '\'];
 
     %converting Angelo's variables to mine
-    N = size(ROIs_gal(day_i,:),2); %number of ROIs
+    N = size(ROIs_manual(day_i,:),2); %number of ROIs
     %N = size(cellData.results.C_raw,1); %number of ROIs
     T = size(cellData.results.C_raw,2); %length of each neural trace
     CNMFe_Fs = cellData.results.Fs; %imaging sampling rate
@@ -166,11 +178,11 @@ saveDir = [saveDir1 datestr(now,'yymmdd') filesep batName{day_i} '_' dateSesh{da
         
         %Binning in time and space, p values calculation
         figure();   set(gcf, 'units','normalized','outerposition',[0.2 0 0.5 1]);
-        for id_cluster_SI = 1:until_cluster %for each cluster
+        for id_cluster_SI = 1:3%until_cluster %for each cluster
             id = [];    %id = find(flight_clus.id==id_cluster_SI); %find all flights that belong to that cluster
             id = flightPaths.clusterIndex{id_cluster_SI};
             ROIcounter = 1;
-            for cell_n = ROIs_gal(day_i,:)%1:N %for each cell, initialize the below matrices
+            for cell_n = ROIs_manual(day_i,:)%1:N %for each cell, initialize the below matrices
                 if ~isnan(cell_n)
                 sgtitle([batName{day_i} ' ' dateSesh{day_i} ' ROI: ' num2str(ROIcounter) ' (' num2str(cell_n) ') Cluster: ' num2str(id_cluster_SI)]);
                 disp(['Cell number: ' num2str(ROIcounter) ' (' num2str(cell_n) ')  Trajectory number: ' num2str(id_cluster_SI)]);
@@ -376,7 +388,7 @@ saveDir = [saveDir1 datestr(now,'yymmdd') filesep batName{day_i} '_' dateSesh{da
             [~,max_bin] = max(sp_bnd_velCel{clus(clus_i)}.*sp_bnd_response(:,clus(clus_i),cellNum(clus_i)),[],1,'linear');
             max_position = round(size(ave_trajectory,2)*max_bin/n_space_bins); %find centroid of place field
             %plot the firing activity along the average
-            sgtitle([batName{day_i} ' ' dateSesh{day_i} ' ROI: ' num2str(cellNum(clus_i)) ' (' num2str(ROIs_gal(day_i,cellNum(clus_i))) ') Cluster: ' num2str(clus(clus_i))]);
+            sgtitle([batName{day_i} ' ' dateSesh{day_i} ' ROI: ' num2str(cellNum(clus_i)) ' (' num2str(ROIs_manual(day_i,cellNum(clus_i))) ') Cluster: ' num2str(clus(clus_i))]);
             subplot(121); cmap = viridis(100);
             p = plot3(ave_trajectory(1,:),ave_trajectory(2,:),ave_trajectory(3,:),'r', 'LineWidth',5);
             grid on;
@@ -464,7 +476,7 @@ saveDir = [saveDir1 datestr(now,'yymmdd') filesep batName{day_i} '_' dateSesh{da
         placeCellsAngStable.meta.dateSesh = dateSesh{day_i};
         placeCellsAngStable.meta.sessionType = sessionType{day_i};
 
-        placeCellsAngStable.ROIs_gal = ROIs_gal;
+        placeCellsAngStable.ROIs_manual = ROIs_manual;
         placeCellsAngStable.Rate = Rate;
         placeCellsAngStable.p_val = p_val;
         placeCellsAngStable.response = response;

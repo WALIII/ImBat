@@ -8,12 +8,12 @@ function [ROI_refined] = ImBat_ROIcovar
 saveFlag = 1; %do you want to save the figures and output structure?
 saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
 % Check if folder exists
-if exist([saveDir1 datestr(now,'yymmdd')])>0;
+if exist([saveDir1 datestr(now,'yymmdd') filesep 'ROI_covar_refined'])>0;
     disp('Youve been working today..');
 else
-    mkdir([saveDir1 datestr(now,'yymmdd')])
+    mkdir([saveDir1 datestr(now,'yymmdd') filesep 'ROI_covar_refined'])
 end
-saveDir = [saveDir1 datestr(now,'yymmdd') '\'];
+saveDir = [saveDir1 datestr(now,'yymmdd') filesep 'ROI_covar_refined' '\'];
 
 
 distThresh = 10; %number of pixels to check if the cells are close enough to be considered same cell

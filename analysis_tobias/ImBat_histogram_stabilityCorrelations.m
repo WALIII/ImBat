@@ -1,4 +1,5 @@
-saveFlag = 1;
+saveFlag = 0;
+batId = 'Gal';
 saveTag = ['cRaw_sMat_smooth'];
 if saveFlag == 1
     saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
@@ -20,7 +21,7 @@ timeCorr = cell(1,nPhases);
 timeDiff = cell(1,nPhases);
 %create figure
 histogram_peakCorr_acrossDays = figure();
-sgtitle(['Gal Pairwise Selectively Active Cells Across Days ' saveTag]);
+sgtitle(['Gen Pairwise Selectively Active Cells Across Days ' saveTag]);
 set(gcf, 'units','normalized','outerposition',[0 0 0.8 0.6]);
 %find the overlapping ROIs for each day/phase, then gather all the
 %differences between max peaks and correlation coefficients for each pair
@@ -93,6 +94,11 @@ for phase_i = 1:nPhases
 end
 
 if saveFlag == 1
-    saveas(histogram_peakCorr_acrossDays,[saveDir filesep 'Gal_200311and20_histogram_peakDiff_corr_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
-    savefig(histogram_peakCorr_acrossDays,[saveDir filesep 'Gal_200311and20_histogram_peakDiff_corr_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+    if strcmp(batId,'Gal')
+        saveas(histogram_peakCorr_acrossDays,[saveDir filesep 'Gal_200311and20_histogram_peakDiff_corr_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(histogram_peakCorr_acrossDays,[saveDir filesep 'Gal_200311and20_histogram_peakDiff_corr_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+    elseif strcmp(batId,'Gen')
+        saveas(histogram_peakCorr_acrossDays,[saveDir filesep 'Gen_200319and24_histogram_peakDiff_corr_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(histogram_peakCorr_acrossDays,[saveDir filesep 'Gen_200319and24_histogram_peakDiff_corr_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+    end
 end

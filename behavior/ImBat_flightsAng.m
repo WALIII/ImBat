@@ -3,9 +3,9 @@ function [flightPaths] = ImBat_flightsAng(trackData,alignment,varargin)
 batName = [];
 dateSesh = [];
 sessionType = [];
-saveFlag = 0;
+saveFlag = 1;
 loadFlag = 0;
-flightAdjustFlag = 1;
+flightAdjustFlag = 0;
 
 % User inputs overrides
 nparams=length(varargin);
