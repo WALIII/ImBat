@@ -171,6 +171,14 @@ for i = 1:length(subFolders);
             mkdir(processed_FN);
             ImBat_processVideos('metadata',metadata);
             disp('processing!!');
+        else
+            
+            % get most recent processed folder:
+            temp_files = dir(pwd);
+            temp_files(ismember( {temp_files.name}, {'.', '..','Processed'})) = [];  %remove . and .. and Processed
+            temp_dirFlags = [temp_files.isdir];% Get a logical vector that tells which is a directory.
+            temp_subFolders = temp_files(temp_dirFlags);% Extract only those that are directories.
+            processed_FN = temp_subFolders(size(temp_subFolders,1)).name;
         end
         
         
@@ -199,7 +207,7 @@ for i = 1:length(subFolders);
             
             
             ROI_flag = ROI_flag_reset;
-            
+        end 
             %%====[ Aligning Time Stamps ]======%%
             % to do: add logfile
             if alignment ==1;
@@ -207,9 +215,8 @@ for i = 1:length(subFolders);
                 load('AV_data.mat');
                 [out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
             end
-        end
+        
         clear video audio Markers AnalogSignals out % Clear vars from RAM
-        extract =1;
     end
     
 end
