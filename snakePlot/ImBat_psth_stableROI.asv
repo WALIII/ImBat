@@ -5,6 +5,7 @@ plotPSTHclustFlag = 0;
 batId = '';
 saveFlag = 0; %do you want to save the figures and output structure?
 cRaw_flag = 1;
+clustNum = 2; %which cluster trajectory to look at for each day
 
 % User inputs overrides
 nparams=length(varargin);
@@ -64,7 +65,7 @@ flight = cell(length(dirTop));
 traceIndiv = cell(length(dirTop));
 colDay = jet(length(dirTop));
 
-for day_i = 1:length(dirTop)
+for day_i = 1:9%length(dirTop)
     %load results data
     try %extract metadata names and enter processed folder
         cd([dirTop(day_i).name filesep 'extracted'])
@@ -185,7 +186,7 @@ for day_i = 1:length(dirTop)
                             set(gca,'xticklabel',[],'yticklabel',[]);
                         end
                         ylim([0 4.5]);
-                        xlim([0 length(snakeTrace_data.smoothSpeedRawFlight{clust_i}(flight_i,:))]);
+                        %xlim([0 length(snakeTrace_data.smoothSpeedRawFlight{clust_i}(flight_i,:))]);
                         
                         %plot each flight activity
                         plotIndivTraces = subplot(10,nClusts,[clust_i+6*nClusts:nClusts:clust_i+9*nClusts]);
@@ -197,7 +198,7 @@ for day_i = 1:length(dirTop)
                         xlabel('Time (s)');
                         xt = get(gca, 'XTick');
                         set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
-                        xlim([0 length(snakeTrace_data.normTraceRawFlight{clust_i}(flight_i,:,ROIs_manual(day_i,cell_i)))]);
+                        %xlim([0 length(snakeTrace_data.normTraceRawFlight{clust_i}(flight_i,:,ROIs_manual(day_i,cell_i)))]);
                     end
                     %plot mean and stdev of activity per cluster
                     plotMeanTraces = subplot(10,nClusts,[clust_i+4*nClusts clust_i+5*nClusts]);
@@ -206,7 +207,7 @@ for day_i = 1:length(dirTop)
                     hold on;
                     ylabel('Mean stdev df/f');
                     set(gca,'xticklabel',[]);
-                    xlim([0 length(snakeTrace_data.normTraceFlight{clust_i}(ROIs_manual(day_i,cell_i),:))]);
+                    %xlim([0 length(snakeTrace_data.normTraceFlight{clust_i}(ROIs_manual(day_i,cell_i),:))]);
                 end
             catch
                 sgtitle(['Flight Aligned Activity per cluster: ' batName{day_i} ' ' dateSesh{day_i} ' Cell# ' num2str(cell_i) ' NO ACTIVITY']);
@@ -252,15 +253,15 @@ for cell_ii = 1:nROIs
                 xlim([-3 3])
                 ylim([-3 3])
                 if strcmp(batId,'Gal')
-                    title(['ROI # ' num2str(cell_ii) ': Gal 200311to20 - clust2']);
+                    title(['ROI # ' num2str(cell_ii) ': Gal 200311to20 - clust' num2str(clustNum)]);
                 elseif strcmp(batId,'Gen')
-                    title(['ROI # ' num2str(cell_ii) ': Gen 200319to24 - clust2']);
+                    title(['ROI # ' num2str(cell_ii) ': Gen 200319to24 - clust' num2str(clustNum)]);
                 end
                 xlabel('m'); ylabel('m');
                 
                 %plot velocity of each cluster
                 plotVelocity = subplot(10,1,[3 4]);
-                plot(1:length(psth_stableROI.velocity{day_ii}{2}{cell_ii}(flight_i,:)),psth_stableROI.velocity{day_ii}{2}{cell_ii}(flight_i,:),'Color',colDay(day_ii,:));
+                plot(1:length(psth_stableROI.velocity{day_ii}{clustNum}{cell_ii}(flight_i,:)),psth_stableROI.velocity{day_ii}{clustNum}{cell_ii}(flight_i,:),'Color',colDay(day_ii,:));
                 hold on;
                 ylabel('Velocity (m/s)');
                 yt = get(gca,'YTick');
@@ -268,19 +269,19 @@ for cell_ii = 1:nROIs
                 set(gca,'xticklabel',[]);
                 %set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
                 ylim([0 4.5]);
-                xlim([0 length(psth_stableROI.velocity{1}{2}{cell_ii}(1,:))]);
+                %xlim([0 length(psth_stableROI.velocity{1}{clustNum}{cell_ii}(1,:))]);
                 
             end
             %plot mean and stdev of activity per cluster
             plotMeanTraces = subplot(10,1,[5 10]);
-            p(day_ii) = boundedline(1:length(psth_stableROI.traceMean{day_ii}{2}(cell_ii,:)),psth_stableROI.traceMean{day_ii}{2}(cell_ii,:),psth_stableROI.traceStd{day_ii}{2}(cell_ii,:),...
+            p(day_ii) = boundedline(1:length(psth_stableROI.traceMean{day_ii}{clustNum}(cell_ii,:)),psth_stableROI.traceMean{day_ii}{clustNum}(cell_ii,:),psth_stableROI.traceStd{day_ii}{clustNum}(cell_ii,:),...
                 'alpha','cmap',colDay(day_ii,:),'nan','gap');
             hold on;
             ylabel('Mean stdev df/f');
             xlabel('Time (s)');
             xt = get(gca, 'XTick');
             set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
-            xlim([0 length(psth_stableROI.traceMean{1}{2}(cell_ii,:))]);
+            %xlim([0 length(psth_stableROI.traceMean{1}{clustNum}(cell_ii,:))]);
         catch
             sgtitle(['Flight Aligned Activity per cluster: ' batName{day_ii} ' ' dateSesh{day_ii} ' Cell# ' num2str(cell_ii) ' NO ACTIVITY']);
         end
@@ -291,11 +292,11 @@ for cell_ii = 1:nROIs
     drawnow;
     if saveFlag == 1
         if strcmp(batId,'Gal')
-        saveas(plotPSTH_acrossDays,[saveDir filesep 'Gal_200311to20_psth_acrossDays_ROI' num2str(cell_ii) '_' datestr(now,'yymmdd_HHMM') '.tif']);
-        savefig(plotPSTH_acrossDays,[saveDir filesep 'Gal_200311to20_psth_acrossDays_ROI' num2str(cell_ii) '_' datestr(now,'yymmdd_HHMM') '.fig']);
+        saveas(plotPSTH_acrossDays,[saveDir filesep 'Gal_200311to20_psth_acrossDays_clust' num2str(clustNum) '_ROI' num2str(cell_ii) '_' datestr(now,'yymmdd_HHMM') '.tif']);
+        savefig(plotPSTH_acrossDays,[saveDir filesep 'Gal_200311to20_psth_acrossDays_clust' num2str(clustNum) '_ROI' num2str(cell_ii) '_' datestr(now,'yymmdd_HHMM') '.fig']);
         elseif strcmp(batId,'Gen')
-        saveas(plotPSTH_acrossDays,[saveDir filesep 'Gen_200319to24_psth_acrossDays_ROI' num2str(cell_ii) '_' datestr(now,'yymmdd_HHMM') '.tif']);
-        savefig(plotPSTH_acrossDays,[saveDir filesep 'Gen_200319to24_psth_acrossDays_ROI' num2str(cell_ii) '_' datestr(now,'yymmdd_HHMM') '.fig']);
+        saveas(plotPSTH_acrossDays,[saveDir filesep 'Gen_200319to24_psth_acrossDays_clust' num2str(clustNum) '_ROI' num2str(cell_ii) '_' datestr(now,'yymmdd_HHMM') '.tif']);
+        savefig(plotPSTH_acrossDays,[saveDir filesep 'Gen_200319to24_psth_acrossDays_clust' num2str(clustNum) '_ROI' num2str(cell_ii) '_' datestr(now,'yymmdd_HHMM') '.fig']);
         end
     end
     clf;

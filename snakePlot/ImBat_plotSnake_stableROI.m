@@ -1,7 +1,7 @@
 %function to plot snakePlots flight paths of the
 %bats for each day focusing only on the stable neurons from ROIs_manual
 batId = 'Gen';
-clustNum = 3;
+clustNum = 2; %which cluster to look across all the days
 saveFlag = 1; %do you want to save the figures and output structure?
 saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
 % Check if folder exists
@@ -596,7 +596,7 @@ for day_i = 1:length(ROIs_manual(:,1))
     %plot odd trials for all ROIs normalized to itself and plotted in 1-n numerical order
     %across all days
     subplot(3,2*length(ROIs_manual(:,1)), 4*length(ROIs_manual(:,1)) + (day_i*2)-1);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceOdd{clustNum}(:,1:xlimCalcium),[1.5 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceOdd{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.Iodd{clustNum},1:xlimCalcium),[1.5 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -623,7 +623,7 @@ for day_i = 1:length(ROIs_manual(:,1))
         else
             set(gca,'xticklabel',[],'yticklabel',[]);
         end   
-        %plot odd velocity for cluster #2
+        %plot even velocity for cluster #2
         subplot(3,length(ROIs_manual(:,1))*2, length(ROIs_manual(:,1))*2 + (day_i*2));
         plot(1:length(snakeTraceT(day_i).snakeTrace.cRaw.smoothSpeedRawFlight{clustNum}(flight_i,1:xlimFlight)),snakeTraceT(day_i).snakeTrace.cRaw.smoothSpeedRawFlight{clustNum}(flight_i,1:xlimFlight));
         hold on;
@@ -640,10 +640,10 @@ for day_i = 1:length(ROIs_manual(:,1))
         ylim([0 4.5]);
                 title([num2str(length(flightPathsF(day_i).flightPaths.clusterIndex{clustNum})) ' flights']);
     end 
-    %plot odd trials for all ROIs normalized to itself and plotted in 1-n numerical order
+    %plot even trials for all ROIs normalized to itself and plotted in 1-n numerical order
     %across all days
     subplot(3,length(ROIs_manual(:,1))*2, length(ROIs_manual(:,1))*4 + (day_i*2));
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceEven{clustNum}(:,1:xlimCalcium),[1.5 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceEven{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.Iodd{clustNum},1:xlimCalcium),[1.5 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');

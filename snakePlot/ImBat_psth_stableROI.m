@@ -5,7 +5,7 @@ plotPSTHclustFlag = 0;
 batId = '';
 saveFlag = 0; %do you want to save the figures and output structure?
 cRaw_flag = 1;
-clustNum = 3; %which cluster trajectory to look at for each day
+clustNum = 2; %which cluster trajectory to look at for each day
 
 % User inputs overrides
 nparams=length(varargin);
@@ -186,7 +186,7 @@ for day_i = 1:length(dirTop)
                             set(gca,'xticklabel',[],'yticklabel',[]);
                         end
                         ylim([0 4.5]);
-                        xlim([0 length(snakeTrace_data.smoothSpeedRawFlight{clust_i}(flight_i,:))]);
+                        %xlim([0 length(snakeTrace_data.smoothSpeedRawFlight{clust_i}(flight_i,:))]);
                         
                         %plot each flight activity
                         plotIndivTraces = subplot(10,nClusts,[clust_i+6*nClusts:nClusts:clust_i+9*nClusts]);
@@ -198,7 +198,7 @@ for day_i = 1:length(dirTop)
                         xlabel('Time (s)');
                         xt = get(gca, 'XTick');
                         set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
-                        xlim([0 length(snakeTrace_data.normTraceRawFlight{clust_i}(flight_i,:,ROIs_manual(day_i,cell_i)))]);
+                        %xlim([0 length(snakeTrace_data.normTraceRawFlight{clust_i}(flight_i,:,ROIs_manual(day_i,cell_i)))]);
                     end
                     %plot mean and stdev of activity per cluster
                     plotMeanTraces = subplot(10,nClusts,[clust_i+4*nClusts clust_i+5*nClusts]);
@@ -207,7 +207,7 @@ for day_i = 1:length(dirTop)
                     hold on;
                     ylabel('Mean stdev df/f');
                     set(gca,'xticklabel',[]);
-                    xlim([0 length(snakeTrace_data.normTraceFlight{clust_i}(ROIs_manual(day_i,cell_i),:))]);
+                    %xlim([0 length(snakeTrace_data.normTraceFlight{clust_i}(ROIs_manual(day_i,cell_i),:))]);
                 end
             catch
                 sgtitle(['Flight Aligned Activity per cluster: ' batName{day_i} ' ' dateSesh{day_i} ' Cell# ' num2str(cell_i) ' NO ACTIVITY']);
@@ -269,7 +269,7 @@ for cell_ii = 1:nROIs
                 set(gca,'xticklabel',[]);
                 %set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
                 ylim([0 4.5]);
-                xlim([0 length(psth_stableROI.velocity{1}{clustNum}{cell_ii}(1,:))]);
+                %xlim([0 length(psth_stableROI.velocity{1}{clustNum}{cell_ii}(1,:))]);
                 
             end
             %plot mean and stdev of activity per cluster
@@ -281,14 +281,17 @@ for cell_ii = 1:nROIs
             xlabel('Time (s)');
             xt = get(gca, 'XTick');
             set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
-            xlim([0 length(psth_stableROI.traceMean{1}{clustNum}(cell_ii,:))]);
+            %xlim([0 length(psth_stableROI.traceMean{1}{clustNum}(cell_ii,:))]);
         catch
             sgtitle(['Flight Aligned Activity per cluster: ' batName{day_ii} ' ' dateSesh{day_ii} ' Cell# ' num2str(cell_ii) ' NO ACTIVITY']);
         end
         
     end
-    legend([p(1),p(2),p(3),p(4),p(5)],'Day 1','Day 2','Day 3','Day 4','Day 5');
-
+    if strcmp(batId,'Gal')
+         legend([p(1),p(2),p(3),p(4),p(5),p(6),p(7),p(8),p(9)],'Day 1','Day 2','Day 3','Day 4','Day 5','Day 6','Day 7','Day 8','Day 9');
+    elseif strcmp(batId,'Gen')
+        legend([p(1),p(2),p(3),p(4),p(5)],'Day 1','Day 2','Day 3','Day 4','Day 5');
+    end
     drawnow;
     if saveFlag == 1
         if strcmp(batId,'Gal')
