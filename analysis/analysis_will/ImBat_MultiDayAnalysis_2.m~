@@ -3,10 +3,10 @@ function ImBat_MultiDayAnalysis_2(CellReg2,ROI_Data);
 
 % Plot 'place cells' across days.
 % 
-
-day1 = 1;
-day2 = 2;
-day3 = 3;
+% Check 
+day1 = 7;
+day2 = 8;
+day3 = 9;
 offset = 0;
 
 % 
@@ -35,6 +35,7 @@ end
 
 figure(); 
 clf
+subplot(1,2,1);
 imagesc(squeeze(RGB1))
 title('ROI Mask on days 1(r) 2(g) and 3(b)');
 

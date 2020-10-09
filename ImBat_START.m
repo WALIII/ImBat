@@ -34,6 +34,8 @@ reExtract = 1; % re-extract, in the event that things have been extracted alread
 extract_track = 1;
 Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
 Bat_Cluster =1; % extract the bat_cluster tracking
+alignment = 1;
+
 
 % Default Movie Paramaters:
 metadata.temporal_downsample = 1; % temporal downsampleing
@@ -76,6 +78,17 @@ for i=1:length(vin)
         metadata = vin{i+1};
     elseif isequal(vin{i},'rextract');
         reExtract=vin{i+1};
+    elseif isequal(vin{i},'realign'); % Re-alignment-dont re-process everything
+        % Default extraction Params
+        ROI_flag = 0; % run ROI extraction
+        ROI_flag_reset = 0;
+        reROI_extract = 0; %rerun ROI extraction
+        extract  = 0; % extract the basic ROI timeseries
+        extract_track = 1;
+        alignment = 1;
+        Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
+        Bat_Cluster =1; % extract the bat_cluster tracking
+        
     end
 end
 
@@ -126,28 +139,6 @@ for i = 1:length(subFolders);
     
     for ii = 1:length(flight_subFolders);
         cd([subFolders(i).folder,'/',subFolders(i).name]);
-        
-        %         Check if folder exists
-        %         if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/',processed_FN,'/','Motion_corrected_Data_DS.mat'])>0;
-        %             disp('Folder already extracted..');
-        %             if reExtract ==1
-        %                 disp('Re-Extracting...');
-        %                 fname = [flight_subFolders(ii).name,'/','processed'];
-        %                 try
-        %                 rmdir(fname);
-        %                 catch
-        %                      cmd_rmdir( fname )
-        %                 end
-        %
-        %                 mkdir(fname);
-        %             else
-        %                 disp('Moving to the next folder...');
-        %                 ROI_flag = 0 ;
-        %
-        %                 extract = 0 ;
-        %             end
-        %         end
-        %
         
         % load tracking data
         if extract_track ==1;
@@ -203,15 +194,15 @@ for i = 1:length(subFolders);
         if ROI_flag ==1;
             disp('extracting ROIs...')
             nam = './Motion_corrected_Data.mat'
-           
-                CNMFe_extract2(nam,'metadata',metadata);
-           
+            
+            CNMFe_extract2(nam,'metadata',metadata);
+            
             
             ROI_flag = ROI_flag_reset;
             
             %%====[ Aligning Time Stamps ]======%%
             % to do: add logfile
-            if extract_track ==1;
+            if alignment ==1;
                 disp('Aligning Timestamps...');
                 load('AV_data.mat');
                 [out] = ImBat_alignTimeStamps(audio,video,AnalogSignals,Markers);
