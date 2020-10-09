@@ -205,9 +205,7 @@ for i = 1:length(subFolders);
             nam = './Motion_corrected_Data.mat'
            
                 CNMFe_extract2(nam,'metadata',metadata);
-     
-            
-            
+           
             
             ROI_flag = ROI_flag_reset;
             

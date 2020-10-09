@@ -46,7 +46,7 @@ TS2 = TS;
 
 
 audio_data(audio_data<0) = 0;
-audio_z = zscore(audio_data);
+audio_z = zscore(audio_data
 TS_z = zscore(smooth(TS2,10));
 try
 [Apks,Alocs] = findpeaks(audio_z,'MinPeakProminence',4,'MinPeakDistance',60);
