@@ -29,7 +29,6 @@ for i = 1:length(subFolders);
     
     cd([subFolders(i).folder,'/',subFolders(i).name]);
     
-cd('extracted');  
 
 % Now, the meat:
 ImBat_START('realign');
