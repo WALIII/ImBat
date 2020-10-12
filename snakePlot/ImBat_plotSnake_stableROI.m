@@ -6,7 +6,7 @@ saveFlag = 1; %do you want to save the figures and output structure?
 saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
 % Check if folder exists
 if exist([saveDir1 datestr(now,'yymmdd') filesep 'snakePlots'])>0;
-    disp('Youve been working today..');
+    disp('Youvee been working today..');
 else
     mkdir([saveDir1 datestr(now,'yymmdd') filesep 'snakePlots'])
 end
@@ -122,7 +122,7 @@ end
 
 % plot all stable ROIs across all 9 days sorted by their own preference
 plotSnake_acrossDays_prefEach = figure('units','normalized','outerposition',[0 0 0.5 1]);
-sgtitle('Mean Activity Across 9 Days for Same Flight Path (Pref Each Day): Gal 203011 to 200320');
+sgtitle(['Mean Activity Across ' num2str(length(ROIs_manual(:,1))) ' Days for Same Flight Path (Pref Each Day): ' batId]);
 col = jet(length(ROIs_manual(:,1)));
 for day_i = 1:length(ROIs_manual(:,1))
     %plot flightpath for cluster #2
@@ -176,7 +176,7 @@ end
 
 % plot each ROI across all 9 days in same image with different images for each ROI sorted by day 1 preference
 plotSnake_acrossDays_pref1 = figure('units','normalized','outerposition',[0 0 0.5 1]);
-sgtitle('Mean Activity Across 9 Days for Same Flight Path (Pref Day 1): Gal 203011 to 200320');
+sgtitle(['Mean Activity Across ' num2str(length(ROIs_manual(:,1))) ' Days for Same Flight Path (Pref Day 1): ' batId]);
 col = jet(length(ROIs_manual(:,1)));
 for day_i = 1:length(ROIs_manual(:,1))
     %plot flightpath for cluster #2
@@ -215,7 +215,7 @@ for day_i = 1:length(ROIs_manual(:,1))
     
     %plot all ROIs according to preferred sorting individually
     subplot(3,length(ROIs_manual(:,1)), 2*length(ROIs_manual(:,1)) + day_i);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceFlight{clustNum}(snakeTraceT(1).snakeTrace.cRaw.IFlight{clustNum},1:xlimCalcium),[1 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceFlight{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.IFlight{clustNum},1:xlimCalcium),[1 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -231,7 +231,7 @@ end
 %% Pre-flight activity
 %plot all stable ROIs across all 9 days sorted by order of ROIs 
 plotSnake_acrossDays_pre = figure('units','normalized','outerposition',[0 0 0.5 1]);
-sgtitle('Mean Pre-Activity Across 9 Days for Same Flight Path: Gal 203011 to 200320');
+sgtitle(['Mean Pre-Activity Across ' num2str(length(ROIs_manual(:,1))) ' Days for Same Flight Path: ' batId]);
 col = jet(length(ROIs_manual(:,1)));
 for day_i = 1:length(ROIs_manual(:,1))
     %plot flightpath for cluster #2
@@ -286,7 +286,7 @@ end
 
 % plot all stable ROIs across all 9 days sorted by their own preference
 plotSnake_acrossDays_prefEach_pre = figure('units','normalized','outerposition',[0 0 0.5 1]);
-sgtitle('Mean Pre-Activity Across 9 Days for Same Flight Path (Pref Each Day): Gal 203011 to 200320');
+sgtitle(['Mean Pre-Activity Across ' num2str(length(ROIs_manual(:,1))) ' Days for Same Flight Path (Pref Each Day): ' batId]);
 col = jet(length(ROIs_manual(:,1)));
 for day_i = 1:length(ROIs_manual(:,1))
     %plot flightpath for cluster #2
@@ -340,7 +340,7 @@ end
 
 % plot each ROI across all 9 days in same image with different images for each ROI sorted by day 1 preference
 plotSnake_acrossDays_pref1_pre = figure('units','normalized','outerposition',[0 0 0.5 1]);
-sgtitle('Mean Pre-Activity Across 9 Days for Same Flight Path (Pref Day 1): Gal 203011 to 200320');
+sgtitle(['Mean Pre-Activity Across ' num2str(length(ROIs_manual(:,1))) ' Days for Same Flight Path (Pref Day 1): ' batId]);
 col = jet(length(ROIs_manual(:,1)));
 for day_i = 1:length(ROIs_manual(:,1))
     %plot flightpath for cluster #2
@@ -379,7 +379,7 @@ for day_i = 1:length(ROIs_manual(:,1))
     
     %plot all ROIs according to preferred sorting individually
     subplot(3,length(ROIs_manual(:,1)), 2*length(ROIs_manual(:,1)) + day_i);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTracePre{clustNum}(snakeTraceT(1).snakeTrace.cRaw.IPre{clustNum},1:xlimCalciumPre),[1 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTracePre{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.IPre{clustNum},1:xlimCalciumPre),[1 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -395,7 +395,7 @@ end
 %% Post-flight activity
 %plot all stable ROIs across all 9 days sorted by order of ROIs 
 plotSnake_acrossDays_post = figure('units','normalized','outerposition',[0 0 0.5 1]);
-sgtitle('Mean Post-Activity Across 9 Days for Same Flight Path: Gal 203011 to 200320');
+sgtitle(['Mean Post-Activity Across ' num2str(length(ROIs_manual(:,1))) ' Days for Same Flight Path: ' batId]);
 col = jet(length(ROIs_manual(:,1)));
 for day_i = 1:length(ROIs_manual(:,1))
     %plot flightpath for cluster #2
@@ -450,7 +450,7 @@ end
 
 % plot all stable ROIs across all 9 days sorted by their own preference
 plotSnake_acrossDays_prefEach_post = figure('units','normalized','outerposition',[0 0 0.5 1]);
-sgtitle('Mean Post-Activity Across 9 Days for Same Flight Path (Pref Each Day): Gal 203011 to 200320');
+sgtitle(['Mean Post-Activity Across ' num2str(length(ROIs_manual(:,1))) ' Days for Same Flight Path (Pref Each Day): ' batId]);
 col = jet(length(ROIs_manual(:,1)));
 for day_i = 1:length(ROIs_manual(:,1))
     %plot flightpath for cluster #2
@@ -504,7 +504,7 @@ end
 
 % plot each ROI across all 9 days in same image with different images for each ROI sorted by day 1 preference
 plotSnake_acrossDays_pref1_post = figure('units','normalized','outerposition',[0 0 0.5 1]);
-sgtitle('Mean Post-Activity Across 9 Days for Same Flight Path (Pref Day 1): Gal 203011 to 200320');
+sgtitle(['Mean Post-Activity Across ' num2str(length(ROIs_manual(:,1))) ' Days for Same Flight Path (Pref Day 1): ' batId]);
 col = jet(length(ROIs_manual(:,1)));
 for day_i = 1:length(ROIs_manual(:,1))
     %plot flightpath for cluster #2
@@ -543,7 +543,7 @@ for day_i = 1:length(ROIs_manual(:,1))
     
     %plot all ROIs according to preferred sorting individually
     subplot(3,length(ROIs_manual(:,1)), 2*length(ROIs_manual(:,1)) + day_i);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTracePost{clustNum}(snakeTraceT(1).snakeTrace.cRaw.IPost{clustNum},:),[1 4.5]); %1:xlimCalciumPost),[1 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTracePost{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.IPost{clustNum},:),[1 4.5]); %1:xlimCalciumPost),[1 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -556,9 +556,9 @@ for day_i = 1:length(ROIs_manual(:,1))
     hold off
 end
 
-%% plot all stable ROIs across all 9 days sorted by order of ROIs 
+%% Even/odd trials: plot all stable ROIs across all days sorted by order of ROIs 
 plotSnake_acrossDays_oddEven = figure('units','normalized','outerposition',[0 0 1 1]);
-sgtitle('Odd vs Even Trials Across 9 Days for Same Flight Path: Gal 203011 to 200320');
+sgtitle(['Odd vs Even Trials Across ' num2str(length(ROIs_manual(:,1))) ' Days for Same Flight Path: ' batId]);
 col = jet(length(ROIs_manual(:,1)));
 for day_i = 1:length(ROIs_manual(:,1))
     %plot odd flightpath for cluster #2
@@ -596,7 +596,8 @@ for day_i = 1:length(ROIs_manual(:,1))
     %plot odd trials for all ROIs normalized to itself and plotted in 1-n numerical order
     %across all days
     subplot(3,2*length(ROIs_manual(:,1)), 4*length(ROIs_manual(:,1)) + (day_i*2)-1);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceOdd{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.Iodd{clustNum},1:xlimCalcium),[1.5 4.5]);
+    %imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceOdd{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.Iodd{clustNum},1:xlimCalcium),[1.5 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceOdd{clustNum}(:,1:xlimCalcium),[1.5 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -656,26 +657,170 @@ for day_i = 1:length(ROIs_manual(:,1))
     hold off
 end
 
-%%save
+%% 1st half/2nd half: plot all stable ROIs across all 9 days sorted by order of ROIs 
+plotSnake_acrossDays_1st2ndHalf = figure('units','normalized','outerposition',[0 0 1 1]);
+sgtitle(['1st Half vs 2nd Half Trials Across ' num2str(length(ROIs_manual(:,1))) ' Days for Same Flight Path: ' batId]);
+col = jet(length(ROIs_manual(:,1)));
+for day_i = 1:length(ROIs_manual(:,1))
+ % split the trials in 1st/2nd half and smooth/normalize
+    traceSmooth = 3;
+    firstHalf = zeros(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    secondHalf = zeros(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    meanTrace1stHalf = cell(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    normTrace1stHalf = cell(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    meanTrace2ndHalf = cell(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    normTrace2ndHalf = cell(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    I1stHalf = cell(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    B1stHalf = cell(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    I2ndHalf = cell(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    B2ndHalf = cell(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    maxNormTrace1stHalf  = cell(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    maxNormTrace2ndHalf = cell(length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight),1);
+    for clust_i = 1:length(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight)
+            firstHalf(clust_i) = round(length(flightPathsF(day_i).flightPaths.clusterIndex{clust_i})/2);
+            secondHalf(clust_i) = length(flightPathsF(day_i).flightPaths.clusterIndex{clust_i});
+        
+            meanTrace1stHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
+            normTrace1stHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
+            meanTrace2ndHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
+            normTrace2ndHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
+            maxNormTrace1stHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),1);
+            maxNormTrace2ndHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),1);
+            
+            for cell_i = 1:size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3)
+                meanTrace1stHalf{clust_i}(cell_i,:) = mean(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i}(1:firstHalf(clust_i),:,cell_i),1);
+                normTrace1stHalf{clust_i}(cell_i,:) = zscore(smooth(meanTrace1stHalf{clust_i}(cell_i,:),traceSmooth));
+                normTrace1stHalf{clust_i}(cell_i,:) = normTrace1stHalf{clust_i}(cell_i,:) - min(normTrace1stHalf{clust_i}(cell_i,:));
+                [~,maxNormTrace1stHalf{clust_i}(cell_i,1)] = max(normTrace1stHalf{clust_i}(cell_i,:));
+                
+                meanTrace2ndHalf{clust_i}(cell_i,:) = mean(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i}(firstHalf(clust_i)+1:secondHalf(clust_i),:,cell_i),1);
+                normTrace2ndHalf{clust_i}(cell_i,:) = zscore(smooth(meanTrace2ndHalf{clust_i}(cell_i,:),traceSmooth));
+                normTrace2ndHalf{clust_i}(cell_i,:) = normTrace2ndHalf{clust_i}(cell_i,:) - min(normTrace2ndHalf{clust_i}(cell_i,:));
+                [~,maxNormTrace2ndHalf{clust_i}(cell_i,1)] = max(normTrace2ndHalf{clust_i}(cell_i,:));
+                
+            end
+            [B1stHalf{clust_i},I1stHalf{clust_i}] = sort(maxNormTrace1stHalf{clust_i});
+            [B2ndHalf{clust_i},I2ndHalf{clust_i}] = sort(maxNormTrace2ndHalf{clust_i});
+    end
+    
+    %plot 1st half of session flights for cluster #2
+    for flight_i = 1:firstHalf(clustNum)
+        subplot(3,length(ROIs_manual(:,1))*2,(day_i*2)-1);
+        plot3(flightPathsF(day_i).flightPaths.pos(1,:,flightPathsF(day_i).flightPaths.clusterIndex{clustNum}(flight_i)),flightPathsF(day_i).flightPaths.pos(2,:,flightPathsF(day_i).flightPaths.clusterIndex{clustNum}(flight_i)),flightPathsF(day_i).flightPaths.pos(3,:,flightPathsF(day_i).flightPaths.clusterIndex{clustNum}(flight_i)),...
+            '-','LineWidth',1,'Color', col(day_i,:));
+        hold on;
+        view(0,90);
+        xlim([-3 3])
+        ylim([-3 3])
+        title(['Day ' num2str(day_i)]);
+        if day_i == 1
+            xlabel('m'); ylabel('m');
+        else
+            set(gca,'xticklabel',[],'yticklabel',[]);
+        end   
+        %plot 1st half velocity for cluster #2
+        subplot(3,length(ROIs_manual(:,1))*2, length(ROIs_manual(:,1))*2 + (day_i*2)-1);
+        plot(1:length(snakeTraceT(day_i).snakeTrace.cRaw.smoothSpeedRawFlight{clustNum}(flight_i,1:xlimFlight)),snakeTraceT(day_i).snakeTrace.cRaw.smoothSpeedRawFlight{clustNum}(flight_i,1:xlimFlight));
+        hold on;
+        if day_i == 1
+            ylabel('Velocity (m/s)');
+            xlabel('Time (s)');
+            yt = get(gca,'YTick');
+            xt = get(gca,'XTick');
+            set(gca,'xticklabel',[]);
+            %set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
+        else
+            set(gca,'xticklabel',[],'yticklabel',[]);
+        end
+        ylim([0 4.5]);
+                title([num2str(length(flightPathsF(day_i).flightPaths.clusterIndex{clustNum})) ' flights']);
+    end 
+    %plot 1st half trials for all ROIs normalized to itself and plotted in 1-n numerical order
+    %across all days
+    subplot(3,2*length(ROIs_manual(:,1)), 4*length(ROIs_manual(:,1)) + (day_i*2)-1);
+    %imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceOdd{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.Iodd{clustNum},1:xlimCalcium),[1.5 4.5]);
+    imagesc(normTrace1stHalf{clustNum}(I1stHalf{clustNum},1:xlimCalcium),[1.5 4.5]);
+    colormap(hot);
+    if day_i == 1
+        ylabel('ROI #');
+        xlabel('Time (s)');
+        xt = get(gca, 'XTick');
+        set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+    else
+        set(gca,'xticklabel',[]);
+    end 
+    hold off
+    
+    %plot even flightpath for cluster #2
+    for flight_i = (firstHalf(clustNum) + 1):secondHalf(clustNum)
+        subplot(3,length(ROIs_manual(:,1))*2,day_i*2);
+        plot3(flightPathsF(day_i).flightPaths.pos(1,:,flightPathsF(day_i).flightPaths.clusterIndex{clustNum}(flight_i)),flightPathsF(day_i).flightPaths.pos(2,:,flightPathsF(day_i).flightPaths.clusterIndex{clustNum}(flight_i)),flightPathsF(day_i).flightPaths.pos(3,:,flightPathsF(day_i).flightPaths.clusterIndex{clustNum}(flight_i)),...
+            '-','LineWidth',1,'Color', col(day_i,:));
+        hold on;
+        view(0,90);
+        xlim([-3 3])
+        ylim([-3 3])
+        title(['Day ' num2str(day_i)]);
+        if day_i == 1
+            xlabel('m'); ylabel('m');
+        else
+            set(gca,'xticklabel',[],'yticklabel',[]);
+        end   
+        %plot even velocity for cluster #2
+        subplot(3,length(ROIs_manual(:,1))*2, length(ROIs_manual(:,1))*2 + (day_i*2));
+        plot(1:length(snakeTraceT(day_i).snakeTrace.cRaw.smoothSpeedRawFlight{clustNum}(flight_i,1:xlimFlight)),snakeTraceT(day_i).snakeTrace.cRaw.smoothSpeedRawFlight{clustNum}(flight_i,1:xlimFlight));
+        hold on;
+        if day_i == 1
+            ylabel('Velocity (m/s)');
+            xlabel('Time (s)');
+            yt = get(gca,'YTick');
+            xt = get(gca,'XTick');
+            set(gca,'xticklabel',[]);
+            %set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
+        else
+            set(gca,'xticklabel',[],'yticklabel',[]);
+        end
+        ylim([0 4.5]);
+                title([num2str(length(flightPathsF(day_i).flightPaths.clusterIndex{clustNum})) ' flights']);
+    end 
+    %plot even trials for all ROIs normalized to itself and plotted in 1-n numerical order
+    %across all days
+    subplot(3,length(ROIs_manual(:,1))*2, length(ROIs_manual(:,1))*4 + (day_i*2));
+    %imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceEven{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.Iodd{clustNum},1:xlimCalcium),[1.5 4.5]);
+    imagesc(normTrace2ndHalf{clustNum}(I2ndHalf{clustNum},1:xlimCalcium),[1.5 4.5]);
+    colormap(hot);
+    if day_i == 1
+        ylabel('ROI #');
+        xlabel('Time (s)');
+        xt = get(gca, 'XTick');
+        set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
+    else
+        set(gca,'xticklabel',[]);
+    end 
+    hold off
+end
+%% save
 if saveFlag ==1
-   saveas(plotSnake_acrossDays,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays.tif']);
-   savefig(plotSnake_acrossDays,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays.fig']);
-   saveas(plotSnake_acrossDays_prefEach,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_prefEach.tif']);
-   savefig(plotSnake_acrossDays_prefEach,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_prefEach.fig']);
-   saveas(plotSnake_acrossDays_pref1,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_pref1.tif']);
-   savefig(plotSnake_acrossDays_pref1,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_pref1.fig']);
-   saveas(plotSnake_acrossDays_pre,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_pre.tif']);
-   savefig(plotSnake_acrossDays_pre,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_pre.fig']);
-   saveas(plotSnake_acrossDays_prefEach_pre,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_prefEach_pre.tif']);
-   savefig(plotSnake_acrossDays_prefEach_pre,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_prefEach_pre.fig']);
-   saveas(plotSnake_acrossDays_pref1_pre,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_pref1_pre.tif']);
-   savefig(plotSnake_acrossDays_pref1_pre,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_pref1_pre.fig']);
-   saveas(plotSnake_acrossDays_post,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_pre.tif']);
-   savefig(plotSnake_acrossDays_post,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_pre.fig']);
-   saveas(plotSnake_acrossDays_prefEach_post,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_prefEach_post.tif']);
-   savefig(plotSnake_acrossDays_prefEach_post,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_prefEach_post.fig']);
-   saveas(plotSnake_acrossDays_pref1_post,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_pref1_post.tif']);
-   savefig(plotSnake_acrossDays_pref1_post,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_pref1_post.fig']);
-   saveas(plotSnake_acrossDays_oddEven,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_oddEven.tif']);
-   savefig(plotSnake_acrossDays_oddEven,[saveDir filesep 'Gal_200311to20_snakePlot_acrossDays_oddEven.fig']);
+   saveas(plotSnake_acrossDays,[saveDir filesep batId '_snakePlot_acrossDays.tif']);
+   savefig(plotSnake_acrossDays,[saveDir filesep batId '_snakePlot_acrossDays.fig']);
+   saveas(plotSnake_acrossDays_prefEach,[saveDir filesep batId '_snakePlot_acrossDays_prefEach.tif']);
+   savefig(plotSnake_acrossDays_prefEach,[saveDir filesep batId '_snakePlot_acrossDays_prefEach.fig']);
+   saveas(plotSnake_acrossDays_pref1,[saveDir filesep batId '_snakePlot_acrossDays_pref1.tif']);
+   savefig(plotSnake_acrossDays_pref1,[saveDir filesep batId '_snakePlot_acrossDays_pref1.fig']);
+   saveas(plotSnake_acrossDays_pre,[saveDir filesep batId '_snakePlot_acrossDays_pre.tif']);
+   savefig(plotSnake_acrossDays_pre,[saveDir filesep batId '_snakePlot_acrossDays_pre.fig']);
+   saveas(plotSnake_acrossDays_prefEach_pre,[saveDir filesep batId '_snakePlot_acrossDays_prefEach_pre.tif']);
+   savefig(plotSnake_acrossDays_prefEach_pre,[saveDir filesep batId '_snakePlot_acrossDays_prefEach_pre.fig']);
+   saveas(plotSnake_acrossDays_pref1_pre,[saveDir filesep batId '_snakePlot_acrossDays_pref1_pre.tif']);
+   savefig(plotSnake_acrossDays_pref1_pre,[saveDir filesep batId '_snakePlot_acrossDays_pref1_pre.fig']);
+   saveas(plotSnake_acrossDays_post,[saveDir filesep batId '_snakePlot_acrossDays_pre.tif']);
+   savefig(plotSnake_acrossDays_post,[saveDir filesep batId '_snakePlot_acrossDays_pre.fig']);
+   saveas(plotSnake_acrossDays_prefEach_post,[saveDir filesep batId '_snakePlot_acrossDays_prefEach_post.tif']);
+   savefig(plotSnake_acrossDays_prefEach_post,[saveDir filesep batId '_snakePlot_acrossDays_prefEach_post.fig']);
+   saveas(plotSnake_acrossDays_pref1_post,[saveDir filesep batId '_snakePlot_acrossDays_pref1_post.tif']);
+   savefig(plotSnake_acrossDays_pref1_post,[saveDir filesep batId '_snakePlot_acrossDays_pref1_post.fig']);
+   saveas(plotSnake_acrossDays_oddEven,[saveDir filesep batId '_snakePlot_acrossDays_oddEven.tif']);
+   savefig(plotSnake_acrossDays_oddEven,[saveDir filesep batId '_snakePlot_acrossDays_oddEven.fig']);
+ saveas(plotSnake_acrossDays_1st2ndHalf,[saveDir filesep batId '_snakePlot_acrossDays_1st2ndHalf.tif']);
+   savefig(plotSnake_acrossDays_1st2ndHalf,[saveDir filesep batId '_snakePlot_acrossDays_1st2ndHalf.fig']);
 end

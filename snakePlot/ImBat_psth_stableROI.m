@@ -3,7 +3,7 @@ function [psth_stableROI] = ImBat_psth_stableROI(varargin)
 %bats for each day focusing only on the stable neurons from ROIs_manual
 plotPSTHclustFlag = 0;
 batId = '';
-saveFlag = 0; %do you want to save the figures and output structure?
+saveFlag = 1; %do you want to save the figures and output structure?
 cRaw_flag = 1;
 clustNum = 2; %which cluster trajectory to look at for each day
 

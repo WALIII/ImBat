@@ -1,22 +1,27 @@
 function activity_allTrials = ImBat_extract_activity_allTrials(batId)
 plotFlag = 0;
 saveFlag = 1; %do you want to save the figures and output structure?
-saveTag = 'sMat_vel';
+cRaw = 1;
+saveTag = 'cRaw_vel';
 if saveFlag == 1
 saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
 % Check if folder exists
-if exist([saveDir1 datestr(now,'yymmdd') filesep 'activity_allTrials'])>0;
+if exist([saveDir1 datestr(now,'yymmdd')])>0;
     disp('Youve been working today..');
 else
-    mkdir([saveDir1 datestr(now,'yymmdd') filesep 'activity_allTrials'])
+    mkdir([saveDir1 datestr(now,'yymmdd')])
 end
-saveDir = [saveDir1 datestr(now,'yymmdd') filesep 'activity_allTrials' '\'];
+saveDir = [saveDir1 datestr(now,'yymmdd') '\'];
 end
 
-cRaw = 0;
-nDays = [1:5]; %which days to look at
+if strcmp(batId,'Gal')
+    nDays = [1:9]; %which days to look at
+    nRois = [1:15];
+elseif strcmp(batId,'Gen')
+    nDays = [1:5];
+    nRois = [1:20];%size(ROIs_manual(day_i,:),2); %number of ROIs
+end
 %dayCounter = 1; %start the
-nRois = [1:20];%size(ROIs_manual(day_i,:),2); %number of ROIs
 if strcmp(batId,'Gal') 
 % 15 stable manually selected ROIs across 9 days for Gal
 ROIs_manual = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
@@ -105,16 +110,6 @@ for day_i = 1:length(nDays) %for each day
         close all;
     end
     
-    if saveFlag == 1
-    saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
-    % Check if folder exists
-    if exist([saveDir1 datestr(now,'yymmdd') filesep batName{day_i} '_' dateSesh{day_i} '_preDurPostCells'])>0;
-        disp('Youve been working today..');
-    else
-        mkdir([saveDir1 datestr(now,'yymmdd') filesep batName{day_i} '_' dateSesh{day_i} '_preDurPostCells'])
-    end
-    saveDir = [saveDir1 datestr(now,'yymmdd') filesep batName{day_i} '_' dateSesh{day_i} '_preDurPostCells' '\'];
-    end
     if cRaw ==1
         sData = snakeTrace.cRaw; %select data from the s,cRaw, or c matrix
     else

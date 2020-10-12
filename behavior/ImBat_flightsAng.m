@@ -3,7 +3,7 @@ function [flightPaths] = ImBat_flightsAng(trackData,alignment,varargin)
 batName = [];
 dateSesh = [];
 sessionType = [];
-saveFlag = 1;
+saveFlag = 0;
 loadFlag = 0;
 flightAdjustFlag = 0;
 

@@ -1,4 +1,5 @@
 saveFlag = 1;
+batId = 'Gen';
 if strcmp(batId,'Gal')
     g = dir('Ga*');
 elseif strcmp(batId,'Gen')
@@ -63,11 +64,12 @@ for clust_i = 1:size(clustList,1);
 
 categoricalStabilityBarcode = figure();
 set(gcf, 'units','normalized','outerposition',[0 0 1 1]);
-sgtitle(['Gen Pre (r)/Dur (g)/Post (b) Categorical Stability: Cluster ' num2str(clust_i+1)]);
-ha = tight_subplot(5,20,[.01 .01],[.03 .1],[.02 .02]);
+sgtitle([batId 'Pre (r)/Dur (g)/Post (b) Categorical Stability: Cluster ' num2str(clust_i+1)]);
+nROI = size(ppCells{1},2);
+ha = tight_subplot(nDays,nROI,[.01 .01],[.03 .1],[.02 .02]);
 for day_ii = 1:nDays
-    nROI = size(ppCells{1},2);
-    for roi_i = 1:nROI
+     hold on;
+      for roi_i = 1:nROI
         if ppreCells{day_ii}(clustList(clust_i,day_ii),roi_i) == 1
            axes(ha((nROI*day_ii)-nROI+roi_i));
            x = [0 1 1 0];
