@@ -1,10 +1,11 @@
-function [flightPaths] = ImBat_flightsAng(trackData,varargin)
+function [flightPaths] = ImBat_flightsAng(trackData,alignment,varargin)
     
 batName = [];
 dateSesh = [];
 sessionType = [];
-saveFlag = 0;
+saveFlag = 1;
 loadFlag = 0;
+flightAdjustFlag = 0;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -54,15 +55,30 @@ N_min = 3;                                                                  %min
 xR = +2.85; xL = -2.85; yF = 2.50;  yB = -2.50;  zT = 2.20;                 %Flight volume coordinates
 F3 = [2.56; 1.43; 0.72];    F4 = [2.56; -1.24; 0.72];                       %Feeders coordinates
 
-T_tk = size(trackData.Markers,1);  t = [0:1/trackData.VideoFrameRate:(T_tk-1)/trackData.VideoFrameRate];  %Generate time vector
+%Use day to day flight adjustment?
+if flightAdjustFlag == 1
+    % Load master Tracking File
+    masterDir = extractBefore(pwd,'topQualityData');
+    MasterTrack = load([masterDir 'topQualityData' filesep 'Master_Tracking_File.mat'],'out');
+    
+    % Run alignment
+    locMarkers = trackData.Markers(:,1,:);
+    loc_inpt = alignment.out.Location;%queeze(locMarkers);
+    dFlightAligned = ImBat_Align_Tracking(loc_inpt,MasterTrack.out,dateSesh);
+    dataFlight = reshape(dFlightAligned,length(dFlightAligned),1,3);
+else
+    dataFlight = trackData.Markers;
+end
+
+T_tk = size(dataFlight,1);  t = [0:1/trackData.VideoFrameRate:(T_tk-1)/trackData.VideoFrameRate];  %Generate time vector
 rew_signal = trackData.AnalogSignals(:,1);                                            %Reward signal, usually on Analog Ch1
 
 
 %% Trajectory extraction
 if use_bat_cluster
-    x_mean = [trackData.Markers(:,1,1) trackData.Markers(:,1,2) trackData.Markers(:,1,3)]'./1000;     x_mean(x_mean==0) = nan;
+    x_mean = [dataFlight(:,1,1) dataFlight(:,1,2) dataFlight(:,1,3)]'./1000;     x_mean(x_mean==0) = nan;
 else
-    Markers_nan = trackData.Markers;  Markers_nan(Markers_nan==0) = nan;
+    Markers_nan = dataFlight;  Markers_nan(Markers_nan==0) = nan;
     Markers_mean = mean(Markers_nan,2,'omitnan');
     x_mean = [Markers_mean(:,1,1) Markers_mean(:,1,2) Markers_mean(:,1,3)]'./1000;
 end

@@ -55,10 +55,22 @@ postFlightPadSpeed = postFlightPad*120;%add 6 seconds * FS of tracking data (120
 %meanTrace = cell(1,length(flightPaths.clusterIndex));
 meanTracePreFlightPostAll = []; %initialize the variable to concatenate all pre/post/flight traces for uniform zscore
 
+% 15 stable manually selected ROIs across 9 days for Gal
+ROIs_gal = [28 20 1 23 12 22 10 8 11 24 NaN 2 21 30 19;
+    3 2 10 28 11 1 5 33 8 35 NaN 6 22 32 29;
+    4 5 11 24 5 1 16 10 2 18 14 8 25 19 9;
+    11 22 4 18 3 1 14 5 19 39 9 17 36 25 8;
+    14 3 16 21 2 1 5 7 8 26 NaN 9 27 6 4;
+    5 13 41 23 1 21 3 24 6 22 2 25 16 15 7;
+    12 3 34 19 2 14 6 15 9 36 5 10 35 20 1;
+    25 26 16 32 1 12 4 19 5 28 15 NaN 34 3 2;
+    32 34 29 51 7 10 6 40 16 45 5 8 42 26 43];
+
 %for each cell in each sort type (pre,during,post)
 
 %for each cell
-for cell_i = 1:length(cellData.results.C(:,1))
+cellCount = 1;
+for cell_i = ROIs_gal(1,:)%1:length(C(:,1))
     %for each trial in cluster, calculate the start/stop times and duration of the calcium videos
     for dur_i = 1:length(flightPaths.flight_starts_idx)
         %get imaging times of start and stop index converting from tracking to video times
@@ -94,23 +106,26 @@ for cell_i = 1:length(cellData.results.C(:,1))
                 speedPost(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(trace_i)+postPadCalcium:flightPaths.flight_ends_idx(trace_i)+postPadCalcium + postFlightPadSpeed);
                 smoothSpeedRawPost(trace_i,:) = smooth(speedPost(trace_i,:),100);
             catch
-                sizeToRecordingEnd = size(cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end),2);
-                sizeToTraceEnd = size(traceFlight(trace_i,:),2);
                 try
-                traceFlight(trace_i,:) = (cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end + postFlightPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
-                                speedFlight(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - preFlightPadSpeed:end + postFlightPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                    sizeToRecordingEnd = size(cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end),2);
+                    sizeToTraceEnd = size(traceFlight(trace_i,:),2);
+                    try
+                        traceFlight(trace_i,:) = (cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end + postFlightPadCalcium)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                        speedFlight(trace_i,:) = (flightPaths.batSpeed(closestIndexStart(trace_i) - preFlightPadSpeed:end + postFlightPadSpeed)+(zeros(1,sizeToTraceEnd - sizeToRecordingEnd)));
+                    catch
+                        traceFlight(trace_i,:) = cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end+(sizeToTraceEnd - sizeToRecordingEnd));
+                        speedFlight(trace_i,:) = flightPaths.batSpeed(closestIndexStart(trace_i) - preFlightPadSpeed:end +(sizeToTraceEnd - sizeToRecordingEnd));
+                    end
                 catch
-                    traceFlight(trace_i,:) = cellData.results.C_raw(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:end+(sizeToTraceEnd - sizeToRecordingEnd));
-                    speedFlight(trace_i,:) = flightPaths.batSpeed(closestIndexStart(trace_i) - preFlightPadSpeed:end +(sizeToTraceEnd - sizeToRecordingEnd));
-
+                    
                 end
                 disp('End of rec')
             end
         end
      %calculate the mean neural activity across all flights in a cluster for each cell
-        meanTraceFlight(cell_i,:) = mean(traceFlight);
-        meanTracePre(cell_i,:) = mean(tracePre);
-        meanTracePost(cell_i,:) = mean(tracePost);
+        meanTraceFlight(cellCount,:) = mean(traceFlight);
+        meanTracePre(cellCount,:) = mean(tracePre);
+        meanTracePost(cellCount,:) = mean(tracePost);
         meanSpeedFlight = mean(speedFlight);
         meanSpeedPre = mean(speedPre);
         meanSpeedPost = mean(speedPost);
@@ -118,20 +133,23 @@ for cell_i = 1:length(cellData.results.C(:,1))
         
         %smooth and zscore the neural data. subtract the min of the zscore so the
         %min is 0 rather than mean 0
-        normTraceFlight(cell_i,:) = zscore(smooth(meanTraceFlight(cell_i,:),3));
-        normTraceFlight(cell_i,:) = normTraceFlight(cell_i,:) - min(normTraceFlight(cell_i,:));
+        normTraceFlight(cellCount,:) = zscore(smooth(meanTraceFlight(cellCount,:),3));
+        normTraceFlight(cellCount,:) = normTraceFlight(cellCount,:) - min(normTraceFlight(cellCount,:));
         smoothSpeedFlight = smooth(meanSpeedFlight,40);
-        normTracePre(cell_i,:) = zscore(smooth(meanTracePre(cell_i,:),3));
-        normTracePre(cell_i,:) = normTracePre(cell_i,:) - min(normTracePre(cell_i,:));       
+        normTracePre(cellCount,:) = zscore(smooth(meanTracePre(cellCount,:),3));
+        normTracePre(cellCount,:) = normTracePre(cellCount,:) - min(normTracePre(cellCount,:));       
         smoothSpeedPre = smooth(meanSpeedPre,40);
-        normTracePost(cell_i,:) = zscore(smooth(meanTracePost(cell_i,:),3));
-        normTracePost(cell_i,:) = normTracePost(cell_i,:) - min(normTracePost(cell_i,:));       
+        normTracePost(cellCount,:) = zscore(smooth(meanTracePost(cellCount,:),3));
+        normTracePost(cellCount,:) = normTracePost(cellCount,:) - min(normTracePost(cellCount,:));       
         smoothSpeedPost = smooth(meanSpeedPost,40);
         %find time index of max peaks
-        [~,maxnormTraceFlight(cell_i,1)] = max(normTraceFlight(cell_i,:));
-        [~,maxnormTracePre(cell_i,1)] = max(normTracePre(cell_i,:));
-        [~,maxnormTracePost(cell_i,1)] = max(normTracePost(cell_i,:));
+        [~,maxnormTraceFlight(cellCount,1)] = max(normTraceFlight(cellCount,:));
+        [~,maxnormTracePre(cellCount,1)] = max(normTracePre(cellCount,:));
+        [~,maxnormTracePost(cellCount,1)] = max(normTracePost(cellCount,:));
+        
+        cellCount = cellCount + 1;
 end    
+        cellCount = cellCount -1;
  %sort each cell by the timing of its peak firing
     [BFlight,IFlight] = sort(maxnormTraceFlight);
     [BPre,IPre] = sort(maxnormTracePre);
@@ -144,7 +162,7 @@ end
 
 %% this is to smooth, zscore, and sort the entire cell data by their preferred flight according to a homemade k-means (max dff across flights)
 %zscore the full data set and subtract min to start at 0
-for cell_ii = 1:length(cellData.results.C(:,1))
+for cell_ii = 1:cellCount%length(cellData.results.C(:,1))
     normMeanTracePreFlightPostAll(cell_ii,:) = zscore(smooth(meanTracePreFlightPostAll(cell_ii,:),10));
     normMeanTracePreFlightPostAll(cell_ii,:) = normMeanTracePreFlightPostAll(cell_ii,:) - min(normMeanTracePreFlightPostAll(cell_ii,:));
 end
@@ -154,7 +172,7 @@ normTraceFlightAll = normMeanTracePreFlightPostAll(:,preFlightPadCalcium+1:preFl
 normTracePreAll = normMeanTracePreFlightPostAll(:,1:preFlightPadCalcium);
 normTracePostAll = normMeanTracePreFlightPostAll(:,preFlightPadCalcium+maxDur+1+prePadCalcium+postPadCalcium:preFlightPadCalcium++prePadCalcium+postPadCalcium+maxDur+postFlightPadCalcium);
 %find the order of the maximum for each flight group within the regrouping
-for cell_iii = 1:length(cellData.results.C(:,1))
+for cell_iii = 1:cellCount%length(cellData.results.C(:,1))
     [~,maxNormFlightAll(cell_iii,1)] = max(normTraceFlightAll(cell_iii,:));
     [~,maxNormPreAll(cell_iii,1)] = max(normTracePreAll(cell_iii,:));
     [~,maxNormPostAll(cell_iii,1)] = max(normTracePostAll(cell_iii,:));

@@ -37,7 +37,7 @@ for p = 2:snakeTrace.nClusters + 1
     xlim([0 length(snakeTrace.smoothSpeedPre{p})]);
     
     p2 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p-1,2*snakeTrace.nClusters+p-1,3*snakeTrace.nClusters+p-1]);
-    imagesc(snakeTrace.normMeanTraceEachPre{p},[0.5 5.5]);
+    imagesc(snakeTrace.normMeanTraceEachPre{p},[0.5 4.5]);
     colormap(hot);
     %make labels for first left plot only
     if p == 1
@@ -69,7 +69,7 @@ for p = 2:snakeTrace.nClusters + 1
     
     
     p4 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p-1+(4*snakeTrace.nClusters),2*snakeTrace.nClusters+p-1+(4*snakeTrace.nClusters),3*snakeTrace.nClusters+p-1+(4*snakeTrace.nClusters)]);
-    imagesc(snakeTrace.normMeanTraceEachFlight{p},[0.5 5.5]);
+    imagesc(snakeTrace.normMeanTraceEachFlight{p},[0.5 4.5]);
     colormap(hot);
     if p == 1
         %ylabel('ROI number');
@@ -101,7 +101,7 @@ for p = 2:snakeTrace.nClusters + 1
     hold off
     
     p6 = subplot(12,snakeTrace.nClusters,[snakeTrace.nClusters+p-1+(8*snakeTrace.nClusters),2*snakeTrace.nClusters+p-1+(8*snakeTrace.nClusters),3*snakeTrace.nClusters+p-1+(8*snakeTrace.nClusters)]);
-    imagesc(snakeTrace.normMeanTraceEachPost{p},[0.5 5.5]);
+    imagesc(snakeTrace.normMeanTraceEachPost{p},[0.5 4.5]);
     colormap(hot);
     if p == 1
         %ylabel('ROI number');
@@ -171,7 +171,7 @@ for p = 2:snakeTrace.nClusters+1
     set(gca,'YTick',yt,'YTickLabel',yt,'xTickLabel',round(xt/120,1));
     
     p2 = subplot(4,snakeTrace.nClusters,[snakeTrace.nClusters+p-1,2*snakeTrace.nClusters+p-1,3*snakeTrace.nClusters+p-1]);
-    imagesc(snakeTrace.normMeanTraceEachFlight{p},[0.5 5.5]);
+    imagesc(snakeTrace.normMeanTraceEachFlight{p},[0.5 4.5]);
     colormap(hot);
     %make labels for first left plot only
     if p == 1
@@ -223,8 +223,6 @@ for p = 2:snakeTrace.nClusters+1
     %make labels for first left plot only
     if p == 1
         ylabel('ROI number');
-   %else
-        %set(gca,'yticklabel',{[]});
     end
     xt = get(gca, 'XTick');
     set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
@@ -500,15 +498,15 @@ for p = 2:snakeTrace.nClusters+1
     else
         set(gca,'yticklabel',{[]});
     end
-    title(['Cluster ' num2str(p) ' Odd']);
+    title(['Odd']);
     xt = get(gca, 'XTick');
     set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
     xlabel('time (s)'); %ylabel('ROI number');
     
-    p3 = subplot(4,2*snakeTrace.nClusters,[2*snakeTrace.nClusters+(2*(p-1)),4*snakeTrace.nClusters+(2*(p-1)),6*snakeTrace.nClusters+(2*(p-1))]);
+    p3 = subplot(4,2*snakeTrace.nClusters,[2*snakeTrace.nClusters+(2*(p-1)-1),4*snakeTrace.nClusters+(2*(p-1)-1),6*snakeTrace.nClusters+(2*(p-1)-1)]);
     imagesc(snakeTrace.normTraceEven{p}(snakeTrace.Iodd{p},:));
     colormap(hot);
-    title(['Cluster ' num2str(p) ' Even']);
+    title(['Even']);
     xt = get(gca, 'XTick');
     set(gca,'XTick',xt,'XTickLabel',round(xt/30,1),'yticklabel',{[]});
     xlabel('time (s)'); %ylabel('ROI number');

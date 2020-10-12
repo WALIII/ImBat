@@ -1,7 +1,20 @@
 function [ROI_refined] = ImBat_ROIcovar
-distThresh = 10; %number of pixels to check if the cells are close enough to be considered same cell
-corrThresh = 0.7; %max correlation of time series if cells are very close
-saveFlag = 0; %do you want to save the figures and output structure?
+%this function checks distance between all pairs of ROIs and removes
+%duplicate cells that are within the distance threshold and have a high
+%correlation. It takes the cell that has the higher SNR between two
+%duplicates. Plot the covariance matrices and the distribution of
+%correlation coefficients.
+
+saveFlag = 1; %do you want to save the figures and output structure?
+saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
+% Check if folder exists
+if exist([saveDir1 datestr(now,'yymmdd') filesep 'ROI_covar_refined'])>0;
+    disp('Youve been working today..');
+else
+    mkdir([saveDir1 datestr(now,'yymmdd') filesep 'ROI_covar_refined'])
+end
+saveDir = [saveDir1 datestr(now,'yymmdd') filesep 'ROI_covar_refined' '\'];
+
 
 distThresh = 10; %number of pixels to check if the cells are close enough to be considered same cell
 corrThresh = 0.65; %max correlation of time series if cells are very close
@@ -10,8 +23,8 @@ minLim = 0.7; %limits for correlation imagesc
 maxLim = 1; %limits for correlation imagesc
 distThresh = distThresh * scaling;
 
-g = dir('G*');
-z = dir('Z*');
+g = dir('Ge*');
+z = dir('Z1*');
 dirTop = vertcat(g,z); %find all folders in top quality directory
 
 ROI_duplicate = cell(length(dirTop),1); %make cell for indices of duplicated ROIS
@@ -29,7 +42,7 @@ corrIndCloseS =  cell(length(dirTop),1); %make cell for indices of correlations 
 corrIndAllS = cell(length(dirTop),1); %make cell for indices of correlations across all pairwise cells with S matrix
 spikeSmooth = cell(length(dirTop),1); %make cell for smoothed S matrix
 
-for d = 1:4%length(dirTop)-2
+for d = 1:length(dirTop)
     plot_ROI_refined = figure('units','normalized','outerposition',[0 0 0.9 0.9]);
     try %extract metadata names and enter processed folder
         cd([dirTop(d).name filesep 'extracted'])
@@ -41,7 +54,7 @@ for d = 1:4%length(dirTop)-2
         cd(flyFolders(end).name);
         dirProcessed = dir('processed_*');
         if strcmp(batName{d}(1),'G')
-            cd(dirProcessed(3).name);
+            cd(dirProcessed(end).name);
         else
             cd(dirProcessed(end).name);
         end
@@ -270,20 +283,20 @@ for d = 1:4%length(dirTop)-2
     if saveFlag == 1
     %save fig and tif of max projection
     %set(findall(maxFig,'-property','FontSize'),'FontSize',20);
-    savefig(plot_ROI_refined,['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_ROIrefined_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
-    saveas(plot_ROI_refined, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_ROIrefined_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
-    saveas(plot_ROI_refined, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_ROIrefined_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
+    savefig(plot_ROI_refined,[saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
+    saveas(plot_ROI_refined, [saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
+    saveas(plot_ROI_refined, [saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
     
     %save fig and tif of correlation distributions
     %set(findall(maxFig,'-property','FontSize'),'FontSize',20);
-    savefig(plot_corrDist,['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
-    saveas(plot_corrDist, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
-    saveas(plot_corrDist, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
+    savefig(plot_corrDist,[saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
+    saveas(plot_corrDist, [saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
+    saveas(plot_corrDist, [saveDir 'plot_corrDist_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
     %save fig and tif of correlation distributions
     %set(findall(maxFig,'-property','FontSize'),'FontSize',20);
-    savefig(plot_corrDistS,['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
-    saveas(plot_corrDistS, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
-    saveas(plot_corrDistS, ['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
+    savefig(plot_corrDistS,[saveDir 'plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.fig']);
+    saveas(plot_corrDistS, [saveDir 'plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.tif']);
+    saveas(plot_corrDistS, [saveDir 'plot_corrDistS_' batName{d} dateSesh{d} sessionType{d} '_' datestr(now,'yymmdd-hhMMss') '.svg']);
     
     end
     close all;
@@ -340,7 +353,7 @@ ROI_refined.maxLim = maxLim;
 ROI_refined.ROI_coords = ROI_coords;
 ROI_refined.centroid = centroid;
 
-if saveFlag == 1
-save(['\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\ROI_refined_' num2str(distThresh/scaling) '_' num2str(corrThresh) '_' datestr(now,'yyMMdd-hhmmss') '.mat'],'ROI_refined');
+%if saveFlag == 1
+save([saveDir 'ROI_refined_c05' num2str(distThresh/scaling) '_' num2str(corrThresh) '_' datestr(now,'yyMMdd-hhmmss') '.mat'],'ROI_refined');
 %save(['/Users/periscope/Desktop/analysis/ROI_refined/ROI_refined_' num2str(distThresh/scaling) '_' num2str(corrThresh) '_' datestr(now,'yyMMdd-hhmmss') '.mat'],'ROI_refined');
-end
+%end
