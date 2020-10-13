@@ -4,7 +4,7 @@ function ImBat_placeCells_Ang_stableROI
 
 p_val_analysis = 1; %run the pval analayis?
 saveFlag = 1; %do you want to save the figures and output structure?
-batId = 'Gen';
+batId = 'Gal';
 
 if strcmp(batId,'Gal') 
 % 15 stable manually selected ROIs across 9 days for Gal

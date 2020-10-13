@@ -1,7 +1,7 @@
 function dataPreDurPost = ImBat_extract_dataPreDurPost(batId)
-saveFlag = 1;
-saveTag = 'cRaw_vel';
-cRaw = 1;
+saveFlag = 0;
+saveTag = 'sMat_vel';
+cRaw = 0;
 %load first day placeCellStableROI data
 if strcmp(batId,'Gal')
     %cd([dirTop(day1).folder filesep 'plots\200911-preDurPost cells across days']);
@@ -48,7 +48,7 @@ vel_pre= cell(1,max(max(clustList)));
 vel_dur= cell(1,max(max(clustList)));
 vel_post= cell(1,max(max(clustList)));
 %pull in/cutout all the aligned, pre, dur, and post data
-for clust_i = 1:15%max(max(clustList))
+for clust_i = 1:max(max(clustList))
     minFlightSizesVect = cellfun('size',activity_allTrials.act_dur{clust_i}(:,1),2);
     minFlightLength{clust_i} = min(minFlightSizesVect(minFlightSizesVect>0));
     %minFlightLength{clust_i} = min(cellfun('size',activity_allTrials.act_dur{clust_i}(:,1),2)(cellfun('size',activity_allTrials.act_dur{clust_i}(:,1),2)>0)); %shortest flight length for each day since they may be slightly different lengths
