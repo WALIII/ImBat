@@ -11,6 +11,11 @@ optimizer.Epsilon = 1.5e-4;
 optimizer.GrowthFactor = 1.01;
 optimizer.MaximumIterations = 500;
 
-IM3_aligned = IM3;
-IM1_aligned = imregister(IM1, IM3, 'affine', optimizer, metric);
-IM2_aligned = imregister(IM2, IM3, 'affine', optimizer, metric);
+if ~isempty(IM3)
+    IM3_aligned = IM3;
+    IM1_aligned = imregister(IM1, IM3, 'affine', optimizer, metric);
+    IM2_aligned = imregister(IM2, IM3, 'affine', optimizer, metric);
+else
+    IM2_aligned = IM2;
+    IM1_aligned = imregister(IM1, IM2, 'affine', optimizer, metric);
+end
