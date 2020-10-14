@@ -55,13 +55,13 @@ end
 rsjp = imadjust(im1(:),[Llim ; Hlim]);
 rsjp2 = imadjust(im2(:),[Llim ; Hlim]);
 
-if ~isempty(GG3)
+%if ~isempty(GG3)
     RGB1 = reshape(rsjp,[size(im1,1),size(im1,2),size(im1,3),3]);
     RGB2 = reshape(rsjp2,[size(im2,1),size(im2,2),size(im2,3),3]);
-else
-    RGB1 = reshape(rsjp,[size(im1,1),size(im1,2),2]);
-    RGB2 = reshape(rsjp2,[size(im2,1),size(im2,2),2]);
-end
+% else
+     RGB1 = reshape(rsjp,[size(im1,1),size(im1,2),3]);
+     RGB2 = reshape(rsjp2,[size(im2,1),size(im2,2),3]);
+% end
 
 %F = flip(F,1);
 %RGB1 = RGB1(size(RGB1,1):-1:1,:,:);

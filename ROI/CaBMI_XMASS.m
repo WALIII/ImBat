@@ -1,9 +1,6 @@
 function [RGB1 RGB2] = CaBMI_XMASS(GG1,GG2,GG3,varargin);
-if isempty(GG3)
-    days = 2;
-else
-    days = 3;
-end
+days = 3;
+
 
 % Make sure you take the median for the input matrixes..
 HL = [0.20 .80];
@@ -34,8 +31,10 @@ Hlim = HL(2);
 
 im1(:,:,:,1)=  mat2gray(GG1);
 im1(:,:,:,2)=  mat2gray(GG2);
-if ~isempty(GG3)
-    im1(:,:,:,3)=  mat2gray(GG3);
+if isempty(GG3)
+    im1(:,:,:,3)=  mat2gray(GG2);
+else
+    im1(:,:,:,3)=  mat2gray(GG3);    
 end
 
 % Mean subtracted/Normalized
@@ -47,7 +46,7 @@ end
 %im2 = im2 - mean(im2(:,:,:,:),3);
 %im2 = mat2gray(im2);
 
-for ii = 1:days; % normalize each channel...
+for ii = 1:days % normalize each channel...
     M = squeeze(im2(:,:,:,ii));
     im2(:,:,:,ii) = mat2gray(M);%(M - min(M(:))) / (max(M(:)) - min(M(:)));
 end
@@ -55,13 +54,8 @@ end
 rsjp = imadjust(im1(:),[Llim ; Hlim]);
 rsjp2 = imadjust(im2(:),[Llim ; Hlim]);
 
-if ~isempty(GG3)
     RGB1 = reshape(rsjp,[size(im1,1),size(im1,2),size(im1,3),3]);
     RGB2 = reshape(rsjp2,[size(im2,1),size(im2,2),size(im2,3),3]);
-else
-    RGB1 = reshape(rsjp,[size(im1,1),size(im1,2),2]);
-    RGB2 = reshape(rsjp2,[size(im2,1),size(im2,2),2]);
-end
 
 %F = flip(F,1);
 %RGB1 = RGB1(size(RGB1,1):-1:1,:,:);

@@ -1,8 +1,9 @@
-function ImBat_RGB_flightAlign(day1,day2,day3)
-batId = 'Gal';
+function ImBat_RGB_flightAlign(batId,fullSeshTag,day1,day2,day3)
+%batId = 'Gal';
+%fullSeshTag chooses to look at whole session
 clustNum = 2;
-saveFlag = 0;
-saveTag = 'day1_clust2Vfull';
+saveFlag = 1;
+saveTag = 'clust2';
 %load first day placeCellStableROI data
 if strcmp(batId,'Gal')
     %cd([dirTop(day1).folder filesep 'plots\200911-preDurPost cells across days']);
@@ -21,31 +22,46 @@ if saveFlag == 1
     saveDir = [saveDir1 datestr(now,'yymmdd') filesep 'maxProjFlightAlign' filesep];
 end
 
-if isempty(day3)
-    if day1==day2
-        IM1 = mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day1});
-        IM2 = mat2gray(activity_allTrials.YmaxFull{day2});
-        plotTitle = [batId ' clust ' num2str(clustNum) ': Day ' num2str(day1) '(r) v full session (g)'];
-    else
+if fullSeshTag == 0
+    if isempty(day3) %comparing flight aligned max proj
+        if day1==day2 %if looking at the cluster flight aligned vs full session
+            IM1 = mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day1});
+            IM2 = mat2gray(activity_allTrials.YmaxFull{day2});
+            plotTitle = [batId ' clust ' num2str(clustNum) ': Day ' num2str(day1) ' (r) v full session (c)'];
+        else %if looking at 1 day vs another day only
+            IM1 = mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day1});
+            IM2 = mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day2});
+            plotTitle = [batId ' clust ' num2str(clustNum) ': Day ' num2str(day1) ' (r) v Day ' num2str(day2) ' (c)']
+        end
+        IM3 = [];
+        % Alignment script
+        rowTemp = [size(IM1,1),size(IM2,1),size(IM3,1)];
+        colTemp = [size(IM1,2),size(IM2,2),size(IM3,2)];
+        minRow = min(rowTemp(rowTemp>0));
+        minCol = min(colTemp(colTemp>0));
+        [IM1_aligned,IM2_aligned] = ImBat_imageAlign(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3);
+        IM3_aligned = [];
+        % Will RGB script
+        [a1,b1] = CaBMI_XMASS(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3);
+        [a2,b2] = CaBMI_XMASS(IM1_aligned,IM2_aligned,IM3_aligned);
+    else %if looking at comparing 3 days
         IM1 = mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day1});
         IM2 = mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day2});
-        plotTitle = [batId ' clust ' num2str(clustNum) ': Day ' num2str(day1) '(r) v Day ' num2str(day2) '(g)']
+        IM3 = mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day3});
+        minRow = min([size(IM1,1),size(IM2,1),size(IM3,1)]);
+        minCol = min([size(IM1,2),size(IM2,2),size(IM3,2)]);
+        % Alignment script
+        [IM1_aligned,IM2_aligned,IM3_aligned] = ImBat_imageAlign(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3(1:minRow,1:minCol));
+        % Will RGB script
+        [a1,b1] = CaBMI_XMASS(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3(1:minRow,1:minCol));
+        [a2,b2] = CaBMI_XMASS(IM1_aligned,IM2_aligned,IM3_aligned);
+        plotTitle = [batId ' clust ' num2str(clustNum) ': Day ' num2str(day1) ' (r) v Day ' num2str(day2) ' (g) v Day ' num2str(day3) ' (b)'];
     end
-    IM3 = [];
-     % Alignment script
-     rowTemp = [size(IM1,1),size(IM2,1),size(IM3,1)];
-     colTemp = [size(IM1,2),size(IM2,2),size(IM3,2)];
-     minRow = min(rowTemp(rowTemp>0));
-     minCol = min(colTemp(colTemp>0));
-     [IM1_aligned,IM2_aligned] = ImBat_imageAlign(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3);
-    IM3_aligned = [];
-     % Will RGB script
-    [a1,b1] = CaBMI_XMASS(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3);
-    [a2,b2] = CaBMI_XMASS(IM1_aligned,IM2_aligned,IM3_aligned);
-else
-    IM1 = mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day1});
-    IM2 = mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day2});
-    IM3 = mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day3});
+elseif fullSeshTag == 1
+    %if looking at comparing 3 days full sessions
+    IM1 = mat2gray(activity_allTrials.YmaxFull{day1});
+    IM2 = mat2gray(activity_allTrials.YmaxFull{day2});
+    IM3 = mat2gray(activity_allTrials.YmaxFull{day3});
     minRow = min([size(IM1,1),size(IM2,1),size(IM3,1)]);
     minCol = min([size(IM1,2),size(IM2,2),size(IM3,2)]);
     % Alignment script
@@ -53,21 +69,26 @@ else
     % Will RGB script
     [a1,b1] = CaBMI_XMASS(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3(1:minRow,1:minCol));
     [a2,b2] = CaBMI_XMASS(IM1_aligned,IM2_aligned,IM3_aligned);
+    plotTitle = [batId ' clust ' num2str(clustNum) ' Full Sesh: Day ' num2str(day1) ' (r) v Day ' num2str(day2) ' (g) v Day ' num2str(day3) ' (b)'];
 end
+   
 
 
 plotDay123_unaligned = figure(); 
 sgtitle(plotTitle); 
-subplot(1,2,1)
-image((a1(:,:,:)))
-title('un-aligned')
-subplot(1,2,2)
-image((a2(:,:,:)))
-title('aligned')
+subplot(1,2,1);
+image((a1(:,:,:)));
+title('un-aligned');
+set(gca,'xticklabel',[],'yticklabel',[]);
+subplot(1,2,2);
+image((a2(:,:,:)));
+title('aligned');
+set(gca,'xticklabel',[],'yticklabel',[]);
 
 plotDay123_aligned = figure(); 
 image((a2(:,:,:)))
 title(plotTitle);
+set(gca,'xticklabel',[],'yticklabel',[]);
 %set(gca,'YDir','normal');
     
 if saveFlag == 1
