@@ -1,6 +1,6 @@
-batId = 'Gen';
+batId = 'Gal';
 saveFlag = 1;
-cRaw = 1;
+cRaw = 0;
 clustNum = 2;
 Fs_trace = 30;
 Fs_behav = 120;
@@ -15,7 +15,8 @@ else
 end
 %make saving directory
 if saveFlag == 1
-    saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
+    saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
+    %saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
     if ~exist([saveDir1 datestr(now,'yymmdd') filesep 'meanAllROIAllDays'])
         mkdir([saveDir1 datestr(now,'yymmdd') filesep 'meanAllROIAllDays']);
     else

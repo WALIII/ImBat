@@ -11,7 +11,7 @@ cRaw = 0;
 saveTag = ['selectiveCells_consistent_allDays_sMat_std'];
 if strcmp(batId,'Gal')
     dirDates = dir('Gal_*');
-elseif strcmp(batId,'Gen')
+    elseifstrcmp(batId,'Gen')
     dirDates = dir('Gen_*');
 end
 nDays = length(dirDates);
@@ -133,7 +133,7 @@ end
 functionalStabilityDotPlot_consistent_all = figure();
 set(gcf, 'units','normalized','outerposition',[0 0 0.8 0.6]);
 for clust_i = 1:size(clustList,1);
-    sgtitle([batId ': Functional Stability of Consistently Selectively Active Cells: All Days: Cluster ' num2str(clust_i+1)]);
+    sgtitle([batId ' :Functional Stability of Consistently Selectively Active Cells: All Days: Cluster ' num2str(clust_i+1)]);
     colorDays = jet(length(days)); %make the color vector for each day
     for day_i = 1:size(dataPreDurPost.selectiveCells,1)
         roiStableCounter = length([dataPreDurPost.intersectDays{clust_i+1}{:}]); %roi counter

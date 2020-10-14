@@ -1,5 +1,5 @@
 saveFlag = 1;
-batId = 'Gen';
+batId = 'Gal';
 if strcmp(batId,'Gal')
     g = dir('Ga*');
 elseif strcmp(batId,'Gen')

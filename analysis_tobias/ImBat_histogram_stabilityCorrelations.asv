@@ -1,9 +1,6 @@
-function ImBat_histogram_stabilityCorrelations(batId,dataPreDurPost)
-saveFlag = 1;
-%batId = 'Gal';
-cRaw_tag = 1;
-clustNum = 2;
-saveTag = ['cRaw'];
+saveFlag = 0;
+batId = 'Gal';
+saveTag = ['sMat'];
 if saveFlag == 1
     saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
     % Check if folder exists
@@ -18,13 +15,13 @@ end
 %set sizes of variables
 CNMFe_Fs = 30; %sampling frequency of imaging to divide the timing into seconds
 smoothFactor = 10;
-nPhases = size(dataPreDurPost.findSelectiveCells{clustNum},2);
-nDays = size(dataPreDurPost.findSelectiveCells{clustNum},1);
+nPhases = size(dataPreDurPost.findSelectiveCells,2);
+nDays = size(dataPreDurPost.findSelectiveCells,1);
 timeCorr = cell(1,nPhases);
 timeDiff = cell(1,nPhases);
 %create figure
 histogram_peakCorr_acrossDays = figure();
-sgtitle([batId ' Pairwise Selectively Active Cells Across Days, Clust ' num2str(clustNum) ' ' saveTag]);
+sgtitle([batId ' Pairwise Selectively Active Cells Across Days ' saveTag]);
 set(gcf, 'units','normalized','outerposition',[0 0 0.8 0.6]);
 %find the overlapping ROIs for each day/phase, then gather all the
 %differences between max peaks and correlation coefficients for each pair
@@ -34,26 +31,26 @@ for phase_i = 1:nPhases
     timeCorr{phase_i} = zeros(nDays,nDays);
     timeDiff{phase_i} = zeros(nDays,nDays);
     for day_i = 1:nDays
-        rois = dataPreDurPost.findSelectiveCells{clustNum}{day_i,phase_i};
-        nRois = length(dataPreDurPost.findSelectiveCells{clustNum}{day_i,phase_i});
+        rois = dataPreDurPost.findSelectiveCells{day_i,phase_i};
+        nRois = length(dataPreDurPost.findSelectiveCells{day_i,phase_i});
         for roi_i = 1:nRois
             for day_ii = day_i+1:nDays
                 w = gausswin(smoothFactor); %smooth the S matrix by gaussian window of 10
-                [~,b] = ismember(rois(roi_i),dataPreDurPost.findSelectiveCells{clustNum}{day_ii,phase_i});
+                [~,b] = ismember(rois(roi_i),dataPreDurPost.findSelectiveCells{day_ii,phase_i});
                 if b > 0
                     %smooth the smatrix and take the difference in peak times
                     if phase_i == 1
-                        spikeSmooth1 = filter(w,1,dataPreDurPost.mean_act_pre{clustNum}{day_i,rois(roi_i)});
-                        spikeSmooth2 = filter(w,1,dataPreDurPost.mean_act_pre{clustNum}{day_ii,b});
-                        timeDiff{phase_i}(day_i,day_ii) = (dataPreDurPost.meanMax_act_pre{clustNum}(day_ii,b) - dataPreDurPost.meanMax_act_pre{clustNum}(day_i,b))/CNMFe_Fs;
+                        spikeSmooth1 = filter(w,1,dataPreDurPost.mean_act_pre{day_i,rois(roi_i)});
+                        spikeSmooth2 = filter(w,1,dataPreDurPost.mean_act_pre{day_ii,b});
+                        timeDiff{phase_i}(day_i,day_ii) = (dataPreDurPost.meanMax_act_pre(day_ii,b) - dataPreDurPost.meanMax_act_pre(day_i,b))/CNMFe_Fs;
                     elseif phase_i == 2
-                        spikeSmooth1 = filter(w,1,dataPreDurPost.mean_act_dur{clustNum}{day_i,rois(roi_i)});
-                        spikeSmooth2 = filter(w,1,dataPreDurPost.mean_act_dur{clustNum}{day_ii,b});
-                        timeDiff{phase_i}(day_i,day_ii) = (dataPreDurPost.meanMax_act_dur{clustNum}(day_ii,b) - dataPreDurPost.meanMax_act_dur{clustNum}(day_i,b))/CNMFe_Fs;
+                        spikeSmooth1 = filter(w,1,dataPreDurPost.mean_act_dur{day_i,rois(roi_i)});
+                        spikeSmooth2 = filter(w,1,dataPreDurPost.mean_act_dur{day_ii,b});
+                        timeDiff{phase_i}(day_i,day_ii) = (dataPreDurPost.meanMax_act_dur(day_ii,b) - dataPreDurPost.meanMax_act_dur(day_i,b))/CNMFe_Fs;
                     elseif phase_i == 3
-                        spikeSmooth1 = filter(w,1,dataPreDurPost.mean_act_post{clustNum}{day_i,rois(roi_i)});
-                        spikeSmooth2 = filter(w,1,dataPreDurPost.mean_act_post{clustNum}{day_ii,b});
-                        timeDiff{phase_i}(day_i,day_ii) = (dataPreDurPost.meanMax_act_post{clustNum}(day_ii,b) - dataPreDurPost.meanMax_act_post{clustNum}(day_i,b))/CNMFe_Fs;
+                        spikeSmooth1 = filter(w,1,dataPreDurPost.mean_act_post{day_i,rois(roi_i)});
+                        spikeSmooth2 = filter(w,1,dataPreDurPost.mean_act_post{day_ii,b});
+                        timeDiff{phase_i}(day_i,day_ii) = (dataPreDurPost.meanMax_act_post(day_ii,b) - dataPreDurPost.meanMax_act_post(day_i,b))/CNMFe_Fs;
                     end
                     %find correlation coefficient between the two time series
                     R1 = corrcoef(spikeSmooth1,spikeSmooth2);

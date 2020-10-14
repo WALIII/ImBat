@@ -1,7 +1,7 @@
 function dataPreDurPost = ImBat_extract_dataPreDurPost(batId)
 saveFlag = 1;
-saveTag = 'cRaw_vel';
-cRaw = 1;
+saveTag = 'sMat_vel';
+cRaw = 0;
 %load first day placeCellStableROI data
 if strcmp(batId,'Gal')
     %cd([dirTop(day1).folder filesep 'plots\200911-preDurPost cells across days']);
@@ -23,7 +23,7 @@ end
 nDays = length(dirDates);
 day1 = 1; %first day to start comparing
 dayEnd = nDays; %last day to start comparing
-days = [1:5]; %all days concat
+days = [1:dayEnd]; %all days concat
 clusts = 2;
 CNMFe_Fs = 30;
 track_Fs = 120;
@@ -201,7 +201,7 @@ end
 
 
 
-
+dataPreDurPost.batId = batId;
 dataPreDurPost.nDays = nDays;
 dataPreDurPost.day1 = day1;
 dataPreDurPost.dayEnd = dayEnd;

@@ -66,7 +66,7 @@ Y = Y-Y_min;
 
 % take max
 Ymax = max(Y,[],3);
-%Ymax = imresize(Ymax,scaling);
+Ymax = imresize(Ymax,scaling);
 maxFig = figure();
 colormap(gray);
 %imagesc(Ymax,[0 10]);

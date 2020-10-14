@@ -1,5 +1,5 @@
 function ImBat_snakeData_wrapperUpdate
-plotFlag = 1;
+plotFlag = 0;
 saveFlag = 1;
 g = dir('G*');
 z = dir('Z*');

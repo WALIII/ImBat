@@ -15,7 +15,7 @@ end
 %dur, post with craw data
 nDays = length(dirDates);
 day1 = 1;
-dayEnd = 2;
+dayEnd = 9;
 days = [day1 dayEnd];
 clusts = 2;
 preDur = 90;
@@ -155,7 +155,7 @@ end
 %% plot the max peak of each selective pre/dur/post cell
 functionalStabilityDotPlot = figure();
 set(gcf, 'units','normalized','outerposition',[0 0 0.8 0.6]);
-sgtitle('Functional Stability of Selectively Active Cells: Cluster 2');
+sgtitle([batId ' Functional Stability of Selectively Active Cells: Cluster 2']);
 colorDays = ["r","b"];
 
 for day_i = 1:size(selectiveCells,1)
@@ -237,7 +237,7 @@ end
 
 functionalStabilityDotPlot_consistent = figure();
 set(gcf, 'units','normalized','outerposition',[0 0 0.8 0.6]);
-sgtitle('Functional Stability of Consistently Selectively Active Cells: Cluster 2');
+sgtitle([batId ' Functional Stability of Consistently Selectively Active Cells: Cluster 2']);
 colorDays = ["r","b"];
 
 %find the overlapping cells and phase
