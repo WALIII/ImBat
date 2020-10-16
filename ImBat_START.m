@@ -45,14 +45,17 @@ metadata.artifact_reject = 1; % median filtering
 metadata.initial_median_filter_kernal = 11;
 
 % Motion ocrrection:
-metadata.moco.itter = 10;
-metadata.moco.bin_width = 200;
+metadata.moco.itter = 1;
+metadata.moco.bin_width = 1000;
 
 % Default CNMFe Paramaters:
 metadata.cnmfe.min_corr = 0.9;     % minimum local correlation for a seeding pixel
 metadata.cnmfe.min_pnr = 10;       % minimum peak-to-noise ratio for a seeding pixel
 metadata.cnmfe.tsub = 5;           % temporal downsampling factor
 metadata.cnmfe.ssub = 1;           % temporal downsampling factor
+metadata.cnmfe.gSig = 4;           % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
+metadata.cnmfe.gSiz = 4*metadata.cnmfe.gSig+1;    % pixel, approximate neuron diameter
+metadata.cnmfe.ssub = 1;   % 
 
 % Mergting thesholds:
 %metadata.cnmfe.min_pnr = 10;       % minimum peak-to-noise ratio for a seeding pixel
