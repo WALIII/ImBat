@@ -2,6 +2,8 @@
 Handling functions for wireless miniscope data
 
 
+![ScreenShot](images/Wireless_Bat-01.png)
+
 ### Dependancies:
     CNMF-E: https://github.com/zhoupc/CNMF_E
     Noremcorre: https://github.com/flatironinstitute/NoRMCorre
