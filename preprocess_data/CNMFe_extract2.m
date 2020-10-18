@@ -44,7 +44,6 @@ pars_envs = struct('memory_size_to_use', 60,...  % GB, memory space you allow to
 % -------------------------      SPATIAL      -------------------------  %
 metadata.cnmfe.gSig = 4;           % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
 metadata.cnmfe.gSiz = 4*metadata.cnmfe.gSig+1;    % pixel, approximate neuron diameter
-metadata.cnmfe.ssub = 1;           % spatial downsampling factor
 
 with_dendrites = false;   % with dendrites or not, indicated with high-resolution/2p-movies
 if with_dendrites
@@ -68,7 +67,6 @@ catch
     disp(' no metadata, assuming 6fps...')
     metadata.cnmfe.Fs = 6;             % frame rate
 end
-metadata.cnmfe.tsub = 1;           % temporal downsampling factor
 deconv_flag = true; % run deconvolution or not
 
 % %--foopsi deconvolution
@@ -113,9 +111,9 @@ center_psf = true;              % set the value as true when the background fluc
 
 % -------------------------      MERGING      -------------------------  %
 show_merge = false;                      % if true, manually verify the merging step
-metadata.cnmfe.merge_thr = 0.7;                         % temporal correlation threshold for merging neurons;
+metadata.cnmfe.merge_thr = 0.65;                         % temporal correlation threshold for merging neurons;
 method_dist = 'mean';                    % method for computing neuron distances {'mean', 'max'}
-dmin = metadata.cnmfe.gSig;                             % minimum distances between two neurons. it is used together with merge_thr
+dmin = metadata.cnmfe.gSig*2;                             % minimum distances between two neurons. it is used together with merge_thr
 dmin_only = metadata.cnmfe.gSig;                        % merge neurons if their distances are smaller than dmin_only.
 metadata.cnmfe.merge_thr_spatial = [0.9, 0.6, -inf];    % merge components with highly correlated spatial shapes and temporal shapes
 
@@ -154,6 +152,7 @@ neuron.updateParams('gSig', metadata.cnmfe.gSig, ...       % -------- spatial --
     'nk', nk, ...
     'detrend_method', detrend_method, ...
     'background_model', bg_model, ...       % -------- background --------
+    'save_intermediate  ' ,true, ... % save intermediate results or not
     'nb', nb, ...
     'ring_radius', ring_radius, ...
     'num_neighbors', num_neighbors, ...

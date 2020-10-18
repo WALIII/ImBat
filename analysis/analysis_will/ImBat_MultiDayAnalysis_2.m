@@ -2,27 +2,61 @@ function ImBat_MultiDayAnalysis_2(CellReg2,ROI_Data);
 
 
 % Plot 'place cells' across days.
+% 
 
+day1 = 1;
+day2 = 2;
+day3 = 3;
+offset = 0;
 
 % 
-topCells = size(CellReg2.cell_to_index_map,1);
+days2use = [day1 day2 day3];
+
+topCells = CellReg2.cell_to_index_map(:,[day1 day2 day3]);
+counter = 1;
+for i = 1:size(topCells,1);
+    if any(topCells(i,:)==0) 
+    else
+    topCells2(counter,:) = topCells(i,:);
+    counter = counter+1;
+    end
+end
+
+clear topCells
+topCells = topCells2;
+
+% Plot All tracked cells:
+for i = 1:3
+    IDX{i} = topCells(:,i);
+IM_all(:,:,i) = mean(CellReg2.spatial_footprints_corrected{days2use(i),:}(IDX{i},:,:),1);
+end
+
+    [RGB1 RGB2] = CaBMI_XMASS(IM_all(:,:,1),IM_all(:,:,2),IM_all(:,:,3),'hl',[0.05 .25],'normalize',2);
+
+figure(); 
+clf
+imagesc(squeeze(RGB1))
+title('ROI Mask on days 1(r) 2(g) and 3(b)');
+
+
+
+% Plot one by one
 
   mkdir('PlaceCellsComp/fig'); % save as a figure file in local dir
    mkdir('PlaceCellsComp/jpg'); % Save as .jpg in local dir
 
-offset = 0.0;
 col = {'or','og','ob'};
 
-for ii = 1:topCells;; % for each cell
+for ii = 1:size(topCells,1);; % for each cell
     clear IDX
     for ix = 1: 3;
 %         [a, b] =  find(CellReg2.cell_to_index_map(:,ix) == ii); 
 %         IDX{ix} = a;
-IDX{ix} = CellReg2.cell_to_index_map(ii,ix);
+IDX{ix} = topCells(ii,ix);
 if IDX{ix} ==0;
    IM(:,:,ix) = zeros(ROI_Data{ix}.Ysiz_DS(1)*2,ROI_Data{ix}.Ysiz_DS(2)*2);
 else
-    IM(:,:,ix) = CellReg2.spatial_footprints_corrected{ix,:}(IDX{ix},:,:);
+    IM(:,:,ix) = CellReg2.spatial_footprints_corrected{days2use(ix),:}(IDX{ix},:,:);
     %IM(:,:,ix) = reshape(full(ROI_Data{ix}.ROIs.results.A(:,IDX{ix})),ROI_Data{ix}.Ysiz_DS(1),ROI_Data{ix}.Ysiz_DS(2));
 end
     end
@@ -36,9 +70,9 @@ title('ROI Mask on days 1(r) 2(g) and 3(b)');
 %     
 subplot(1,2,2);
       hold on;
-      A = ROI_Data{1, 1}.Alignment;
-      B = ROI_Data{1, 2}.Alignment;
-      C = ROI_Data{1, 3}.Alignment;
+      A = ROI_Data{1, days2use(1)}.Alignment;
+      B = ROI_Data{1, days2use(2)}.Alignment;
+      C = ROI_Data{1, days2use(3)}.Alignment;
 plot3(A.out.Location2(:,1),A.out.Location2(:,2),A.out.Location2(:,3),'Color',[0.7 0.1 0.1]);% plot the flight trajectory in space
 plot3(B.out.Location2(:,1),B.out.Location2(:,2),B.out.Location2(:,3),'Color',[0.1 0.7 0.1]);% plot the flight trajectory in space
 plot3(C.out.Location2(:,1),C.out.Location2(:,2),C.out.Location2(:,3),'Color',[0.1 0.1 0.7]);% plot the flight trajectory in space
@@ -48,19 +82,19 @@ for iii = 1:3
     clear Spike_times xy LX LY LZ
     if (IDX{iii}) ==0; ; 
     else
-[~,xy] = find(ROI_Data{1, iii}.ROIs.results.S(IDX{iii},:)>0.1);  % get time neuron is active
-Spike_times = ROI_Data{1, iii}.Alignment.out.video_times2(xy)-offset; % convert this to 'spike time'
+[~,xy] = find(ROI_Data{1, days2use(iii)}.ROIs.results.S(IDX{iii},:)>0.1);  % get time neuron is active
+Spike_times = ROI_Data{1, days2use(iii)}.Alignment.out.video_times2(xy)-offset; % convert this to 'spike time'
 
 
 try % this 'try/catch' is to avoid crashing if cells are not active in plotting window...
 for i = 1:size(Spike_times,1)
 try
     % Find the closest 'Location time' to the 'Spike time'
-[minValue(:,i),closestIndex(:,i)] = min(abs(ROI_Data{1, iii}.Alignment.out.Location_time-Spike_times(i)));
+[minValue(:,i),closestIndex(:,i)] = min(abs(ROI_Data{1, days2use(iii)}.Alignment.out.Location_time-Spike_times(i)));
 
-LX(i) = ROI_Data{1, iii}.Alignment.out.flights(closestIndex(:,i),1);
-LY(i) = ROI_Data{1, iii}.Alignment.out.flights(closestIndex(:,i),2);
-LZ(i) = ROI_Data{1, iii}.Alignment.out.flights(closestIndex(:,i),3);
+LX(i) = ROI_Data{1, days2use(iii)}.Alignment.out.flights(closestIndex(:,i),1);
+LY(i) = ROI_Data{1, days2use(iii)}.Alignment.out.flights(closestIndex(:,i),2);
+LZ(i) = ROI_Data{1, days2use(iii)}.Alignment.out.flights(closestIndex(:,i),3);
 catch % we need this if Spiketime occurs before/after the location tracking was on..
 continue
 end

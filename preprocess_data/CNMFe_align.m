@@ -9,7 +9,7 @@ gcp;
 %addpath(genpath('../../NoRMCorre'));
 type = 1; % 1 = rigid
 
-if type ==1;
+if type ==2;
     disp( 'Rigid motion correction')
 else
     disp('non-rigid motion correction')
@@ -42,14 +42,14 @@ else
     Y = imfilter(Yf,psf,'symmetric');
     [Y] = ImBat_FilterForMovCorr(Y);
     % take onnly center of image:
-    Y = Y(8:end-8,8:end-8,:);
-    bound = 1;
+    %Y = Y(8:end-8,8:end-8,:);
+    bound = 4;
 end
 %% first try out rigid motion correction
 % exclude boundaries due to high pass filtering effects
 if type ==1;
 
-    options_r = NoRMCorreSetParms('d1',d1-bound,'d2',d2-bound,'bin_width',metadata.moco.bin_width,'max_shift',20,'iter',metadata.moco.itter,'correct_bidir',false);
+    options_r = NoRMCorreSetParms('d1',d1-bound,'d2',d2-bound,'bin_width',metadata.moco.bin_width,'max_shift',15,'iter',metadata.moco.itter,'correct_bidir',false);
 
     %% register using the high pass filtered data and apply shifts to original data
     tic; [M1,shifts1,template1] = normcorre_batch(Y(bound/2+1:end-bound/2,bound/2+1:end-bound/2,:),options_r); toc % register filtered data
@@ -215,9 +215,25 @@ end
 % smooth motion corrected data...
 %[Y] = ImBat_Filter(Y);
 
+
+% Get max and corr images ( take every 5 frames to save time) 
+[maxproj, allVids2] = ImBat_Dff(Y(:,:,1:5:end),'filt_rad',5);
+[Cnproj, temp] = ImBat_correlation_image(Y(:,:,1:5:end),metadata);
+
+
+% Plot the output:
+figure();
+colormap(gray);
+subplot(1,2,1);
+imagesc(maxproj);
+title('max projection');
+subplot(1,2,2);
+imagesc(Cnproj);
+title('Cn Projection');
+
+
 disp('Saving corrected data...');
 save([metadata.processed_FN,'/Motion_corrected_Data.mat'],'all_shifts','Y','Ysiz','-v7.3');
-
 
 % Saving Downsampled video
 Y = imresize(Y,0.5);

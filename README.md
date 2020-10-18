@@ -8,14 +8,26 @@ Handling functions for wireless miniscope data
     FinchScope (Liberti Branch) : https://github.com/gardner-lab/FinchScope/tree/Liberti
 
 
-    ## Walkthrough for manual extraction and alignment
+### Data
 
-    1. Extract .mov files. This must be run on a mac computer
+1. Data Structure
+2. Remote Data Repository
+3. Metadata
+3. Tracking data
+
+### Data Extraction Walk-through
+
+1. Extracting raw .mov data ( Mac )
+2. Image Registration and ROI extraction
+3. Aligning Sessions across days
+
+### Data Analysis Walk-through
+
+1. Behavior Segregation
+2. Neural alignment to behavior
+3. Basic Plotting
 
 
-  ```
-    >>  FS_AV_Parse_Batch
-  ```
 
 
     2. Align to behavioral data

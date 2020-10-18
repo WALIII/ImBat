@@ -115,7 +115,7 @@ for i=1:length(mov_listing)
                 if aspect_update == 1; % update to the proper
                     temp =  imresize(temp,[480 640]);
                 end
-                video.frames(:,:,ii) = imresize(temp,resize_factor);
+                video.frames(:,:,ii) = imresize(temp,[240, 320]);
                 
                 v{ii} = []; % empty the buffer
                 temp = [];

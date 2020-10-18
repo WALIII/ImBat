@@ -24,14 +24,14 @@ function ImBat_START(varargin)
 
 
 % Default extraction Params
-ROI_flag = 0; % run ROI extraction
-ROI_flag_reset = 0;
+ROI_flag = 1; % run ROI extraction
+ROI_flag_reset = 1;
 reROI_extract = 0; %rerun ROI extraction
 
 Analysis_flag = 1; % run basic ROI analysis...
 extract  = 1; % extract the basic ROI timeseries
 reExtract = 1; % re-extract, in the event that things have been extracted already.
-extract_track = 0;
+extract_track = 1;
 Mov_extract_flag = 0; % run .mov extraction ( Mac only...);
 Bat_Cluster =1; % extract the bat_cluster tracking
 
@@ -108,19 +108,19 @@ end
 % For each folder ( extraction, and motion correction step)
 for i = 1:length(subFolders);
     disp(['entering folder', char(subFolders(i).name)])
-
+    
     cd([subFolders(i).folder,'/',subFolders(i).name]);
-
+    
     % index every subfolder...
     flight_files = dir(pwd);
     flight_files(ismember( {flight_files.name}, {'.', '..','Processed'})) = [];  %remove . and .. and Processed
     flight_dirFlags = [flight_files.isdir];% Get a logical vector that tells which is a directory.
     flight_subFolders = flight_files(flight_dirFlags);% Extract only those that are directories.
-
-
+    
+    
     for ii = 1:length(flight_subFolders);
         cd([subFolders(i).folder,'/',subFolders(i).name]);
-
+        
         %         Check if folder exists
         %         if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/',processed_FN,'/','Motion_corrected_Data_DS.mat'])>0;
         %             disp('Folder already extracted..');
@@ -142,24 +142,32 @@ for i = 1:length(subFolders);
         %             end
         %         end
         %
-
+        
         % load tracking data
         if extract_track ==1;
             track_fname = flight_subFolders(ii).name;
             track_fname = extractBefore( track_fname,'_extraction');
             if strcmp(metadata.tracking_file_type, 'Bat_Cluster')
-                track_fname = [track_fname,'-Bat_Cluster_track'];
-                load(track_fname);
+                try
+                    track_fname = [track_fname,'-Bat_Cluster_track'];
+                    load(track_fname);
+                catch % TO DO: eliminate redundancy ( turn into 'exist' not try/catch...)
+                    track_fname = flight_subFolders(ii).name;
+                    track_fname = extractBefore( track_fname,'_extraction');
+                    track_fname = [track_fname,'_track'];
+                    load(track_fname);
+                    metadata.tracking_file_type = 'track';
+                end
             else
                 track_fname = [track_fname,'_track'];
                 load(track_fname);
                 metadata.tracking_file_type = 'track';
             end
         end
-
-
+        
+        
         %%====[ Motion Correction ]======%%
-
+        
         cd([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name])% index into the flight_subfolder
         if extract ==1;
             % Run processing script
@@ -167,24 +175,24 @@ for i = 1:length(subFolders);
             ImBat_processVideos('metadata',metadata);
             disp('processing!!');
         end
-
-
+        
+        
         cd(processed_FN) % move to processed folder...
-
+        
         % Check if roi extraction folder exists
         if exist([flight_subFolders(ii).folder,'/',flight_subFolders(ii).name,'/',processed_FN,'/','Motion_corrected_Data_DS_neurons'])>0;
             disp('ROIs already extracted..');
-
+            
             if reROI_extract ==1
                 disp('Re-Extracting ROIs...');
                 ROI_flag = 1 ;
-
+                
             else
                 disp('Moving to the next folder...');
             end
         end
-
-
+        
+        
         %%====[ CNMF-e ROI Extraction ]======%%
         if ROI_flag ==1;
             disp('extracting ROIs...')
@@ -192,12 +200,13 @@ for i = 1:length(subFolders);
             try
                 CNMFe_extract3(nam,'metadata',metadata);
             catch
+                disp('ll');
             end
-
-
-
+            
+            
+            
             ROI_flag = ROI_flag_reset;
-
+            
             %%====[ Aligning Time Stamps ]======%%
             % to do: add logfile
             if extract_track ==1;
@@ -209,5 +218,5 @@ for i = 1:length(subFolders);
         clear video audio Markers AnalogSignals out % Clear vars from RAM
         extract =1;
     end
-
+    
 end

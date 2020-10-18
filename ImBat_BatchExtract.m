@@ -61,6 +61,7 @@ for i = 1:length(subFolders);
         % Run extraction
         close all;
         ImBat_START;      
+        
 end
     
 cd(HomeDir);

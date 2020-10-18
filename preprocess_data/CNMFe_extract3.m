@@ -136,7 +136,7 @@ neuron.updateParams('gSig', metadata.cnmfe.gSig, ...       % -------- spatial --
     'detrend_method', detrend_method, ...
     'background_model', bg_model, ...       % -------- background --------
     'nb', nb, ...
-    'save_intermediate' ,true, ... % save intermediate results or not
+    'save_intermediate  ' ,true, ... % save intermediate results or not
     'ring_radius', ring_radius, ...
     'num_neighbors', num_neighbors, ...
     'bg_ssub', metadata.cnmfe.bg_ssub, ...
@@ -206,10 +206,10 @@ neuron.merge_high_corr(show_merge, metadata.cnmfe.merge_thr_spatial);
 for m=1:2
     % update temporal
     neuron.update_temporal_parallel(use_parallel);
-
+    
     % delete bad neurons
     neuron.remove_false_positives();
-
+    
     % merge neurons based on temporal correlation + distances
     neuron.merge_neurons_dist_corr(show_merge);
 end
