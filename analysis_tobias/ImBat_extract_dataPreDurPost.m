@@ -1,6 +1,6 @@
 function dataPreDurPost = ImBat_extract_dataPreDurPost(batId)
 saveFlag = 1;
-saveTag = 'sMat_vel';
+saveTag = 'sMat_dff';
 cRaw = 0;
 %load first day placeCellStableROI data
 if strcmp(batId,'Gal')
@@ -8,14 +8,14 @@ if strcmp(batId,'Gal')
     if cRaw ==1
         load('200311to200320_Gal_activity_allTrials_allClusts_cRaw_vel.mat'); %load activity for pre,dur,post
     else
-        load('200311to200320_Gal_activity_allTrials_allClusts_sMat_vel.mat'); %load s matrix activity data
+        load('200311to200320_Gal_activity_allTrials_allClusts_sMat_dff.mat'); %load s matrix activity data
     end
     dirDates = dir('Gal_*');
 elseif strcmp(batId,'Gen')
     if cRaw ==1
         load('200319to200324_Gen_activity_allTrials_allClusts_cRaw_vel.mat'); %load activity for pre,dur,post
     else
-        load('200319to200324_Gen_activity_allTrials_allClusts_sMat_vel.mat'); %load s matrix activity data
+        load('200319to200324_Gen_activity_allTrials_allClusts_sMat_dff.mat'); %load s matrix activity data
     end
     dirDates = dir('Gen_*');
     

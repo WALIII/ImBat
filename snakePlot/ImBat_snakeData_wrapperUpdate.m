@@ -1,6 +1,8 @@
 function ImBat_snakeData_wrapperUpdate
-plotFlag = 0;
-saveFlag = 1;
+plotFlag = 0; %plot the snakeData too?
+saveFlag = 1; %save data?
+stableFlag = 1; %do snakeData for only stable ROIs?
+
 g = dir('G*');
 z = dir('Z*');
 dirTop = vertcat(g,z); %find all folders in top quality directory
@@ -26,7 +28,11 @@ for sesh_i = 1:length(dirTop)
     cellData = load([dirCD.folder filesep dirCD.name]);
     alignment = load([dirA.folder filesep dirA.name]);
     
-    [snakeTrace_cRaw,snakeTrace_c,snakeTrace_s] = ImBat_snakeData(cellData,flightPaths,alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
+    if stableFlag == 0
+        [snakeTrace_cRaw,snakeTrace_c,snakeTrace_s] = ImBat_snakeData(cellData,flightPaths,alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType);
+    else
+        [snakeTrace_cRaw,snakeTrace_c,snakeTrace_s] = ImBat_snakeData_manualStable(cellData,flightPaths,alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType,'galdate',sesh_i);
+    end
     %add the 3 data sets to snakeTrace
     snakeTrace.cRaw = snakeTrace_cRaw;
     snakeTrace.c = snakeTrace_c;
@@ -60,7 +66,9 @@ for sesh_i = 1:length(dirTop)
             savefig(snakeTrace_plots.snakePlot_clustBy1PrePostFlight, [dirAnal(end).folder filesep dirAnal(end).name filesep 'snakePlots' filesep fileName '_snakePlot_clustBy1PrePostFlight.fig']);
         end
     end
-    if saveFlag == 1
+    if saveFlag == 1 && stableFlag == 1
+        save([dirAnal(end).folder filesep dirAnal(end).name filesep fileName '_snakePlotData_stable.mat'],'snakeTrace');
+    elseif saveFlag == 1 && stableFlag == 0
         save([dirAnal(end).folder filesep dirAnal(end).name filesep fileName '_snakePlotData.mat'],'snakeTrace');
     end
     cd(dirTop(sesh_i).folder);

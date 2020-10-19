@@ -1,8 +1,8 @@
-function activity_allTrials = ImBat_extract_activity_allTrials(batId)
+function [activity_allTrials,flightAligned_vidData] = ImBat_extract_activity_allTrials(batId)
 plotFlag = 0;
 saveFlag = 1; %do you want to save the figures and output structure?
 cRaw = 0;
-saveTag = 'sMat_dff';
+saveTag = 'allTrials_sMat';
 if saveFlag == 1
 saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
 % Check if folder exists
@@ -237,6 +237,7 @@ for day_i = 1:length(nDays) %for each day
         maxMeanFrames_dur{clust_i}{day_i} = imresize(maxMeanFrames_dur{clust_i}{day_i},scaling);
         maxMeanFrames_post{clust_i}{day_i} = max(meanFrames_post{clust_i}{day_i},[],3);        
         maxMeanFrames_post{clust_i}{day_i} = imresize(maxMeanFrames_post{clust_i}{day_i},scaling);
+        
     end
     cd(dirTop(1).folder);
 end
@@ -257,12 +258,17 @@ activity_allTrials.maxMeanFrames_dur = maxMeanFrames_dur;
 activity_allTrials.maxMeanFrames_post = maxMeanFrames_post;
 activity_allTrials.YmaxFull = YmaxFull;
 
+%flightAligned_vidData.frames_pre = frames_pre;
+flightAligned_vidData.frames_dur = frames_dur;
+%flightAligned_vidData.frames_post = frames_post;
+
 if saveFlag == 1
     if strcmp(batId,'Gal')
-        save([saveDir '200311to200320_Gal_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials','-v7.3');
+        save([saveDir 'Gal_200311to200320_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials');
+        save([saveDir 'Gal_200311to200320_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');        
     elseif strcmp(batId,'Gen')
-        save([saveDir '200319to200324_Gen_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials','-v7.3');
-        
+        save([saveDir 'Gen_200319to200324_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials');    
+        save([saveDir 'Gen_200319to200324_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');    
     end
 end
 

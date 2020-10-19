@@ -5,7 +5,6 @@ dateSesh = [];
 sessionType = [];
 loadFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
 saveFlag = 0;
-batId = 'Gen';
 %offset = 0.1; % account for slow calcium estimation ~move locations back  0ms in time... This is the knob to turn for 'prospective' coding...
 %clusters = [1 2 4 6];
 %nClusters = 4;%length(clusters); %number of flight trajectories to look at and for k means clustering of whole time series by peak
@@ -38,6 +37,7 @@ for i=1:2:nparams
             galDate = varargin{i+1};
     end
 end
+batId = batName;
 
 %labels for loading and saving data if running independent fromImBat_analyze
 if loadFlag == 1
@@ -162,6 +162,8 @@ for data_i = 1:3
     normMeanTracePreAll= [];
     normMeanTracePostAll = [];
     normMeanTracePreFlightPostAll = cell(1,nClusters);
+    dur = cell(1,nClusters);
+    durSpeed = cell(1,nClusters);
     %for each cluster type
     for clust_i = 1:nClusters %length(flightPaths.clusterIndex)
         %for each trial in cluster, calculate the start/stop times and duration of the calcium videos
@@ -171,16 +173,16 @@ for data_i = 1:3
             [minValueEnd(dur_i),closestIndexEnd(dur_i)] = min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(dur_i)))));
             %calculate duration of each flight in a particular cluster so
             %you can pad all flights to the longest flight in that cluster
-            dur(dur_i) = closestIndexEnd(dur_i)-closestIndexStart(dur_i);
-            durSpeed(dur_i)= flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(dur_i))-flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(dur_i));
+            dur{clust_i}(dur_i) = closestIndexEnd(dur_i)-closestIndexStart(dur_i);
+            durSpeed{clust_i}(dur_i)= flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(dur_i))-flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(dur_i));
         end
         %calculate max duration for each cluster of trajectories
-        maxDur = max(dur);
-        maxDurSpeed = max(durSpeed);
-        %meanTrace{clust_i}=zeros(length(traceData(:,1)),maxDur+preWindow+1);
+        medDur{clust_i} = round(median(dur{clust_i}));
+        medDurSpeed{clust_i} = round(median(durSpeed{clust_i}));
+        %meanTrace{clust_i}=zeros(length(traceData(:,1)),medDur{clust_i}+preWindow+1);
         %initialize the vector to store the neural activity of each flight
-        traceFlight{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDur+prePadCalcium+postPadCalcium+1,length(traceData(:,1)));
-        speedFlight{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),maxDurSpeed+prePadSpeed+postPadSpeed+1);
+        traceFlight{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),medDur{clust_i}+prePadCalcium+postPadCalcium+1,length(traceData(:,1)));
+        speedFlight{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),medDurSpeed{clust_i}+prePadSpeed+postPadSpeed+1);
         tracePre{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),preFlightPadCalcium+1,length(traceData(:,1)));
         speedPre{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),preFlightPadSpeed+1);
         tracePost{clust_i} = zeros(length(flightPaths.clusterIndex{clust_i}),postFlightPadCalcium+1,length(traceData(:,1)));
@@ -195,16 +197,16 @@ for data_i = 1:3
                 
                 traceFlightIdx{clust_i}(trace_i) = flightPaths.clusterIndex{clust_i}(trace_i);
                 try
-                    traceFlight{clust_i}(trace_i,:,cellCount) = traceData(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (maxDur-dur(trace_i)) + postPadCalcium);
+                    traceFlight{clust_i}(trace_i,:,cellCount) = traceData(cell_i,closestIndexStart(trace_i) - prePadCalcium:closestIndexEnd(trace_i) + (medDur{clust_i}-dur{clust_i}(trace_i)) + postPadCalcium);
                     tracePre{clust_i}(trace_i,:,cellCount) = traceData(cell_i,closestIndexStart(trace_i) - preFlightPadCalcium:closestIndexStart(trace_i));
                     tracePost{clust_i}(trace_i,:,cellCount) = traceData(cell_i,closestIndexEnd(trace_i):closestIndexEnd(trace_i) + postFlightPadCalcium);
-                    speedFlight{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePadSpeed:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postPadSpeed);
+                    speedFlight{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - prePadSpeed:flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (medDurSpeed{clust_i}-durSpeed{clust_i}(trace_i)) + postPadSpeed);
                     speedPre{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)) - preFlightPadSpeed:flightPaths.flight_starts_idx(flightPaths.clusterIndex{clust_i}(trace_i)));
-                    speedPost{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (maxDurSpeed-durSpeed(trace_i)) + postFlightPadSpeed);
+                    speedPost{clust_i}(trace_i,:) = flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(medDurSpeed{clust_i}-durSpeed{clust_i}(trace_i)):flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i)) + (medDurSpeed{clust_i}-durSpeed{clust_i}(trace_i)) + postFlightPadSpeed);
                     
                 catch
                     %                     tracePost{clust_i}(trace_i,:,cell_i) = [traceData(cell_i,closestIndexEnd(trace_i):end),zeros(1,size(tracePost{clust_i}(trace_i,:,cell_i),2) - size(traceData(cell_i,closestIndexEnd(trace_i):end),2))];
-                    %                     speedPost{clust_i}(trace_i,:) = [flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):end),zeros(1,size(speedPost{clust_i}(trace_i,:),2)-size(flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(maxDurSpeed-durSpeed(trace_i)):end,2)))];
+                    %                     speedPost{clust_i}(trace_i,:) = [flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(medDurSpeed{clust_i}-durSpeed{clust_i}(trace_i)):end),zeros(1,size(speedPost{clust_i}(trace_i,:),2)-size(flightPaths.batSpeed(flightPaths.flight_ends_idx(flightPaths.clusterIndex{clust_i}(trace_i))+(medDurSpeed{clust_i}-durSpeed{clust_i}(trace_i)):end,2)))];
                     %                     smoothTraceRawPost{clust_i}(trace_i,:,cell_i) = smooth(tracePost{clust_i}(trace_i,:,cell_i),traceSmooth);
                     %                     normTraceRawPost{clust_i}(trace_i,:,cell_i) = zscore(smoothTraceRawPost{clust_i}(trace_i,:,cell_i),0,2);
                     %                     normTraceRawPost{clust_i}(trace_i,:,cell_i) = normTraceRawPost{clust_i}(trace_i,:,cell_i) - min(normTraceRawPost{clust_i}(trace_i,:,cell_i));
@@ -491,7 +493,10 @@ for data_i = 1:3
         snakeTraceData.batName = batName;
         snakeTraceData.dateSesh = dateSesh;
         snakeTraceData.sessionType = sessionType;
-        snakeTraceData.dur = dur;
+        snakeTraceData.dur = dur;        
+        snakeTraceData.durSpeed = durSpeed;
+        snakeTraceData.medDur = medDur;
+        snakeTraceData.medDurSpeed = medDurSpeed;
         snakeTraceData.BPre = BPre;
         snakeTraceData.IPre = IPre;
         snakeTraceData.BFlight = BFlight;

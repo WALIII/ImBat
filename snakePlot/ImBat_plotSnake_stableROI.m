@@ -12,7 +12,7 @@ else
 end
 saveDir = [saveDir1 datestr(now,'yymmdd') filesep 'snakePlots' '\'];
 
-xlimFlight = 1300;
+xlimFlight = 1560;
 xlimCalcium = xlimFlight/4;
 xlimFlightPre = 800;
 xlimCalciumPre = xlimFlightPre/4;
@@ -57,7 +57,7 @@ for d = 1:length(dirTop)
     %extract metadata names and enter analysis folder
     dirAnalysis = dir('analysis_*');
     cd(dirAnalysis(end).name);
-    sp = dir('*snakePlotData.mat');
+    sp = dir('*snakePlotData_stable.mat');
     snakeTraceT(d) = load(sp(end).name);
     fp = dir('*flightPaths.mat');
     flightPathsF(d) = load(fp(end).name);
@@ -107,7 +107,7 @@ for day_i = 1:length(ROIs_manual(:,1))
     %plot all ROIs normalized to itself and plotted in 1-n numerical order
     %across all days
     subplot(3,length(ROIs_manual(:,1)), 2*length(ROIs_manual(:,1)) + day_i);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normMeanTraceEachFlight{clustNum}(:,1:xlimCalcium),[1 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceFlight{clustNum}(:,1:xlimCalcium),[1 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -210,12 +210,12 @@ for day_i = 1:length(ROIs_manual(:,1))
             set(gca,'xticklabel',[],'yticklabel',[]);
         end
         ylim([0 4.5]);
-                title([num2str(length(flightPathsF(day_i).flightPaths.clusterIndex{clustNum})) ' flights']);
+        title([num2str(length(flightPathsF(day_i).flightPaths.clusterIndex{clustNum})) ' flights']);
     end
     
-    %plot all ROIs according to preferred sorting individually
+    %plot all ROIs according to preferred day 1 activity
     subplot(3,length(ROIs_manual(:,1)), 2*length(ROIs_manual(:,1)) + day_i);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceFlight{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.IFlight{clustNum},1:xlimCalcium),[1 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceFlight{clustNum}(snakeTraceT(1).snakeTrace.cRaw.IFlight{clustNum},1:xlimCalcium),[1 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -377,9 +377,9 @@ for day_i = 1:length(ROIs_manual(:,1))
                 title([num2str(length(flightPathsF(day_i).flightPaths.clusterIndex{clustNum})) ' flights']);
     end
     
-    %plot all ROIs according to preferred sorting individually
+    %plot all ROIs according to preferred day 1 sorting
     subplot(3,length(ROIs_manual(:,1)), 2*length(ROIs_manual(:,1)) + day_i);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTracePre{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.IPre{clustNum},1:xlimCalciumPre),[1 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTracePre{clustNum}(snakeTraceT(1).snakeTrace.cRaw.IPre{clustNum},1:xlimCalciumPre),[1 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -541,9 +541,9 @@ for day_i = 1:length(ROIs_manual(:,1))
                 title([num2str(length(flightPathsF(day_i).flightPaths.clusterIndex{clustNum})) ' flights']);
     end
     
-    %plot all ROIs according to preferred sorting individually
+    %plot all ROIs according to preferred  day 1 activity
     subplot(3,length(ROIs_manual(:,1)), 2*length(ROIs_manual(:,1)) + day_i);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTracePost{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.IPost{clustNum},:),[1 4.5]); %1:xlimCalciumPost),[1 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTracePost{clustNum}(snakeTraceT(1).snakeTrace.cRaw.IPost{clustNum},:),[1 4.5]); %1:xlimCalciumPost),[1 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -597,7 +597,7 @@ for day_i = 1:length(ROIs_manual(:,1))
     %across all days
     subplot(3,2*length(ROIs_manual(:,1)), 4*length(ROIs_manual(:,1)) + (day_i*2)-1);
     %imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceOdd{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.Iodd{clustNum},1:xlimCalcium),[1.5 4.5]);
-    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceOdd{clustNum}(:,1:xlimCalcium),[1.5 4.5]);
+    imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceOdd{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.Iodd{clustNum},1:xlimCalcium),[1.5 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -680,24 +680,32 @@ for day_i = 1:length(ROIs_manual(:,1))
             firstHalf(clust_i) = round(length(flightPathsF(day_i).flightPaths.clusterIndex{clust_i})/2);
             secondHalf(clust_i) = length(flightPathsF(day_i).flightPaths.clusterIndex{clust_i});
         
-            meanTrace1stHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
-            normTrace1stHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
-            meanTrace2ndHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
-            normTrace2ndHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
-            maxNormTrace1stHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),1);
-            maxNormTrace2ndHalf{clust_i} = zeros(size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3),1);
-            
-            for cell_i = 1:size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3)
-                meanTrace1stHalf{clust_i}(cell_i,:) = mean(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i}(1:firstHalf(clust_i),:,cell_i),1);
+            meanTrace1stHalf{clust_i} = zeros(size(ROIs_manual(1,:),2),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
+            normTrace1stHalf{clust_i} = zeros(size(ROIs_manual(1,:),2),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
+            meanTrace2ndHalf{clust_i} = zeros(size(ROIs_manual(1,:),2),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
+            normTrace2ndHalf{clust_i} = zeros(size(ROIs_manual(1,:),2),size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},2));
+            maxNormTrace1stHalf{clust_i} = zeros(size(ROIs_manual(1,:),2),1);
+            maxNormTrace2ndHalf{clust_i} = zeros(size(ROIs_manual(1,:),2),1);
+            %cellCount = 1;
+            nRois = size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i},3);
+            nRoisStable = size(ROIs_manual(1,:),2);
+            for cell_i = 1:nRois
+                %try
+                meanTrace1stHalf{clust_i}(cell_i,:) = nanmean(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i}(1:firstHalf(clust_i),:,cell_i),1);
+                meanTrace2ndHalf{clust_i}(cell_i,:) = nanmean(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i}(firstHalf(clust_i)+1:secondHalf(clust_i),:,cell_i),1);
+                %catch
+                %meanTrace1stHalf{clust_i}(cell_i,:) = nan(1,size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i}(1:firstHalf(clust_i),:,1),2));
+                %meanTrace2ndHalf{clust_i}(cell_i,:) = nan(1,size(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i}(firstHalf(clust_i)+1:secondHalf(clust_i),:,1),2));
+                %end
                 normTrace1stHalf{clust_i}(cell_i,:) = zscore(smooth(meanTrace1stHalf{clust_i}(cell_i,:),traceSmooth));
                 normTrace1stHalf{clust_i}(cell_i,:) = normTrace1stHalf{clust_i}(cell_i,:) - min(normTrace1stHalf{clust_i}(cell_i,:));
                 [~,maxNormTrace1stHalf{clust_i}(cell_i,1)] = max(normTrace1stHalf{clust_i}(cell_i,:));
                 
-                meanTrace2ndHalf{clust_i}(cell_i,:) = mean(snakeTraceT(day_i).snakeTrace.cRaw.traceFlight{clust_i}(firstHalf(clust_i)+1:secondHalf(clust_i),:,cell_i),1);
                 normTrace2ndHalf{clust_i}(cell_i,:) = zscore(smooth(meanTrace2ndHalf{clust_i}(cell_i,:),traceSmooth));
                 normTrace2ndHalf{clust_i}(cell_i,:) = normTrace2ndHalf{clust_i}(cell_i,:) - min(normTrace2ndHalf{clust_i}(cell_i,:));
                 [~,maxNormTrace2ndHalf{clust_i}(cell_i,1)] = max(normTrace2ndHalf{clust_i}(cell_i,:));
-                
+                    
+                cellCount = cellCount + 1;
             end
             [B1stHalf{clust_i},I1stHalf{clust_i}] = sort(maxNormTrace1stHalf{clust_i});
             [B2ndHalf{clust_i},I2ndHalf{clust_i}] = sort(maxNormTrace2ndHalf{clust_i});
@@ -739,7 +747,7 @@ for day_i = 1:length(ROIs_manual(:,1))
     %across all days
     subplot(3,2*length(ROIs_manual(:,1)), 4*length(ROIs_manual(:,1)) + (day_i*2)-1);
     %imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceOdd{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.Iodd{clustNum},1:xlimCalcium),[1.5 4.5]);
-    imagesc(normTrace1stHalf{clustNum}(I1stHalf{clustNum},1:xlimCalcium),[1.5 4.5]);
+    imagesc(normTrace1stHalf{clustNum}(I1stHalf{clustNum}(end-nRoisStable:end),1:xlimCalcium),[1.5 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');
@@ -751,7 +759,7 @@ for day_i = 1:length(ROIs_manual(:,1))
     end 
     hold off
     
-    %plot even flightpath for cluster #2
+    %plot 2nd half flightpath for cluster #2
     for flight_i = (firstHalf(clustNum) + 1):secondHalf(clustNum)
         subplot(3,length(ROIs_manual(:,1))*2,day_i*2);
         plot3(flightPathsF(day_i).flightPaths.pos(1,:,flightPathsF(day_i).flightPaths.clusterIndex{clustNum}(flight_i)),flightPathsF(day_i).flightPaths.pos(2,:,flightPathsF(day_i).flightPaths.clusterIndex{clustNum}(flight_i)),flightPathsF(day_i).flightPaths.pos(3,:,flightPathsF(day_i).flightPaths.clusterIndex{clustNum}(flight_i)),...
@@ -766,7 +774,7 @@ for day_i = 1:length(ROIs_manual(:,1))
         else
             set(gca,'xticklabel',[],'yticklabel',[]);
         end   
-        %plot even velocity for cluster #2
+        %plot 2nd half velocity for cluster #2
         subplot(3,length(ROIs_manual(:,1))*2, length(ROIs_manual(:,1))*2 + (day_i*2));
         plot(1:length(snakeTraceT(day_i).snakeTrace.cRaw.smoothSpeedRawFlight{clustNum}(flight_i,1:xlimFlight)),snakeTraceT(day_i).snakeTrace.cRaw.smoothSpeedRawFlight{clustNum}(flight_i,1:xlimFlight));
         hold on;
@@ -783,11 +791,11 @@ for day_i = 1:length(ROIs_manual(:,1))
         ylim([0 4.5]);
                 title([num2str(length(flightPathsF(day_i).flightPaths.clusterIndex{clustNum})) ' flights']);
     end 
-    %plot even trials for all ROIs normalized to itself and plotted in 1-n numerical order
+    %plot 2nd half trials for all ROIs normalized to itself and plotted in 1-n numerical order
     %across all days
     subplot(3,length(ROIs_manual(:,1))*2, length(ROIs_manual(:,1))*4 + (day_i*2));
     %imagesc(snakeTraceT(day_i).snakeTrace.cRaw.normTraceEven{clustNum}(snakeTraceT(day_i).snakeTrace.cRaw.Iodd{clustNum},1:xlimCalcium),[1.5 4.5]);
-    imagesc(normTrace2ndHalf{clustNum}(I2ndHalf{clustNum},1:xlimCalcium),[1.5 4.5]);
+    imagesc(normTrace2ndHalf{clustNum}(I2ndHalf{clustNum}(end-nRoisStable:end),1:xlimCalcium),[1.5 4.5]);
     colormap(hot);
     if day_i == 1
         ylabel('ROI #');

@@ -3,7 +3,7 @@ function [psth_stableROI] = ImBat_psth_stableROI(varargin)
 %bats for each day focusing only on the stable neurons from ROIs_manual
 plotPSTHclustFlag = 0;
 batId = '';
-saveFlag = 1; %do you want to save the figures and output structure?
+saveFlag = 0; %do you want to save the figures and output structure?
 cRaw_flag = 1;
 clustNum = 2; %which cluster trajectory to look at for each day
 
@@ -186,7 +186,7 @@ for day_i = 1:length(dirTop)
                             set(gca,'xticklabel',[],'yticklabel',[]);
                         end
                         ylim([0 4.5]);
-                        %xlim([0 length(snakeTrace_data.smoothSpeedRawFlight{clust_i}(flight_i,:))]);
+                        xlim([0 length(snakeTrace_data.smoothSpeedRawFlight{clust_i}(flight_i,:))]);
                         
                         %plot each flight activity
                         plotIndivTraces = subplot(10,nClusts,[clust_i+6*nClusts:nClusts:clust_i+9*nClusts]);
@@ -198,7 +198,7 @@ for day_i = 1:length(dirTop)
                         xlabel('Time (s)');
                         xt = get(gca, 'XTick');
                         set(gca,'XTick',xt,'XTickLabel',round(xt/30,1));
-                        %xlim([0 length(snakeTrace_data.normTraceRawFlight{clust_i}(flight_i,:,ROIs_manual(day_i,cell_i)))]);
+                        xlim([0 length(snakeTrace_data.normTraceRawFlight{clust_i}(flight_i,:,ROIs_manual(day_i,cell_i)))]);
                     end
                     %plot mean and stdev of activity per cluster
                     plotMeanTraces = subplot(10,nClusts,[clust_i+4*nClusts clust_i+5*nClusts]);
@@ -207,7 +207,7 @@ for day_i = 1:length(dirTop)
                     hold on;
                     ylabel('Mean stdev df/f');
                     set(gca,'xticklabel',[]);
-                    %xlim([0 length(snakeTrace_data.normTraceFlight{clust_i}(ROIs_manual(day_i,cell_i),:))]);
+                    xlim([0 length(snakeTrace_data.normTraceFlight{clust_i}(ROIs_manual(day_i,cell_i),:))]);
                 end
             catch
                 sgtitle(['Flight Aligned Activity per cluster: ' batName{day_i} ' ' dateSesh{day_i} ' Cell# ' num2str(cell_i) ' NO ACTIVITY']);
