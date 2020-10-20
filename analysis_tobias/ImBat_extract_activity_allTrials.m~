@@ -147,12 +147,12 @@ for day_i = 1:length(nDays) %for each day
             vel_dur{clust_i}{day_i} = NaN(1,4000);
             vel_post{clust_i}{day_i} = NaN(1,4000);
             XY_dur{clust_i}{day_i} = NaN(2,1,4000);
-            framesRaw_pre{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
-            framesRaw_dur{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
-            framesRaw_post{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
-            framesFilt_pre{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
-            framesFilt_dur{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
-            framesFilt_post{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
+            frames_pre{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
+            frames_dur{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
+            frames_post{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
+            frames_pre{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
+            frames_dur{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
+            frames_post{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
         end
     end
     %for each cluster in nClusts
@@ -263,6 +263,7 @@ for day_i = 1:length(nDays) %for each day
         maxMeanFrames_dur{clust_i}{day_i} = imresize(maxMeanFrames_dur{clust_i}{day_i},scaling);
         maxMeanFrames_post{clust_i}{day_i} = max(meanFrames_post{clust_i}{day_i},[],3);        
         maxMeanFrames_post{clust_i}{day_i} = imresize(maxMeanFrames_post{clust_i}{day_i},scaling);
+        
     end
     cd(dirTop(1).folder);
 end
@@ -285,8 +286,7 @@ activity_allTrials.maxMeanFrames_post = maxMeanFrames_post;
 activity_allTrials.YmaxFull = YmaxFull;
 
 %flightAligned_vidData.frames_pre = frames_pre;
-flightAligned_vidData.framesRaw_dur = framesRaw_dur;
-flightAligned_vidData.framesFilt_dur = framesFilt_dur;
+flightAligned_vidData.frames_dur = frames_dur;
 %flightAligned_vidData.frames_post = frames_post;
 
 if saveFlag == 1

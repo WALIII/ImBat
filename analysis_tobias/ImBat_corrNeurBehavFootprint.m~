@@ -42,10 +42,8 @@ for day_i = 1:nDays
         Rbehav = corrcoef(mean_velXY_dur{clustNum}{day_i}(:,:),mean_velXY_dur{clustNum}{day_ii}(:,:));
         corrBehav(day_i,day_ii) = Rbehav(1,2);
         for roi_i = 1:nRois %also take correlation for each individual ROI of that day
-            RneuralRoi(roi_i,:,:) = corrcoef(act_allRois(day_i,roi_i,:),act_allRois(day_ii,roi_i,:));
-            corrNeuralRoi(roi_i,day_i,day_ii) = RneuralROI(roi_i,1,2);
-            RBehavRoi(roi_i,:,:) = corrcoef(mean_velXY_dur{clustNum}{day_i}(:,:),mean_velXY_dur{clustNum}{day_ii}(:,:));
-            corrBehavRoi(roi_i,day_i,day_ii) = RBehavRoi(roi_i,1,2);
+            RneuralRoi(roi_i,:) = corrcoef(act_allRois(day_i,roi_i,:),act_allRois(day_ii,roi_i,:));
+            corrNeuralRoi(roi_i,day_i,day_ii) = RneuralROI(
         end
     end
 end
@@ -76,6 +74,6 @@ if saveFlag == 1
 end
 
 
-%% make scatter plot of the correlations of behavior and neural data for each ROI
+%%
 figScatterCorrNeurBehav = figure();
-scatter(corrBehavRoi,corrNeuralRoi);
+scatter(corrBehav,corrNeural);

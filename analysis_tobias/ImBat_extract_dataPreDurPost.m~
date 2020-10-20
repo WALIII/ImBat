@@ -227,7 +227,7 @@ dataPreDurPost.mean_vel_post = mean_vel_post;
 dataPreDurPost.std_vel_post = std_vel_post;
 dataPreDurPost.XY_dur = XY_dur;
 dataPreDurPost.mean_XY_dur = mean_XY_dur;
-dataPreDurPost.std_XY_dur = std_XY_dur;
+dataPreDurPost.std_XY
 
 dataPreDurPost.meanMax_act_aligned = meanMax_act_aligned;
 dataPreDurPost.stdMax_act_aligned = stdMax_act_aligned;
