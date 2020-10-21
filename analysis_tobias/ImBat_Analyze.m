@@ -39,7 +39,7 @@ plotPlaceCellsAng = 1;
 plotSnakesFlag = 1;
 plotSnakesManualFlag = 0;
 plotPsthFlag = 1;
-plotPSTHstableFlag = 1;
+plotPSTHstableFlag = 0;
 batId = 'Gen';
 galDate = 0;
 %align max projections of specific flights across trajectories

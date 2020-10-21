@@ -15,15 +15,15 @@ end
 %dur, post with craw data
 nDays = length(dirDates);
 day1 = 1;
-dayEnd = 9;
-days = [day1 dayEnd];
+dayEnd = 11;
+days = [day1 nDays];
 clusts = 2;
 preDur = 90;
 postDur = 210;
 
 
 if saveFlag == 1
-    saveTag = [num2str(day1) 'v' num2str(dayEnd)];
+    saveTag = [num2str(day1) 'v' num2str(nDays)];
     saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
     % Check if folder exists
     if exist([saveDir1 datestr(now,'yymmdd') filesep 'functionalStability'])>0;
@@ -41,7 +41,7 @@ selectiveCells1 = placeCellsAngStable;
 cd(dirDates(day1).folder);
 
 %load last day PlaceCellStableROI data
-cd(dirDates(dayEnd).name);
+cd(dirDates(nDays).name);
 dirExtracted = dir('*Extracted_trajectories*');
 load(dirExtracted(end).name);
 selectiveCellsEnd = placeCellsAngStable;
