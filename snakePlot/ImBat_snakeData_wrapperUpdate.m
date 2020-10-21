@@ -1,7 +1,7 @@
 function ImBat_snakeData_wrapperUpdate
 plotFlag = 0; %plot the snakeData too?
 saveFlag = 1; %save data?
-stableFlag = 1; %do snakeData for only stable ROIs?
+stableFlag = 0; %do snakeData for only stable ROIs?
 
 g = dir('G*');
 z = dir('Z*');
