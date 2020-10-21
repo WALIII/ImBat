@@ -1,5 +1,5 @@
 saveFlag = 1; %do you want to save the figures and output structure?
-reexportFlag = 1; %do you want to reproduce the dff and corr images in new folder
+reexportFlag = 0; %do you want to reproduce the dff and corr images in new folder
 saveTag = 'allTrials_sMat_large_1to4';
 if saveFlag == 1
 saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';

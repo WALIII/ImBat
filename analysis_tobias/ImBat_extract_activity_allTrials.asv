@@ -2,7 +2,7 @@ function [activity_allTrials,flightAligned_vidData] = ImBat_extract_activity_all
 plotFlag = 0;
 saveFlag = 1; %do you want to save the figures and output structure?
 cRaw = 0;
-saveTag = 'allTrials_sMat';
+saveTag = 'allTrials_sMat_large';
 if saveFlag == 1
 saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
 % Check if folder exists
@@ -15,7 +15,7 @@ saveDir = [saveDir1 datestr(now,'yymmdd') '\'];
 end
 
 if strcmp(batId,'Gal')
-    nDays = [1:9]; %which days to look at
+    nDays = [1:4]; %which days to look at
     nRois = [1:15];
 elseif strcmp(batId,'Gen')
     nDays = [1:5];
@@ -90,7 +90,7 @@ for day_i = 1:length(nDays) %for each day
     %make gaussian filter based on dff function for spatial filtering
     gSig = 1;
     gSiz = 4.5*gSig; 
-    scaling = 10; %scale up the ymax to make less pixelated
+    scaling = 1; %scale up the ymax to make less pixelated
     psf = fspecial('gaussian', round(2*gSiz), gSig);
 	ind_nonzero = (psf(:)>=max(psf(:,1)));
 	psf = psf-mean(psf(ind_nonzero));
@@ -173,9 +173,9 @@ for day_i = 1:length(nDays) %for each day
         framesRaw_pre{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPre{clust_i});
         framesRaw_dur{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenFlight{clust_i});
         framesRaw_post{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPost{clust_i});        
-        framesFilt_pre{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPre{clust_i});
-        framesFilt_dur{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenFlight{clust_i});
-        framesFilt_post{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPost{clust_i});        
+        %framesFilt_pre{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPre{clust_i});
+        %framesFilt_dur{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenFlight{clust_i});
+        %framesFilt_post{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPost{clust_i});        
         %roiCounter = 1;r
         for roi_i = 1:length(nRois)
             %if nFlights{clust_i} > 0
@@ -268,7 +268,7 @@ for day_i = 1:length(nDays) %for each day
     end
     cd(dirTop(1).folder);
     disp(num2str(day_i))
-    clear 
+    clear vidData;
 end
 
 
