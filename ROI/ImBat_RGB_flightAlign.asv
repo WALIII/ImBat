@@ -80,7 +80,7 @@ if fullSeshTag == 0
         IM1_filt=IM1doub./(bground1+1);
         IM2_filt=IM2doub./(bground2+5);
         IM3_filt=IM3doub./(bground3+5);
-        IMcat = [IM1_raw IM2_raw IM3_raw];
+        IMcat = [IM1_filt IM2_filt IM3_filt];
         IMcat_gray = mat2gray(IMcat);
         IM1 = IMcat_gray(:,1:size(IMcat_gray,2)/3);
         IM2 = IMcat_gray(:,(size(IMcat_gray,2)/3)+1:2*size(IMcat_gray,2)/3);
