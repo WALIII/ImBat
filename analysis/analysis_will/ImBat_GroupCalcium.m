@@ -1,45 +1,72 @@
-function [CombinedROI] = ImBat_GroupCalcium(ROI_Data,CellReg2);            % Calcium Imaging Data
+function [CombinedROI] = ImBat_GroupCalcium(ROI_Data,cell_registered_struct,aligned_data_struct);            % Calcium Imaging Data
+% Combine all ROI data to a dsingle timeseries
 
-cell_registered_struct = CellReg2
+% WAL3
+% d10/21/2020
 
+
+plotting = 0;
+
+% make sure the data is sorted...
+for i = 1:size(aligned_data_struct.file_names,2)
+    G(i) = str2num(aligned_data_struct.file_names{i}(end-9:end-4));
+end
+[G1, ord] = sort(G);
+
+
+cell_registered_struct.cell_to_index_map = cell_registered_struct.cell_to_index_map(:,ord);
+cell_registered_struct.spatial_footprints_corrected = cell_registered_struct.spatial_footprints_corrected(ord);
 INDEX = cell_registered_struct.cell_to_index_map;
 
 clear roi_combined temp_C_raw new_C_raw
 
 for i = 1: size(ROI_Data,2); % for all days
+    % Timestamp alignment first
     
+    % ROI alignment next
     for ID = 1:size(cell_registered_struct.cell_to_index_map,1) % for all ROIs
-        
         if i ==1 % if the first day
             if INDEX(ID,i) ==0; % if cell was not detected, pad with zeros
                 new_C_raw(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.C_raw(1,:)));
-%                 new_C(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.C(1,:)));
-%                 new_S(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.C(1,:)));
-%                 new_timestamps(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.C_raw(1,:)));
-
+                new_C(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.C(1,:)));
+                new_S(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.S(1,:)));
             else
                 new_C_raw(ID,:) = ROI_Data{i}.ROIs.results.C_raw(INDEX(ID,i),:);
+                new_C(ID,:) = ROI_Data{i}.ROIs.results.C(INDEX(ID,i),:);
+                new_S(ID,:) = ROI_Data{i}.ROIs.results.S(INDEX(ID,i),:);
             end
-            
         else % concat if not the first day
-            
             if INDEX(ID,i) ==0; % if cell was not detected, pad with zeros
                 temp_C_raw(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.C_raw(1,:)));
+                temp_C(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.C(1,:)));
+                temp_S(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.S(1,:)));
+
             else
                 temp_C_raw(ID,:) = ROI_Data{i}.ROIs.results.C_raw(INDEX(ID,i),:);
+                temp_C(ID,:) = ROI_Data{i}.ROIs.results.C(INDEX(ID,i),:);
+                temp_S(ID,:) = ROI_Data{i}.ROIs.results.S(INDEX(ID,i),:);
+
             end
         end
-      end
-      
-        
-        if  i ==1
-            new_C_raw = new_C_raw;
-        else
-            
-            new_C_raw = cat(2,new_C_raw,temp_C_raw);
-            clear temp_C_raw
-        end
-        
+    end
+    
+    if  i ==1
+        new_C_raw = new_C_raw;
+        new_C = new_C;
+        new_S = new_S;
+        new_timestamps = ROI_Data{i}.Alignment.out.video_times; % align timestamps
+    else
+        % ROI Alignemnt
+        new_C_raw = cat(2,new_C_raw,temp_C_raw);
+        new_C = cat(2,new_C,temp_C);
+        new_S = cat(2,new_S,temp_S);
+
+        % Timestamp Alignmnet
+        temp_new_timestamps = ROI_Data{i}.Alignment.out.video_times; % align timestamps
+        new_timestamps = cat(1,new_timestamps,temp_new_timestamps);
+        clear temp_C_raw temp_new_timestamps temp_C temp_S
+    end
+    
 end
 
 
@@ -47,7 +74,7 @@ end
 
 %% A MATRIX of ROI Masks
 clear ROI ROI_temp ROI_all RGBim2 ROI2plot RGBim
-resize_factor = 4; 
+resize_factor = 4;
 % now, Plot a projection for all 'unique' ROIs on this interval:
 for ID = 1:size(cell_registered_struct.cell_to_index_map,1) % for all ROIs
     for i = 1: size(ROI_Data,2); % for all days
@@ -57,8 +84,8 @@ for ID = 1:size(cell_registered_struct.cell_to_index_map,1) % for all ROIs
             ROI_temp(:,:,i) = imresize(squeeze(cell_registered_struct.spatial_footprints_corrected{i}(INDEX(ID,i),:,:)),resize_factor);
         end
     end
-  %  figure(); for i = 1: 5; subplot(1,5,i); imagesc(squeeze(ROI_temp(:,:,i))); end
-
+    %  figure(); for i = 1: 5; subplot(1,5,i); imagesc(squeeze(ROI_temp(:,:,i))); end
+    
     ROI_all{ID} = ROI_temp;
     ROI(:,:,ID) = mat2gray(squeeze(mean(ROI_temp,3)));
 end
@@ -97,23 +124,29 @@ title('All Unique ROIs');
 
 % Plot to look for artifacts:
 
- 
-figure(); 
-for i = 1:80;
-hold on;
-for ii=1:5;
-subplot(2,5,ii)
- imagesc(squeeze(ROI_all{i}(:,:,ii)));
+if plotting ==1;
+figure();
+for i = 1:size(ROI2plot,3);
+    hold on;
+    for ii=1:size(ROI_Data,2);
+        subplot(2,size(ROI_Data,2),ii)
+        imagesc(squeeze(ROI_all{i}(:,:,ii)));
+    end
+    subplot(2,size(ROI_Data,2),size(ROI_Data,2)+1:size(ROI_Data,2)*2)
+    plot(smooth(new_C_raw(i,:),30)); ylim([-4 20]);
+    pause();
+    clf('reset');
+    
 end
-subplot(2,5,6:10)
-plot(smooth(new_C_raw(i,:),30)); ylim([-4 20]); 
-pause(); 
-clf('reset');
-
 end
 
 
 
+% Save 
+CombinedROI.C_raw =  new_C_raw;
+CombinedROI.C = new_C;
+CombinedROI.S = new_S;
+CombinedROI.timestamps = new_timestamps;
 
 
 
@@ -121,24 +154,4 @@ end
 
 
 
-% 
-% % Group Unique ROI data together across days, based on 
-% 
-% for i = 1: size(ROI_Data,2)
-% 
-% if i ==1;
-% A = 
-% C = 
-% C_r = 
-% S = 
-% 
-% else
-% 
-% A = 
-% C = 
-% C_r = 
-% S = 
-% 
-% 
-
-
+%
