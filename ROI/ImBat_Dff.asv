@@ -6,8 +6,8 @@ sessionType = [];
 loadFlag = 0;
 % ImBat_Dff
 scaling = 10;
-minLimMult = 0; %0 5 min limit multiplier for max projections
-maxLimMult = 0.45; %32 20 max limit multiplier for max projections
+minLimMult = 1; %0 5 min limit multiplier for max projections
+maxLimMult = 0.7; %32 20 max limit multiplier for max projections
 %filt_rad = 10;
 %filt_alpha = 2;
     gSig = 1; 
