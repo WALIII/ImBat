@@ -15,7 +15,7 @@ if saveFlag == 1
 end
 
 if strcmp(batId,'Gal')
-    nDays = [1:4]; %which days to look at
+    nDays = [1:9]; %which days to look at
     nRois = [1:15];
 elseif strcmp(batId,'Gen')
     nDays = [1:5];
