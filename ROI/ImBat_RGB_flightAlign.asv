@@ -1,6 +1,5 @@
 function ImBat_RGB_flightAlign(batId,fullSeshTag,day1,day2,day3)
-%batId = 'Gal';
-%fullSeshTag = 1, chooses to look at whole session for 3 day comparison
+
 clustNum = 2;
 saveFlag = 0;
 saveTag = 'clust2';

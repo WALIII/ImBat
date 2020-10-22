@@ -1,5 +1,5 @@
 clustNum = 2;
-saveFlag = 0;
+saveFlag = 1;
 saveTag = ['cRaw_smooth'];
 if saveFlag == 1
     saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
