@@ -22,7 +22,7 @@ dirTop = vertcat(g,z); %find all folders in top quality directory
 %ROI_duplicate = cell(length(dirTop),1); %make cell for indices of duplicated ROIS
 
 %plot_ROI_refined = figure('units','normalized','outerposition',[0 0 0.9 0.9]);
-for day_i = length(dirTop)-2:length(dirTop)
+for day_i = 1:length(dirTop)
     
     try %extract metadata names and enter processed folder
         cd([dirTop(day_i).name filesep 'extracted']);
