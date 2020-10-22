@@ -2,7 +2,7 @@ function [activity_allTrials,flightAligned_vidData] = ImBat_extract_activity_all
 plotFlag = 0;
 saveFlag = 1; %do you want to save the figures and output structure?
 cRaw = 0;
-saveTag = 'allTrials_sMat_large_1to4';
+saveTag = 'allTrials_sMat_newDff';
 if saveFlag == 1
     saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
     % Check if folder exists
@@ -89,11 +89,11 @@ for day_i = 1:length(nDays) %for each day
         cd(dirProcessed(end).name);
     end
     load('results.mat'); %load cellData
-    vidData = load('Motion_corrected_Data.mat'); %load video frame data
+    vidData = load('Motion_corrected_Data_DS.mat'); %load video frame data
     %make gaussian filter based on dff function for spatial filtering
     gSig = 1;
     gSiz = 4.5*gSig;
-    scaling = 1; %scale up the ymax to make less pixelated
+    scaling = 10; %scale up the ymax to make less pixelated
     psf = fspecial('gaussian', round(2*gSiz), gSig);
     ind_nonzero = (psf(:)>=max(psf(:,1)));
     psf = psf-mean(psf(ind_nonzero));
