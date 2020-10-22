@@ -6,7 +6,7 @@ saveFlag = 0;
 saveTag = 'clust2';
 gSig = 1;
 gSiz = 4.5*gSig;
-h = fspecial('disk',35);
+h = fspecial('disk',30);
 psf = fspecial('gaussian', round(2*gSiz), gSig);
 ind_nonzero = (psf(:)>=max(psf(:,1)));
 psf = psf-mean(psf(ind_nonzero));
@@ -77,21 +77,20 @@ if fullSeshTag == 0
         IM1_raw = activity_allTrials.maxMeanFrames_dur{clustNum}{day1};%mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day1});
         IM2_raw = activity_allTrials.maxMeanFrames_dur{clustNum}{day2};%mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day2});
         IM3_raw = activity_allTrials.maxMeanFrames_dur{clustNum}{day3};%mat2gray(activity_allTrials.maxMeanFrames_dur{clustNum}{day3});
-        IM1doub = imresize(double(IM1_raw),1);
-        IM2doub = imresize(double(IM2_raw),1);
-        IM3doub = imresize(double(IM3_raw),1);
-        bground1=imfilter(IM1doub,h,'replicate');%smoothdata(IM1doub,'gaussian',2);%
-        bground2=imfilter(IM2doub,h,'replicate');%smoothdata(IM2doub,'gaussian',2);%
-        bground3=imfilter(IM3doub,h,'replicate');%smoothdata(IM3doub,'gaussian',2);%
-        IM1_filt=IM1doub./(bground1+5);
-        IM2_filt=IM2doub./(bground2+5);
-        IM3_filt=IM3doub./(bground3+5);
-        IMcat = [IM1_filt IM2_filt IM3_filt];
+        IMcat = [IM1_raw IM2_raw IM3_raw];
         IMcat_gray = mat2gray(IMcat);
-        IM1 = IMcat_gray(:,1:size(IMcat_gray,2)/3);
-        IM2 = IMcat_gray(:,(size(IMcat_gray,2)/3)+1:2*size(IMcat_gray,2)/3);
-        IM3 = IMcat_gray(:,(2*size(IMcat_gray,2)/3)+1:end);
-        
+        IM1preFilt = IMcat_gray(:,1:size(IMcat_gray,2)/3);
+        IM2preFilt = IMcat_gray(:,(size(IMcat_gray,2)/3)+1:2*size(IMcat_gray,2)/3);
+        IM3preFilt = IMcat_gray(:,(2*size(IMcat_gray,2)/3)+1:end);
+        IM1doub = imresize(double(IM1preFilt),1);
+        IM2doub = imresize(double(IM2preFilt),1);
+        IM3doub = imresize(double(IM3preFilt),1);
+        bground1=smoothdata(IM1doub,'gaussian',2);%imfilter(IM1doub,h);
+        bground2=smoothdata(IM2doub,'gaussian',2);%imfilter(IM2doub,h);
+        bground3=smoothdata(IM3doub,'gaussian',2);%imfilter(IM3doub,h);
+        IM1=IM1doub./(bground1+1);
+        IM2=IM2doub./(bground2+1);
+        IM3=IM3doub./(bground3+1);
 %         test=imresize(double(IM1preFilt),1);
 %         x = [1 5 10 15 20 25];
 %         % Plot

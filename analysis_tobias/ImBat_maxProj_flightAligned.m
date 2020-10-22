@@ -1,7 +1,7 @@
 batId = 'Gen';
 clustNum = 3;
 saveFlag = 1;
-saveTag = 'sMat_vel_clust3';
+saveTag = 'sMat';
 %load first day placeCellStableROI data
 if strcmp(batId,'Gal')
     %cd([dirTop(day1).folder filesep 'plots\200911-preDurPost cells across days']);

@@ -3,7 +3,7 @@ days = 3;
 
 
 % Make sure you take the median for the input matrixes..
-HL = [0.20 .80];
+HL = [0.05 0.4];%[0.05 .4];
 T = 1:size(GG1,2);
 F = 1:size(GG1,1);
 movie = 0;
@@ -29,12 +29,12 @@ Hlim = HL(2);
 % im1(:,:,:,2)=  (GG2 - min(GG2(:))) / (max(GG2(:)) - min(GG2(:)));
 % im1(:,:,:,3)=  (GG3 - min(GG3(:))) / (max(GG3(:)) - min(GG3(:)));
 
-im1(:,:,:,1)=  mat2gray(GG1);
-im1(:,:,:,2)=  mat2gray(GG2);
+im1(:,:,:,1)=  GG1;%mat2gray(GG1);
+im1(:,:,:,2)=  GG2;%mat2gray(GG2);
 if isempty(GG3)
-    im1(:,:,:,3)=  mat2gray(GG2);
+    im1(:,:,:,3)=  GG2;%mat2gray(GG2);
 else
-    im1(:,:,:,3)=  mat2gray(GG3);    
+    im1(:,:,:,3)=  GG3;%mat2gray(GG3);    
 end
 
 % Mean subtracted/Normalized
