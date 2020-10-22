@@ -9,7 +9,7 @@ h = fspecial('disk',30);
 %load first day placeCellStableROI data
 if strcmp(batId,'Gal')
     %cd([dirTop(day1).folder filesep 'plots\200911-preDurPost cells across days']);
-    load('Gal_200311to200324_activity_allTrials_allClusts_sMat_newDff.mat'); %load activity for pre,dur,post
+    load('Gal_200311to200324_activity_allTrials_allClusts_allTrials_sMat_newDff_newOrder_1to3.mat'); %load activity for pre,dur,post
 elseif strcmp(batId,'Gen')
     load('Gen_200319to200324_activity_allTrials_allClusts_sMat_newDff.mat'); %load activity for pre,dur,post
 end
@@ -77,7 +77,7 @@ if fullSeshTag == 0
         bground1=imfilter(IM1doub,h,'replicate');%smoothdata(IM1doub,'gaussian',2);%
         bground2=imfilter(IM2doub,h,'replicate');%smoothdata(IM2doub,'gaussian',2);%
         bground3=imfilter(IM3doub,h,'replicate');%smoothdata(IM3doub,'gaussian',2);%
-        IM1_filt=IM1doub./(bground1+1);
+        IM1_filt=IM1doub./(bground1+5);
         IM2_filt=IM2doub./(bground2+5);
         IM3_filt=IM3doub./(bground3+5);
         IMcat = [IM1_filt IM2_filt IM3_filt];
@@ -122,8 +122,16 @@ elseif fullSeshTag == 1
     IM1_raw = activity_allTrials.YmaxFull{day1};
     IM2_raw = activity_allTrials.YmaxFull{day2};
     IM3_raw = activity_allTrials.YmaxFull{day3};
-    IMcat = [IM1_raw IM2_raw IM3_raw];
-    IMcat_gray = mat2gray(IMcat);
+        IM1doub = imresize(double(IM1_raw),1);
+        IM2doub = imresize(double(IM2_raw),1);
+        IM3doub = imresize(double(IM3_raw),1);
+        bground1=imfilter(IM1doub,h,'replicate');%smoothdata(IM1doub,'gaussian',2);%
+        bground2=imfilter(IM2doub,h,'replicate');%smoothdata(IM2doub,'gaussian',2);%
+        bground3=imfilter(IM3doub,h,'replicate');%smoothdata(IM3doub,'gaussian',2);%
+        IM1_filt=IM1doub./(bground1+5);
+        IM2_filt=IM2doub./(bground2+5);
+        IM3_filt=IM3doub./(bground3+5);
+        IMcat = [IM1_filt IM2_filt IM3_filt];    IMcat_gray = mat2gray(IMcat);
     IM1 = IMcat_gray(:,1:size(IMcat_gray,2)/3);
     IM2 = IMcat_gray(:,(size(IMcat_gray,2)/3)+1:2*size(IMcat_gray,2)/3);
     IM3 = IMcat_gray(:,(2*size(IMcat_gray,2)/3)+1:end);

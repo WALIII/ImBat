@@ -2,7 +2,7 @@ function [activity_allTrials,flightAligned_vidData] = ImBat_extract_activity_all
 plotFlag = 0;
 saveFlag = 1; %do you want to save the figures and output structure?
 cRaw = 0;
-saveTag = 'allTrials_sMat_newDff';
+saveTag = 'allTrials_sMat_newDff_newOrder';
 if saveFlag == 1
     saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
     % Check if folder exists
@@ -101,7 +101,7 @@ for day_i = 1:length(nDays) %for each day
     %   % Take median, filter, and max of full movie
     Y_med = median(vidData.Y,3);
     Y_min = min(vidData.Y,3);
-    Ydff = vidData.Y - Y_min; %subtract min
+    Ydff = vidData.Y - Y_med; %subtract min
     Ydff_tFilt = medfilt3(Ydff); %temporal filtering
     Ydff_filt = imfilter(Ydff_tFilt,psf,'symmetric'); %spatial filtering
     YmaxFull{day_i} = max(Ydff_filt,[],3); %take max
@@ -149,7 +149,7 @@ for day_i = 1:length(nDays) %for each day
             vel_pre{clust_i}{day_i} = NaN(1,4000);
             vel_dur{clust_i}{day_i} = NaN(1,4000);
             vel_post{clust_i}{day_i} = NaN(1,4000);
-            XY_dur{clust_i}{day_i} = NaN(1,2,4000);
+            XY_dur{clust_i}{day_i} = NaN(1,3,4000);
             framesRaw_pre{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
             framesRaw_dur{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
             framesRaw_post{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
@@ -172,7 +172,7 @@ for day_i = 1:length(nDays) %for each day
         vel_pre{clust_i}{day_i} = zeros(nFlights{clust_i},lenBehavPre{clust_i});
         vel_dur{clust_i}{day_i} = zeros(nFlights{clust_i},lenBehavDur{clust_i});
         vel_post{clust_i}{day_i} = zeros(nFlights{clust_i},lenBehavPost{clust_i});
-        XY_dur{clust_i}{day_i} = zeros(nFlights{clust_i},2,lenBehavDur{clust_i});
+        XY_dur{clust_i}{day_i} = zeros(nFlights{clust_i},3,lenBehavDur{clust_i});
         framesRaw_pre{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPre{clust_i});
         framesRaw_dur{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenFlight{clust_i});
         framesRaw_post{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPost{clust_i});
@@ -220,30 +220,30 @@ for day_i = 1:length(nDays) %for each day
         for flight_i = 1:nFlights{clust_i}
             %build matrices with the imaging raw frames for flight-aligned max projections
             %cut out raw data, subtract min, temporal and spatial filtering
-            framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:) = vidData.Y(:,:,sData.startIdxTrace{clust_i}(flight_i)-sData.preFlightPadCalcium:sData.startIdxTrace{clust_i}(flight_i));
-            Y_minPre = min(framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:),4);
-            framesDff_pre = framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:) - Y_minPre;
+            framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:) = Ydff(:,:,sData.startIdxTrace{clust_i}(flight_i)-sData.preFlightPadCalcium:sData.startIdxTrace{clust_i}(flight_i));
+            %Y_minPre = min(framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:),4);
+            framesDff_pre = framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:);% - Y_minPre;
             framesDff_pre = squeeze(framesDff_pre);
             framesTFilt_pre = medfilt3(framesDff_pre);
             framesFilt_pre{clust_i}{day_i}(flight_i,:,:,:) = imfilter(framesTFilt_pre,psf,'symmetric');
             try
-                framesRaw_dur{clust_i}{day_i}(flight_i,:,:,:) = vidData.Y(:,:,sData.startIdxTrace{clust_i}(flight_i)-prePad:...
+                framesRaw_dur{clust_i}{day_i}(flight_i,:,:,:) = Ydff(:,:,sData.startIdxTrace{clust_i}(flight_i)-prePad:...
                     sData.endIdxTrace{clust_i}(flight_i) + (sData.medDur{clust_i}-sData.dur{clust_i}(flight_i))+ postPad);
-                framesRaw_post{clust_i}{day_i}(flight_i,:,:,:) = vidData.Y(:,:,sData.endIdxTrace{clust_i}(flight_i):sData.endIdxTrace{clust_i}(flight_i)+sData.postFlightPadCalcium);
+                framesRaw_post{clust_i}{day_i}(flight_i,:,:,:) = Ydff(:,:,sData.endIdxTrace{clust_i}(flight_i):sData.endIdxTrace{clust_i}(flight_i)+sData.postFlightPadCalcium);
             catch
-                framesRaw_dur{clust_i}{day_i}(flight_i,:,:,1:length(vidData.Y(:,:,sData.startIdxTrace{clust_i}(flight_i)-prePad:end)))...
-                    = vidData.Y(:,:,sData.startIdxTrace{clust_i}(flight_i)-prePad:end);
-                framesRaw_post{clust_i}{day_i}(flight_i,:,:,1:length(vidData.Y(:,:,sData.endIdxTrace{clust_i}(flight_i):end)))...
-                    = vidData.Y(:,:,sData.endIdxTrace{clust_i}(flight_i):end);
+                framesRaw_dur{clust_i}{day_i}(flight_i,:,:,1:length(Ydff(:,:,sData.startIdxTrace{clust_i}(flight_i)-prePad:end)))...
+                    = Ydff(:,:,sData.startIdxTrace{clust_i}(flight_i)-prePad:end);
+                framesRaw_post{clust_i}{day_i}(flight_i,:,:,1:length(Ydff(:,:,sData.endIdxTrace{clust_i}(flight_i):end)))...
+                    = Ydff(:,:,sData.endIdxTrace{clust_i}(flight_i):end);
             end
             %cut out raw data, subtract min, temporal and spatial filtering
-            Y_minDur = min(framesRaw_dur{clust_i}{day_i}(flight_i,:,:,:),3);
-            framesDff_dur = framesRaw_dur{clust_i}{day_i}(flight_i,:,:,:) - Y_minDur;
+            %Y_minDur = min(framesRaw_dur{clust_i}{day_i}(flight_i,:,:,:),3);
+            framesDff_dur = framesRaw_dur{clust_i}{day_i}(flight_i,:,:,:);% - Y_minDur;
             framesDff_dur = squeeze(framesDff_dur);
             framesTFilt_dur = medfilt3(squeeze(framesDff_dur));
             framesFilt_dur{clust_i}{day_i}(flight_i,:,:,:) = imfilter(framesTFilt_dur,psf,'symmetric');
-            Y_minPost = min(framesRaw_post{clust_i}{day_i}(flight_i,:,:,:),3);
-            framesDff_post = framesRaw_post{clust_i}{day_i}(flight_i,:,:,:) - Y_minPost;
+            %Y_minPost = min(framesRaw_post{clust_i}{day_i}(flight_i,:,:,:),3);
+            framesDff_post = framesRaw_post{clust_i}{day_i}(flight_i,:,:,:);% - Y_minPost;
             framesDff_post = squeeze(framesDff_post);
             framesTFilt_post = medfilt3(squeeze(framesDff_post));
             framesFilt_post{clust_i}{day_i}(flight_i,:,:,:) = imfilter(framesTFilt_post,psf,'symmetric');
@@ -255,6 +255,7 @@ for day_i = 1:length(nDays) %for each day
                 vel_post{clust_i}{day_i}(flight_i,:) = sData.smoothSpeedRawPost{clust_i}(flight_i,:);
                 XY_dur{clust_i}{day_i}(flight_i,1,:) = sData.posFlight{clust_i}(flight_i,1,:); %flightPaths.pos(1,:,flightPaths.clusterIndex{clust_i}(flight_i));
                 XY_dur{clust_i}{day_i}(flight_i,2,:) = sData.posFlight{clust_i}(flight_i,2,:);            %flightPaths.pos(2,:,flightPaths.clusterIndex{clust_i}(flight_i));
+                XY_dur{clust_i}{day_i}(flight_i,3,:) = sData.posFlight{clust_i}(flight_i,3,:);
             end
         end
         %take average across all trials to get 'average' flight activity
@@ -293,13 +294,13 @@ activity_allTrials.YmaxFull = YmaxFull;
 
 %flightAligned_vidData.frames_pre = frames_pre;
 flightAligned_vidData.framesRaw_dur = framesRaw_dur;
-flightAligned_vidData.framesFilt_dur = framesFilt_dur;
+%flightAligned_vidData.framesFilt_dur = framesFilt_dur;
 %flightAligned_vidData.frames_post = frames_post;
 
 if saveFlag == 1
     if strcmp(batId,'Gal')
-        save([saveDir 'Gal_200311to200320_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials');
-        save([saveDir 'Gal_200311to200320_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
+        save([saveDir 'Gal_200311to200324_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials');
+        save([saveDir 'Gal_200311to200324_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
     elseif strcmp(batId,'Gen')
         save([saveDir 'Gen_200319to200324_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials');
         save([saveDir 'Gen_200319to200324_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');

@@ -3,7 +3,7 @@ days = 3;
 
 
 % Make sure you take the median for the input matrixes..
-HL = [0.05 1];%[0.05 .4];
+HL = [0.05 0.6];%[0.05 .4];
 T = 1:size(GG1,2);
 F = 1:size(GG1,1);
 movie = 0;
