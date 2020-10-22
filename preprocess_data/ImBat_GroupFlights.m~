@@ -1,9 +1,6 @@
-function flightPaths = ImBat_GroupFlights(ROI_Data,varargin);
-% Group flights across days, now w/ Angelo's function
-% updated 10/20/2020
+function out = ImBat_GroupFlights(ROI_Data,varargin);
 
-% WAL3
-
+clear allFlightTime allFlights
 
 do_mtf =0;
 % Manual inputs
@@ -44,7 +41,6 @@ for i = 1: size(ROI_Data,2);
     if i ==1;
         AllFlights = A;
         AllFlightsTime = B;
-        AllFlightsMasterTime = B; % accumulating time as an index
         DayIndex = C;
     else
         AllFlightsTemp = A;
@@ -52,8 +48,6 @@ for i = 1: size(ROI_Data,2);
         DayIndexTemp = C;
         AllFlights = cat(1, AllFlights, AllFlightsTemp);
         AllFlightsTime = cat(1, AllFlightsTime, AllFlightsTimeTemp);
-        AllFlightsMasterTime = cat(1, AllFlightsMasterTime, AllFlightsTimeTemp+max(AllFlightsMasterTime));
-
         DayIndex = cat(1,DayIndex,DayIndexTemp);
         
     end
@@ -69,11 +63,9 @@ colorbar;
 
 %[out] =  ImBat_SegTrajectories(AllFlights,AllFlightsTime,'nclusters',8,'day_index',DayIndex);
 Fs = ROI_Data{1, 1}.ROIs.results.metadata.cnmfe.Fs; 
-[flightPaths] = ImBat_flightsAngelo(AllFlights,AllFlightsTime,'fs',Fs,'n_splines',6,'dist',1,'day_index',DayIndex);
+[flightPaths] = ImBat_flightsAngelo(AllFlights,AllFlightsTime,'fs',Fs,'n_splines',6,'dist',4,'day_index',DayIndex);
 
-flightPaths.AllFlights = AllFlights;
-flightPaths.AllFlightsTime = AllFlightsTime;
-flightPaths.AllFlightsMasterTime = AllFlightsMasterTime;
+
 
 % Plot all flight occurances:
 
