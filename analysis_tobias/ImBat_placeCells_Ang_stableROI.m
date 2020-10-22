@@ -26,8 +26,8 @@ elseif strcmp(batId,'Gen')
 ROIs_manual = [NaN NaN 10 3 16 12 17 18 27 29 8 9 NaN NaN 21 11 31 15 20 25;
     8 17 5 1 2 6 21 10 18 31 NaN 11 51 53 28 4 38 19 23 20;
     50 54 12 3 48 18 27 15 31 34 NaN NaN 28 NaN 29 25 24 22 38 14;
-    8 NaN 4 28 3 18 10 35 42 25 13 NaN 50 39 46 NaN 49 2 32 26;
-    14 NaN 3 28 2 6 33 26 18 45 NaN NaN 25 NaN 32 NaN 37 8 28 11];
+    9 NaN 7 31 2 22 NaN 20 40 25 13 NaN 34 NaN 26 NaN 45 3 24 21;
+    10 36 3 11 2 NaN 21 18 20 9 33 NaN NaN NaN 17 NaN 22 7 30 26]; %14 NaN 3 28 2 6 33 26 18 45 NaN NaN 25 NaN 32 NaN 37 8 28 11
 g = dir('Ge*');
 end
  % P_value calculation params
