@@ -1,10 +1,12 @@
-function flightPaths = ImBat_GroupFlights(ROI_Data,varargin);
+function [flightPaths] = ImBat_GroupFlights(ROI_Data,varargin);
 % Group flights across days, now w/ Angelo's function
 % updated 10/20/2020
 
 % WAL3
 
-
+dist_met = 1.5; %1.2
+disp(['WARNING: distance metric set to: ', num2str(dist_met), ' default is 1.2']);
+pause(2);
 do_mtf =0;
 % Manual inputs
 vin=varargin;
@@ -41,6 +43,17 @@ for i = 1: size(ROI_Data,2);
     C = ones(size(B))*i;
     plot3(A(:,1),A(:,2),A(:,3),'Color',col(i,:));
     
+    D = ROI_Data{1, i}.Alignment.out.video_times(1:end-1); % align timestamps
+% trim the end, otherwise the flights will be longer or shorter than the
+% calcium..
+if max(D)>max(B); disp('adding extra timepoint to flight data');
+A = cat(1,A,A(end,:));
+B = cat(1,B,max(D));
+else
+disp('WARNING, Calcium is shorter than flights');
+
+end
+
     if i ==1;
         AllFlights = A;
         AllFlightsTime = B;
@@ -69,7 +82,7 @@ colorbar;
 
 %[out] =  ImBat_SegTrajectories(AllFlights,AllFlightsTime,'nclusters',8,'day_index',DayIndex);
 Fs = ROI_Data{1, 1}.ROIs.results.metadata.cnmfe.Fs; 
-[flightPaths] = ImBat_flightsAngelo(AllFlights,AllFlightsTime,'fs',Fs,'n_splines',6,'dist',1,'day_index',DayIndex);
+[flightPaths] = ImBat_flightsAngelo(AllFlights,AllFlightsTime,'fs',Fs,'n_splines',6,'dist',dist_met,'day_index',DayIndex);
 
 flightPaths.AllFlights = AllFlights;
 flightPaths.AllFlightsTime = AllFlightsTime;

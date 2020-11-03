@@ -5,6 +5,7 @@ function [CombinedROI] = ImBat_GroupCalcium(ROI_Data,cell_registered_struct,alig
 % d10/21/2020
 
 
+
 plotting = 0;
 
 % make sure the data is sorted...
@@ -13,6 +14,9 @@ for i = 1:size(aligned_data_struct.file_names,2)
 end
 [G1, ord] = sort(G);
 
+for i = 1:size(cell_registered_struct.p_same_registered_pairs,1)
+ CombinedROI.p_same_registered_pairs{i} = cell_registered_struct.p_same_registered_pairs{i}(ord,ord);
+end
 
 cell_registered_struct.cell_to_index_map = cell_registered_struct.cell_to_index_map(:,ord);
 cell_registered_struct.spatial_footprints_corrected = cell_registered_struct.spatial_footprints_corrected(ord);
@@ -40,12 +44,12 @@ for i = 1: size(ROI_Data,2); % for all days
                 temp_C_raw(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.C_raw(1,:)));
                 temp_C(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.C(1,:)));
                 temp_S(ID,:) = zeros(size(ROI_Data{i}.ROIs.results.S(1,:)));
-
+                
             else
                 temp_C_raw(ID,:) = ROI_Data{i}.ROIs.results.C_raw(INDEX(ID,i),:);
                 temp_C(ID,:) = ROI_Data{i}.ROIs.results.C(INDEX(ID,i),:);
                 temp_S(ID,:) = ROI_Data{i}.ROIs.results.S(INDEX(ID,i),:);
-
+                
             end
         end
     end
@@ -54,17 +58,24 @@ for i = 1: size(ROI_Data,2); % for all days
         new_C_raw = new_C_raw;
         new_C = new_C;
         new_S = new_S;
-        new_timestamps = ROI_Data{i}.Alignment.out.video_times; % align timestamps
+        new_timestamps = ROI_Data{i}.Alignment.out.video_times(1:size(new_S,2)); % align timestamps
+        day_vector = ones(size(new_S,2),1); % align timestamps
+
     else
+        
+        % Timestamp Alignmnet
+        temp_new_timestamps = ROI_Data{i}.Alignment.out.video_times(1:size(temp_S,2)); % align timestamps
+        new_timestamps = cat(1,new_timestamps,temp_new_timestamps+max(new_timestamps));
+        temp_day_vector = ones(size(temp_S,2),1)+(i-1);
+        day_vector = cat(1,day_vector,temp_day_vector);
+
         % ROI Alignemnt
         new_C_raw = cat(2,new_C_raw,temp_C_raw);
         new_C = cat(2,new_C,temp_C);
         new_S = cat(2,new_S,temp_S);
-
-        % Timestamp Alignmnet
-        temp_new_timestamps = ROI_Data{i}.Alignment.out.video_times; % align timestamps
-        new_timestamps = cat(1,new_timestamps,temp_new_timestamps);
         clear temp_C_raw temp_new_timestamps temp_C temp_S
+        
+        
     end
     
 end
@@ -125,28 +136,32 @@ title('All Unique ROIs');
 % Plot to look for artifacts:
 
 if plotting ==1;
-figure();
-for i = 1:size(ROI2plot,3);
-    hold on;
-    for ii=1:size(ROI_Data,2);
-        subplot(2,size(ROI_Data,2),ii)
-        imagesc(squeeze(ROI_all{i}(:,:,ii)));
+    figure();
+    for i = 1:size(ROI2plot,3);
+        hold on;
+        for ii=1:size(ROI_Data,2);
+            subplot(2,size(ROI_Data,2),ii)
+            imagesc(squeeze(ROI_all{i}(:,:,ii)));
+        end
+        subplot(2,size(ROI_Data,2),size(ROI_Data,2)+1:size(ROI_Data,2)*2)
+        plot(smooth(new_C_raw(i,:),30)); ylim([-4 20]);
+        pause();
+        clf('reset');
+        
     end
-    subplot(2,size(ROI_Data,2),size(ROI_Data,2)+1:size(ROI_Data,2)*2)
-    plot(smooth(new_C_raw(i,:),30)); ylim([-4 20]);
-    pause();
-    clf('reset');
-    
-end
 end
 
 
 
-% Save 
+% Save
 CombinedROI.C_raw =  new_C_raw;
 CombinedROI.C = new_C;
-CombinedROI.S = new_S;
+CombinedROI.S = full(new_S);
 CombinedROI.timestamps = new_timestamps;
+CombinedROI.ROI_all = ROI_all;
+CombinedROI.ROI = ROI;
+CombinedROI.day_vector = day_vector;
+
 
 
 

@@ -15,27 +15,27 @@
 
 
 
+
+
+
 % Concatonate/Cluster data across days
 flightPaths = ImBat_GroupFlights(ROI_Data,'mtf',master_track_file);         % just the flights
 [CombinedROI] = ImBat_GroupCalcium(ROI_Data,cell_registered_struct,aligned_data_struct);
 
 
-% Bassics of loaded and aligned data;
-    % 1. Quality of ROI maps for each day, and across days
-    % 2. Quality of flight data for each day, and across days
-   
-ImBat_PlotBasics(ROI_Data,flightPaths,CombinedROI); % Under construction...
+% Bassics of loaded, alif data;
+    % 1. Quality of ROI maps
+    % 2. QUality of flight data
+    
+ImBat_PlotBasics(ROI_Data);
 
-%To DO: ImBat_PlotAdvanced % if ROIs are skipped, are they just not ID'd?
-
-
-
+% 
+clust2use = 2;
                 % SUBFUNCTION: ImBat_Align_FC(CombinedROI,flightPaths,clust2use);
 close all
 
 
 % Figure Making: 
-clust2use = 2; % seperate all functions by cluster: TO DO- add to batch...
 
 % Stability over days:
 ImBat_analysis_20201029(CombinedROI,flightPaths,clust2use)
