@@ -1,7 +1,14 @@
-function out = ImBat_GroupFlights(ROI_Data,varargin);
+function [flightPaths] = ImBat_GroupFlights(ROI_Data,varargin);
+% Group flights across days, now w/ Angelo's function
+% updated 10/20/2020
 
-clear allFlightTime allFlights
+% WAL3
 
+n_splines = 20;
+dist_met = 1; %1.2 % lower is more selective ( more clusters) 
+
+disp(['WARNING: distance metric set to: ', num2str(dist_met), ' default is 1.2']);
+pause(2);
 do_mtf =0;
 % Manual inputs
 vin=varargin;
@@ -20,9 +27,10 @@ if do_mtf ==1;
     for i = 1: size(ROI_Data,2);
         d = ROI_Data{i}.date(end-5:end);
         try
-            ROI_Data{1, i}.Alignment.out.flights = ImBat_Align_Tracking(ROI_Data{1, i}.Alignment.out.flights,MTF,d);
+            ROI_Data{1, i}.Alignment.out.flights = ImBat_Align_Tracking(ROI_Data{1, i}.Alignment.out.Flights_Repaired,MTF,d);
         catch
             disp([' no track data for ',d]);
+            ROI_Data{1, i}.Alignment.out.flights= ROI_Data{1, i}.Alignment.out.Flights_Repaired;
         end
     end
     disp('finished alignment');
@@ -38,9 +46,29 @@ for i = 1: size(ROI_Data,2);
     C = ones(size(B))*i;
     plot3(A(:,1),A(:,2),A(:,3),'Color',col(i,:));
     
+    D = ROI_Data{1, i}.Alignment.out.video_times(1:end-1); % align timestamps
+% trim the end, otherwise the flights will be longer or shorter than the
+% calcium..
+if max(D)>max(B); disp('adding extra timepoint to flight data');
+A = cat(1,A,A(end,:));
+B = cat(1,B,max(D));
+else
+disp(' Calcium is shorter than flights, trimming data'); % cut flight data down
+% find closest 
+[minValue_1,closestIndex_1] = min(abs(D(end)-B));
+% cut off trailing data
+A(closestIndex_1-1:end,:) = [];
+B(closestIndex_1-1:end,:) = [];
+A = cat(1,A,A(end,:));
+B = cat(1,B,max(D));
+
+% add closest timepoint
+end
+
     if i ==1;
         AllFlights = A;
         AllFlightsTime = B;
+        AllFlightsMasterTime = B; % accumulating time as an index
         DayIndex = C;
     else
         AllFlightsTemp = A;
@@ -48,6 +76,8 @@ for i = 1: size(ROI_Data,2);
         DayIndexTemp = C;
         AllFlights = cat(1, AllFlights, AllFlightsTemp);
         AllFlightsTime = cat(1, AllFlightsTime, AllFlightsTimeTemp);
+        AllFlightsMasterTime = cat(1, AllFlightsMasterTime, AllFlightsTimeTemp+max(AllFlightsMasterTime));
+
         DayIndex = cat(1,DayIndex,DayIndexTemp);
         
     end
@@ -61,11 +91,13 @@ colorbar;
 
 % Segregate flights:
 
-[out] =  ImBat_SegTrajectories(AllFlights,AllFlightsTime,'nclusters',10,'day_index',DayIndex);
+%[out] =  ImBat_SegTrajectories(AllFlights,AllFlightsTime,'nclusters',8,'day_index',DayIndex);
+Fs = ROI_Data{1, 1}.ROIs.results.metadata.cnmfe.Fs; 
+[flightPaths] = ImBat_flightsAngelo(AllFlights,AllFlightsTime,'fs',Fs,'n_splines',n_splines,'dist',dist_met,'day_index',DayIndex);
 
-
-
-
+flightPaths.AllFlights = AllFlights;
+flightPaths.AllFlightsTime = AllFlightsTime;
+flightPaths.AllFlightsMasterTime = AllFlightsMasterTime;
 
 % Plot all flight occurances:
 
@@ -74,15 +106,21 @@ colorbar;
 %     qq(i) = size(out.day(out.day ==i),1);
 % end
 
+flight_clust_size = size(flightPaths.clusterIndex,2);
+if flight_clust_size>9;
+    num2plot = 10;
+else 
+    num2plot = flight_clust_size;
+end
 figure();
 hold on;
-for i = 1:10
+for i = 1:num2plot
     temp = zeros(1,size(ROI_Data,2));
     ax(i) =  subplot(5,2,i);
-    h = histogram(out.day(out.ClusterIndex{i}),'BinMethod','integers');
+    h = histogram(flightPaths.day(flightPaths.clusterIndex{i}),'BinMethod','integers');
     temp(round(h.BinEdges(2:end)-1)) = h.BinCounts;
     
-    h2 = histogram(out.day,'BinMethod','integers');
+    h2 = histogram(flightPaths.day,'BinMethod','integers');
     temp2(round(h2.BinEdges(2:end)-1)) = h2.BinCounts;
     histDat(:,i) = temp; % flights of this type
     histDat2(:,1) = temp2; % all flights
@@ -90,7 +128,7 @@ for i = 1:10
 end
 linkaxes(ax, 'xy');
 
-hist2plot = 9;% top flights
+hist2plot = num2plot-1;% top flights
 colors = hsv(hist2plot+4);
 remains = histDat2 - sum(histDat(:,1:hist2plot)')'; % get remainder
 
