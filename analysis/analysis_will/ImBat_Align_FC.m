@@ -107,7 +107,7 @@ end
 %     pause();
 % end
 
-col = jet(90);
+col = jet(size(CutCells,1)+3);
 
 figure();
 CutCells_nan = CutCells;

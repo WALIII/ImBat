@@ -13,11 +13,17 @@
 % 3. cell_registered_struct
 % 4. aligned_data_struct
 
-
+% NOTE: this will load data subsets from ROI_Data depending on the CellRegistered mat file. 
 
 % Concatonate/Cluster data across days
+[CombinedROI,ROI_Data] = ImBat_GroupCalcium(ROI_Data,cell_registered_struct,aligned_data_struct);
+
+% repair z bat flight data:
+ROI_Data = ImBat_RepairFlightData(ROI_Data);
+
+% now, we have a restricted set for ROI_Data, now cluster the flights:
 flightPaths = ImBat_GroupFlights(ROI_Data,'mtf',master_track_file);         % just the flights
-[CombinedROI] = ImBat_GroupCalcium(ROI_Data,cell_registered_struct,aligned_data_struct);
+close all
 
 
 % Bassics of loaded and aligned data;
@@ -35,7 +41,7 @@ close all
 
 
 % Figure Making: 
-clust2use = 2; % seperate all functions by cluster: TO DO- add to batch...
+clust2use = 3; % seperate all functions by cluster: TO DO- add to batch...
 
 % Stability over days:
 ImBat_analysis_20201029(CombinedROI,flightPaths,clust2use)
@@ -45,5 +51,5 @@ ImBat_analysis_20201029(CombinedROI,flightPaths,clust2use)
 ImBat_analysis_10212020(flightPaths,ROI_Data,CombinedROI,clust2use);
 
 % STATs and tracking quality:
-ScoreMatrix = ImBat_analysis_10212026(flightPaths,ROI_Data,CombinedROI,4);
+ScoreMatrix = ImBat_analysis_10212026(flightPaths,ROI_Data,CombinedROI,2);
 ImBat_Tuning_Stability(ScoreMatrix); % migrate into this funciton 

@@ -28,21 +28,9 @@ end
 for i = 1:size(loc,2)
 ROI_Data2{i} = ROI_Data{loc(i)};
 end
-% ROI Data now needs to go back in extraction order...
-
-% find data in ROI_Data:
-counter = 1;
-for i = 1:size(ROI_Data2,2)
-G_backSort(i) = str2num(ROI_Data2{i}.date(3:end));
-end
-
-[G1, ord_R] = sort(G_backSort);
-for i = 1:size(ord_R,2);
-ROI_Data3{i} = ROI_Data2{ord_R(i)};
-end
-
-clear ROI_Data ROI_Data2;
-ROI_Data = ROI_Data3;
+% ROI Data 
+clear ROI_Data;
+ROI_Data = ROI_Data2;
 clear ROI_Data2;
 % [G1, ord] = sort(G);
 

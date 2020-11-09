@@ -19,7 +19,7 @@ A = flightPaths.tracjectoriesRaw*1000;
 for i = 1:sub2plot%max(flightPaths.day); % number of days
     subplot(1,sub2plot,i);
     start_time = stop_time;
-    stop_time = start_time+length(ROI_Data{i}.Alignment.out.flights(:,1))-1;
+    stop_time = start_time+length(ROI_Data{i}.Alignment.out.Flights_Repaired(:,1))-1;
     % plot all flights for one day:
     bound = start_time:stop_time;
     
@@ -31,7 +31,7 @@ for i = 1:sub2plot%max(flightPaths.day); % number of days
     dayFlights = flightPaths.day(flightPaths.clusterIndex{clst});
     todaysFlight = find(dayFlights==i);
     for ii = 1:size(todaysFlight,1)
-        plot3(squeeze(FlightAlignedROI.ClustFlight(:,1,todaysFlight(ii))),squeeze(FlightAlignedROI.ClustFlight(:,2,todaysFlight(ii))),squeeze(FlightAlignedROI.ClustFlight(:,3,todaysFlight(ii))),'LineWidth',2,'color','r')
+        plot3(squeeze(FlightAlignedROI.ClustFlight(1:FlightAlignedROI.ROI_OFF,1,todaysFlight(ii))),squeeze(FlightAlignedROI.ClustFlight(1:FlightAlignedROI.ROI_OFF,2,todaysFlight(ii))),squeeze(FlightAlignedROI.ClustFlight(1:FlightAlignedROI.ROI_OFF,3,todaysFlight(ii))),'LineWidth',2,'color','r')
     end
     grid on;
     view( -37.5000,30)
