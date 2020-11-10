@@ -2,7 +2,7 @@ function [activity_allTrials,flightAligned_vidData] = ImBat_extract_activity_all
 plotFlag = 0;
 saveFlag = 1; %do you want to save the figures and output structure?
 cRaw = 0;
-saveTag = 'allTrials_sMat_newDff_newOrder';
+saveTag = 'allTrials_sMat_newDff_newOrder_full_10to12';
 if saveFlag == 1
     saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
     % Check if folder exists
@@ -61,7 +61,7 @@ for clust_ii = 1:length(act_pre)
     act_dur{clust_ii} = cell(length(nDays),length(nRois));
 end
 
-for day_i = 1:length(nDays) %for each day
+for day_i = 10:12%length(nDays) %for each day
     %load results data
     try %extract metadata names and enter processed folder
         cd([dirTop(nDays(day_i)).name filesep 'extracted'])
@@ -89,11 +89,11 @@ for day_i = 1:length(nDays) %for each day
         cd(dirProcessed(end).name);
     end
     load('results.mat'); %load cellData
-    vidData = load('Motion_corrected_Data_DS.mat'); %load video frame data
+    vidData = load('Motion_corrected_Data.mat'); %load video frame data
     %make gaussian filter based on dff function for spatial filtering
     gSig = 1;
     gSiz = 4.5*gSig;
-    scaling = 10; %scale up the ymax to make less pixelated
+    scaling = 1; %scale up the ymax to make less pixelated
     psf = fspecial('gaussian', round(2*gSiz), gSig);
     ind_nonzero = (psf(:)>=max(psf(:,1)));
     psf = psf-mean(psf(ind_nonzero));
@@ -150,12 +150,12 @@ for day_i = 1:length(nDays) %for each day
             vel_dur{clust_i}{day_i} = NaN(1,4000);
             vel_post{clust_i}{day_i} = NaN(1,4000);
             XY_dur{clust_i}{day_i} = NaN(1,3,4000);
-            framesRaw_pre{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
+            %framesRaw_pre{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
             framesRaw_dur{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
-            framesRaw_post{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
-            framesFilt_pre{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
+            %framesRaw_post{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
+            %framesFilt_pre{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
             framesFilt_dur{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
-            framesFilt_post{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
+            %framesFilt_post{clust_i}{day_i} = NaN(1,vidData.Ysiz(1),vidData.Ysiz(2),1500);
         end
     end
     %for each cluster in nClusts
@@ -173,12 +173,12 @@ for day_i = 1:length(nDays) %for each day
         vel_dur{clust_i}{day_i} = zeros(nFlights{clust_i},lenBehavDur{clust_i});
         vel_post{clust_i}{day_i} = zeros(nFlights{clust_i},lenBehavPost{clust_i});
         XY_dur{clust_i}{day_i} = zeros(nFlights{clust_i},3,lenBehavDur{clust_i});
-        framesRaw_pre{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPre{clust_i});
+        %framesRaw_pre{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPre{clust_i});
         framesRaw_dur{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenFlight{clust_i});
-        framesRaw_post{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPost{clust_i});
-        framesFilt_pre{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPre{clust_i});
+        %framesRaw_post{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPost{clust_i});
+        %framesFilt_pre{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPre{clust_i});
         framesFilt_dur{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenFlight{clust_i});
-        framesFilt_post{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPost{clust_i});
+        %framesFilt_post{clust_i}{day_i} = zeros(nFlights{clust_i},vidData.Ysiz(1),vidData.Ysiz(2),lenPost{clust_i});
         %roiCounter = 1;r
         for roi_i = 1:length(nRois)
             %if nFlights{clust_i} > 0
@@ -220,21 +220,21 @@ for day_i = 1:length(nDays) %for each day
         for flight_i = 1:nFlights{clust_i}
             %build matrices with the imaging raw frames for flight-aligned max projections
             %cut out raw data, subtract min, temporal and spatial filtering
-            framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:) = Ydff(:,:,sData.startIdxTrace{clust_i}(flight_i)-sData.preFlightPadCalcium:sData.startIdxTrace{clust_i}(flight_i));
-            %Y_minPre = min(framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:),4);
-            framesDff_pre = framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:);% - Y_minPre;
-            framesDff_pre = squeeze(framesDff_pre);
-            framesTFilt_pre = medfilt3(framesDff_pre);
-            framesFilt_pre{clust_i}{day_i}(flight_i,:,:,:) = imfilter(framesTFilt_pre,psf,'symmetric');
+            %framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:) = Ydff(:,:,sData.startIdxTrace{clust_i}(flight_i)-sData.preFlightPadCalcium:sData.startIdxTrace{clust_i}(flight_i));
+                %Y_minPre = min(framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:),4);
+            %framesDff_pre = framesRaw_pre{clust_i}{day_i}(flight_i,:,:,:);% - Y_minPre;
+            %framesDff_pre = squeeze(framesDff_pre);
+            %framesTFilt_pre = medfilt3(framesDff_pre);
+            %framesFilt_pre{clust_i}{day_i}(flight_i,:,:,:) = imfilter(framesTFilt_pre,psf,'symmetric');
             try
                 framesRaw_dur{clust_i}{day_i}(flight_i,:,:,:) = Ydff(:,:,sData.startIdxTrace{clust_i}(flight_i)-prePad:...
                     sData.endIdxTrace{clust_i}(flight_i) + (sData.medDur{clust_i}-sData.dur{clust_i}(flight_i))+ postPad);
-                framesRaw_post{clust_i}{day_i}(flight_i,:,:,:) = Ydff(:,:,sData.endIdxTrace{clust_i}(flight_i):sData.endIdxTrace{clust_i}(flight_i)+sData.postFlightPadCalcium);
+                %framesRaw_post{clust_i}{day_i}(flight_i,:,:,:) = Ydff(:,:,sData.endIdxTrace{clust_i}(flight_i):sData.endIdxTrace{clust_i}(flight_i)+sData.postFlightPadCalcium);
             catch
                 framesRaw_dur{clust_i}{day_i}(flight_i,:,:,1:length(Ydff(:,:,sData.startIdxTrace{clust_i}(flight_i)-prePad:end)))...
                     = Ydff(:,:,sData.startIdxTrace{clust_i}(flight_i)-prePad:end);
-                framesRaw_post{clust_i}{day_i}(flight_i,:,:,1:length(Ydff(:,:,sData.endIdxTrace{clust_i}(flight_i):end)))...
-                    = Ydff(:,:,sData.endIdxTrace{clust_i}(flight_i):end);
+                %framesRaw_post{clust_i}{day_i}(flight_i,:,:,1:length(Ydff(:,:,sData.endIdxTrace{clust_i}(flight_i):end)))...
+                 %   = Ydff(:,:,sData.endIdxTrace{clust_i}(flight_i):end);
             end
             %cut out raw data, subtract min, temporal and spatial filtering
             %Y_minDur = min(framesRaw_dur{clust_i}{day_i}(flight_i,:,:,:),3);
@@ -242,11 +242,11 @@ for day_i = 1:length(nDays) %for each day
             framesDff_dur = squeeze(framesDff_dur);
             framesTFilt_dur = medfilt3(squeeze(framesDff_dur));
             framesFilt_dur{clust_i}{day_i}(flight_i,:,:,:) = imfilter(framesTFilt_dur,psf,'symmetric');
-            %Y_minPost = min(framesRaw_post{clust_i}{day_i}(flight_i,:,:,:),3);
-            framesDff_post = framesRaw_post{clust_i}{day_i}(flight_i,:,:,:);% - Y_minPost;
-            framesDff_post = squeeze(framesDff_post);
-            framesTFilt_post = medfilt3(squeeze(framesDff_post));
-            framesFilt_post{clust_i}{day_i}(flight_i,:,:,:) = imfilter(framesTFilt_post,psf,'symmetric');
+                %Y_minPost = min(framesRaw_post{clust_i}{day_i}(flight_i,:,:,:),3);
+            %framesDff_post = framesRaw_post{clust_i}{day_i}(flight_i,:,:,:);% - Y_minPost;
+            %framesDff_post = squeeze(framesDff_post);
+            %framesTFilt_post = medfilt3(squeeze(framesDff_post));
+            %framesFilt_post{clust_i}{day_i}(flight_i,:,:,:) = imfilter(framesTFilt_post,psf,'symmetric');
             
             %add data to matrices for velocity of the active trials
             if ~isnan(ROIs_manual(nDays(day_i),nRois(roi_i)))
@@ -259,16 +259,16 @@ for day_i = 1:length(nDays) %for each day
             end
         end
         %take average across all trials to get 'average' flight activity
-        meanFrames_pre{clust_i}{day_i} = squeeze(nanmean(framesFilt_pre{clust_i}{day_i},1));
+        %meanFrames_pre{clust_i}{day_i} = squeeze(nanmean(framesFilt_pre{clust_i}{day_i},1));
         meanFrames_dur{clust_i}{day_i} = squeeze(nanmean(framesFilt_dur{clust_i}{day_i},1));
-        meanFrames_post{clust_i}{day_i} = squeeze(nanmean(framesFilt_post{clust_i}{day_i},1));
+        %meanFrames_post{clust_i}{day_i} = squeeze(nanmean(framesFilt_post{clust_i}{day_i},1));
         %find max projection of this mean
-        maxMeanFrames_pre{clust_i}{day_i} = max(meanFrames_pre{clust_i}{day_i},[],3);
-        maxMeanFrames_pre{clust_i}{day_i} = imresize(maxMeanFrames_pre{clust_i}{day_i},scaling);
+        %maxMeanFrames_pre{clust_i}{day_i} = max(meanFrames_pre{clust_i}{day_i},[],3);
+        %maxMeanFrames_pre{clust_i}{day_i} = imresize(maxMeanFrames_pre{clust_i}{day_i},scaling);
         maxMeanFrames_dur{clust_i}{day_i} = max(meanFrames_dur{clust_i}{day_i},[],3);
         maxMeanFrames_dur{clust_i}{day_i} = imresize(maxMeanFrames_dur{clust_i}{day_i},scaling);
-        maxMeanFrames_post{clust_i}{day_i} = max(meanFrames_post{clust_i}{day_i},[],3);
-        maxMeanFrames_post{clust_i}{day_i} = imresize(maxMeanFrames_post{clust_i}{day_i},scaling);
+        %maxMeanFrames_post{clust_i}{day_i} = max(meanFrames_post{clust_i}{day_i},[],3);
+        %maxMeanFrames_post{clust_i}{day_i} = imresize(maxMeanFrames_post{clust_i}{day_i},scaling);
     end
     cd(dirTop(1).folder);
     disp(num2str(day_i))
@@ -284,12 +284,12 @@ activity_allTrials.vel_pre = vel_pre;
 activity_allTrials.vel_dur = vel_dur;
 activity_allTrials.vel_post = vel_post;
 activity_allTrials.XY_dur = XY_dur;
-activity_allTrials.meanFrames_pre = meanFrames_pre;
+%activity_allTrials.meanFrames_pre = meanFrames_pre;
 activity_allTrials.meanFrames_dur = meanFrames_dur;
-activity_allTrials.meanFrames_post = meanFrames_post;
-activity_allTrials.maxMeanFrames_pre = maxMeanFrames_pre;
+%activity_allTrials.meanFrames_post = meanFrames_post;
+%activity_allTrials.maxMeanFrames_pre = maxMeanFrames_pre;
 activity_allTrials.maxMeanFrames_dur = maxMeanFrames_dur;
-activity_allTrials.maxMeanFrames_post = maxMeanFrames_post;
+%activity_allTrials.maxMeanFrames_post = maxMeanFrames_post;
 activity_allTrials.YmaxFull = YmaxFull;
 
 %flightAligned_vidData.frames_pre = frames_pre;
@@ -299,10 +299,10 @@ flightAligned_vidData.framesRaw_dur = framesRaw_dur;
 
 if saveFlag == 1
     if strcmp(batId,'Gal')
-        save([saveDir 'Gal_200311to200324_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials');
+        save([saveDir 'Gal_200311to200324_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials','-v7.3');
         save([saveDir 'Gal_200311to200324_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
     elseif strcmp(batId,'Gen')
-        save([saveDir 'Gen_200319to200324_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials');
+        save([saveDir 'Gen_200319to200324_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials','-v7.3');
         save([saveDir 'Gen_200319to200324_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
     end
 end

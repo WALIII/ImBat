@@ -9,8 +9,8 @@ function [IM1_aligned,IM2_aligned,IM3_aligned] = ImBat_imageAlign(IM1,IM2,IM3)
 optimizer.InitialRadius = 0.005;
 optimizer.Epsilon = 1.5e-4;
 optimizer.GrowthFactor = 1.01;
-optimizer.MaximumIterations = 1000;
-transformType = 'affine';
+optimizer.MaximumIterations = 500;
+transformType = '';
 
 if ~isempty(IM3)
     IM3_aligned = IM3;
