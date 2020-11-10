@@ -8,16 +8,16 @@ if strcmp(batId,'Gal')
     if cRaw ==1
         load('200311to200320_Gal_activity_allTrials_allClusts_cRaw_vel.mat'); %load activity for pre,dur,post
     else
-        load('Gal_200311to200324_activity_allTrials_allClusts_sMat_newDff.mat'); %load s matrix activity data
+        load('Gal_200311to200324_activity_allTrials_allClusts_allTrials_sMat_newDff_newOrder.mat'); %load s matrix activity data
     end
-    dirDates = dir('Gal_*');
+    dirDates = dir('Gal*preDurPostCells');
 elseif strcmp(batId,'Gen')
     if cRaw ==1
         load('200319to200324_Gen_activity_allTrials_allClusts_cRaw_vel.mat'); %load activity for pre,dur,post
     else
-        load('Gen_200319to200324_activity_allTrials_allClusts_sMat_newDff.mat'); %load s matrix activity data
+        load('Gen_200319to200324_activity_allTrials_allClusts_sMat_newDff_newOrder.mat'); %load s matrix activity data
     end
-    dirDates = dir('Gen_*');
+    dirDates = dir('Gen*preDurPostCells');
     
 end
 nDays = length(dirDates);
@@ -67,7 +67,7 @@ for clust_i = 1:15%max(max(clustList))
     vel_pre{clust_i} = cellfun(@(c) c(:,1:preDur*track_Fs), activity_allTrials.vel_dur{clust_i},'UniformOutput',false); %cut the traces so they are aligned to the shortest flight trajectory across all the days
     vel_dur{clust_i} = cellfun(@(c) c(:,1+preDur*track_Fs:minBehavFlightLength{clust_i}-postDur*track_Fs), activity_allTrials.vel_dur{clust_i},'UniformOutput',false); %cut the traces so they are aligned to the shortest flight trajectory across all the days
     vel_post{clust_i} = cellfun(@(c) c(:,1+minBehavFlightLength{clust_i}-postDur*track_Fs:minBehavFlightLength{clust_i}), activity_allTrials.vel_dur{clust_i},'UniformOutput',false); %cut the traces so they are aligned to the shortest flight trajectory across all the days
-    XY_dur{clust_i} = cellfun(@(c) c(:,1+preDur*track_Fs:minBehavFlightLength{clust_i}-postDur*track_Fs), activity_allTrials.XY_dur{clust_i},'UniformOutput',false); %cut the traces so they are aligned to the shortest flight trajectory across all the days
+    XY_dur{clust_i} = cellfun(@(c) c(:,:,1+preDur*track_Fs:minBehavFlightLength{clust_i}-postDur*track_Fs), activity_allTrials.XY_dur{clust_i},'UniformOutput',false); %cut the traces so they are aligned to the shortest flight trajectory across all the days
     %catch
     %end
     
@@ -255,7 +255,7 @@ dataPreDurPost.ISelectiveCells = ISelectiveCells;
 
 if saveFlag == 1
     if strcmp(batId,'Gal')
-    save([pwd filesep '200311to200320_Gal_dataPreDurPost_' saveTag '.mat'],'dataPreDurPost');
+    save([pwd filesep '200311to200324_Gal_dataPreDurPost_' saveTag '.mat'],'dataPreDurPost');
     elseif strcmp(batId,'Gen')
       save([pwd filesep '200319to200324_Gen_dataPreDurPost_' saveTag '.mat'],'dataPreDurPost');
   end

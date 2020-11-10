@@ -33,14 +33,14 @@ clustManualFlag = 0;
 flightPathsFeederFlag = 0;
 plotFlightvsCellsFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 1;
-plotPlaceCellsAng = 1;
+plotPlaceCellsFlag = 0;
+plotPlaceCellsAng = 0;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 plotSnakesManualFlag = 0;
 plotPsthFlag = 1;
 plotPSTHstableFlag = 0;
-batId = 'Gen';
+batId = 'Gal';
 galDate = 0;
 %align max projections of specific flights across trajectories
 plotROI3dayFlag = 0;
