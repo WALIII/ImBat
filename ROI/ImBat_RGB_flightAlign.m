@@ -1,5 +1,6 @@
 function ImBat_RGB_flightAlign(batId,fullSeshTag,day1,day2,day3)
-
+%batId = 'Gal';
+%fullSeshTag = 1, chooses to look at whole session for 3 day comparison
 clustNum = 2;
 saveFlag = 0;
 saveTag = 'clust2';
@@ -121,15 +122,15 @@ elseif fullSeshTag == 1
     %IM1_scale = imresize(IM1_raw,1);
     %IM2_scale = imresize(IM2_raw,1);
     %IM3_scale = imresize(IM3_raw,1);
-        IM1doub = imresize(double(IM1_raw),3);
-        IM2doub = imresize(double(IM2_raw),3);
-        IM3doub = imresize(double(IM3_raw),3);
+        IM1doub = imresize(double(IM1_raw),2);
+        IM2doub = imresize(double(IM2_raw),2);
+        IM3doub = imresize(double(IM3_raw),2);
         bground1=imfilter(IM1doub,h,'replicate');%smoothdata(IM1doub,'gaussian',2);%
         bground2=imfilter(IM2doub,h,'replicate');%smoothdata(IM2doub,'gaussian',2);%
         bground3=imfilter(IM3doub,h,'replicate');%smoothdata(IM3doub,'gaussian',2);%
-        IM1_filt=IM1doub./(bground1+10);
-        IM2_filt=IM2doub./(bground2+10);
-        IM3_filt=IM3doub./(bground3+10);
+        IM1_filt=IM1doub./(bground1+5);
+        IM2_filt=IM2doub./(bground2+5);
+        IM3_filt=IM3doub./(bground3+5);
         IMcat = [IM1_filt IM2_filt IM3_filt];    IMcat_gray = mat2gray(IMcat);
     IM1 = IMcat_gray(:,1:size(IMcat_gray,2)/3);
     IM2 = IMcat_gray(:,(size(IMcat_gray,2)/3)+1:2*size(IMcat_gray,2)/3);
@@ -144,7 +145,7 @@ elseif fullSeshTag == 1
     % Will RGB script
     [a1,b1] = CaBMI_XMASS(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3(1:minRow,1:minCol));
     [a2,b2] = CaBMI_XMASS(IM1_aligned,IM2_aligned,IM3_aligned);
-    plotTitle = ['similarity ' batId ' clust ' num2str(clustNum) ' Full Sesh: Day ' num2str(day1) ' (r) v Day ' num2str(day2) ' (g) v Day ' num2str(day3) ' (b)'];
+    plotTitle = ['affine 1000 ' batId ' clust ' num2str(clustNum) ' Full Sesh: Day ' num2str(day1) ' (r) v Day ' num2str(day2) ' (g) v Day ' num2str(day3) ' (b)'];
 end
 
 

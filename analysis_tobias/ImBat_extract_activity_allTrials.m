@@ -2,11 +2,8 @@ function [activity_allTrials,flightAligned_vidData] = ImBat_extract_activity_all
 plotFlag = 0;
 saveFlag = 1; %do you want to save the figures and output structure?
 cRaw = 0;
-<<<<<<< HEAD
-saveTag = 'allTrials_sMat_newDff_newOrder_full_10to12';
-=======
+
 saveTag = 'sMat_newDff_newOrder';
->>>>>>> d5130dbf4c083e4d7a936cf263f8e6d8427a9191
 if saveFlag == 1
     saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
     % Check if folder exists
