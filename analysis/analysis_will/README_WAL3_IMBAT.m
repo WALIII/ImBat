@@ -22,7 +22,7 @@
 ROI_Data = ImBat_RepairFlightData(ROI_Data);
 
 % now, we have a restricted set for ROI_Data, now cluster the flights:
-flightPaths = ImBat_GroupFlights(ROI_Data,'mtf',master_track_file);         % just the flights
+flightPaths = ImBat_GroupFlights(ROI_Data,'mtf',master_track_file,'dist',1.5);         % just the flights
 close all
 
 
@@ -44,12 +44,19 @@ close all
 clust2use = 3; % seperate all functions by cluster: TO DO- add to batch...
 
 % Stability over days:
-ImBat_analysis_20201029(CombinedROI,flightPaths,clust2use)
+ImBat_analysis_20201029(CombinedROI,flightPaths,2)
  % find first day 
 
 % Figure 1: plot Flights across days
-ImBat_analysis_10212020(flightPaths,ROI_Data,CombinedROI,clust2use);
+ImBat_analysis_10212020(flightPaths,ROI_Data,CombinedROI,2);
 
 % STATs and tracking quality:
 ScoreMatrix = ImBat_analysis_10212026(flightPaths,ROI_Data,CombinedROI,2);
 ImBat_Tuning_Stability(ScoreMatrix); % migrate into this funciton 
+
+% plot heat map on flights:
+ImBat_analysis_11062020(flightPaths,ROI_Data,CombinedROI,2);
+
+
+% look at stability for all significant ROIs, on  first 3 flight clusters:
+ImBat_analysis_11122020(CombinedROI,flightPaths);

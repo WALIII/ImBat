@@ -4,21 +4,37 @@ function [flightPaths] = ImBat_GroupFlights(ROI_Data,varargin);
 
 % WAL3
 
+% Default params
 n_splines = 20;
-dist_met = 1; %1.2 % lower is more selective ( more clusters) 
+dist_met = 1.2; %1.2 % lower is more selective ( more clusters)
 
-disp(['WARNING: distance metric set to: ', num2str(dist_met), ' default is 1.2']);
 pause(2);
 do_mtf =0;
 % Manual inputs
-vin=varargin;
-for i=1:length(vin)
-    if isequal(vin{i},'mtf') % manually inputing a sort order
-        MTF=vin{i+1};
-        do_mtf = 1;
+% vin=varargin;
+% for i=1:length(vin)
+%     if isequal(vin{i},'mtf') % manually inputing a sort order
+%         MTF=vin{i+1};
+%         do_mtf = 1;
+%     end
+%
+% end
+
+% User inputs overrides
+nparams=length(varargin);
+for i=1:2:nparams
+    switch lower(varargin{i})
+        case 'mtf'
+            MTF=varargin{i+1};
+            do_mtf = 1;
+        case 'dist'
+            dist_met=varargin{i+1};
+            disp(['WARNING: distance metric set to: ', num2str(dist_met), ' default is 1.2']);
+        case 'n_splines'
+            n_splines=varargin{i+1};
+            disp(['WARNING: splines metric set to: ', num2str(dist_met), ' default is 20']);
     end
 end
-
 
 
 % Align to track file
@@ -47,24 +63,24 @@ for i = 1: size(ROI_Data,2);
     plot3(A(:,1),A(:,2),A(:,3),'Color',col(i,:));
     
     D = ROI_Data{1, i}.Alignment.out.video_times(1:end-1); % align timestamps
-% trim the end, otherwise the flights will be longer or shorter than the
-% calcium..
-if max(D)>max(B); disp('adding extra timepoint to flight data');
-A = cat(1,A,A(end,:));
-B = cat(1,B,max(D));
-else
-disp(' Calcium is shorter than flights, trimming data'); % cut flight data down
-% find closest 
-[minValue_1,closestIndex_1] = min(abs(D(end)-B));
-% cut off trailing data
-A(closestIndex_1-1:end,:) = [];
-B(closestIndex_1-1:end,:) = [];
-A = cat(1,A,A(end,:));
-B = cat(1,B,max(D));
-
-% add closest timepoint
-end
-
+    % trim the end, otherwise the flights will be longer or shorter than the
+    % calcium..
+    if max(D)>max(B); disp('adding extra timepoint to flight data');
+        A = cat(1,A,A(end,:));
+        B = cat(1,B,max(D));
+    else
+        disp(' Calcium is shorter than flights, trimming data'); % cut flight data down
+        % find closest
+        [minValue_1,closestIndex_1] = min(abs(D(end)-B));
+        % cut off trailing data
+        A(closestIndex_1-1:end,:) = [];
+        B(closestIndex_1-1:end,:) = [];
+        A = cat(1,A,A(end,:));
+        B = cat(1,B,max(D));
+        
+        % add closest timepoint
+    end
+    
     if i ==1;
         AllFlights = A;
         AllFlightsTime = B;
@@ -77,7 +93,7 @@ end
         AllFlights = cat(1, AllFlights, AllFlightsTemp);
         AllFlightsTime = cat(1, AllFlightsTime, AllFlightsTimeTemp);
         AllFlightsMasterTime = cat(1, AllFlightsMasterTime, AllFlightsTimeTemp+max(AllFlightsMasterTime));
-
+        
         DayIndex = cat(1,DayIndex,DayIndexTemp);
         
     end
@@ -92,7 +108,7 @@ colorbar;
 % Segregate flights:
 
 %[out] =  ImBat_SegTrajectories(AllFlights,AllFlightsTime,'nclusters',8,'day_index',DayIndex);
-Fs = ROI_Data{1, 1}.ROIs.results.metadata.cnmfe.Fs; 
+Fs = ROI_Data{1, 1}.ROIs.results.metadata.cnmfe.Fs;
 [flightPaths] = ImBat_flightsAngelo(AllFlights,AllFlightsTime,'fs',Fs,'n_splines',n_splines,'dist',dist_met,'day_index',DayIndex);
 
 flightPaths.AllFlights = AllFlights;
@@ -109,7 +125,7 @@ flightPaths.AllFlightsMasterTime = AllFlightsMasterTime;
 flight_clust_size = size(flightPaths.clusterIndex,2);
 if flight_clust_size>9;
     num2plot = 10;
-else 
+else
     num2plot = flight_clust_size;
 end
 figure();
