@@ -15,15 +15,21 @@ out =  ImBat_analysis_11112020(FlightAlignedROI,ii);
 AllColZ = zscore(out.data2.AllCol);
 %remove zeros
 xtemp = mean(AllColZ);
+clear h1 h2
 h1 = find(xtemp ==0);
+h2 = find(xtemp ~=0);
 AllColZ(:,h1) = [];
 x = mean(AllColZ,2);
 % get peaks
-[Bpks,Blocs] = findpeaks(x,'MinPeakProminence',0.5,'MinPeakDistance',1);
+[Bpks,Blocs] = findpeaks(x,'MinPeakProminence',.5,'MinPeakDistance',1);
 
 % only use peaks in the flight pad ( exclude reward...
 Blocs(Blocs<250) = [];
 Blocs(Blocs>1100) = [];
+
+% Blocs(Blocs<300) = [];
+% Blocs(Blocs>800) = [];
+
 
 % figure(); 
 % hold on;
@@ -53,9 +59,9 @@ calPeakLoc = Blocs(iii);
 % plot(a1,calPeaks,'*r')
 
 % get  position to mean point 
-meanPoint(1) = mean(flPeaksX);
-meanPoint(2) = mean(flPeaksY);
-meanPoint(3) = mean(flPeaksZ);
+meanPoint(1) = mean(flPeaksX(h2));
+meanPoint(2) = mean(flPeaksY(h2));
+meanPoint(3) = mean(flPeaksZ(h2));
 
 for i = 1: size(flPeaksZ,1)
     currPoint(1) = flPeaksX(i);
@@ -111,13 +117,9 @@ Loca = mat2gray(Loca);
 % figure();
 % plot(varF,varC,'*');
 
-figure(); 
-plot(meanF,(meanC),'*');
-title('Mean Calcium intensity vs aveage flight distance from the mean flight');
-ylabel(' Mean, Normalized Ca++ activity');
-xlabel(' average euclidian distance from the mean flight in that cluster');
 
-% stats ( regression)
+
+% ========== stats ( regression) ===========%
 clear y x1 X
 X1 = meanF';
 y = meanC';
@@ -129,7 +131,19 @@ X = [X1];
 mdl = fitlm(X,y);
 figure(); 
 plotAdded(mdl)
+title('Calcium consistancy vs Flight Variance');
+ylabel(' Mean, Normalized Ca+ activity');
+xlabel('mean Flight distance (cm);');
 
+
+
+% More plotting..... :
+
+figure(); 
+plot(meanF,(meanC),'*');
+title('Mean Calcium intensity vs aveage flight distance from the mean flight');
+ylabel(' Mean, Normalized Ca++ activity');
+xlabel(' average euclidian distance from the mean flight in that cluster');
 
 
 

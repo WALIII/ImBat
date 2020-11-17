@@ -15,7 +15,9 @@ out =  ImBat_analysis_11112020(FlightAlignedROI,ii);
 AllColZ = zscore(out.data2.AllCol);
 %remove zeros
 xtemp = mean(AllColZ);
+clear h1 h2
 h1 = find(xtemp ==0);
+h2 = find(xtemp ~=0);
 AllColZ(:,h1) = [];
 x = mean(AllColZ,2);
 % get peaks
@@ -23,7 +25,7 @@ x = mean(AllColZ,2);
 
 % only use peaks in the flight pad ( exclude reward...
 Blocs(Blocs<250) = [];
-Blocs(Blocs>1100) = [];
+Blocs(Blocs>1200) = [];
 
 % Blocs(Blocs<300) = [];
 % Blocs(Blocs>800) = [];
@@ -57,9 +59,9 @@ calPeakLoc = Blocs(iii);
 % plot(a1,calPeaks,'*r')
 
 % get  position to mean point 
-meanPoint(1) = mean(flPeaksX);
-meanPoint(2) = mean(flPeaksY);
-meanPoint(3) = mean(flPeaksZ);
+meanPoint(1) = mean(flPeaksX(h2));
+meanPoint(2) = mean(flPeaksY(h2));
+meanPoint(3) = mean(flPeaksZ(h2));
 
 for i = 1: size(flPeaksZ,1)
     currPoint(1) = flPeaksX(i);

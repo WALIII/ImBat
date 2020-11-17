@@ -25,7 +25,7 @@ ROI_Data = ImBat_RepairFlightData(ROI_Data);
 flightPaths = ImBat_GroupFlights(ROI_Data,'mtf',master_track_file,'dist',1.5);         % just the flights
 close all
 
-[FlightAlignedROI_1] = ImBat_Align_FC(CombinedROI,flightPaths,3);
+[FlightAlignedROI_1] = ImBat_Align_FC(CombinedROI,flightPaths,2);
 FlightAlignedROI{1} = FlightAlignedROI_1;
 
 % Bassics of loaded and aligned data;
