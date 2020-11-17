@@ -119,7 +119,7 @@ metadata.cnmfe.merge_thr_spatial = [0.9, 0.6, -inf];    % merge components with 
 
 % -------------------------  Residual   -------------------------  %
 metadata.cnmfe.min_corr_res = 0.6;
-metadata.cnmfe.min_pnr_res = 10;
+metadata.cnmfe.min_pnr_res = metadata.cnmfe.min_pnr;
 seed_method_res = 'manual';  % method for initializing neurons from the residual
 update_sn = true;
 
