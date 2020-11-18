@@ -126,11 +126,7 @@ if isempty(day3)
     image3 = [];
 end
 if rigidFlag == 1 %use the rigid alignment with affine
-    try
-        [IM1_aligned,IM2_aligned,IM3_aligned] = ImBat_imageAlign(image1,image2,image3,IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3(1:minRow,1:minCol));
-    catch
-        [IM1_aligned,IM2_aligned,IM3_aligned] = ImBat_imageAlign(image1,image2,image3,IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3);
-    end
+    [IM1_aligned,IM2_aligned,IM3_aligned] = ImBat_imageAlign(image1,image2,image3,IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3(1:minRow,1:minCol));
     [a2,b2] = CaBMI_XMASS(IM1_aligned,IM2_aligned,IM3_aligned);
 else %use nonrigid with demon flow
     [figNonrigid,imagesAligned] = ImBat_imageAlign_nonrigid(image1,image2,image3,IM1,IM2,IM3);
