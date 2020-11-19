@@ -34,7 +34,7 @@ end
 disp('aligning all days...');
 out.ReferenceDate = out.date{RefDay};
 for i = 1:size(out.date,2)
-[out.tform{i},out.Markers_Adjusted{i}] = ImBat_AlignPoints(out.Markers_Raw{RefDay},out.Markers_Raw{i});
+[out.tform{i},out.Markers_Adjusted{i}] = ImBat_AlignPoints(out.Markers_Raw{2},out.Markers_Raw{i});
 
 % % STEP 4: Use tform to adjust markers ( for reference)
 % 

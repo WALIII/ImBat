@@ -22,11 +22,11 @@
 ROI_Data = ImBat_RepairFlightData(ROI_Data);
 
 % now, we have a restricted set for ROI_Data, now cluster the flights:
-flightPaths = ImBat_GroupFlights(ROI_Data,'mtf',master_track_file,'dist',1.5);         % just the flights
+flightPaths = ImBat_GroupFlights(ROI_Data,'mtf',master_track_file,'dist',1.2);         % just the flights
 close all
 
-[FlightAlignedROI_1] = ImBat_Align_FC(CombinedROI,flightPaths,3);
-FlightAlignedROI{1} = FlightAlignedROI_1;
+[FlightAlignedROI] = ImBat_Align_FC(CombinedROI,flightPaths,2);
+FlightAlignedROI_combined{1} = FlightAlignedROI;
 
 % Bassics of loaded and aligned data;
     % 1. Quality of ROI maps for each day, and across days
@@ -64,4 +64,4 @@ ImBat_analysis_11062020(flightPaths,ROI_Data,CombinedROI,2);
 ImBat_analysis_11122020(CombinedROI,flightPaths);
 
 % stats between variability in ROIs and in flight
-out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI)
+out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined)
