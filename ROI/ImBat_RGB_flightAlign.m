@@ -5,6 +5,7 @@ clustNum = 2;
 saveFlag = 1;
 rigidFlag = 1;
 saveTag = 'rigid';
+dirAllTrials = pwd;
 h = fspecial('disk',50);
 
 %load first day placeCellStableROI data
@@ -16,9 +17,9 @@ elseif strcmp(batId,'Gen')
 end
 %make saving directory
 if saveFlag == 1
-    %saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
+    saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
     %saveDir1 = '/Users/periscope/Desktop/analysis/flight/plots/';
-    saveDir1 = 'C:\Users\tobias\Desktop\analysis\plots\';
+    %saveDir1 = 'C:\Users\tobias\Desktop\analysis\plots\';
     if ~exist([saveDir1 datestr(now,'yymmdd') filesep 'maxProjFlightAlign'])
         mkdir([saveDir1 datestr(now,'yymmdd') filesep 'maxProjFlightAlign']);
     else
@@ -26,20 +27,7 @@ if saveFlag == 1
     end
     saveDir = [saveDir1 datestr(now,'yymmdd') filesep 'maxProjFlightAlign' filesep];
 end
-
-% %set raw to the flight aligned frames,
-% IM1_raw = activity_allTrials.maxMeanFrames_dur{clustNum}{day1};
-% IM2_raw = activity_allTrials.maxMeanFrames_dur{clustNum}{day2};
-% IM1_rawFull = activity_allTrials.YmaxFull{day1};
-% IM2_rawFull = activity_allTrials.YmaxFull{day2};
-% if ~isempty(day3) %if there is a day3
-%     IM3_raw = activity_allTrials.maxMeanFrames_dur{clustNum}{day3};
-%     IM3_rawFull = activity_allTrials.YmaxFull{day3};
-% else
-%     IM3_raw = IM2_raw; %replicate for now
-%     IM3_rawFull = IM2_rawFull;
-% end
-%pull out the correct data into the raw image variables
+%% pull out the correct data into the raw image variables
 if fullSeshTag == 0 %comparing flight aligned max proj
     if isempty(day3)
         if day1 == day2 %if looking at the cluster flight aligned vs full session
@@ -60,7 +48,7 @@ if fullSeshTag == 0 %comparing flight aligned max proj
         IM2_raw = activity_allTrials.maxMeanFrames_dur{clustNum}{day2};
         IM3_raw = activity_allTrials.maxMeanFrames_dur{clustNum}{day3};
         plotTitle = [saveTag ' ' batId ' clust ' num2str(clustNum) ': Day ' num2str(day1) ' (r) v Day ' num2str(day2) ' (g) v Day ' num2str(day3) ' (b)'];
-     end
+    end
 else %comparing the full session
     if isempty(day3) %comparing 1 day vs another
         IM1_raw = activity_allTrials.YmaxFull{day1};
@@ -127,64 +115,340 @@ if isempty(day3)
 end
 if rigidFlag == 1 %use the rigid alignment with affine
     try
-        [IM1_aligned,IM2_aligned,IM3_aligned] = ImBat_imageAlign(image1,image2,image3,IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3(1:minRow,1:minCol));
+        [imagesAligned] = ImBat_imageAlign(image1,image2,image3,IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3(1:minRow,1:minCol));
     catch
-        [IM1_aligned,IM2_aligned,IM3_aligned] = ImBat_imageAlign(image1,image2,image3,IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3);
+        [imagesAligned] = ImBat_imageAlign(image1,image2,image3,IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3);
     end
-    [a2,b2] = CaBMI_XMASS(IM1_aligned,IM2_aligned,IM3_aligned);
 else %use nonrigid with demon flow
     [figNonrigid,imagesAligned] = ImBat_imageAlign_nonrigid(image1,image2,image3,IM1,IM2,IM3);
-    [a2,b2] = CaBMI_XMASS(imagesAligned.IM1_aligned,imagesAligned.IM2_aligned,imagesAligned.IM3_aligned);
 end
-[a1,b1] = CaBMI_XMASS(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3);
+IM1_aligned = imagesAligned.IM1_aligned;
+IM2_aligned = imagesAligned.IM2_aligned;
+IM3_aligned = imagesAligned.IM3_aligned;
+%RGB the images
+[aOverlap,bOverlap] = CaBMI_XMASS(IM1_aligned,IM2_aligned,IM3_aligned);
+%rgb the original unaligned for comparison
+[aUnaligned,bUnaligned] = CaBMI_XMASS(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3);
+%filter, then average the images and subtract each from that average to show difference
+hFilt = fspecial('disk',15);
+IM1_aligned_filt = imfilter(IM1_aligned,hFilt,'replicate');
+IM2_aligned_filt = imfilter(IM2_aligned,hFilt,'replicate');
+IM3_aligned_filt = imfilter(IM3_aligned,hFilt,'replicate');
+IM_sum = IM1_aligned_filt + IM2_aligned_filt + IM3_aligned_filt;
+IM_mean = IM_sum/3;
+IM1_diff = IM1_aligned_filt - IM_mean;
+IM2_diff = IM2_aligned_filt - IM_mean;
+IM3_diff = IM3_aligned_filt - IM_mean;
+IM_1diff2 = IM2_aligned_filt - IM1_aligned_filt;
+IM_2diff3 = IM3_aligned_filt - IM2_aligned_filt;
+IM_1diff3 = IM3_aligned_filt - IM1_aligned_filt;
 
- plotDay123_unaligned = figure();
-    sgtitle(plotTitle);
-    subplot(1,2,1);
-    image((a1(:,:,:)));
-    title('un-aligned');
-    set(gca,'xticklabel',[],'yticklabel',[]);
-    subplot(1,2,2);
-    image((a2(:,:,:)));
-    title('aligned');
-    set(gca,'xticklabel',[],'yticklabel',[]);
-    
-    plotDay123_aligned = figure();
-    image((a2(:,:,:)))
-    title(plotTitle);
-    set(gca,'xticklabel',[],'yticklabel',[]);
-    %set(gca,'YDir','normal');
-    
-    if saveFlag == 1
-        if strcmp(batId,'Gal')
-            saveas(plotDay123_unaligned,[saveDir filesep 'Gal_200311and20_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
-            savefig(plotDay123_unaligned,[saveDir filesep 'Gal_200311and20_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-            saveas(plotDay123_aligned,[saveDir filesep 'Gal_200311and20_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
-            savefig(plotDay123_aligned,[saveDir filesep 'Gal_200311and20_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-            if rigidFlag == 0
-                saveas(figNonrigid,[saveDir filesep 'Gal_200311and20_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
-                savefig(figNonrigid,[saveDir filesep 'Gal_200311and20_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+IM_combined(:,:,1) = IM1_aligned_filt;
+IM_combined(:,:,2) = IM2_aligned_filt;
+IM_combined(:,:,3) = IM3_aligned_filt;
+IM_combined_max = max(IM_combined,[],3);
+IM_combined_min = min(IM_combined,[],3);
+IM1_maxDiff = IM1_aligned_filt - IM_combined_max;
+IM2_maxDiff = IM2_aligned_filt - IM_combined_max;
+IM3_maxDiff = IM3_aligned_filt - IM_combined_max;
+IM1_minDiff = IM1_aligned_filt - IM_combined_min;
+IM2_minDiff = IM2_aligned_filt - IM_combined_min;
+IM3_minDiff = IM3_aligned_filt - IM_combined_min;
+
+%% load masks and warp to match registered max projection for each day
+if rigidFlag == 1 %only if have the rigid twarp output
+    maskDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\new3\';
+    days = [day1 day2 day3];
+    ROI2plot = cell(length(days),1);
+    ROI_coords = cell(length(days),1);
+    centroid = cell(length(days),1);
+    col = cell(length(days));
+    for day_i = 1:length(days)
+        cd([maskDir1 batId]);
+        dayDir = dir([batId(1:2) '*']);
+        cd([dayDir(days(day_i)).name filesep 'extracted']);
+        flyDir = dir('*fly-*extraction');
+        cd(flyDir(end).name);
+        processedDir = dir('processed*');
+        load([processedDir(end).name filesep 'results.mat']);
+        Atemp = full(results.A);
+        resultsA{day_i} = Atemp;
+        resultsCn{day_i} = results.Cn;
+        
+        % Plot binary mask of all neurons in the A matrix
+        %convert A matrix into full matrix
+        Ysiz = size(resultsCn{day_i});
+        nRois = size(resultsA{day_i},2);
+        scaling = 10; %depends on size of frame and downsampling from extraction step
+        %ROI2plot = (:,:,zeros(length(Atemp(1,:)));
+        % get ROI centroids for top 30%;
+        %ROI2plot{day_i} = zeros(Ysiz(1),Ysiz(2),nRois);
+        %centroid{day_i} = zeros(nRois,2);
+        col{day_i} = zeros(nRois,3);
+        for roi_i = 1:nRois
+            %create 3d matrix with all ROI heat maps
+            ROI2plot{day_i}(:,:,roi_i) = mat2gray(reshape(Atemp(:,roi_i),Ysiz(1),Ysiz(2)));
+            ROI2plot_scaled{day_i}(:,:,roi_i) = imresize(ROI2plot{day_i}(:,:,roi_i),scaling);
+        end
+        cd(dirAllTrials); %go back to home activitity all_trials directory
+    end
+    %register day ROIs 1 to day 2 alignment
+    for day_i = 1:length(days)
+        for roi_i = 1:size(resultsA{day_i},2)
+            if day_i == 1
+                ROI2plot_aligned{1}(:,:,roi_i) = imwarp(ROI2plot_scaled{1}(:,:,roi_i),imagesAligned.IM1_tform,'OutputView',imref2d(size(IM2)));
+            elseif day_i == 2
+                ROI2plot_aligned{2}(:,:,roi_i) = ROI2plot_scaled{2}(:,:,roi_i);
+            elseif day_i == 3
+                ROI2plot_aligned{3}(:,:,roi_i) = imwarp(ROI2plot_scaled{3}(:,:,roi_i),imagesAligned.IM3_tform,'OutputView',imref2d(size(IM2)));
             end
-        elseif strcmp(batId,'Gen')
-            saveas(plotDay123_unaligned,[saveDir filesep 'Gen_200319and24_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
-            savefig(plotDay123_unaligned,[saveDir filesep 'Gen_200319and24_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-            saveas(plotDay123_aligned,[saveDir filesep 'Gen_200319and24_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
-            savefig(plotDay123_aligned,[saveDir filesep 'Gen_200319and24_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-            if rigidFlag == 0
-                saveas(figNonrigid,[saveDir filesep 'Gen_200319and24_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
-                savefig(figNonrigid,[saveDir filesep 'Gen_200319and24_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-            end
+            binaryImage = imbinarize(ROI2plot_aligned{day_i}(:,:,roi_i));
+            [y,x]=find(binaryImage);
+            %get ROI coordinates
+            ROI_coords{day_i}(roi_i,1) = {x};
+            ROI_coords{day_i}(roi_i,2) = {y};
+            %calculate centroids
+            centroid{day_i}(roi_i,1) = mean(cell2mat(ROI_coords{day_i}(roi_i,1)));%*scaling;
+            centroid{day_i}(roi_i,2) = mean(cell2mat(ROI_coords{day_i}(roi_i,2)));%*scaling;%get the centroid of mask
+            %subplot(2,1,1);
+            %imshow(ROI2plot_aligned{1}(:,:,roi_i));
+            %subplot(2,1,2);
+            %p = plot(ROI_coords{1}{roi_i,1},ROI_coords{1}{roi_i,2},'LineWidth',4);
+            %clf;
+        end
+        col{day_i} = jet(size(resultsA{day_i},2));
+    end
+    %ROI_coords = smoothdata(ROI_coords,'gaussian',3); %filter the ROI coordinate mask so it is not so jagged
+end
+
+%%
+%plot the unaligned vs aligned for comparison
+plotDay123_unaligned = figure();
+sgtitle(plotTitle);
+subplot(1,2,1);
+image((aUnaligned(:,:,:)));
+title('un-aligned');
+set(gca,'xticklabel',[],'yticklabel',[]);
+subplot(1,2,2);
+image((aOverlap(:,:,:)));
+title('aligned');
+set(gca,'xticklabel',[],'yticklabel',[]);
+
+%plot just the aligned figure with all 3rgb overlapping
+plotDay123_aligned = figure();
+image((aOverlap(:,:,:)))
+title(plotTitle);
+set(gca,'xticklabel',[],'yticklabel',[]);
+%set(gca,'YDir','normal');
+
+%plot aligned RGB figure and each day with centroids on top
+plotDay123_centroids = figure('units','normalized','outerposition',[0 0 1 0.6]);
+sgtitle([plotTitle ' and daily centroids']);
+ha = tight_subplot(1,4,[.02 .01],[.01 .08],[.01 .01]);
+set(0,'CurrentFigure',plotDay123_centroids);
+axes(ha(1)); imshow((aOverlap(:,:,:)),[]); title('RGB Overlap');
+axes(ha(2)); imshow(IM1_aligned,[]);
+colormap(ha(2),gray);
+hold on;
+for roi_i = 1:size(ROI2plot_aligned{1},3)
+        plot(ROI_coords{1}{roi_i,1},ROI_coords{1}{roi_i,2},'LineWidth',4,'Color',[col{1}(roi_i,:) 0.01]);
+        p = text(centroid{1}(roi_i,1),centroid{1}(roi_i,2),num2str(roi_i));
+        p.Color(1:3) = col{1}(size(ROI2plot_aligned{1},3) + 1 - roi_i,:);
+end
+title('Day 1 ROIs');
+hold off
+axes(ha(3)); imshow(IM2_aligned,[]);
+colormap(ha(3),gray);
+hold on;
+for roi_i = 1:size(ROI2plot_aligned{2},3)
+    plot(ROI_coords{2}{roi_i,1},ROI_coords{2}{roi_i,2},'LineWidth',4,'Color',[col{2}(roi_i,:) 0.01]);
+    p = text(centroid{2}(roi_i,1),centroid{2}(roi_i,2),num2str(roi_i));
+    p.Color(1:3) = col{2}(size(ROI2plot_aligned{2},3) + 1 - roi_i,:);
+end
+title('Day 2 ROIs');
+hold off
+axes(ha(4)); imshow(IM3_aligned,[]);
+colormap(ha(4),gray);
+hold on;
+try
+for roi_i = 1:size(ROI2plot_aligned{3},3)
+        plot(ROI_coords{3}{roi_i,1},ROI_coords{3}{roi_i,2},'LineWidth',4,'Color',[col{3}(roi_i,:) 0.01]);
+        p = text(centroid{3}(roi_i,1),centroid{3}(roi_i,2),num2str(roi_i));
+        p.Color(1:3) = col{3}(size(ROI2plot_aligned{3},3) + 1 - roi_i,:);
+end
+catch
+end
+title('Day 3 ROIs');
+hold off
+
+%plot the rgb, mean, and each difference
+plotDay123_diffs = figure('units','normalized','outerposition',[0 0 1 0.6]);
+sgtitle([plotTitle ' and daily differences from mean']);
+ha = tight_subplot(1,5,[.02 .01],[.01 .08],[.01 .01]);
+set(0,'CurrentFigure',plotDay123_diffs);
+axes(ha(1)); imshow(aOverlap(:,:,:),[]); title('RGB Overlap');
+%colorbar('southoutside');
+axes(ha(2)); imshow(IM_mean,[]); title('Mean Day 1, 2, 3');
+colormap(ha(2),gray);
+colorbar('southoutside');
+axes(ha(3)); imshow(IM1_diff,[-0.6 0.6]); title('Diff Day 1');
+colormap(ha(3),fireice);
+colorbar('southoutside');
+axes(ha(4)); imshow(IM2_diff,[-0.6 0.6]); title('Diff Day 2');
+colormap(ha(4),fireice);
+colorbar('southoutside');
+axes(ha(5)); imshow(IM3_diff,[-0.6 0.6]); title('Diff Day 3');
+colormap(ha(5),fireice);
+colorbar('southoutside');
+
+%plot rgb and each progression of differences from 1 day to next
+plotDay123_progression = figure('units','normalized','outerposition',[0 0 1 0.6]);
+sgtitle([plotTitle ' and day to day progression']);
+ha = tight_subplot(1,5,[.02 .01],[.01 .08],[.01 .01]);
+set(0,'CurrentFigure',plotDay123_progression);
+axes(ha(1)); imshow(aOverlap(:,:,:),[]); title('RGB Overlap');
+%colorbar('southoutside');
+axes(ha(2)); imshow(IM1_aligned,[]); title('Day 1');
+colormap(ha(2),gray);
+colorbar('southoutside');
+axes(ha(3)); imshow(IM_1diff2,[-0.6 0.6]); title('Day 2 - Day 1');
+colormap(ha(3),fireice);
+colorbar('southoutside');
+axes(ha(4)); imshow(IM_2diff3,[-0.6 0.6]); title('Day 3 - Day 2');
+colormap(ha(4),fireice);
+colorbar('southoutside');
+axes(ha(5)); imshow(IM_1diff3,[-0.6 0.6]); title('Day 3 - Day 1');
+colorbar('southoutside');
+colormap(ha(5),fireice);
+
+%% plot rgb and each progression of differences from 1 day to next
+plotDay123_all = figure('units','normalized','outerposition',[0 0 1 1]);
+sgtitle([plotTitle ' comparing days']);
+ha = tight_subplot(4,5,[.02 .01],[.01 .08],[.01 .01]);
+set(0,'CurrentFigure',plotDay123_all);
+axes(ha(1)); imshow(aOverlap(:,:,:),[]); title('RGB Overlap');
+%colorbar('southoutside');
+axes(ha(2)); imshow(IM1_aligned,[]); title('Day 1');
+%colorbar('southoutside');
+axes(ha(3)); imshow(IM_1diff2,[-0.6 0.6]); title('Day 2 - Day 1');
+%colorbar('southoutside');
+axes(ha(4)); imshow(IM_2diff3,[-0.6 0.6]); title('Day 3 - Day 2');
+%colorbar('southoutside');
+axes(ha(5)); imshow(IM_1diff3,[-0.6 0.6]); title('Day 3 - Day 1');
+%colorbar('southoutside');
+colormap(ha(3),fireice);
+colormap(ha(4),fireice);
+colormap(ha(5),fireice);
+axes(ha(6)); imshow(IM1_aligned,[]);
+colormap(ha(6),gray);
+hold on;
+for roi_i = 1:size(ROI2plot_aligned{1},3)
+        plot(ROI_coords{1}{roi_i,1},ROI_coords{1}{roi_i,2},'LineWidth',4,'Color',[col{1}(roi_i,:) 0.01]);
+        p = text(centroid{1}(roi_i,1),centroid{1}(roi_i,2),num2str(roi_i));
+        p.Color(1:3) = col{1}(size(ROI2plot_aligned{1},3) + 1 - roi_i,:);
+end
+title('Day 1 ROIs');
+hold off
+axes(ha(7)); imshow(IM_mean,[]); title('Mean Day 1, 2, 3');
+%colorbar('southoutside');
+axes(ha(8)); imshow(IM1_diff,[-0.6 0.6]); title('Day 1 - mean');
+%colorbar('southoutside');
+axes(ha(9)); imshow(IM2_diff,[-0.6 0.6]); title('Day 2 - mean');
+%colorbar('southoutside');
+axes(ha(10)); imshow(IM3_diff,[-0.6 0.6]); title('Day 3 - mean');
+colormap(ha(8),fireice);
+colormap(ha(9),fireice);
+colormap(ha(10),fireice);%colorbar('southoutside');
+axes(ha(11)); imshow(IM2_aligned,[]);
+colormap(ha(11),gray);
+hold on;
+for roi_i = 1:size(ROI2plot_aligned{2},3)
+    plot(ROI_coords{2}{roi_i,1},ROI_coords{2}{roi_i,2},'LineWidth',4,'Color',[col{2}(roi_i,:) 0.01]);
+    p = text(centroid{2}(roi_i,1),centroid{2}(roi_i,2),num2str(roi_i));
+    p.Color(1:3) = col{2}(size(ROI2plot_aligned{2},3) + 1 - roi_i,:);
+end
+title('Day 2 ROIs');
+hold off
+axes(ha(12)); imshow(IM_combined_max,[]); title('Max Day 1, 2, 3');
+%colorbar('southoutside');
+axes(ha(13)); imshow(IM1_maxDiff,[-0.6 0.6]); title('Day 1  - max');
+%colorbar('southoutside');
+axes(ha(14)); imshow(IM2_maxDiff,[-0.6 0.6]); title('Day 2  - max');
+%colorbar('southoutside');
+axes(ha(15)); imshow(IM3_maxDiff,[-0.6 0.6]); title('Day 3 - max');
+colormap(ha(13),fireice);
+colormap(ha(14),fireice);
+colormap(ha(15),fireice);%colorbar('southoutside');
+axes(ha(16)); imshow(IM3_aligned,[]);
+colormap(ha(16),gray);
+hold on;
+try
+for roi_i = 1:size(ROI2plot_aligned{3},3)
+        plot(ROI_coords{3}{roi_i,1},ROI_coords{3}{roi_i,2},'LineWidth',4,'Color',[col{3}(roi_i,:) 0.01]);
+        p = text(centroid{3}(roi_i,1),centroid{3}(roi_i,2),num2str(roi_i));
+        p.Color(1:3) = col{3}(size(ROI2plot_aligned{3},3) + 1 - roi_i,:);
+end
+catch
+end
+title('Day 3 ROIs');
+hold off
+axes(ha(17)); imshow(IM_combined_min,[]); title('Min Day 1, 2, 3');
+%colorbar('southoutside');
+axes(ha(18)); imshow(IM1_minDiff,[-0.6 0.6]); title('Day 1 - min');
+%colorbar('southoutside');
+axes(ha(19)); imshow(IM2_minDiff,[-0.6 0.6]); title('Day 2 - min');
+%colorbar('southoutside');
+axes(ha(20)); imshow(IM3_minDiff,[-0.6 0.6]); title('Day 3 - min');
+colormap(ha(18),fireice);
+colormap(ha(19),fireice);
+colormap(ha(20),fireice);%colorbar('southoutside');
+%%
+if saveFlag == 1
+    if strcmp(batId,'Gal')
+        saveas(plotDay123_unaligned,[saveDir filesep 'Gal_200311and20_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_unaligned,[saveDir filesep 'Gal_200311and20_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_aligned,[saveDir filesep 'Gal_200311and20_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_aligned,[saveDir filesep 'Gal_200311and20_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_diffs,[saveDir filesep 'Gal_200311and20_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_diffs,[saveDir filesep 'Gal_200311and20_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_progression,[saveDir filesep 'Gal_200311and20_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_progression,[saveDir filesep 'Gal_200311and20_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_centroids,[saveDir filesep 'Gal_200311and20_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_centroids,[saveDir filesep 'Gal_200311and20_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_all,[saveDir filesep 'Gal_200311and20_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_all,[saveDir filesep 'Gal_200311and20_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        if rigidFlag == 0
+            saveas(figNonrigid,[saveDir filesep 'Gal_200311and20_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+            savefig(figNonrigid,[saveDir filesep 'Gal_200311and20_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        end
+    elseif strcmp(batId,'Gen')
+        saveas(plotDay123_unaligned,[saveDir filesep 'Gen_200319and24_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_unaligned,[saveDir filesep 'Gen_200319and24_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_aligned,[saveDir filesep 'Gen_200319and24_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_aligned,[saveDir filesep 'Gen_200319and24_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_diffs,[saveDir filesep 'Gen_200319and24_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_diffs,[saveDir filesep 'Gen_200319and24_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_progression,[saveDir filesep 'Gen_200319and24_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_progression,[saveDir filesep 'Gen_200319and24_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_all,[saveDir filesep 'Gen_200319and24_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_all,[saveDir filesep 'Gen_200319and24_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_centroids,[saveDir filesep 'Gen_200319and24_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_centroids,[saveDir filesep 'Gen_200319and24_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        if rigidFlag == 0
+            saveas(figNonrigid,[saveDir filesep 'Gen_200319and24_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+            savefig(figNonrigid,[saveDir filesep 'Gen_200319and24_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         end
     end
-    
-    
+end
+
+
 %%
 
-%     
+%
 %     if fullSeshTag == 0
 %         if isempty(day3) %comparing flight aligned max proj
 %             if day1==day2 %if looking at the cluster flight aligned vs full session
-%                 
+%
 %                 plotTitle = [batId ' clust ' num2str(clustNum) ': Day ' num2str(day1) ' (r) v full session (c)'];
 %             else %if looking at 1 day vs another day only
 %                 IM1_raw = activity_allTrials.maxMeanFrames_dur{clustNum}{day1};
@@ -300,7 +564,7 @@ end
 %         image1(end-10:end,end-10:end) = 0;
 %         image2(end-10:end,end-10:end) = 0;
 %         image3(end-10:end,end-10:end) = 0;
-%         
+%
 %         [figNonrigid,imagesAligned] = ImBat_imageAlign_nonrigid(image1,image2,image3,IM1,IM2,IM3);
 %         % Alignment script
 %         %[IM1_aligned,IM2_aligned,IM3_aligned] = ImBat_imageAlign(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3(1:minRow,1:minCol));
@@ -309,8 +573,8 @@ end
 %         [a2,b2] = CaBMI_XMASS(imagesAligned.IM1_aligned,imagesAligned.IM2imagesAligned.,IM3_aligned);
 %         plotTitle = ['nonrigid alpha' num2str(imagesAligned.alpha) ' ' batId ' clust ' num2str(clustNum) ' Full Sesh: Day ' num2str(day1) ' (r) v Day ' num2str(day2) ' (g) v Day ' num2str(day3) ' (b)'];
 %     end
-%     
-%     
-%     
-%    
-    
+%
+%
+%
+%
+
