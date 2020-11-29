@@ -107,9 +107,9 @@ for day_i = 10:12%length(nDays) %for each day
     Ydff_filt = imfilter(Ydff_tFilt,psf,'symmetric'); %spatial filtering
     length_vector = 1:length(Ydff_filt);
     rand_length_vector= randperm(length(length_vector));
-    YmaxFull{7} = max(Ydff_filt(:,:,rand_length_vector(1:round(length(length_vector)/3))),[],3);
-    YmaxFull{8} = max(Ydff_filt(:,:,rand_length_vector(round(length(length_vector)/3):round(length(length_vector)/3)*2)),[],3);
-    YmaxFull{9} = max(Ydff_filt(:,:,rand_length_vector(round(length(length_vector)/3)*2:end)),[],3);
+    YmaxFull{4} = max(Ydff_filt(:,:,rand_length_vector(1:round(length(length_vector)/3))));
+    YmaxFull{5} = max(Ydff_filt(:,:,rand_length_vector(round(length(length_vector)/3)):round(length(length_vector)/3)*2));
+    YmaxFull{6} = max(Ydff_filt(:,:,rand_length_vector(round(length(length_vector)/3))*2:round(length(length_vector)/3)*3));
     
     YmaxFull{day_i} = max(Ydff_filt,[],3); %take max
     YmaxFull{day_i} = imresize(YmaxFull{day_i},scaling); %resize to eliminate pixelation
