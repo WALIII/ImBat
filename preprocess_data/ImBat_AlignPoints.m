@@ -10,9 +10,10 @@ function [tform,Markers2_aligned] = ImBat_AlignPoints(Markers1,Markers2);
 M1_temp = squeeze(median(Markers1(:,:,:),1));
 M2_temp = squeeze(median(Markers2(:,:,:),1));
 
+outlierBound = 2000;
 % remove outliers:
-M1 = M1_temp( M1_temp(:,1)<-2000 | M1_temp(:,1)>=2000 | M1_temp(:,2)<-2000 | M1_temp(:,2)>=2000,:);
-M2 = M2_temp( M2_temp(:,1)<-2000 | M2_temp(:,1)>=2000 | M2_temp(:,2)<-2000 | M2_temp(:,2)>=2000,:);
+M1 = M1_temp( M1_temp(:,1)<-outlierBound | M1_temp(:,1)>=outlierBound | M1_temp(:,2)<-outlierBound | M1_temp(:,2)>=outlierBound,:);
+M2 = M2_temp( M2_temp(:,1)<-outlierBound | M2_temp(:,1)>=outlierBound | M2_temp(:,2)<-outlierBound | M2_temp(:,2)>=outlierBound,:);
 
 
 % make euclidean distance matrix:
@@ -33,8 +34,10 @@ subplot(121);
 grid on;
 hold on;
 for i = 1: size(M2,1);
-    plot3(M1(i,1),M1(i,2),M1(i,3),'ro');
     plot3(M2(i,1),M2(i,2),M2(i,3),'bo');
+end
+for i = 1: size(M1,1);
+    plot3(M1(i,1),M1(i,2),M1(i,3),'ro');
     %     plot3(M4(i,1),M4(i,2),M4(i,3),'go');
 end
 title('UN Aligned Reference Points');
@@ -63,6 +66,9 @@ hold on;
 for i = 1:size(M2,1);
     plot3(M1(i,1),M1(i,2),M1(i,3),'ro');
     plot3(M2_t(i,1),M2_t(i,2),M2_t(i,3),'bo');
+end
+for i = 1:size(M1,1);
+    plot3(M1(i,1),M1(i,2),M1(i,3),'ro');
 end
 title('Aligned Reference Points');
 xlim([-4000 4000]);

@@ -1,4 +1,4 @@
-function out = ImBat_Create_Master_Track
+function master_track_file = ImBat_Create_Master_Track
 
 % run in folder with calibration .c3d files 
 % WAL3
@@ -13,6 +13,9 @@ out.Creation_date = datestr(now);
 DIR = pwd;
 mov_listing=dir(fullfile(DIR,'*.c3d'));
 mov_listing={mov_listing(:).name};
+
+% select Reference Day
+RefDay  = 23;
 
 
 for i=1:length(mov_listing)
@@ -29,9 +32,9 @@ end
 
 % STEP 3: Align Markers to first day
 disp('aligning all days...');
-out.ReferenceDate = out.date{1};
+out.ReferenceDate = out.date{RefDay};
 for i = 1:size(out.date,2)
-[out.tform{i},out.Markers_Adjusted{i}] = ImBat_AlignPoints(out.Markers_Raw{4},out.Markers_Raw{i});
+[out.tform{i},out.Markers_Adjusted{i}] = ImBat_AlignPoints(out.Markers_Raw{RefDay},out.Markers_Raw{i});
 
 % % STEP 4: Use tform to adjust markers ( for reference)
 % 
@@ -41,6 +44,7 @@ for i = 1:size(out.date,2)
 
 end
 
+master_track_file = out;
 
-save('Master_Tracking_File.mat','out');
+save(['Master_Tracking_File_',datestr(now),'.mat'],'master_track_file');
 

@@ -11,9 +11,6 @@ AftPad = 2500;
 ROI_ON = (ForePad/tfs)*fs;
 ROI_OFF = (AftPad/tfs)*fs;
 
-
-
-
 A = flightPaths.AllFlights;
 At = flightPaths.AllFlightsMasterTime;
 Velocity = flightPaths.batSpeed;
@@ -28,6 +25,9 @@ for i = clust; % for this clustered Trajectory ( use one to start)
             FlightLength(:,ii) = flightPaths.flight_ends_idx(idX(ii))-flightPaths.flight_starts_idx(idX(ii));
             %             CutFlights(:,ii) = Velocity(flightPaths.flight_starts_indx(idX(ii))-(ROI_ON/fs)*tfs:flightPaths.flight_starts_indx(idX(ii))+(ROI_OFF/fs)*tfs );
         catch
+             ClustFlight(:,:,ii) = A(flightPaths.flight_starts_idx(idX(ii-1))-ForePad:flightPaths.flight_starts_idx(idX(ii-1))+AftPad,:);
+            FlightTimes(:,ii) = At(flightPaths.flight_starts_idx(idX(ii-1)));
+            FlightLength(:,ii) = flightPaths.flight_ends_idx(idX(ii-1))-flightPaths.flight_starts_idx(idX(ii-1));
             disp('flight too close to end')
         end
     end
@@ -162,6 +162,8 @@ FlightAlignedROI.C_raw = CutCells2;
 FlightAlignedROI.S = CutCells3;
 FlightAlignedROI.clust_number = clust;
 FlightAlignedROI.IDX = IDX;
+FlightAlignedROI.cluster_idX = idX;
+
 FlightAlignedROI.ClustFlight_withPads = ClustFlight;
 FlightAlignedROI.ClustFlight = ClustFlight(ForePad-40:end-AftPad/2,:,:);
 FlightAlignedROI.FlightLength = FlightLength;

@@ -7,23 +7,18 @@ function ImBat_Tuning_Stability(ScoreMatrix);
 
 % Plot correlation over days 
 clear Var1 Var2
-
-% Variables:
-
-minROI_TrackingScore = 0.5; % only effects green trace
-minROI_SNR = 1;
 for i = 1:max(ScoreMatrix(5,:));
     
 ix1 = find(ScoreMatrix(5,:)==i);
 
-Var1(i) = nanmedian(ScoreMatrix(2,ix1));
+Var1(i) = nanmean(ScoreMatrix(2,ix1));
 Var2(i) = nanstd(ScoreMatrix(2,ix1));
 end
 
 % concat within day stability on day 1:
 ix1 = find(ScoreMatrix(5,:)==1);
 toAdd = ScoreMatrix(3,ix1);
-Var1 = cat(2,nanmedian(toAdd),Var1);
+Var1 = cat(2,nanmean(toAdd),Var1);
 Var2 = cat(2,nanstd(toAdd),Var2);
 
 figure();
@@ -42,39 +37,39 @@ errorbar([1:size(Var1,2)], Var1,...
 clear Var1 Var2 Var3 Var4
 for i = 1:max(ScoreMatrix(5,:));
     
-ix1 = find(ScoreMatrix(5,:)==i & ScoreMatrix(1,:)> minROI_TrackingScore & ScoreMatrix(8,:)> minROI_SNR); % find good tracking, and high peak value
-ix2 = find(ScoreMatrix(5,:)==i & ScoreMatrix(1,:)< 0.2 & ScoreMatrix(8,:)> minROI_SNR);
-ix3 = find(ScoreMatrix(5,:)==i & ScoreMatrix(8,:)> minROI_SNR);
+ix1 = find(ScoreMatrix(5,:)==i & ScoreMatrix(1,:)> 0.7 & ScoreMatrix(8,:)> 1.2); % find good tracking, and high peak value
+ix2 = find(ScoreMatrix(5,:)==i & ScoreMatrix(1,:)< 0.2 & ScoreMatrix(8,:)> 1.5);
+ix3 = find(ScoreMatrix(5,:)==i & ScoreMatrix(8,:)> 1.5);
 
 
-Var1(i) = nanmedian(ScoreMatrix(2,ix1));
+Var1(i) = nanmean(ScoreMatrix(2,ix1));
 Var2(i) = nanstd(ScoreMatrix(2,ix1));
 
-Var3(i) = nanmedian(ScoreMatrix(2,ix2));
+Var3(i) = nanmean(ScoreMatrix(2,ix2));
 Var4(i) = nanstd(ScoreMatrix(2,ix2));
 
-Var5(i) = nanmedian(ScoreMatrix(2,ix3));
+Var5(i) = nanmean(ScoreMatrix(2,ix3));
 Var6(i) = nanstd(ScoreMatrix(2,ix3));
 end
 
 % concat within day stability on day 1:
-ix1 = find(ScoreMatrix(5,:)==i & ScoreMatrix(1,:)> minROI_TrackingScore & ScoreMatrix(8,:)> minROI_SNR); % find good tracking, and high peak value
-ix2 = find(ScoreMatrix(5,:)==i & ScoreMatrix(1,:)< 0.2 & ScoreMatrix(8,:)> minROI_SNR);
-ix3 = find(ScoreMatrix(5,:)==i & ScoreMatrix(8,:)> minROI_SNR);
+ix1 = find(ScoreMatrix(5,:)==i & ScoreMatrix(1,:)> 0.7 & ScoreMatrix(8,:)> 1.2); % find good tracking, and high peak value
+ix2 = find(ScoreMatrix(5,:)==i & ScoreMatrix(1,:)< 0.2 & ScoreMatrix(8,:)> 1.5);
+ix3 = find(ScoreMatrix(5,:)==i & ScoreMatrix(8,:)> 1.5);
 
 
 toAdd = ScoreMatrix(3,ix1);
 toAdd2 = ScoreMatrix(3,ix2);
-toAdd3 = ScoreMatrix(3,ix3);
+toAdd4 = ScoreMatrix(3,ix3);
 
 % high corr
-Var1 = cat(2,nanmedian(toAdd),Var1);
+Var1 = cat(2,nanmean(toAdd),Var1);
 Var2 = cat(2,nanstd(toAdd),Var2);
 % Low Corr
-Var3 = cat(2,nanmedian(toAdd2),Var3);
+Var3 = cat(2,nanmean(toAdd2),Var3);
 Var4 = cat(2,nanstd(toAdd2),Var4);
 % all
-Var5 = cat(2,nanmedian(toAdd3),Var5);
+Var5 = cat(2,nanmean(toAdd3),Var5);
 Var6 = cat(2,nanstd(toAdd3),Var6);
 
 
@@ -87,11 +82,7 @@ errorbar([1:size(Var1,2)], Var1,...
  errorbar([1:size(Var3,2)], Var3,...
         (Var4)/sqrt(length(Var4)), 'color', ...
      'g', 'LineWidth', 2);
- 
-  errorbar([1:size(Var5,2)], Var5,...
-        (Var6)/sqrt(length(Var6)), 'color', ...
-     'b', 'LineWidth', 2);
- title('Tuning stability over days, for best (r) and worst ( g) and all ( b) tracked cells');
+ title('Tuning stability over days, for best (r) and worst ( g) tracked cells');
  xlabel('days');
  ylabel('tuning stability to day 1');
 
@@ -190,14 +181,14 @@ title(' top 10 (blue) and bottem 10% (red) spatial correlations');
 % %ix1 = find(ScoreMatrix(5,:)==i & ScoreMatrix(1,:)> 0.7 & ScoreMatrix(8,:)> 1.2); % find good tracking, and high peak value
 % ix1 = find(ScoreMatrix(5,:)==i &  ScoreMatrix(8,:)> 1.2); % find good tracking, and high peak value
 % 
-% Var1(i) = nanmedian(ScoreMatrix(2,ix1));
+% Var1(i) = nanmean(ScoreMatrix(2,ix1));
 % Var2(i) = nanstd(ScoreMatrix(2,ix1));
 % end
 % 
 % % concat within day stability on day 1:
 % ix1 = find(ScoreMatrix(5,:)==1);
 % toAdd = ScoreMatrix(3,ix1);
-% Var1 = cat(2,nanmedian(toAdd),Var1);
+% Var1 = cat(2,nanmean(toAdd),Var1);
 % Var2 = cat(2,nanstd(toAdd),Var2);
 % 
 % figure();
