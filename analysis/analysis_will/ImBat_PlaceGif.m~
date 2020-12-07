@@ -1,12 +1,17 @@
 function ImBat_PlaceGif
 
-axis tight
+% axis tight
+axis off
 h = gcf;
-filename = 'TestGif.gif';
+h.Color = 'w';
+filename = 'TestGif4.gif';
 grid on;
-subplot(1,2,1);
-for i = 1:1:360
 
+for i = 1:1:360
+view(i,10)
+set(gca, 'YAxisLocation', 'origin')
+
+%axis tight
  % Capture the plot as an image 
       frame = getframe(h); 
       im = frame2im(frame); 
@@ -18,7 +23,6 @@ for i = 1:1:360
           imwrite(imind,cm,filename,'gif','DelayTime',0.05,'WriteMode','append'); 
       end       
 
-view(i,10)
-axis tight
+
 pause(0.1)
 end

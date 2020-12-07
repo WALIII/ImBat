@@ -157,3 +157,30 @@ xlabel('days')
 ylabel('Number of flights');
 
 for K = 1 : length(b); b(K).FaceColor = colors(K,:).'; end
+
+% 
+% % Resort based on time
+% [aa ab] = sort(flightPaths.flight_starts_idx);
+% 
+% flightPaths.day = flightPaths.day(ab);
+% flightPaths.id = flightPaths.id(ab);
+% flightPaths.flight_starts_idx = flightPaths.flight_starts_idx(ab);
+% flightPaths.flight_ends_idx = flightPaths.flight_ends_idx(ab);
+% flightPaths.pos= flightPaths.pos(:,:,ab); 
+% flightPaths.vel = flightPaths.vel(:,:,ab);
+% flightPaths.day = flightPaths.day(ab);
+% 
+% flightPaths.length = flightPaths.length(ab);
+% flightPaths.dur = flightPaths.dur(ab);
+% %flightPaths.ifd = flightPaths.ifd(ab);
+%                      
+% for i = 1: size(flightPaths.clusterIndex,2)
+%     XX = flightPaths.clusterIndex{i};
+%     flightPaths.clusterIndex2{i} = ab(XX)';
+%     clear XX;
+% end
+% flightPaths.clusterIndex = flightPaths.clusterIndex2;
+%               
+% flightPaths.flight_starts_xyz = flightPaths.flight_starts_xyz(:,:,ab); 
+% flightPaths.flight_ends_xyz = flightPaths.flight_ends_xyz(ab,3); 
+

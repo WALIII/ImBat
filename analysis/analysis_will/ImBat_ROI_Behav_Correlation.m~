@@ -1,4 +1,4 @@
-function out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI)
+function out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined)
 
 % find if there is a correlation to the ROI and behavioral variance 
 
@@ -7,8 +7,8 @@ counter = 1;
 % NOTE: there may be more than one peak per ROI!
 
 % to get data, run:
-for ii = 1:size(FlightAlignedROI{1}.C,1) % first 10 cells:
-out =  ImBat_analysis_11112020(FlightAlignedROI,ii);
+for ii = 1:size(FlightAlignedROI_combined{1}.C,1) % first 10 cells:
+out =  ImBat_analysis_11112020(FlightAlignedROI_combined,ii);
 
 % plot mean of ROI data
 % Zscore data:
@@ -21,11 +21,11 @@ h2 = find(xtemp ~=0);
 AllColZ(:,h1) = [];
 x = mean(AllColZ,2);
 % get peaks
-[Bpks,Blocs] = findpeaks(x,'MinPeakProminence',.5,'MinPeakDistance',1);
+[Bpks,Blocs] = findpeaks(x,'MinPeakProminence',1.5,'MinPeakDistance',1);
 
 % only use peaks in the flight pad ( exclude reward...
 Blocs(Blocs<250) = [];
-Blocs(Blocs>1100) = [];
+Blocs(Blocs>1200) = [];
 
 % Blocs(Blocs<300) = [];
 % Blocs(Blocs>800) = [];

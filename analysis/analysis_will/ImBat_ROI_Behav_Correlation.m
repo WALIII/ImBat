@@ -1,14 +1,14 @@
-function out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI)
+function out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined)
 
 % find if there is a correlation to the ROI and behavioral variance 
-
+close all
 counter = 1; 
 
 % NOTE: there may be more than one peak per ROI!
 
 % to get data, run:
-for ii = 1:size(FlightAlignedROI{1}.C,1) % first 10 cells:
-out =  ImBat_analysis_11112020(FlightAlignedROI,ii);
+for ii = 1:size(FlightAlignedROI_combined{1}.C,1) % first 10 cells:
+out =  ImBat_analysis_11112020(FlightAlignedROI_combined,ii);
 
 % plot mean of ROI data
 % Zscore data:
@@ -21,14 +21,14 @@ h2 = find(xtemp ~=0);
 AllColZ(:,h1) = [];
 x = mean(AllColZ,2);
 % get peaks
-[Bpks,Blocs] = findpeaks(x,'MinPeakProminence',.5,'MinPeakDistance',1);
+[Bpks,Blocs] = findpeaks(x,'MinPeakProminence',0.5,'MinPeakDistance',1);
 
 % only use peaks in the flight pad ( exclude reward...
-Blocs(Blocs<250) = [];
-Blocs(Blocs>1200) = [];
+% Blocs(Blocs<250) = [];
+% Blocs(Blocs>1200) = [];
 
-% Blocs(Blocs<300) = [];
-% Blocs(Blocs>800) = [];
+Blocs(Blocs<550) = [];
+Blocs(Blocs>1050) = [];
 
 
 % figure(); 
@@ -127,6 +127,7 @@ x1 = ones(size(X1,1),1);
 X = [x1 X1];    % Includes column of ones
 
 [~,~,~,~,stats] = regress(y,X);
+stats
 X = [X1];
 mdl = fitlm(X,y);
 figure(); 
@@ -140,7 +141,7 @@ xlabel('mean Flight distance (cm);');
 % More plotting..... :
 
 figure(); 
-plot(meanF,(meanC),'*');
+plot(meanF,(meanC),'o');
 title('Mean Calcium intensity vs aveage flight distance from the mean flight');
 ylabel(' Mean, Normalized Ca++ activity');
 xlabel(' average euclidian distance from the mean flight in that cluster');
@@ -151,7 +152,7 @@ figure();
 subplot(2,1,1);
 
 hold on;
-plot(Loca,(meanC),'*');
+plot(Loca,(meanC),'o');
 [g1 g2] = sort(Loca);
 plot(Loca(g2),(smooth(meanC(g2),30,'lowess')),'LineWidth',3);
 
@@ -164,7 +165,7 @@ xlabel(' Flight Phase');
 
 subplot(2,1,2);
 hold on;
-plot(Loca,(meanF),'*');
+plot(Loca,(meanF),'o');
 plot(Loca(g2),(smooth(meanF(g2),30,'lowess')),'LineWidth',3);
 title('Mean Flight distance from center of cluster vs Flight Phase');
 ylabel(' Distance from center of cluster (cm)');

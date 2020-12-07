@@ -15,6 +15,8 @@
 
 % NOTE: this will load data subsets from ROI_Data depending on the CellRegistered mat file. 
 
+
+%% PRE-FLIGHT:
 % Concatonate/Cluster data across days
 [CombinedROI,ROI_Data] = ImBat_GroupCalcium(ROI_Data,cell_registered_struct,aligned_data_struct);
 
@@ -25,8 +27,27 @@ ROI_Data = ImBat_RepairFlightData(ROI_Data);
 flightPaths = ImBat_GroupFlights(ROI_Data,'mtf',master_track_file,'dist',1.2);         % just the flights
 close all
 
+
+%% 
+
+
 [FlightAlignedROI] = ImBat_Align_FC(CombinedROI,flightPaths,2);
+[FlightAlignedROI2] = ImBat_Align_FC(CombinedROI,flightPaths,3);
+[FlightAlignedROI3] = ImBat_Align_FC(CombinedROI,flightPaths,4);
+[FlightAlignedROI4] = ImBat_Align_FC(CombinedROI,flightPaths,5);
+
 FlightAlignedROI_combined{1} = FlightAlignedROI;
+FlightAlignedROI_combined{2} = FlightAlignedROI2;
+FlightAlignedROI_combined{3} = FlightAlignedROI3;
+FlightAlignedROI_combined{4} = FlightAlignedROI4;
+
+
+
+% Save data
+mkdir('Saved_Data')
+save('Saved_Data/Aligned_Data.mat','flightPaths','CombinedROI');
+
+
 
 % Bassics of loaded and aligned data;
     % 1. Quality of ROI maps for each day, and across days
@@ -65,3 +86,11 @@ ImBat_analysis_11122020(CombinedROI,flightPaths);
 
 % stats between variability in ROIs and in flight
 out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined)
+
+
+%% Markov analysis
+[out_markov] = ImBat_New_Markov(flightPaths);
+ImBat_ProbSuffixTree(out_markov,5);
+
+ImBat_ClusterCalciumVar(FlightAlignedROI,1);
+ImBat_PlotMarkov(out_markov,FlightAlignedROI,1)

@@ -10,7 +10,7 @@ figure();
 hold on;
 
 stop_time = 1;
-sub2plot = 5;
+sub2plot = 12;
 
 
 % Plot all flights for 5 days, hilighting the clustered flights
@@ -26,7 +26,7 @@ for i = 1:sub2plot%max(flightPaths.day); % number of days
     hold on;
     % plot all flights
     plot1 =  plot3(A(1,bound),A(2,bound),A(3,bound),'k');
-    plot1.Color(4) = 0.4;
+    %plot1.Color(4) = 0.4;
     % plot clust flights
     dayFlights = flightPaths.day(flightPaths.clusterIndex{clst});
     todaysFlight = find(dayFlights==i);
@@ -35,6 +35,7 @@ for i = 1:sub2plot%max(flightPaths.day); % number of days
     end
     grid on;
     view( -37.5000,30)
+    axis off
     
 end
 
@@ -45,13 +46,14 @@ end
 CutCells = FlightAlignedROI.C_raw;
 ROI_ON = FlightAlignedROI.ROI_ON;
 
+
 % get dates:
 transition_points = find((diff(FlightAlignedROI.CutCells_date)>=1));  %?
 transition_points = [1 transition_points size(CutCells,3)];
 
 
 % get bound to plot
-bound2plot = 1:400;
+bound2plot = 1:500;
 counter = 1;
 col = hsv(size(transition_points,2)+1);
 figure();
@@ -72,8 +74,10 @@ hold on;
     subplot(10,1,3:10);
     
     adata = zscore(squeeze(CutCells(i,bound2plot,:)),[],1)';
+%     adata = adata-median(adata(:,500:600)')';
     imagesc(adata);
     % draw date lines:
+    colormap(parula.^2)
     hold on;
     for ii = 1:size(transition_points,2)
         line([1,size(CutCells,2)], [transition_points(ii),transition_points(ii)], 'Color','r','LineWidth',2);
