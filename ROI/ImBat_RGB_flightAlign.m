@@ -4,9 +4,14 @@ function ImBat_RGB_flightAlign(batId,fullSeshTag,day1,day2,day3)
 clustNum = 2;
 saveFlag = 1;
 rigidFlag = 1;
-saveTag = 'rigid 25filt .25range';
+hFilt1 = 50; %this is for smoothing the image to determine background for dividing it out to normalize the pixel intensities on all layers
+hFilt2 = 25; %this is for smoothing the actual image before the exponential to show the layers, use 25 for rgb overlay and 50 for the difference heat plots
+clipRangeShow = [-0.20 0.20]; %clipping HL to use for the heat map plots
+clipRangeOverlap = [0.05 .25]; %clipping HL to use for the RGB overlay
+saveTag = ['rigid ' num2str(hFilt2) 'filt'];
 dirAllTrials = pwd;
-h = fspecial('disk',50);
+h1 = fspecial('disk',hFilt1); %normalize background smoothing
+h2 = fspecial('disk',hFilt2); %smooth presentation image
 
 %load first day placeCellStableROI data
 if strcmp(batId,'Gal')
@@ -59,39 +64,40 @@ else %comparing the full session
         IM1_raw = activity_allTrials.YmaxFull{day1};
         IM2_raw = activity_allTrials.YmaxFull{day2};
         IM3_raw = activity_allTrials.YmaxFull{day3};
-        plotTitle = [saveTag ' ' batId ' clust ' num2str(clustNum) ' Full Sesh: Day ' num2str(day1) ' (r) v Day ' num2str(day2) ' (g) v Day ' num2str(day3) ' (b)'];
+        plotTitle = [saveTag ' ' batId ' Full Sesh: Day ' num2str(day1) ' (r) v Day ' num2str(day2) ' (g) v Day ' num2str(day3) ' (b)'];
     end
 end
 
-IM_rawall = cell(3,1);
-for day_i = 1:3
-    IM_rawall{day_i} = zeros(size(YmaxFull{day_i},1),size(YmaxFull{day_i},2),3);
-for part_i = 1:3
-IM_rawall{day_i}(:,:,part_i) = YmaxFull{part_i+(day_i-1)*3};
-end
-end
-IM1_raw = mean(IM_rawall{1},3);
-IM2_raw = mean(IM_rawall{2},3);
-IM3_raw = mean(IM_rawall{3},3);
-IM1_raw = IM_rawall{3}(:,:,1);
-IM2_raw = IM_rawall{3}(:,:,2);
-IM3_raw = IM_rawall{3}(:,:,3);
+% IM_rawall = cell(3,1);
+% for day_i = 1:3
+%     IM_rawall{day_i} = zeros(size(YmaxFull{day_i},1),size(YmaxFull{day_i},2),3);
+% for part_i = 1:3
+% IM_rawall{day_i}(:,:,part_i) = YmaxFull{part_i+(day_i-1)*3};
+% end
+% end
+% IM1_raw = mean(IM_rawall{1},3);
+% IM2_raw = mean(IM_rawall{2},3);
+% IM3_raw = mean(IM_rawall{3},3);
+% IM1_raw = IM_rawall{3}(:,:,1);
+% IM2_raw = IM_rawall{3}(:,:,2);
+% IM3_raw = IM_rawall{3}(:,:,3);
 
 %filter, and divide background to make the pixels all the same brightness
 %resize and subtract background
 IM1doub = imresize(double(IM1_raw),2);
 IM2doub = imresize(double(IM2_raw),2);
 IM3doub = imresize(double(IM3_raw),2);
-IM1_filt = IM1doub;
-IM2_filt = IM2doub;
-IM3_filt = IM3doub;
+% IM1_filt = IM1doub;
+% IM2_filt = IM2doub;
+% IM3_filt = IM3doub;
 
-bground1=imfilter(IM1doub,h,'replicate');%smoothdata(IM1doub,'gaussian',2);%
-bground2=imfilter(IM2doub,h,'replicate');%smoothdata(IM2doub,'gaussian',2);%
-bground3=imfilter(IM3doub,h,'replicate');%smoothdata(IM3doub,'gaussian',2);%
+bground1=imfilter(IM1doub,h1,'replicate');%smoothdata(IM1doub,'gaussian',2);%
+bground2=imfilter(IM2doub,h1,'replicate');%smoothdata(IM2doub,'gaussian',2);%
+bground3=imfilter(IM3doub,h1,'replicate');%smoothdata(IM3doub,'gaussian',2);%
 IM1_filt=IM1doub./(bground1+5);
 IM2_filt=IM2doub./(bground2+5);
 IM3_filt=IM3doub./(bground3+5);
+
 %concatenate to make into grayscale and then break apart into correct sizes
 IMcat = [IM1_filt IM2_filt IM3_filt];    IMcat_gray = mat2gray(IMcat);
 IM1 = IMcat_gray(:,1:size(IMcat_gray,2)/3);
@@ -151,24 +157,26 @@ IM1_aligned = imagesAligned.IM1_aligned;
 IM2_aligned = imagesAligned.IM2_aligned;
 IM3_aligned = imagesAligned.IM3_aligned;
 
-bground1=imfilter(IM1_aligned,h,'replicate');%smoothdata(IM1doub,'gaussian',2);%
-bground2=imfilter(IM2_aligned,h,'replicate');%smoothdata(IM2doub,'gaussian',2);%
-bground3=imfilter(IM3_aligned,h,'replicate');%smoothdata(IM3doub,'gaussian',2);%
-IM1_bfilt=IM1_aligned./(bground1+5);
-IM2_bfilt=IM2_aligned./(bground2+5);
-IM3_bfilt=IM3_aligned./(bground3+5);
+% IM1doub = imresize(double(IM1_aligned),2);
+% IM2doub = imresize(double(IM2_aligned),2);
+% IM3doub = imresize(double(IM3_aligned),2);
+% bground1=imfilter(IM1doub,h,'replicate');%smoothdata(IM1doub,'gaussian',2);%
+% bground2=imfilter(IM2doub,h,'replicate');%smoothdata(IM2doub,'gaussian',2);%
+% bground3=imfilter(IM3doub,h,'replicate');%smoothdata(IM3doub,'gaussian',2);%
+% IM1_bfilt=imresize(double(IM1_aligned),2)./(bground1+5);
+% IM2_bfilt=imresize(double(IM2_aligned),2)./(bground2+5);
+% IM3_bfilt=imresize(double(IM3_aligned),2)./(bground3+5);
 
 %filter, then average the images and subtract each from that average to show difference
-hFilt = fspecial('disk',25);
-IM1_aligned_filt = imfilter(IM1_bfilt,hFilt,'replicate');%(IM1_aligned,hFilt,'replicate');
-IM2_aligned_filt = imfilter(IM2_bfilt,hFilt,'replicate');%(IM2_aligned,hFilt,'replicate');
-IM3_aligned_filt = imfilter(IM3_bfilt,hFilt,'replicate');%(IM3_aligned,hFilt,'replicate');
+IM1_aligned_filt = imfilter(IM1_aligned,h2,'replicate');%(IM1_aligned,hFilt,'replicate');
+IM2_aligned_filt = imfilter(IM2_aligned,h2,'replicate');%(IM2_aligned,hFilt,'replicate');
+IM3_aligned_filt = imfilter(IM3_aligned,h2,'replicate');%(IM3_aligned,hFilt,'replicate');
 IM1_aligned_filt = IM1_aligned_filt.^3;
 IM2_aligned_filt = IM2_aligned_filt.^3;
 IM3_aligned_filt = IM3_aligned_filt.^3;
 
 %RGB the images
-[aOverlap,bOverlap] = CaBMI_XMASS(IM1_aligned_filt,IM2_aligned_filt,IM3_aligned_filt,'hl',[.000001 .25]);
+[aOverlap,bOverlap] = CaBMI_XMASS(IM1_aligned_filt,IM2_aligned_filt,IM3_aligned_filt,'hl',clipRangeOverlap);
 %rgb the original unaligned for comparison
 [aUnaligned,bUnaligned] = CaBMI_XMASS(IM1(1:minRow,1:minCol),IM2(1:minRow,1:minCol),IM3);
 
@@ -186,32 +194,38 @@ overlapQuart(quart_i,2) = sum(sum(abs(IM2_aligned_filt(quartRange(quart_i,1):qua
 %overlapQuart(quart_i,3) = sum(sum(abs(IM1_aligned_filt(quartRange(quart_i,1):quartRange(quart_i,2),quartRange(quart_i,3):quartRange(quart_i,4))-IM3_aligned_filt(quartRange(quart_i,1):quartRange(quart_i,2),quartRange(quart_i,3):quartRange(quart_i,4)))));
 medOverlapQuart(quart_i) = median(overlapQuart(quart_i,:));
 end
-medOverlapAll = median(overlapQuart,'all');
+medOverlapAll = round(median(overlapQuart,'all'));
 
-IM_sum = IM1_aligned_filt + IM2_aligned_filt + IM3_aligned_filt;
+%use the larger filter of 50 to smooth the images for subtraction/comparisons
+IM1_aligned_filt_comp = imfilter(IM1_aligned,h1,'replicate');%(IM1_aligned,hFilt,'replicate');
+IM2_aligned_filt_comp = imfilter(IM2_aligned,h1,'replicate');%(IM2_aligned,hFilt,'replicate');
+IM3_aligned_filt_comp = imfilter(IM3_aligned,h1,'replicate');%(IM3_aligned,hFilt,'replicate');
+IM1_aligned_filt_comp = IM1_aligned_filt_comp.^3;
+IM2_aligned_filt_comp = IM2_aligned_filt_comp.^3;
+IM3_aligned_filt_comp = IM3_aligned_filt_comp.^3;
+IM_sum = IM1_aligned_filt_comp + IM2_aligned_filt_comp + IM3_aligned_filt_comp;
 IM_mean = IM_sum/3;
-IM1_diff = IM1_aligned_filt - IM_mean;
-IM2_diff = IM2_aligned_filt - IM_mean;
-IM3_diff = IM3_aligned_filt - IM_mean;
-IM_1diff2 = IM2_aligned_filt - IM1_aligned_filt;
+IM1_diff = IM1_aligned_filt_comp - IM_mean;
+IM2_diff = IM2_aligned_filt_comp - IM_mean;
+IM3_diff = IM3_aligned_filt_comp - IM_mean;
+IM_1diff2 = IM2_aligned_filt_comp - IM1_aligned_filt_comp;
 %IM_1diff2 = IM_1diff2.^5;
-IM_2diff3 = IM3_aligned_filt - IM2_aligned_filt;
+IM_2diff3 = IM3_aligned_filt_comp - IM2_aligned_filt_comp;
 %IM_2diff3 = IM_2diff3.*5;
-IM_1diff3 = IM3_aligned_filt - IM1_aligned_filt;
+IM_1diff3 = IM3_aligned_filt_comp - IM1_aligned_filt_comp;
 %IM_1diff3 = IM_1diff3.*5;
 %concatenate to take min/max and subtract from that
-IM_combined(:,:,1) = IM1_aligned_filt;
-IM_combined(:,:,2) = IM2_aligned_filt;
-IM_combined(:,:,3) = IM3_aligned_filt;
+IM_combined(:,:,1) = IM1_aligned_filt_comp;
+IM_combined(:,:,2) = IM2_aligned_filt_comp;
+IM_combined(:,:,3) = IM3_aligned_filt_comp;
 IM_combined_max = max(IM_combined,[],3);
 IM_combined_min = min(IM_combined,[],3);
-IM1_maxDiff = IM1_aligned_filt - IM_combined_max;
-IM2_maxDiff = IM2_aligned_filt - IM_combined_max;
-IM3_maxDiff = IM3_aligned_filt - IM_combined_max;
-IM1_minDiff = IM1_aligned_filt - IM_combined_min;
-IM2_minDiff = IM2_aligned_filt - IM_combined_min;
-IM3_minDiff = IM3_aligned_filt - IM_combined_min;
-clipRange = [-0.25 0.25];
+IM1_maxDiff = IM1_aligned_filt_comp - IM_combined_max;
+IM2_maxDiff = IM2_aligned_filt_comp - IM_combined_max;
+IM3_maxDiff = IM3_aligned_filt_comp - IM_combined_max;
+IM1_minDiff = IM1_aligned_filt_comp - IM_combined_min;
+IM2_minDiff = IM2_aligned_filt_comp - IM_combined_min;
+IM3_minDiff = IM3_aligned_filt_comp - IM_combined_min;
 
 %% load masks and warp to match registered max projection for each day
 if rigidFlag == 1 %only if have the rigid twarp output
@@ -232,6 +246,7 @@ if rigidFlag == 1 %only if have the rigid twarp output
         Atemp = full(results.A);
         resultsA{day_i} = Atemp;
         resultsCn{day_i} = results.Cn;
+        resultsCraw{day_i} = results.C_raw;
         
         % Plot binary mask of all neurons in the A matrix
         %convert A matrix into full matrix
@@ -278,6 +293,11 @@ if rigidFlag == 1 %only if have the rigid twarp output
     end
     %ROI_coords = smoothdata(ROI_coords,'gaussian',3); %filter the ROI coordinate mask so it is not so jagged
 end
+
+
+
+
+
 
 %% plots
 %plot the unaligned vs aligned for comparison
@@ -349,13 +369,13 @@ axes(ha(1)); imshow(aOverlap(:,:,:),[]); title('RGB Overlap');
 axes(ha(2)); imshow(IM_mean,[]); title('Mean Day 1, 2, 3');
 colormap(ha(2),gray);
 colorbar('southoutside');
-axes(ha(3)); imshow(IM1_diff,clipRange); title('Diff Day 1');
+axes(ha(3)); imshow(IM1_diff,clipRangeShow); title('Diff Day 1');
 colormap(ha(3),fireice);
 colorbar('southoutside');
-axes(ha(4)); imshow(IM2_diff,clipRange); title('Diff Day 2');
+axes(ha(4)); imshow(IM2_diff,clipRangeShow); title('Diff Day 2');
 colormap(ha(4),fireice);
 colorbar('southoutside');
-axes(ha(5)); imshow(IM3_diff,clipRange); title('Diff Day 3');
+axes(ha(5)); imshow(IM3_diff,clipRangeShow); title('Diff Day 3');
 colormap(ha(5),fireice);
 colorbar('southoutside');
 
@@ -369,30 +389,30 @@ axes(ha(1)); imshow(aOverlap(:,:,:),[]); title('RGB Overlap');
 axes(ha(2)); imshow(IM1_aligned_filt,[]); title('Day 1');
 colormap(ha(2),gray);
 colorbar('southoutside');
-axes(ha(3)); imshow(IM_1diff2,clipRange); title('Day 2 - Day 1');
+axes(ha(3)); imshow(IM_1diff2,clipRangeShow); title('Day 2 - Day 1');
 colormap(ha(3),fireice);
 colorbar('southoutside');
-axes(ha(4)); imshow(IM_2diff3,clipRange); title('Day 3 - Day 2');
+axes(ha(4)); imshow(IM_2diff3,clipRangeShow); title('Day 3 - Day 2');
 colormap(ha(4),fireice);
 colorbar('southoutside');
-axes(ha(5)); imshow(IM_1diff3,clipRange); title('Day 3 - Day 1');
+axes(ha(5)); imshow(IM_1diff3,clipRangeShow); title('Day 3 - Day 1');
 colorbar('southoutside');
 colormap(ha(5),fireice);
 
 %% plot rgb and each progression of differences from 1 day to next
 plotDay123_all = figure('units','normalized','outerposition',[0 0 1 1]);
-sgtitle([plotTitle ' comparing days']);
+sgtitle([plotTitle ' medDiff ' num2str(medOverlapAll)]);
 ha = tight_subplot(4,5,[.02 .01],[.01 .08],[.01 .01]);
 set(0,'CurrentFigure',plotDay123_all);
 axes(ha(1)); imshow(aOverlap(:,:,:),[]); title('RGB Overlap');
 %colorbar('southoutside');
 axes(ha(2)); imshow(IM1_aligned_filt,[]); title('Day 1');
 %colorbar('southoutside');
-axes(ha(3)); imshow(IM_1diff2,clipRange); title('Day 2 - Day 1');
+axes(ha(3)); imshow(IM_1diff2,clipRangeShow); title('Day 2 - Day 1');
 %colorbar('southoutside');
-axes(ha(4)); imshow(IM_2diff3,clipRange); title('Day 3 - Day 2');
+axes(ha(4)); imshow(IM_2diff3,clipRangeShow); title('Day 3 - Day 2');
 %colorbar('southoutside');
-axes(ha(5)); imshow(IM_1diff3,clipRange); title('Day 3 - Day 1');
+axes(ha(5)); imshow(IM_1diff3,clipRangeShow); title('Day 3 - Day 1');
 %colorbar('southoutside');
 colormap(ha(3),fireice);
 colormap(ha(4),fireice);
@@ -409,11 +429,11 @@ title('Day 1 ROIs');
 hold off
 axes(ha(7)); imshow(IM_mean,[]); title('Mean Day 1, 2, 3');
 %colorbar('southoutside');
-axes(ha(8)); imshow(IM1_diff,clipRange); title('Day 1 - mean');
+axes(ha(8)); imshow(IM1_diff,clipRangeShow); title('Day 1 - mean');
 %colorbar('southoutside');
-axes(ha(9)); imshow(IM2_diff,clipRange); title('Day 2 - mean');
+axes(ha(9)); imshow(IM2_diff,clipRangeShow); title('Day 2 - mean');
 %colorbar('southoutside');
-axes(ha(10)); imshow(IM3_diff,clipRange); title('Day 3 - mean');
+axes(ha(10)); imshow(IM3_diff,clipRangeShow); title('Day 3 - mean');
 colormap(ha(8),fireice);
 colormap(ha(9),fireice);
 colormap(ha(10),fireice);%colorbar('southoutside');
@@ -429,11 +449,11 @@ title('Day 2 ROIs');
 hold off
 axes(ha(12)); imshow(IM_combined_max,[]); title('Max Day 1, 2, 3');
 %colorbar('southoutside');
-axes(ha(13)); imshow(IM1_maxDiff,clipRange); title('Day 1  - max');
+axes(ha(13)); imshow(IM1_maxDiff,clipRangeShow); title('Day 1  - max');
 %colorbar('southoutside');
-axes(ha(14)); imshow(IM2_maxDiff,clipRange); title('Day 2  - max');
+axes(ha(14)); imshow(IM2_maxDiff,clipRangeShow); title('Day 2  - max');
 %colorbar('southoutside');
-axes(ha(15)); imshow(IM3_maxDiff,clipRange); title('Day 3 - max');
+axes(ha(15)); imshow(IM3_maxDiff,clipRangeShow); title('Day 3 - max');
 colormap(ha(13),fireice);
 colormap(ha(14),fireice);
 colormap(ha(15),fireice);%colorbar('southoutside');
@@ -452,14 +472,228 @@ title('Day 3 ROIs');
 hold off
 axes(ha(17)); imshow(IM_combined_min,[]); title('Min Day 1, 2, 3');
 %colorbar('southoutside');
-axes(ha(18)); imshow(IM1_minDiff,clipRange); title('Day 1 - min');
+axes(ha(18)); imshow(IM1_minDiff,clipRangeShow); title('Day 1 - min');
 %colorbar('southoutside');
-axes(ha(19)); imshow(IM2_minDiff,clipRange); title('Day 2 - min');
+axes(ha(19)); imshow(IM2_minDiff,clipRangeShow); title('Day 2 - min');
 %colorbar('southoutside');
-axes(ha(20)); imshow(IM3_minDiff,clipRange); title('Day 3 - min');
+axes(ha(20)); imshow(IM3_minDiff,clipRangeShow); title('Day 3 - min');
 colormap(ha(18),fireice);
 colormap(ha(19),fireice);
 colormap(ha(20),fireice);%colorbar('southoutside');
+
+%% plot the cnmfe time series only for the 3 days
+plotCnmfeSeries = figure('units','normalized','outerposition',[0 0 1 1]);
+sgtitle(plotTitle);
+% subplot(4,4,1);
+% image(aOverlap(:,:,:));
+% title([plotTitle ' medDiff ' num2str(medOverlapAll)]);
+% set(gca,'xticklabel',[],'yticklabel',[]);
+
+for day_i = 1:length(resultsCraw)
+    subplot(3,1,day_i);
+for roi_i = 1:size(resultsCraw{day_i},1); 
+    plot(1:size(resultsCraw{day_i},2),zscore(smoothdata(resultsCraw{day_i}(roi_i,:),'movmedian',30))+roi_i*6); 
+    hold on;
+end
+dataTicks = [6:6:size(resultsCraw{day_i},1)*6];
+set(gca,'YTick',dataTicks,'YTickLabel',[1:length(dataTicks)],'xlim',[0 size(resultsCraw{day_i},2)]);
+xt = get(gca,'xtick');
+set(gca,'XTick',xt, 'xticklabel',xt/(results.Fs*60));
+title(['Day ' num2str(day_i)]);
+ylabel([num2str(size(resultsCraw{day_i},1)) ' ROIs']);
+if day_i == 3
+    xlabel('Time (m)');
+end
+end
+
+%% plot the time series from cnmfe next to RGB and daily overlap to check that cells are selected properly
+%plot rgb overlap
+plotOverlapTimeSeries = figure('units','normalized','outerposition',[0 0 1 1]);
+sgtitle([plotTitle ' medDiff ' num2str(medOverlapAll)]);
+%ha = tight_subplot(4,4,[.02 .01],[.01 .08],[.01 .01]);
+set(0,'CurrentFigure',plotOverlapTimeSeries);
+ax1 = subplot(4,4,1); imagesc(aOverlap(:,:,:)); title('RGB Overlap');
+set(gca,'XTick',[],'YTick',[],'XTickLabel',[],'YTickLabel',[]);
+%colorbar('southoutside');
+ax2 = subplot(4,4,2); imagesc(IM_1diff2,clipRangeShow); title('Day 2 - Day 1');
+set(gca,'XTick',[],'YTick',[],'XTickLabel',[],'YTickLabel',[]);
+%colorbar('southoutside');
+ax3 = subplot(4,4,3); imagesc(IM_2diff3,clipRangeShow); title('Day 3 - Day 2');
+set(gca,'XTick',[],'YTick',[],'XTickLabel',[],'YTickLabel',[]);
+%colorbar('southoutside');
+ax4 = subplot(4,4,4); imagesc(IM_1diff3,clipRangeShow); title('Day 3 - Day 1');
+set(gca,'XTick',[],'YTick',[],'XTickLabel',[],'YTickLabel',[]);
+colormap(ax2,fireice);
+colormap(ax3,fireice);
+colormap(ax4,fireice);
+ax5 = subplot(4,4,5); imagesc(IM1_aligned_filt);
+colormap(ax5,gray);
+set(gca,'XTick',[],'YTick',[],'XTickLabel',[],'YTickLabel',[]);
+hold on;
+for roi_i = 1:size(ROI2plot_aligned{1},3)
+        plot(ROI_coords{1}{roi_i,1},ROI_coords{1}{roi_i,2},'LineWidth',4,'Color',[col{1}(roi_i,:) 0.01]);
+        p = text(centroid{1}(roi_i,1),centroid{1}(roi_i,2),num2str(roi_i));
+        p.Color(1:3) = col{1}(size(ROI2plot_aligned{1},3) + 1 - roi_i,:);
+end
+title('Day 1 ROIs');
+hold off
+subplot(4,4,6:8);
+for roi_i = 1:size(resultsCraw{1},1); 
+    plot(1:size(resultsCraw{1},2),zscore(smoothdata(resultsCraw{1}(roi_i,:),'movmedian',30))+roi_i*6); 
+    hold on;
+end
+dataTicks = [6:6:size(resultsCraw{1},1)*6];
+set(gca,'YTick',dataTicks,'YTickLabel',[1:length(dataTicks)],'xlim',[0 size(resultsCraw{1},2)]);
+xt = get(gca,'xtick');
+set(gca,'XTick',xt, 'xticklabel',xt/(results.Fs*60));
+title(['Day 1']);
+ylabel([num2str(size(resultsCraw{1},1)) ' ROIs']);
+hold off
+ax9 = subplot(4,4,9); imagesc(IM2_aligned_filt);
+colormap(ax9,gray);
+set(gca,'XTick',[],'YTick',[],'XTickLabel',[],'YTickLabel',[]);
+hold on;
+for roi_i = 1:size(ROI2plot_aligned{2},3)
+        plot(ROI_coords{2}{roi_i,1},ROI_coords{2}{roi_i,2},'LineWidth',4,'Color',[col{2}(roi_i,:) 0.01]);
+        p = text(centroid{2}(roi_i,1),centroid{2}(roi_i,2),num2str(roi_i));
+        p.Color(1:3) = col{2}(size(ROI2plot_aligned{2},3) + 1 - roi_i,:);
+end
+title('Day 2 ROIs');
+hold off
+subplot(4,4,10:12); 
+for roi_i = 1:size(resultsCraw{2},1); 
+    plot(1:size(resultsCraw{2},2),zscore(smoothdata(resultsCraw{2}(roi_i,:),'movmedian',30))+roi_i*6); 
+    hold on;
+end
+dataTicks = [6:6:size(resultsCraw{2},1)*6];
+set(gca,'YTick',dataTicks,'YTickLabel',[1:length(dataTicks)],'xlim',[0 size(resultsCraw{2},2)]);
+xt = get(gca,'xtick');
+set(gca,'XTick',xt, 'xticklabel',xt/(results.Fs*60));
+title(['Day 2']);
+ylabel([num2str(size(resultsCraw{2},1)) ' ROIs']);
+hold off
+ax13 = subplot(4,4,13); imagesc(IM3_aligned_filt);
+colormap(ax13,gray);
+set(gca,'XTick',[],'YTick',[],'XTickLabel',[],'YTickLabel',[]);
+hold on;
+for roi_i = 1:size(ROI2plot_aligned{3},3)
+        plot(ROI_coords{3}{roi_i,1},ROI_coords{3}{roi_i,2},'LineWidth',4,'Color',[col{3}(roi_i,:) 0.01]);
+        p = text(centroid{3}(roi_i,1),centroid{3}(roi_i,2),num2str(roi_i));
+        p.Color(1:3) = col{3}(size(ROI2plot_aligned{3},3) + 1 - roi_i,:);
+end
+title('Day 3 ROIs');
+hold off
+subplot(4,4,14:16);
+for roi_i = 1:size(resultsCraw{3},1); 
+    plot(1:size(resultsCraw{3},2),zscore(smoothdata(resultsCraw{3}(roi_i,:),'movmedian',30))+roi_i*6); 
+    hold on;
+end
+dataTicks = [6:6:size(resultsCraw{3},1)*6];
+set(gca,'YTick',dataTicks,'YTickLabel',[1:length(dataTicks)],'xlim',[0 size(resultsCraw{3},2)]);
+xt = get(gca,'xtick');
+set(gca,'XTick',xt, 'xticklabel',xt/(results.Fs*60));
+title(['Day 3']);
+ylabel([num2str(size(resultsCraw{3},1)) ' ROIs']);
+hold off
+%% ask which cells and days times series to compare
+inputGo = [];
+inputGo = input('Go?');
+while isempty(inputGo)
+    inputDay = input('What days would you like to compare?');
+inputROI = input('What ROIs would you like to compare?');
+Ysiz = size(resultsCn{1}); %size of the image frame
+Rtime = [];
+Rmask = [];
+timeseries = [];
+binaryMask = [];
+binaryMaskAlign = [];
+%find duration of each day and concatenate the day/roi numbers for titles 
+for comp_i = 1:length(inputDay)
+    dur(comp_i) = length(resultsCraw{inputDay(comp_i)});
+    dayROI{comp_i} = [num2str(inputDay(comp_i)) '.' num2str(inputROI(comp_i))];
+end
+minDurDay = min(dur); %find min duration of the days to limit the time series
+%extract the time series and binary mask of each Day/ROI combo 
+for comp_i = 1:length(inputDay)
+    timeseries(:,comp_i) = zscore(smoothdata(resultsCraw{inputDay(comp_i)}(inputROI(comp_i),1:minDurDay),2,'movmedian',30))';
+    
+    roiMask = imresize(mat2gray(reshape(resultsA{inputDay(comp_i)}(:,inputROI(comp_i)),Ysiz(1),Ysiz(2))),10);
+    binaryMask(:,:,comp_i) = imbinarize(roiMask);%mat2gray(reshape(resultsA{inputDay(comp_i)}(:,inputROI(comp_i)),Ysiz(1),Ysiz(2))));
+    
+    %warp the binary mask according to the twarps from the image alignment
+    if inputDay(comp_i) == 1
+    binaryMaskAlign(:,:,comp_i) = imwarp(binaryMask(:,:,comp_i),imagesAligned.IM1_tform,'OutputView',imref2d(size(IM2)));
+    elseif inputDay(comp_i) == 2
+        binaryMaskAlign(:,:,comp_i) = binaryMask(:,:,comp_i);
+    elseif inputDay(comp_i) == 3
+    binaryMaskAlign(:,:,comp_i) = imwarp(binaryMask(:,:,comp_i),imagesAligned.IM3_tform,'OutputView',imref2d(size(IM2)));    
+    end
+end
+%find correlation coefficients and pvalues for timeseries
+[Rtime,Ptime] = corrcoef(timeseries);
+%find correlation coefficients for 2d spatial masks
+for corr_i = 1:length(inputDay)
+    for corr_ii = corr_i:length(inputDay)
+    Rmask(corr_i,corr_ii) = corr2(binaryMaskAlign(:,:,corr_i),binaryMaskAlign(:,:,corr_ii));
+    Rmask(corr_ii,corr_i) = corr2(binaryMaskAlign(:,:,corr_ii),binaryMaskAlign(:,:,corr_i));
+    end  
+end
+%overlay the RGB 
+if length(inputDay) < 3
+    [aMask,bMask] = CaBMI_XMASS(binaryMaskAlign(:,:,1),binaryMaskAlign(:,:,2),binaryMaskAlign(:,:,2));
+    titleMask = ['RGB overlap ' dayROI{1} '(r) ' dayROI{2} '(c)'];
+elseif length(inputDay) >= 3
+    [aMask,bMask] = CaBMI_XMASS(binaryMaskAlign(:,:,1),binaryMaskAlign(:,:,2),binaryMaskAlign(:,:,3));
+    titleMask = ['RGB overlap ' dayROI{1} '(r) ' dayROI{2} '(g) ' dayROI{3} '(b)'];
+end
+%plot the similarity matrix of time series, mask, and the time series
+plotCompareTimeSeries = figure('units','normalized','outerposition',[0 0 1 0.5]);
+sgtitle([batId ' Comparing ROIs']);
+subplot(1,7,1);
+imagesc(Rtime,[0 1]); %plot similarity matrix of time series
+set(gca,'XTick',[1:length(inputDay)],'XTickLabel',dayROI,'YTick',[1:length(inputDay)],'YTickLabel',dayROI);
+xlabel('Day.ROI');
+ylabel('Day.ROI');
+title('Correlation of Time series');
+colorbar('southoutside');
+
+subplot(1,7,2:4); %plot time series of selected ROIS
+for plot_i = 1:length(inputDay)
+    plot(1:minDurDay,timeseries(:,plot_i)+plot_i*6);
+    hold on;
+end
+dataTicks = [6:6:length(inputDay)*6];
+set(gca,'YTick',dataTicks,'YTickLabel',dayROI,'xlim',[0 minDurDay]);
+xt = get(gca,'xtick');
+set(gca,'XTick',xt, 'xticklabel',xt/(results.Fs*60));
+title(['ROI Time Series']);
+%ylabel('ROIs (Day.ROI)');
+xlabel('Time (m)');
+hold off
+subplot(1,7,5);
+imagesc(Rmask,[0 1]); %plot similarity matrix of masks
+set(gca,'XTick',[1:length(inputDay)],'XTickLabel',dayROI,'YTick',[1:length(inputDay)],'YTickLabel',dayROI);
+xlabel('Day.ROI');
+ylabel('Day.ROI');
+title('Correlation of ROI masks');
+colorbar('southoutside');
+subplot(1,7,6:7);
+imshow(aMask);
+set(gca,'xtick',[],'ytick',[]);
+title(titleMask);
+%concatenate the day/rois into 1 title so it can be used for saving title
+dayROITitle = []; 
+for i = 1:length(dayROI); 
+    dayROITitle = [dayROITitle '_' dayROI{i}]; 
+end
+if saveFlag == 1
+   saveas(plotCompareTimeSeries,[saveDir filesep batId '_corrROIS_days' dayROITitle '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+   savefig(plotCompareTimeSeries,[saveDir filesep batId '_corrROIS_days' dayROITitle '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);  
+end
+inputGo = input('Go?');
+end
+%compData1 = ;
+
 %%
 if saveFlag == 1
     if strcmp(batId,'Gal')
@@ -475,7 +709,11 @@ if saveFlag == 1
         savefig(plotDay123_centroids,[saveDir filesep 'Gal_200311and20_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         saveas(plotDay123_all,[saveDir filesep 'Gal_200311and20_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
         savefig(plotDay123_all,[saveDir filesep 'Gal_200311and20_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        if rigidFlag == 0
+        saveas(plotOverlapTimeSeries,[saveDir filesep 'Gal_200311and20_timeSeriesOverlap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotOverlapTimeSeries,[saveDir filesep 'Gal_200311and20_timeSeriesOverlap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotCnmfeSeries,[saveDir filesep 'Gal_200311and20_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotCnmfeSeries,[saveDir filesep 'Gal_200311and20_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+                if rigidFlag == 0
             saveas(figNonrigid,[saveDir filesep 'Gal_200311and20_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
             savefig(figNonrigid,[saveDir filesep 'Gal_200311and20_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         end
@@ -492,6 +730,10 @@ if saveFlag == 1
         savefig(plotDay123_all,[saveDir filesep 'Gen_200319and24_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         saveas(plotDay123_centroids,[saveDir filesep 'Gen_200319and24_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
         savefig(plotDay123_centroids,[saveDir filesep 'Gen_200319and24_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotOverlapTimeSeries,[saveDir filesep 'Gen_200319and24_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotOverlapTimeSeries,[saveDir filesep 'Gen_200319and24_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotCnmfeSeries,[saveDir filesep 'Gen_200319and24_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotCnmfeSeries,[saveDir filesep 'Gen_200319and24_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         if rigidFlag == 0
             saveas(figNonrigid,[saveDir filesep 'Gen_200319and24_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
             savefig(figNonrigid,[saveDir filesep 'Gen_200319and24_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
