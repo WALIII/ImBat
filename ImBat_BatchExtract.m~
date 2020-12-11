@@ -6,12 +6,9 @@ function ImBat_BatchExtract
 
 % 
 % Remove competing code from path:
-try
- addpath(genpath('C:\Users\WAL3\Documents\MATLAB\CNMF_E'));
-rmpath(genpath('C:\Users\WAL3\Documents\MATLAB\CaImAn-MATLAB'));
-catch
-    disp(' not using Wills computer..');
-end
+% addpath(genpath('C:\Users\WAL3\Documents\MATLAB\CNMF_E'));
+% rmpath(genpath('C:\Users\WAL3\Documents\MATLAB\CaImAn-MATLAB'));
+
 parseFiles = 0; % MAC ONLY
 HomeDir = cd;
 % Get all folders in directory
@@ -34,7 +31,7 @@ for i = 1:length(subFolders);
     cd([subFolders(i).folder,'/',subFolders(i).name]);
     
     % check if any mov has been extracted,if not,
-    if isfolder('extracted')==1
+    if exist('extracted','dir')>1
         disp('.mov files already extracted...');
         % move all data into 'extracted folder
         
