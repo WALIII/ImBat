@@ -4,10 +4,7 @@ function  ScoreMatrix =ImBat_BuildScoreMatrix(CombinedROI,FlightAlignedROI)
 %clst = 2% built from: ImBat_analysis_10212026(flightPaths,ROI_Data,CombinedROI,clst);
 
 %[FlightAlignedROI] = ImBat_Align_FC(CombinedROI,flightPaths,clst);
-
-
-figure();
-hold on;
+plot_things = 0;
 
 stop_time = 1;
 sub2plot = 5;
@@ -103,6 +100,8 @@ end
     end
 end
 
+
+if plot_things ==1;
 figure(); 
 hold on;
 plot(ScoreMatrix(1,:),ScoreMatrix(2,:),'*');
@@ -266,5 +265,5 @@ end
 end
 
 
-
+end
 
