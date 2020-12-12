@@ -66,7 +66,7 @@ for i = 1:length(subFolders);
                 %save([copy_dir fileName '_track' '.mat'],'AnalogFrameRate','AnalogSignals','Markers','VideoFrameRate');
             end
             
-        else % move files into extracted folder
+        else % move files into extracted folder ( also see: ImBat_ReformatExtracted)
             mkdir('extracted');
             A= [subFolders(i).folder,'/',subFolders(i).name]
             B= [A,'/extracted']
