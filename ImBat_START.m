@@ -50,7 +50,7 @@ metadata.moco.bin_width = 1000;
 
 % Default CNMFe Paramaters:
 metadata.cnmfe.min_corr = 0.9;     % minimum local correlation for a seeding pixel
-metadata.cnmfe.min_pnr = 7.5;       % minimum peak-to-noise ratio for a seeding pixel
+metadata.cnmfe.min_pnr = 4.0;       % minimum peak-to-noise ratio for a seeding pixel
 metadata.cnmfe.tsub = 5;           % temporal downsampling factor
 metadata.cnmfe.ssub = 1;           % temporal downsampling factor
 metadata.cnmfe.gSig = 4;           % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
