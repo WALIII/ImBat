@@ -24,6 +24,7 @@ computer_name = strtrim(computer_name);
 ftpobj = ftp('169.229.54.11','liberti','batsFly!19');
 cd(ftpobj, server_dir);
 
+
 % list contents of folder, take only relevant folders
 filelist = dir(ftpobj);
 dirFlags = [filelist.isdir];
