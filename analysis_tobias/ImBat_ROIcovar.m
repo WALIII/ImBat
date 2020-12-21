@@ -6,14 +6,15 @@ function [ROI_refined] = ImBat_ROIcovar
 %correlation coefficients.
 
 saveFlag = 1; %do you want to save the figures and output structure?
-saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
+%saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
+saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
 % Check if folder exists
 if exist([saveDir1 datestr(now,'yymmdd') filesep 'ROI_covar_refined'])>0;
     disp('Youve been working today..');
 else
     mkdir([saveDir1 datestr(now,'yymmdd') filesep 'ROI_covar_refined'])
 end
-saveDir = [saveDir1 datestr(now,'yymmdd') filesep 'ROI_covar_refined' '\'];
+saveDir = [saveDir1 datestr(now,'yymmdd') filesep 'ROI_covar_refined' filesep];
 
 
 distThresh = 10; %number of pixels to check if the cells are close enough to be considered same cell
@@ -23,7 +24,7 @@ minLim = 0.7; %limits for correlation imagesc
 maxLim = 1; %limits for correlation imagesc
 distThresh = distThresh * scaling;
 
-g = dir('Ge*');
+g = dir('Ga*');
 z = dir('Z1*');
 dirTop = vertcat(g,z); %find all folders in top quality directory
 

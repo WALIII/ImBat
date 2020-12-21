@@ -38,7 +38,7 @@ plotPlaceCellsAng = 0;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 plotSnakesManualFlag = 0;
-plotPsthFlag = 1;
+plotPsthFlag = 0;
 plotPSTHstableFlag = 0;
 batId = 'Gal';
 galDate = 0;

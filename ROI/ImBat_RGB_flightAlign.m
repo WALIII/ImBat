@@ -6,8 +6,8 @@ saveFlag = 1;
 rigidFlag = 1;
 hFilt1 = 50; %this is for smoothing the image to determine background for dividing it out to normalize the pixel intensities on all layers
 hFilt2 = 25; %this is for smoothing the actual image before the exponential to show the layers, use 25 for rgb overlay and 50 for the difference heat plots
-clipRangeShow = [-0.4 0.4]; %clipping HL to use for the heat map plots
-clipRangeOverlap = [0.05 .25]; %clipping HL to use for the RGB overlay
+clipRangeShow = [-0.15 0.15]; % [-0.4 0.4] clipping HL to use for the heat map plots
+clipRangeOverlap = [0.05 .20]; %clipping HL to use for the RGB overlay
 saveTag = ['rigid ' num2str(hFilt2) 'filt'];
 dirAllTrials = pwd;
 h1 = fspecial('disk',hFilt1); %normalize background smoothing
@@ -19,10 +19,13 @@ if strcmp(batId,'Gal')
     load('Gal_200311to200324_activity_allTrials_allClusts_allTrials_sMat_newDff_newOrder.mat'); %load activity for pre,dur,post
 elseif strcmp(batId,'Gen')
     load('Gen_200319to200324_activity_allTrials_allClusts_sMat_newDff_newOrder.mat'); %load activity for pre,dur,post
+elseif strcmp(batId,'z2')
+    load('Z2_200701to200712_activity_allTrials_allClusts_sMat_newDff_newOrder.mat');
 end
 %make saving directory
 if saveFlag == 1
-    saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
+    saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
+    %saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
     %saveDir1 = '/Users/periscope/Desktop/analysis/flight/plots/';
     %saveDir1 = 'C:\Users\tobias\Desktop\analysis\plots\';
     if ~exist([saveDir1 datestr(now,'yymmdd') filesep 'maxProjFlightAlign'])
@@ -230,13 +233,15 @@ IM3_minDiff = IM3_aligned_filt_comp - IM_combined_min;
 %% load masks and warp to match registered max projection for each day
 if rigidFlag == 1 %only if have the rigid twarp output
     maskDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\new3\';
+    maskDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done';
     days = [day1 day2 day3];
     ROI2plot = cell(length(days),1);
     ROI_coords = cell(length(days),1);
     centroid = cell(length(days),1);
     col = cell(length(days));
     for day_i = 1:length(days)
-        cd([maskDir1 batId]);
+        %cd([maskDir1 batId]);
+        cd([maskDir1]);
         dayDir = dir([batId(1:2) '*']);
         cd([dayDir(days(day_i)).name filesep 'extracted']);
         flyDir = dir('*fly-*extraction');
@@ -576,10 +581,13 @@ ax13 = subplot(4,4,13); imagesc(IM3_aligned_filt);
 colormap(ax13,gray);
 set(gca,'XTick',[],'YTick',[],'XTickLabel',[],'YTickLabel',[]);
 hold on;
+try
 for roi_i = 1:size(ROI2plot_aligned{3},3)
         plot(ROI_coords{3}{roi_i,1},ROI_coords{3}{roi_i,2},'LineWidth',4,'Color',[col{3}(roi_i,:) 0.01]);
         p = text(centroid{3}(roi_i,1),centroid{3}(roi_i,2),num2str(roi_i));
         p.Color(1:3) = col{3}(size(ROI2plot_aligned{3},3) + 1 - roi_i,:);
+end
+catch
 end
 title('Day 3 ROIs');
 hold off
@@ -734,6 +742,23 @@ if saveFlag == 1
         savefig(plotOverlapTimeSeries,[saveDir filesep 'Gen_200319and24_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         saveas(plotCnmfeSeries,[saveDir filesep 'Gen_200319and24_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
         savefig(plotCnmfeSeries,[saveDir filesep 'Gen_200319and24_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        elseif strcmp(batId,'z2')
+        saveas(plotDay123_unaligned,[saveDir filesep 'Zo2_200701and12_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_unaligned,[saveDir filesep 'Zo2_200701and12_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_aligned,[saveDir filesep 'Zo2_200701and12_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_aligned,[saveDir filesep 'Zo2_200701and12_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_diffs,[saveDir filesep 'Zo2_200701and12_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_diffs,[saveDir filesep 'Zo2_200701and12_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_progression,[saveDir filesep 'Zo2_200701and12_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_progression,[saveDir filesep 'Zo2_200701and12_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_all,[saveDir filesep 'Zo2_200701and12_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_all,[saveDir filesep 'Zo2_200701and12_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotDay123_centroids,[saveDir filesep 'Zo2_200701and12_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotDay123_centroids,[saveDir filesep 'Zo2_200701and12_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotOverlapTimeSeries,[saveDir filesep 'Zo2_200701and12_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotOverlapTimeSeries,[saveDir filesep 'Zo2_200701and12_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+        saveas(plotCnmfeSeries,[saveDir filesep 'Zo2_200701and12_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        savefig(plotCnmfeSeries,[saveDir filesep 'Zo2_200701and12_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         if rigidFlag == 0
             saveas(figNonrigid,[saveDir filesep 'Gen_200319and24_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
             savefig(figNonrigid,[saveDir filesep 'Gen_200319and24_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);

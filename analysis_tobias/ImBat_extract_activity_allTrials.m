@@ -5,14 +5,15 @@ cRaw = 0;
 
 saveTag = 'sMat_newDff_newOrder';
 if saveFlag == 1
-    saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
+    saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
+    %saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
     % Check if folder exists
     if exist([saveDir1 datestr(now,'yymmdd')])>0;
         disp('Youve been working today..');
     else
         mkdir([saveDir1 datestr(now,'yymmdd')])
     end
-    saveDir = [saveDir1 datestr(now,'yymmdd') '\'];
+    saveDir = [saveDir1 datestr(now,'yymmdd') filesep];
 end
 
 if strcmp(batId,'Gal')
@@ -21,6 +22,9 @@ if strcmp(batId,'Gal')
 elseif strcmp(batId,'Gen')
     nDays = [1:5];
     nRois = [1:20];%size(ROIs_manual(day_i,:),2); %number of ROIs
+elseif strcmp(batId,'z2')
+    nDays = [1:10]; %which days to look at
+    nRois = [1:10];
 end
 %dayCounter = 1; %start the
 if strcmp(batId,'Gal')
@@ -46,6 +50,19 @@ elseif strcmp(batId,'Gen')
     9 NaN 7 31 2 22 NaN 20 40 25 13 NaN 34 NaN 26 NaN 45 3 24 21;
     10 36 3 11 2 NaN 21 18 20 9 33 NaN NaN NaN 17 NaN 22 7 30 26]; %14 NaN 3 28 2 6 33 26 18 45 NaN NaN 25 NaN 32 NaN 37 8 28 11
     dirTop = dir('Ge*');
+elseif strcmp(batId,'z2')
+    % 15 stable manually selected ROIs across 9 days for Gal
+    ROIs_manual = [1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10];
+        dirTop = dir('z2*');
 end
 if plotFlag == 1
     fig1 = figure();   set(gcf, 'units','normalized','outerposition',[0.2 0 0.5 1]);
@@ -62,7 +79,7 @@ for clust_ii = 1:length(act_pre)
     act_dur{clust_ii} = cell(length(nDays),length(nRois));
 end
 
-for day_i = 10:12%length(nDays) %for each day
+for day_i = 1:length(nDays) %for each day
     %load results data
     try %extract metadata names and enter processed folder
         cd([dirTop(nDays(day_i)).name filesep 'extracted'])
