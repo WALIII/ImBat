@@ -24,7 +24,7 @@
 ROI_Data = ImBat_RepairFlightData(ROI_Data);
 
 % now, we have a restricted set for ROI_Data, now cluster the flights:
-flightPaths = ImBat_GroupFlights(ROI_Data,'mtf',master_track_file,'dist',1.0);         % just the flights
+flightPaths = ImBat_GroupFlights(ROI_Data,'mtf',master_track_file,'dist',1.2);         % just the flights
 close all
 
 
@@ -70,7 +70,7 @@ clust2use = 3; % seperate all functions by cluster: TO DO- add to batch...
 ImBat_analysis_20201029(CombinedROI,flightPaths,2)
  % find first day 
 
-% Figure 1: plot Flights across days
+% Figure 1: plot Flights across days, and PLOT ROIs
 ImBat_analysis_10212020(flightPaths,ROI_Data,CombinedROI,2);
 
 % STATs and tracking quality:

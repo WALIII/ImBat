@@ -104,8 +104,8 @@ if binaryMaskFlag == 1
     hold on
     for i = 1:length(ROI_coords)
         try
-            p = plot(ROI_coords{i,1},ROI_coords{i,2},'LineWidth',8);
-            p.Color(4) = 0.4;
+            p = plot(ROI_coords{i,1},ROI_coords{i,2},'LineWidth',7);
+            p.Color(4) = 0.1;
         catch
         end
     end
