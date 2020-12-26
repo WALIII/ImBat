@@ -1,0 +1,95 @@
+function ImBat_LintROIs(ROI_Data);
+
+% Get ROI SNR score, and watershed score, then use this to prune ROIs
+
+% PROTOTYPE: 
+
+
+% WAL3
+% 12/14/2020
+
+% 
+rmvThresh = 1;
+
+ii = 4;% day
+A = full(ROI_Data{ii}.ROIs.results.A);
+cn = ROI_Data{1, 1}.ROIs.results.Cn;
+A = reshape(A,size(cn,1),size(cn,2),size(A,2));
+
+
+figure();
+hold on;
+for i =1:size(  ROI_Data{ii}.ROIs.results.C_raw,1);
+clf('reset');
+subplot(1,5,1:4)
+hold on;
+
+% remove slow detrend:
+xx = smooth(ROI_Data{ii}.ROIs.results.C_raw(i,:),10);
+%gg2 = highpass(gg,0.01,30,'ImpulseResponse','iir','Steepness',0.5);
+xx = xx(10000:end-10000);
+
+
+trend_dat = smooth(xx,10000);
+detrended_data = xx-trend_dat;
+% detrended_data = xx*1;
+% plot(detrended_data,'r')
+% xx = smooth(detrended_data,5);
+% xx = zscore(xx);
+detrended_data = detrended_data-median(detrended_data);
+detrended_data = smooth(detrended_data,30);
+
+a1 = prctile(detrended_data,99.99);
+a2 = prctile(detrended_data,70);
+plot(detrended_data);
+detrended_data2(i,:) = detrended_data;
+subplot(1,5,5)
+imagesc(squeeze(A(:,:,i)));
+
+score(i) = a1-(a2);
+title([' ROI: ',num2str(i),' Score: ', num2str(score(i))])
+%pause();
+end
+
+disp(['Removal threshold set to ',num2str(rmvThresh)]);
+% Plot rejected ROIs
+ind2rmv = find(score<rmvThresh);
+perrmvd = (length(ind2rmv)./size(ROI_Data{ii}.ROIs.results.C_raw,1))*100
+disp([num2str(length(ind2rmv)),' ROIs Removed, which is ',num2str(perrmvd),' percent of ROIs']);
+figure();
+hold on;
+for i =ind2rmv;
+clf('reset');
+subplot(1,5,1:4)
+hold on;
+xx = smooth(ROI_Data{ii}.ROIs.results.C_raw(i,:),10);
+xx = zscore(xx);
+xx = xx-mode(xx);
+
+    plot(detrended_data2(i,:));
+subplot(1,5,5)
+imagesc(squeeze(A(:,:,i)));
+
+
+title([' ROI: ',num2str(i),' Score: ', num2str(score(i))])
+pause();
+end
+
+
+%% Scrap
+
+for i = 1: 34;
+ff = squeeze(A(:,:,i));
+[~,aa2] = max(mean(ff))
+[~,aa1] = max(mean(ff,2))
+
+if aa2 size(ff,2)
+ff = ff(:);
+ff(ff ==0) = [];
+i
+sum(ff)
+size(ff,1)
+mean(ff)./size(ff,1)
+
+pause(); 
+end

@@ -47,8 +47,35 @@ end
 % Make df/f image
 
 % Filter movie
-
 Y = (convn(Y, double(reshape([1 1 1] /10, 1, 1, [])), 'same'));
+
+
+% 
+% hFilt1 = 50; %this is for smoothing the image to determine background for dividing it out to normalize the pixel intensities on all layers
+% hFilt2 = 25; %this is for smoothing the actual image before the exponential to show the layers, use 25 for rgb overlay and 50 for the difference heat plots
+% h1 = fspecial('disk',hFilt1); %normalize background smoothing
+% h2 = fspecial('disk',hFilt2); %smooth presentation image
+% scaling = 10; %scale up the ymax to make less pixelated
+% psf = fspecial('gaussian', round(2*gSiz), gSig);
+% ind_nonzero = (psf(:)>=max(psf(:,1)));
+% psf = psf-mean(psf(ind_nonzero));
+% psf(~ind_nonzero) = 0;   % only use pixels within the center disk
+% Y_med = median(vidData.Y,3);
+% Ydff = vidData.Y - Y_med; %subtract med
+% Ydff_tFilt = medfilt3(Ydff); %temporal filtering
+% Ydff_filt = imfilter(Ydff_tFilt,psf,'symmetric'); 
+% YmaxFull = max(Ydff_filt,[],3); %take max
+% YmaxFull= imresize(YmaxFull,scaling); %resize to eliminate pixelation
+% IM1_raw = YmaxFull;
+% IM1doub = imresize(double(IM1_raw),2);
+% bground1=imfilter(IM1doub,h1,'replicate');%
+% IM1_filt=IM1doub./(bground1+5);
+% IM1 = mat2gray(IM1);
+% IM1= imfilter(IM1,h2,'replicate');
+
+
+
+
 
 % Take median of movie
 Y_med = median(Y,3);

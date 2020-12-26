@@ -1,23 +1,30 @@
 
-function ImBat_Tuning_Stability(ScoreMatrix);
+function ImBat_Tuning_Stability(ScoreMatrix,col);
 % Plot data stability over days:
 
 % run:
 % ScoreMatrix = ImBat_analysis_10212026(flightPaths,ROI_Data,CombinedROI,3);
 
 % Plot correlation over days 
-clear Var1 Var2
+plot_things = 1;
+plot_all_things = 0;
+
 
 % Variables:
 
 minROI_TrackingScore = 0.5; % only effects green trace
-minROI_SNR = 1;
+minROI_SNR = 1.5;
 for i = 1:max(ScoreMatrix(5,:));
     
 ix1 = find(ScoreMatrix(5,:)==i);
 
+try
 Var1(i) = nanmedian(ScoreMatrix(2,ix1));
 Var2(i) = nanstd(ScoreMatrix(2,ix1));
+catch
+    disp('No data for this epoch and settings');
+    return
+end
 end
 
 % concat within day stability on day 1:
@@ -25,14 +32,14 @@ ix1 = find(ScoreMatrix(5,:)==1);
 toAdd = ScoreMatrix(3,ix1);
 Var1 = cat(2,nanmedian(toAdd),Var1);
 Var2 = cat(2,nanstd(toAdd),Var2);
-
-figure();
-errorbar([1:size(Var1,2)], Var1,...
-        (Var2)/sqrt(length(Var2)), 'color', ...
-     'b', 'LineWidth', 2);
- title('Tuning stability over days,all ROIs');
- xlabel('days');
- ylabel('tuning stability to day 1');
+% 
+% figure();
+% errorbar([1:size(Var1,2)], Var1,...
+%         (Var2)/sqrt(length(Var2)), 'color', ...
+%      'b', 'LineWidth', 2);
+%  title('Tuning stability over days,all ROIs');
+%  xlabel('days');
+%  ylabel('tuning stability to day 1');
 
  
  
@@ -77,6 +84,28 @@ Var4 = cat(2,nanstd(toAdd2),Var4);
 Var5 = cat(2,nanmedian(toAdd3),Var5);
 Var6 = cat(2,nanstd(toAdd3),Var6);
 
+% Explort data for group plotting
+out.Var1 = Var5;
+out.Var2 = Var6;
+
+
+if plot_things ==1;
+    
+hold on;
+  errorbar([1:size(Var5,2)], Var5,...
+        (Var6)/sqrt(length(Var6)), 'color', ...
+     col, 'LineWidth', 2);
+ title('Tuning stability over days, for best (r) and worst ( g) and all ( b) tracked cells');
+ xlabel('days');
+ ylabel('tuning stability to day 1');
+ 
+ 
+end
+
+
+if plot_all_things ==1;
+
+% Plot data 
 
 figure();
 hold on;
@@ -180,7 +209,7 @@ xlabel('trajectory correlation');
 ylabel('frequency');
 title(' top 10 (blue) and bottem 10% (red) spatial correlations');
 
-
+end
 
 % 
 % % Plot correlation over days 
