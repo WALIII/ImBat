@@ -24,9 +24,9 @@ function send_text_message2(number,carrier,subject,message)
 % $Revision: 1.0.0.0 $  $Date: 2007/09/28 16:23:26 $
 
 % =========================================================================
-% YOU NEED TO TYPE IN YOUR OWN EMAIL AND PASSWORDS:
+% YOU NEED TO TYPE IN YOUR OWN EMAIL AND p w 
 mail = 'wal3lab@gmail.com';    %Your GMail email address
-password = 'carmenalab';          %Your GMail password
+pw = 'carmenalab';          %Your p w 
 % =========================================================================
 
 if nargin == 3
@@ -64,7 +64,7 @@ end
 setpref('Internet','E_mail',mail);
 setpref('Internet','SMTP_Server','smtp.gmail.com');
 setpref('Internet','SMTP_Username',mail);
-setpref('Internet','SMTP_Password',password);
+setpref('Internet','SMTP_Password',pw);
 
 % The following four lines are necessary only if you are using GMail as
 % your SMTP server. Delete these lines wif you are using your own SMTP
