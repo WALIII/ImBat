@@ -7,7 +7,7 @@ function ImBat_ReformatExtracted
 % d12/12/2020
 
 files = dir(pwd);
-files(ismember( {files.name}, {'.', '..','Processed','error'})) = [];  %remove . and .. and Processed
+files(ismember( {files.name}, {'.', '..','Processed','error','plots','new3'})) = [];  %remove . and .. and Processed
 
 % Get a logical vector that tells which is a directory.
 dirFlags = [files.isdir];
@@ -25,9 +25,10 @@ for i = 1:length(subFolders);
     cd([subFolders(i).folder,'/',subFolders(i).name]);
     
     % check if any mov has been extracted,if not,
-    if exist('extracted')>1
+    if isfolder('extracted')==1
         
     else % move files into extracted folder
+        disp('old format detected, reformatting...');
         mkdir('extracted');
         A= [subFolders(i).folder,'/',subFolders(i).name]
         B= [A,'/extracted']
