@@ -14,7 +14,7 @@ catch
 % selpath = uigetdir;
 % end_str = strfind(selpath,'server_home');
 % comp_str = selpath(1:end_str-1);
-comp_str = 'Z:/'; % running on Rosetta...
+comp_str = 'Z:/';
 end
 
 counter = 1;
@@ -116,12 +116,12 @@ for i = 1:length(Locations2Use);
                         if X_toCompare_01.datenum>X_toCompare_02.datenum;
                             disp(['coping ', X_toCompare_01.folder, ' : ', X_toCompare_01.name ' to: ']);
                             disp([' `------>', X_toCompare_02.folder]);
-                            copyfile([X_toCompare_01.folder,'/',X_toCompare_01.name],[X_toCompare_02.folder,'/',X_toCompare_01.name]);
+                         %   copyfile([X_toCompare_01.folder,'/',X_toCompare_01.name],[X_toCompare_02.folder,'/',X_toCompare_01.name]);
                             
                         elseif X_toCompare_02.datenum>X_toCompare_01.datenum;
                             disp(['coping ', X_toCompare_02.folder, ' : ', X_toCompare_02.name ' to: ']);
                             disp([' `------>', X_toCompare_01.folder]);           
-                            copyfile([X_toCompare_02.folder,'/',X_toCompare_02.name],[X_toCompare_01.folder,'/',X_toCompare_02.name]);
+                           % copyfile([X_toCompare_02.folder,'/',X_toCompare_02.name],[X_toCompare_01.folder,'/',X_toCompare_02.name]);
                             
                            % % test:
                             % % % %copyfile([X_toCompare_02.folder,'/',X_toCompare_02.name], ['/Users/ARGO/Desktop','/',X_toCompare_02.name);
