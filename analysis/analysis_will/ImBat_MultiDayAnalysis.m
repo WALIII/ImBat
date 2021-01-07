@@ -63,7 +63,7 @@ if ST1 == 1;
         
         cd(days{i});
         % compensate for new data structuring/formating
-        if exist('extracted')>1
+        if isfolder('extracted')==1
             cd('extracted')
         end
         out = ImBat_GetBiggestFolder('fly');
