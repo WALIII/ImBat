@@ -25,6 +25,7 @@ ROI_Data = ImBat_RepairFlightData(ROI_Data);
 
 % now, we have a restricted set for ROI_Data, now cluster the flights:
 flightPaths = ImBat_GroupFlights(ROI_Data,'mtf',master_track_file,'dist',1.2);         % just the flights
+
 close all
 
 

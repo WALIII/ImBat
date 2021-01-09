@@ -1,4 +1,4 @@
-function [Extraction_Metadata] = ImBat_PreCheck(ROI_Data);
+function [Bad_Dates] = ImBat_PreCheck(ROI_Data);
 
 % Check to see that following are within expectations:
 % 1. Check if all flight and video  end times are the same length
@@ -8,19 +8,14 @@ function [Extraction_Metadata] = ImBat_PreCheck(ROI_Data);
 
 
 %%  1. Check if all flight and video  end times are the same length
-%% 2. extraction dates are recent
-
 
 for day = 1:size(ROI_Data,2)
 extraction_date{day,1} = ROI_Data{1,day}.date;
-extraction_date{day,2} = ROI_Data{1,day}.ROIs.results.metadata.Extraction_date; 
-
 
 A = ROI_Data{1,day}.Alignment.out.Location_time(end);
 B = ROI_Data{1,day}.Alignment.out.video_times(end);
 
 C(:,day) = A-B;
-extraction_date{day,3} = C(:,day)*.33;
 % 
 end
 figure();
@@ -42,9 +37,12 @@ end
 Bad_Dates = ROI_Data{1,X}.date;
 end
 
-Extraction_Metadata.Bad_Dates = Bad_Dates;
-Extraction_Metadata.metadata = extraction_date;
 
+%% 2. extraction dates are recent
 
+for day = 1:size(ROI_Data,2)
+extraction_date{day,1} = ROI_Data{1,day}.date;
+extraction_date{day,2} = ROI_Data{1,day}.ROIs.results.metadata.Extraction_date; 
 
-
+end
+extraction_date
