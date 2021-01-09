@@ -1,7 +1,7 @@
 % Imbat Multi-day Analysis Workflow %
 
-%. colsolidate data across days for a single bat:
-[ROI_Data] = ImBat_MultiDayAnalysis(BAT);
+%. consolidate data across days for a single bat ( run in directory with your data):
+[ROI_Data] = ImBat_MultiDayAnalysis(BAT); % BAT is a string, like 'za'
 
 
 

@@ -132,6 +132,7 @@ figure();
 hold on;
 for i = 1:num2plot
     temp = zeros(1,size(ROI_Data,2));
+    temp2 = zeros(1,size(ROI_Data,2));
     ax(i) =  subplot(5,2,i);
     h = histogram(flightPaths.day(flightPaths.clusterIndex{i}),'BinMethod','integers');
     temp(round(h.BinEdges(2:end)-1)) = h.BinCounts;

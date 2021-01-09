@@ -10,7 +10,7 @@ figure();
 hold on;
 
 stop_time = 1;
-sub2plot = 5;
+sub2plot = 1;
 
 
 % Plot all flights for 5 days, hilighting the clustered flights
