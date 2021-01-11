@@ -64,7 +64,7 @@ if extract_data ==1;
             close all
             
             mkdir('Saved_Data')
-            save('Saved_Data/Aligned_Data.mat','flightPaths','CombinedROI','FlightAlignedROI');
+            save('Saved_Data/Aligned_Data.mat','flightPaths','CombinedROI','FlightAlignedROI','-v7.3');
             clear flightPaths CombinedROI ROI_Data FlightAlignedROI
         end
         cd(DIR);
@@ -98,11 +98,11 @@ if make_plots ==1
     hold on;
     for ii = 1 : length(subFolders)
         % 1: Flight plots
-        for iii = 1:2%: length(combined.flights{i}.FL_consistancy);
-            subplot(1,2,iii);
+        for iii = 1:3%: length(combined.flights{i}.FL_consistancy);
+            subplot(1,4,iii);
             ImBat_Plot_FlightStats(combined.flights{ii}.FL_consistancy{iii},col(ii,:));
             grid on;
-            xlim([0 6]);
+            %xlim([0 6]);
 
         end
     end

@@ -46,7 +46,7 @@ col = [0 1 0];
 for ii = 2:size(AllFlights,2)
     if ii <5 % top 3 flights
 plot((AllFlights(:,ii)./sumClustFlights)*100,'color',col,'Linewidth',2);
-col = col+ [0.4 -0.4  00];
+col = col+ [0.1 -0.  0.1];
     else
 plot((AllFlights(:,ii)./sumClustFlights)*100,'color',[0 0 1 0.2]);
     end
