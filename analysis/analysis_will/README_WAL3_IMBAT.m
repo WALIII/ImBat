@@ -30,23 +30,14 @@ close all
 
 
 %% 
+% find first day % Align Flight data to the top 3 flight clusters:
+  for flight_cluster = 1:3;
+    [FlightAlignedROI{flight_cluster}] = ImBat_Align_FC(CombinedROI,flightPaths,flight_cluster+1);
+  end 
 
-
-[FlightAlignedROI] = ImBat_Align_FC(CombinedROI,flightPaths,2);
-[FlightAlignedROI2] = ImBat_Align_FC(CombinedROI,flightPaths,3);
-[FlightAlignedROI3] = ImBat_Align_FC(CombinedROI,flightPaths,4);
-[FlightAlignedROI4] = ImBat_Align_FC(CombinedROI,flightPaths,5);
-
-FlightAlignedROI_combined{1} = FlightAlignedROI;
-FlightAlignedROI_combined{2} = FlightAlignedROI2;
-FlightAlignedROI_combined{3} = FlightAlignedROI3;
-FlightAlignedROI_combined{4} = FlightAlignedROI4;
-
-
-
-% Save data
-mkdir('Saved_Data')
-save('Saved_Data/Aligned_Data.mat','flightPaths','CombinedROI');
+%% Save data
+ mkdir('Saved_Data')
+ save('Saved_Data/Aligned_Data.mat','flightPaths','CombinedROI','FlightAlignedROI','-v7.3');
 
 
 
@@ -54,22 +45,22 @@ save('Saved_Data/Aligned_Data.mat','flightPaths','CombinedROI');
     % 1. Quality of ROI maps for each day, and across days
     % 2. Quality of flight data for each day, and across days
    
-ImBat_PlotBasics(ROI_Data,flightPaths,CombinedROI); % Under construction...
+%ImBat_PlotBasics(ROI_Data,flightPaths,CombinedROI); % Under construction...
 
 %To DO: ImBat_PlotAdvanced % if ROIs are skipped, are they just not ID'd?
 
-
-
-                % SUBFUNCTION: ImBat_Align_FC(CombinedROI,flightPaths,clust2use);
-close all
+% SUBFUNCTION: ImBat_Align_FC(CombinedROI,flightPaths,clust2use);
 
 
 % Figure Making: 
-clust2use = 3; % seperate all functions by cluster: TO DO- add to batch...
 
 % Stability over days:
-ImBat_analysis_20201029(CombinedROI,flightPaths,2)
- % find first day 
+% ImBat_analysis_20201029(CombinedROI,flightPaths,2)
+ 
+
+
+% Plot ROIs aligned to Flights:
+ImBat_PlotAlignedROIs(FlightAlignedROI{1},ROI_Data,flightPaths);
 
 % Figure 1: plot Flights across days, and PLOT ROIs
 ImBat_analysis_10212020(flightPaths,ROI_Data,CombinedROI,2);
