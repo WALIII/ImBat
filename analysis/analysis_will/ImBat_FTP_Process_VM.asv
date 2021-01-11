@@ -1,11 +1,11 @@
-function ImBat_FTP_Process(server_dir);
-% ImBat_FTP_Process.m
+function ImBat_FTP_Process_VM
+% ImBat_FTP_Process_VM.m
 
 % Server--> VM data transfer. Use FTP to transfer files locally for processing,
 % then upload the finished folder when complete. Send text on error/completetion .
 
 % WAL3
-% 12/11/2020
+% 01/09/2020
 
 % local dir should be current directory.. % example:
 local_dir = cd;
@@ -13,9 +13,7 @@ local_dir = cd;
 % example: local_dir = '/Users/ARGO/Desktop/TEST';
 % example:  local_dir ='C:\Users\Tobias\Documents\DATA_2'; % for rosetta
 
-% INPUTs:
-%server_dir = 'server_home/users/tobias/flight/data_processed/ready2analyze_Zbats/Z2';
-%server_dir = 'server_home/users/tobias/flight/data_processed/ready2analyze_Gbats/Ga';
+server_dir = 'server_home/users/tobias/flight/data_processed/ready2analyze_Gbats/Processed';
 
 Folders_per_session = 1; %how many folders to load in per session ( fewer on VM)
 [ret, computer_name] = system('hostname'); % what computer are we using
@@ -23,7 +21,7 @@ computer_name = convertCharsToStrings(computer_name);
 computer_name = strtrim(computer_name);
 
 %log on to server:
-ftpobj = ftp('169.229.54.11','liberti','batsFly!19');
+ftpobj = ftp('169.229.54.11','liberti','batsFly!19','System','WINDOWS');
 cd(ftpobj, server_dir);
 
 
@@ -38,12 +36,34 @@ itter2process = [itter2process, size(filelist,1)];
 
 try
     
-    for i = 1:2%size(filelist,1)
-        % Pick Folder
-        folder2use = filelist(i).name;
-        
-        % Only up/download in one at a time:
-       mget(ftpobj,folder2use,local_dir)
+    for i = 1:size(filelist,1)
+        % Pick Folder, get .mat files
+         folder2use = [filelist(i).name,'/extracted/*.mat'];        
+
+        % Only up/download in one at a time. 
+            % 1. Get tack tiles
+       manifest = mget(ftpobj,folder2use,local_dir);
+       manifest = dir([filelist(i).name,'/extracted/*.mat']);
+              manifest = {manifest.name}
+
+     % 2. Get tifs and mats, based on track files
+     for ii = 1:length(manifest);
+         folder2use2 = manifest{ii};
+       %  idx2use = findstr(folder2use2,'\');
+        % if length(idx2use)==0
+        %      idx2use = findstr(folder2use2,'/');
+        % end
+         folder2use2 = folder2use2(1:end-10);
+         folder2use2 = [filelist(i).name,'/extracted',folder2use2, '_extraction'];
+   
+         % get mat and .tif files
+       %  ind2rplce = findstr(folder2use2,'\');
+         %folder2use2(ind2rplce) = '/';
+           mget(ftpobj,[folder2use2,'/*.mat'],local_dir); % mat files
+           mget(ftpobj,[folder2use2,'/*.tif'],local_dir);  % tif files
+           clear folder2use2 idx2use
+     end
+     clear folder2use
         
         % Process folder
         if ismember(i,itter2process)
