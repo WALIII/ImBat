@@ -1,4 +1,4 @@
-function ImBat_FTP_Process
+function ImBat_FTP_Process(server_dir);
 % ImBat_FTP_Process.m
 
 % Server--> VM data transfer. Use FTP to transfer files locally for processing,
@@ -13,7 +13,9 @@ local_dir = cd;
 % example: local_dir = '/Users/ARGO/Desktop/TEST';
 % example:  local_dir ='C:\Users\Tobias\Documents\DATA_2'; % for rosetta
 
-server_dir = 'server_home/users/tobias/flight/data_processed/ready2analyze_Gbats/Processed';
+% INPUTs:
+%server_dir = 'server_home/users/tobias/flight/data_processed/ready2analyze_Zbats/Z2';
+%server_dir = 'server_home/users/tobias/flight/data_processed/ready2analyze_Gbats/Ga';
 
 Folders_per_session = 1; %how many folders to load in per session ( fewer on VM)
 [ret, computer_name] = system('hostname'); % what computer are we using

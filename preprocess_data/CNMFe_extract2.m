@@ -37,8 +37,8 @@ end
 
 
 % -------------------------    COMPUTATION    -------------------------  %
-pars_envs = struct('memory_size_to_use', 60,...  % GB, memory space you allow to use in MATLAB
-    'memory_size_per_patch', 40, ...              % GB, space for loading data within one patch
+pars_envs = struct('memory_size_to_use', 25,...  % GB, memory space you allow to use in MATLAB
+    'memory_size_per_patch', 10, ...              % GB, space for loading data within one patch
     'patch_dims', [200, 200]);                    % px, patch size [200, 200] usually
 
 % -------------------------      SPATIAL      -------------------------  %
