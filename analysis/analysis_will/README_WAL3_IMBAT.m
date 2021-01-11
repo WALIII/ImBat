@@ -3,7 +3,8 @@
 %. consolidate data across days for a single bat ( run in directory with your data):
 [ROI_Data] = ImBat_MultiDayAnalysis(BAT); % BAT is a string, like 'za'
 
-
+% Check extractions
+[Extraction_Metadata] = ImBat_PreCheck(ROI_Data);
 
 % Analysis
 
