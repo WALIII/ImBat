@@ -44,7 +44,7 @@ try
             % 1. Get tack tiles
        manifest = mget(ftpobj,folder2use,local_dir);
        manifest = dir([filelist(i).name,'/extracted/*.mat']);
-              manifest = {manifest.name};
+              manifest = {manifest.name}
 
      % 2. Get tifs and mats, based on track files
      for ii = 1:length(manifest);
@@ -54,7 +54,7 @@ try
         %      idx2use = findstr(folder2use2,'/');
         % end
          folder2use2 = folder2use2(1:end-10);
-         folder2use2 = [filelist(i).name,'/extracted/',folder2use2, '_extraction'];
+         folder2use2 = [filelist(i).name,'/extracted',folder2use2, '_extraction'];
    
          % get mat and .tif files
        %  ind2rplce = findstr(folder2use2,'\');
