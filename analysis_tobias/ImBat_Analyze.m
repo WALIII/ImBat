@@ -33,14 +33,14 @@ clustManualFlag = 0;
 flightPathsFeederFlag = 0;
 plotFlightvsCellsFlag = 1;
 %place cells plot flags
-plotPlaceCellsFlag = 0;
-plotPlaceCellsAng = 0;
+plotPlaceCellsFlag = 1;
+plotPlaceCellsAng = 1;
 %snake/schnitz plot flags
 plotSnakesFlag = 1;
 plotSnakesManualFlag = 0;
-plotPsthFlag = 0;
+plotPsthFlag = 1;
 plotPSTHstableFlag = 0;
-batId = 'Gal';
+batId = 'Gen';
 galDate = 0;
 %align max projections of specific flights across trajectories
 plotROI3dayFlag = 0;
@@ -59,7 +59,7 @@ for k = 1 : length(subFolders)
 end
 
 %% Perform analysis on each folder
-for i = 1:length(subFolders)
+for i = 1:length(subFolders)%[51,52,67,68,77,78]%[2,3,27,28,33,34]%
     disp(['entering folder ', char(subFolders(i).name)])
     cd([subFolders(i).folder,'/',subFolders(i).name]);
     %     if AngeloData == 1

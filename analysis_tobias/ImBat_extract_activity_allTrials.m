@@ -5,8 +5,8 @@ cRaw = 0;
 
 saveTag = 'sMat_newDff_newOrder';
 if saveFlag == 1
-    saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
-    %saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\analysis_done\plots\';
+    %saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
+    saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\ForTobias\plots\';
     % Check if folder exists
     if exist([saveDir1 datestr(now,'yymmdd')])>0;
         disp('Youve been working today..');
@@ -22,7 +22,7 @@ if strcmp(batId,'Gal')
 elseif strcmp(batId,'Gen')
     nDays = [1:5];
     nRois = [1:20];%size(ROIs_manual(day_i,:),2); %number of ROIs
-elseif strcmp(batId,'z2')
+elseif strcmp(batId,'Z2')
     nDays = [1:10]; %which days to look at
     nRois = [1:10];
 end
@@ -50,7 +50,7 @@ elseif strcmp(batId,'Gen')
     9 NaN 7 31 2 22 NaN 20 40 25 13 NaN 34 NaN 26 NaN 45 3 24 21;
     10 36 3 11 2 NaN 21 18 20 9 33 NaN NaN NaN 17 NaN 22 7 30 26]; %14 NaN 3 28 2 6 33 26 18 45 NaN NaN 25 NaN 32 NaN 37 8 28 11
     dirTop = dir('Ge*');
-elseif strcmp(batId,'z2')
+elseif strcmp(batId,'Z2')
     % 15 stable manually selected ROIs across 9 days for Gal
     ROIs_manual = [1 2 3 4 5 6 7 8 9 10;
         1 2 3 4 5 6 7 8 9 10;
@@ -98,9 +98,9 @@ for day_i = 1:length(nDays) %for each day
     catch
         cd(dirTop(nDays(day_i)).name);
         flyFolders = dir('*fly*extraction');
-        batName{day_i} = flyFolders(end).name(1:3);
-        dateSesh{day_i} = flyFolders(end).name(5:10);
-        sessionType{day_i} = flyFolders(end).name(12:16);
+        batName{day_i} = flyFolders(end).name(1:5);%(1:3);
+        dateSesh{day_i} = flyFolders(end).name(7:12);%(5:10);
+        sessionType{day_i} = flyFolders(end).name(14:18); %(12:16);
         
         cd(flyFolders(end).name);
         dirProcessed = dir('processed_*');
@@ -119,7 +119,7 @@ for day_i = 1:length(nDays) %for each day
     %   % Take median, filter, and max of full movie
     Y_med = median(vidData.Y,3);
     Y_min = min(vidData.Y,3);
-    Ydff = vidData.Y - Y_med; %subtract min
+    Ydff = vidData.Y - Y_med; %subtract med
     Ydff_tFilt = medfilt3(Ydff); %temporal filtering
     Ydff_filt = imfilter(Ydff_tFilt,psf,'symmetric'); %spatial filtering
     length_vector = 1:length(Ydff_filt);
@@ -328,6 +328,9 @@ if saveFlag == 1
     elseif strcmp(batId,'Gen')
         save([saveDir 'Gen_200319to200324_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials','-v7.3');
         save([saveDir 'Gen_200319to200324_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
+    elseif strcmp(batId,'Z2')
+        save([saveDir 'Z2_190701to190808_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials','-v7.3');
+        save([saveDir 'Z2_190319to190808_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
     end
 end
 

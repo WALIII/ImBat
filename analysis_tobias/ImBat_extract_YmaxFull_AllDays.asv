@@ -1,0 +1,109 @@
+function [YmaxFullAllDays] = ImBat_extract_YmaxFull_AllDays(batId)
+saveFlag = 1; %do you want to save the figures and output structure?
+
+saveTag = '';
+if saveFlag == 1
+    %saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
+    saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\ForTobias\plots\';
+    % Check if folder exists
+    if exist([saveDir1 datestr(now,'yymmdd')])>0;
+        disp('Youve been working today..');
+    else
+        mkdir([saveDir1 datestr(now,'yymmdd')])
+    end
+    saveDir = [saveDir1 datestr(now,'yymmdd') filesep];
+end
+
+if strcmp(batId,'Gal')
+    nDays = [1:12]; %which days to look at
+    dirTop = dir('Ga*');
+elseif strcmp(batId,'Gen')
+    nDays = [1:5];
+    dirTop = dir('Ge*');
+elseif strcmp(batId,'Z2')
+    nDays = [1:40]; %which days to look at
+    dirTop = dir('z2*');
+elseif strcmp(batId, 'Zu')
+    nDays = [1:40];
+    dirTop = dir('zu*');
+end
+
+
+for day_i = [10,11,19,20,29,30]%1:length(nDays) %for each day
+    %load results data
+    try %extract metadata names and enter processed folder
+        cd([dirTop(nDays(day_i)).name filesep 'extracted'])
+        flyFolders = dir('*fly*extraction');
+        batName{day_i} = flyFolders(end).name(1:3);
+        dateSesh{day_i} = flyFolders(end).name(5:10);
+        sessionType{day_i} = flyFolders(end).name(12:16);
+        
+        cd(flyFolders(end).name);
+        dirProcessed = dir('processed_*');
+        if strcmp(batName{day_i}(1),'G')
+            cd(dirProcessed(end).name);
+        else
+            cd(dirProcessed(end).name); %can change this if need to look at earlier or later processed folders based on batname, date, etc
+        end
+    catch
+        cd(dirTop(nDays(day_i)).name);
+        flyFolders = dir('*fly*extraction');
+        batName{day_i} = flyFolders(end).name(1:4);%(1:3);
+        dateSesh{day_i} = flyFolders(end).name(6:11);%(5:10);
+        sessionType{day_i} = flyFolders(end).name(13:17); %(12:16);
+        
+        cd(flyFolders(end).name);
+        dirProcessed = dir('processed_*');
+        cd(dirProcessed(end).name);
+    end
+    %load('results.mat'); %load cellData
+    vidData = load('Motion_corrected_Data_DS.mat'); %load video frame data
+    %make gaussian filter based on dff function for spatial filtering
+    gSig = 1;
+    gSiz = 4.5*gSig;
+    scaling = 10; %scale up the ymax to make less pixelated
+    psf = fspecial('gaussian', round(2*gSiz), gSig);
+    ind_nonzero = (psf(:)>=max(psf(:,1)));
+    psf = psf-mean(psf(ind_nonzero));
+    psf(~ind_nonzero) = 0;   % only use pixels within the center disk
+    %   % Take median, filter, and max of full movie
+    Y_med = median(vidData.Y,3);
+    Y_min = min(vidData.Y,3);
+    Ydff = vidData.Y - Y_med; %subtract med
+    Ydff_tFilt = medfilt3(Ydff); %temporal filtering
+    Ydff_filt = imfilter(Ydff_tFilt,psf,'symmetric'); %spatial filtering
+    length_vector = 1:length(Ydff_filt);
+    rand_length_vector= randperm(length(length_vector));
+    YmaxFull{7} = max(Ydff_filt(:,:,rand_length_vector(1:round(length(length_vector)/3))),[],3);
+    YmaxFull{8} = max(Ydff_filt(:,:,rand_length_vector(round(length(length_vector)/3):round(length(length_vector)/3)*2)),[],3);
+    YmaxFull{9} = max(Ydff_filt(:,:,rand_length_vector(round(length(length_vector)/3)*2:end)),[],3);
+    
+    YmaxFull{day_i} = max(Ydff_filt,[],3); %take max
+    YmaxFull{day_i} = imresize(YmaxFull{day_i},scaling); %resize to eliminate pixelation
+    %alignment = load('Alignment.mat');
+    cd(dirProcessed(end).folder);
+    cd(dirTop(1).folder);
+    disp(num2str(day_i))
+    clear vidData;
+end
+
+YmaxFullAllDays.batId = batId;
+YmaxFullAllDays.batName = batName;
+YmaxFullAllDays.sessionType = sessionType;
+YmaxFullAllDays.dateSesh = dateSesh;
+YmaxFullAllDays.YmaxFull = YmaxFull;
+
+if saveFlag == 1
+    if strcmp(batId,'Gal')
+        save([saveDir 'Gal_200311to200324_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');
+    elseif strcmp(batId,'Gen')
+        save([saveDir 'Gen_200319to200324_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');
+    elseif strcmp(batId,'Z2')
+        save([saveDir 'Z2_190701to190822_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');
+     elseif strcmp(batId,'Zu')
+        save([saveDir 'Zu_190704to190820_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');
+    end
+end
+
+
+
