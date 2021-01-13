@@ -1,7 +1,7 @@
 function [YmaxFullAllDays] = ImBat_extract_YmaxFull_AllDays(batId)
 saveFlag = 1; %do you want to save the figures and output structure?
 
-saveTag = 'test';
+saveTag = 'Ymed';
 if saveFlag == 1
     %saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
     saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\ForTobias\plots\';
@@ -29,14 +29,14 @@ elseif strcmp(batId, 'Zu')
 end
 
 
-for day_i = 1:5%length(nDays) %[50,51,66,67,76,77]%[2,3,27,28,33,34]%for each day
+for day_i = 1:length(nDays) %[50,51,66,67,76,77]%[2,3,27,28,33,34]%for each day
     %load results data
     try %extract metadata names and enter processed folder
         cd([dirTop(nDays(day_i)).name filesep 'extracted'])
         flyFolders = dir('*fly*extraction');
-        batName{day_i} = flyFolders(end).name(1:3);
-        dateSesh{day_i} = flyFolders(end).name(5:10);
-        sessionType{day_i} = flyFolders(end).name(12:16);
+        batName{day_i} = flyFolders(end).name(1:5);
+        dateSesh{day_i} = flyFolders(end).name(7:12);
+        sessionType{day_i} = flyFolders(end).name(14:18);
         
         cd(flyFolders(end).name);
         dirProcessed = dir('processed_*');
@@ -97,7 +97,7 @@ if saveFlag == 1
     if strcmp(batId,'Gal')
         save([saveDir 'Gal_200227to200404_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');
     elseif strcmp(batId,'Gen')
-        save([saveDir 'Gen_200319to200324_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');
+        save([saveDir 'Gen_200305to200311_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');
         %save([saveDir 'Gen_200424to200523_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');
     elseif strcmp(batId,'Z2')
         save([saveDir 'Z2_190701to190822_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');

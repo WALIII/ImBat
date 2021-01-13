@@ -59,7 +59,7 @@ for k = 1 : length(subFolders)
 end
 
 %% Perform analysis on each folder
-for i = 1:length(subFolders)%[51,52,67,68,77,78]%[2,3,27,28,33,34]%
+for i = [2,3,4,5,6,7,8,9,12]%1:length(subFolders)%[51,52,67,68,77,78]%[2,3,27,28,33,34]%
     disp(['entering folder ', char(subFolders(i).name)])
     cd([subFolders(i).folder,'/',subFolders(i).name]);
     %     if AngeloData == 1
