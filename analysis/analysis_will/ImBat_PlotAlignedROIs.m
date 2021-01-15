@@ -1,4 +1,4 @@
-function ImBat_PlotAlignedROIs(FlightAlignedROI,ROI_Data,flightPaths);
+function ImBat_PlotAlignedROIs(FlightAlignedROI,ROI_Data,flightPaths,varargin);
 % ImBat_PlotAlignedROIs
 
 % Plot individual ROIs aligned to flights from FlightAlignedROI, Rde lines
@@ -10,11 +10,28 @@ function ImBat_PlotAlignedROIs(FlightAlignedROI,ROI_Data,flightPaths);
 
 % WAL3
 % 01/10/2021
+nparams=length(varargin);
+manIn = 0;
+
+% User input
+for i=1:2:nparams
+	switch lower(varargin{i})
+		case 'cells2use' % downsample video
+             manIn =1;
+			cells2use=varargin{i+1};
+		case 'deinterlace' % de-interlace 60fps video
+			deinterlace =varargin{i+1};
+		case 'max_proj' % to make a max projectio
+			max_proj=varargin{i+1};
+           mkdir('processed/MAX');
+    end
+end
 
 
 
 figure();
 hold on;
+
 clst = FlightAlignedROI.clust_number;
 
 stop_time = 1;
@@ -65,7 +82,12 @@ bound2plot = 1:500;
 counter = 1;
 col = hsv(size(transition_points,2)+1);
 figure();
-for i = 1:size(CutCells,1);
+if manIn ==1;
+else
+    cells2use = 1:size(CutCells,1);
+end
+for i = 1:length(cells2use)
+    i = cells2use(i);
     subplot(10,1,1:2);% plot shadding for each cell, over lay for each day
 hold on;
     for ii = 1:size(transition_points,2)-1

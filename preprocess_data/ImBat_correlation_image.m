@@ -4,6 +4,7 @@ function [Cn, PNR, PNR_mov] = ImBat_correlation_image(Y,metadata)
 try
 options = metadata.options;
 catch
+    [metadata] = ImBat_defaults;
     options.metadata = metadata;
     options.center_psf = 1;
 end

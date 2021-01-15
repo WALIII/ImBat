@@ -59,6 +59,7 @@ figure();
 for i = 1: size(days2use,2) % = 1:5;
     day2use =  days2use(i);
     subplot(1,size(days2use,2),i);
+    title(ROI_Data{day2use}.date);
     hold on;
     
 % Plot Max projection
