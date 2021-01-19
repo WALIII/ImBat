@@ -21,6 +21,9 @@ B = ROI_Data{1,day}.Alignment.out.video_times(end);
 
 C(:,day) = A-B;
 extraction_date{day,3} = C(:,day)*.33;
+extraction_date{day,3} = C(:,day)*.33;
+extraction_date{day,4} = ROI_Data{day}.ROIs.results.Fs;
+
 % 
 end
 figure();

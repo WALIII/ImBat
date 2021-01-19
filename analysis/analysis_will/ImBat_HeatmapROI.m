@@ -12,10 +12,15 @@ function out = ImBat_HeatmapROI(FlightAlignedROI,roi2plot);
 %        a cell array
 
 
+if length(FlightAlignedROI) == 1;
+    FlightAlignedROI2{1} = FlightAlignedROI;
+    clear FlightAlignedROI;
+    FlightAlignedROI{1} = FlightAlignedROI2{1}
+end
 
 fl_counter = 0;
 hold on;
-PlotBoth = 0;
+PlotBoth = 1;
 for ii = roi2plot;%1:size(CutCells,1);
 hold on;
 bound2use = 1:1400;
