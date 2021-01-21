@@ -83,7 +83,7 @@ for i = 1:size(FlightTimes,2);
         CutCells2(:,:,i) = roidat2(:,closestIndex_1(:,i)-ROI_ON :closestIndex_1(:,i)+ROI_OFF);
         CutCells3(:,:,i) = roidat3(:,closestIndex_1(:,i)-ROI_ON :closestIndex_1(:,i)+ROI_OFF);
         CutCells_date(i) = CombinedROI.day_vector(closestIndex_1(:,i));
-        FlightTimes2use(i,:) = FlightTimes(i);
+        FlightTimes2use = FlightTimes(i);
         if exist('Y')
             Ydata(:,:,:,i) = Y(:,:,closestIndex_1(:,i)-ROI_ON :closestIndex_1(:,i)+ROI_OFF);
         end
@@ -168,7 +168,7 @@ FlightAlignedROI.cluster_idX = idX;
 FlightAlignedROI.ClustFlight_withPads = ClustFlight;
 FlightAlignedROI.ClustFlight = ClustFlight(ForePad-40:end-AftPad/2,:,:);
 FlightAlignedROI.FlightLength = FlightLength;
-FlightAlignedROI.FlightTimes = FlightTimes2use;
+FlightAlignedROI.FlightT = ;FlightTimes2use
 
 FlightAlignedROI.ForePad = ForePad;
 FlightAlignedROI.AftPad = AftPad;
