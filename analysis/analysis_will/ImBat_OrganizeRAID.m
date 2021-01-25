@@ -109,7 +109,10 @@ for i = 1:length(Locations2Use);
                         files4b(ismember( {files4b.name}, {'.', '..','Processed'})) = [];
                         dirFlags4b = [files4b.isdir];
                         subFolders4b = files4b(dirFlags4b);
+                        clear Xb
                         Xb = subFolders4b(contains({subFolders4b.name},'processed_'));
+                       
+                        if length(Xb)>0; % if there is something here, process it
                         X_toCompare_02 = Xb(length(Xb));
                         
                         % NOW copy the bigger folder
@@ -129,6 +132,7 @@ for i = 1:length(Locations2Use);
                             %elseif
                             % report date num for log
                             
+                        end
                         end
                     end
                     
