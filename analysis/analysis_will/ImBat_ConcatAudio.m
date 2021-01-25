@@ -5,7 +5,7 @@ function [audio] = ImBat_ConcatAudio
 
 % Get all files in dir.
 
-filePath = cd; %'C:\Users\Tobias\Desktop\analysis\flight\audio_flight\test\song\';
+filePath = cd;
 
 %mic = 1;
 fs = 192000;
