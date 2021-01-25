@@ -1,4 +1,4 @@
-function [audio] = ImBat_ConcatAudio
+function [audio] = ImBat_ConcatAudio;
 
 % concat audio once in the audio folde
 
@@ -17,7 +17,7 @@ if plotFlag == 1
 end
 
 % Get bat and session name:
-sla2find = strfind(filePath,'/'); % get this based on the directory
+sla2find = strfind(filePath,'\'); % get this based on the directory ( windows)
 dateSesh = filePath(sla2find(end-1)+1:sla2find(end)-1);%  dateSesh = '200522';
 batName = filePath(sla2find(end-2)+1:sla2find(end-1)-1); % batName = 'Gen';
 
