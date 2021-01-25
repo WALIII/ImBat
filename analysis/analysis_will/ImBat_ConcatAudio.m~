@@ -1,4 +1,4 @@
-function [audio] = ImBat_ConcatAudio
+function [ audioConCat, ttlConCat] = ImBat_ConcatAudio
 
 % concat audio once in the audio folde
 
@@ -120,44 +120,6 @@ for mic_i = 4%:4
     %play(micObj);
     %pause
 end
-
-[audio] = ImBat_formatAudio(audioConCat,ttlConCat,dateSesh,batName,fs);
-
-
-function [audio] = ImBat_formatAudio(audioConCat,ttlConCat,dateSesh,batName,fs);
-
-% Format audio and align timestamps to flight data
-
-% create time vector, set first ttl to zero
-time_vect = 1:length(ttlConCat);
-time_vect = time_vect/fs; 
-ds_factor = 1000;
-ttl_ds = downsample(ttlConCat,1000);
-[a, b] = findpeaks(abs(ttl_ds),'MinPeakProminence',0.3,'MinPeakDistance',50);
-
-% % test time diff: 
-% [a2, b2] = findpeaks(ttlConCat,'MinPeakProminence',0.3,'MinPeakDistance',50);
-
-% figure(); 
-% hold on;
-% plot(abs(ttl_ds));
-% plot(b,a,'*');
-
-offset_t = b(1)/(fs/ds_factor);
-time_vect = time_vect-offset_t;
-
-% data
-audio.data = audioConCat;
-audio.time_vect = time_vect;
-% downsampled data
-% audio.data = audioConCat_DS;
-% audio.time_vect_DS
-
-% metadata
-audio.fs = fs;
-audio.batName = batName;
-audio.session = dateSesh;
-
 
 
 
