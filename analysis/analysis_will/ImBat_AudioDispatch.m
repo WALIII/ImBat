@@ -14,17 +14,21 @@ dates2use = flightPaths.Dates;
 save_dir = [DIR,'/processed/',bat2use];
 mkdir(save_dir);
 
+DIR = [DIR,'/',bat2use];
+
 % enter bat dir:
+cd(bat2use);
 for i = 1:length(dates2use);
 
-cd(bat2use);
+cd(dates2use{i})
 f = dir('**');
 cd(f(3).name);
 % run and save all audio files:
 
 [audio] = ImBat_ConcatAudio;
 disp('saving audio data');
-save(['audio_data_',f(3).name,'.mat'],'audio','-v7.3');
+save([save_dir,'/audio_data_',f(3).name,'.mat'],'audio','-v7.3');
 cd(DIR)
+clear audio f
 end
 % collect audio after saving:
