@@ -4,7 +4,6 @@ function out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined)
 close all
 counter = 1;
 min_flight_number = 10; % min number of flights needed
-min_prom = 0.5
 
 % NOTE: there may be more than one peak per ROI!
 
@@ -29,7 +28,7 @@ for ii = 1:size(FlightAlignedROI_combined{1}.C,1) % first 10 cells:
     
     
     % get peaks
-    [Bpks,Blocs] = findpeaks(x,'MinPeakProminence',min_prom,'MinPeakDistance',1);
+    [Bpks,Blocs] = findpeaks(x,'MinPeakProminence',0.5,'MinPeakDistance',1);
     
     % only use peaks in the flight pad ( exclude reward...
     % Blocs(Blocs<250) = [];
@@ -110,11 +109,11 @@ for i = 1: size(out2.D,2)
     C2use(h) = [];
     
     % normalize calcium from 0-1
-     %C2use = [min_prom C2use]; % concat a zero to scale from 0->max
+    %C2use = [0 C2use]; % concat a zero to scale from 0->max
     C2use_raw = C2use;
     C2use = mat2gray(C2use);
     
-        %C2use(:,1) = []; % remove that zero..
+    %C2use(:,1) = []; % remove that zero..
     % ..now take the mean, and variance...
     
     varF(i) = var(F2use);

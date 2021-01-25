@@ -39,10 +39,10 @@ close all
 %% Save data
  mkdir('Saved_Data')
  save('Saved_Data/Aligned_Data.mat','flightPaths','CombinedROI','FlightAlignedROI','-v7.3');
+ save('ROI_Data.mat', ROI_Data); % Save fixed flights
 
 
-
-% Bassics of loaded and aligned data;
+% Basics of loaded and aligned data;
     % 1. Quality of ROI maps for each day, and across days
     % 2. Quality of flight data for each day, and across days
    
@@ -60,8 +60,14 @@ close all
  
 
 
-% Plot ROIs aligned to Flights:
+% Get useful flights from each day
+output = ImBat_Quantify_Flights(flightPaths,ROI_Data);
+
+% Now, use the integrated function to find good ( or bad) cells. 
+% FlightAlignedROI{1} is the first clustered flight:
 ImBat_PlotAlignedROIs(FlightAlignedROI{1},ROI_Data,flightPaths);
+
+
 
 % Figure 1: plot Flights across days, and PLOT ROIs
 ImBat_analysis_10212020(flightPaths,ROI_Data,CombinedROI,2);
