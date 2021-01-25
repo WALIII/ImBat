@@ -57,8 +57,7 @@ col = jet(size(ROI_Data,2));
 figure();
 hold on;
 for i = 1: size(ROI_Data,2);
-    flightDates{i} = ROI_Data{i}.date(end-5:end);
-    batID = ROI_Data{i}.date(1:2);
+    d = ROI_Data{i}.date(end-5:end);
     A = ROI_Data{1, i}.Alignment.out.flights;
     B = ROI_Data{1, i}.Alignment.out.Location_time;
     C = ones(size(B))*i;
@@ -116,8 +115,7 @@ Fs = ROI_Data{1, 1}.ROIs.results.metadata.cnmfe.Fs;
 flightPaths.AllFlights = AllFlights;
 flightPaths.AllFlightsTime = AllFlightsTime;
 flightPaths.AllFlightsMasterTime = AllFlightsMasterTime;
-flightPaths.Dates = flightDates;
-flightPaths.batID = batID;
+
 % Plot all flight occurances:
 
 
