@@ -1,13 +1,25 @@
-function [dark_cluster, out] = ImBat_AfterDark(flightPaths)
-
+function [dark_cluster, out] = ImBat_AfterDark(flightPaths,varargin)
 % Find flights that happened in the dark:
 
+% Assumption is the lights are turned off exactly 20min, then back on at
+% 40min
 
 % Get flightpaths of type:
-
 FF = flightPaths.flight_starts_idx;
 
 
+% User Inputs:
+nparams=length(varargin);
+if mod(nparams,2)>0
+    error('Parameters must be specified as parameter/value pairs');
+end
+
+for i=1:2:nparams
+    switch lower(varargin{i})
+        case 'flightpaths'
+            FlightPaths=varargin{i+1};
+    end
+end
 %figure(); plot(flightPaths.AllFlightsTime)
 
 % plot all flights
@@ -15,14 +27,14 @@ figure();
 histogram(flightPaths.AllFlightsTime(FF)/60,100);
 
 % plot unclustered
-for i = 1:4
+for i = 1:5
     cluster = i;
     flightPaths.clusterIndex{cluster};
     FF2 = flightPaths.flight_starts_idx(flightPaths.clusterIndex{cluster});
     
     figure();
     hold on;
-    histout{i} = histogram(flightPaths.AllFlightsTime(FF2)/60,60);
+    histout{i} = histogram(flightPaths.AllFlightsTime(FF2)/60,'NumBins',60,'BinLimits',[1,60]);
     xlabel('time (min)');
     ylabel('count');
     title(['Cluster ',num2str(i)]);
@@ -36,7 +48,7 @@ end
 
 
 % Export Data
-for i = 1:4; % for cluster
+for i = 1:5; % for cluster
     FF2 = flightPaths.flight_starts_idx(flightPaths.clusterIndex{i});
     dc = flightPaths.AllFlightsTime(FF2)/60;
     out.Light_cluster{i}.FirstLight = flightPaths.clusterIndex{i}(find(dc<20));
@@ -107,9 +119,12 @@ title('Lights Return on');
 
 %% %% %% Plot Flights
 
+
 figure();
-cluster = 3;
-col = [0 0 1 1];
+col = {'r','b','g','m'};
+
+for i = 1:length(FlightPaths);
+cluster = FlightPaths(i);
 hold on;
 A = flightPaths.tracjectoriesRaw*1000;
 
@@ -118,44 +133,83 @@ subplot(1,3,1); hold on;
 Ind2use = out.Light_all.FirstLight;
 Ind2use2 = out.Light_cluster{cluster}.FirstLight  ;
 
+if i ==1;
 for iii = 1:length(Ind2use)  
     bound = flightPaths.flight_starts_idx(Ind2use(iii)):flightPaths.flight_ends_idx(Ind2use(iii));
     plot1 =  plot3(A(1,bound),A(2,bound),A(3,bound),'color',[0 0 0 0.5]); % plot all flights
 end
+end
 for ii = 1: length(Ind2use2);
     bound2 = flightPaths.flight_starts_idx(Ind2use2(ii)):flightPaths.flight_ends_idx(Ind2use2(ii));
-    plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col,'LineWidth',2); % plot all flights
+    plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col{i},'LineWidth',2); % plot all flights
 end
 title('Lights ON');
 
 % Darkness
 subplot(1,3,2); hold on;
 Ind2use = out.Light_all.Darkness;
-Ind2use2 = out.Light_cluster{cluster}.Darkness    ;
+Ind2use2 = out.Light_cluster{cluster}.Darkness;
+if i ==1;
 for iii = 1:length(Ind2use)  
     bound = flightPaths.flight_starts_idx(Ind2use(iii)):flightPaths.flight_ends_idx(Ind2use(iii));
     plot1 =  plot3(A(1,bound),A(2,bound),A(3,bound),'color',[0 0 0 0.5]); % plot all flights
 end
+end
 for ii = 1: length(Ind2use2);
     bound2 = flightPaths.flight_starts_idx(Ind2use2(ii)):flightPaths.flight_ends_idx(Ind2use2(ii));
-    plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col,'LineWidth',2); % plot all flights
+    plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col{i},'LineWidth',2); % plot all flights
 end
 title('Lights Off');
 
 % Last Light
 subplot(1,3,3); hold on;
 Ind2use = out.Light_all.LastLight;
-Ind2use2 = out.Light_cluster{cluster}.LastLight    ;
+Ind2use2 = out.Light_cluster{cluster}.LastLight;
+if i ==1;
 for iii = 1:length(Ind2use)  
     bound = flightPaths.flight_starts_idx(Ind2use(iii)):flightPaths.flight_ends_idx(Ind2use(iii));
     plot1 =  plot3(A(1,bound),A(2,bound),A(3,bound),'color',[0 0 0 0.5]); % plot all flights
 end
+end
 for ii = 1: length(Ind2use2);
     bound2 = flightPaths.flight_starts_idx(Ind2use2(ii)):flightPaths.flight_ends_idx(Ind2use2(ii));
-    plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col,'LineWidth',2); % plot all flights
+    plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col{i},'LineWidth',2); % plot all flights
 end
 title('Lights Return on');
+end
+
+% reate custom color:
+col2use(1,:) = [0 0 0];
+col2use(2,:) = [1 0 0];
+col2use(3,:) = [0 0 1];
+col2use(4,:) = [1 0 1];
+col2use(5,:) = [0 1 0];
+
+clear a
+for i = 1:5;
+a(:,i) = histout{i}.Values;
+end
+figure();
+hold on;
+b = bar(a,'stacked');
+    plot([20 20],[0 30],'--k','LineWidth',2)
+    plot([40 40],[0 30],'--k','LineWidth',2)
+title(' Number of flights vs time of day')
+xlabel('time in session ( min)');
+ylabel('total # flights');
+legend('Unique','FlightPath 1','FlightPath 2','FlightPath 3','FlightPath 4');
 
 
+for K = 1 : length(b);
+    if K ==1;
+       b(K).FaceAlpha = 0.5;
+       b(K).EdgeAlpha = 0.5;
+    else
+       b(K).FaceAlpha = 0.8;
+       b(K).EdgeAlpha = 0.8;
+    b(K).FaceColor = col2use(K,:).'; 
+    b(K).EdgeColor = col2use(K,:).'; 
+    end
+end
 
 

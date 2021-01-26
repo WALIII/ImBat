@@ -1,4 +1,4 @@
-function ImBat_AudioDispatch(flightPaths);
+function ImBat_AudioDispatch
 
 % wrapper function for all audio functions
 
