@@ -1,11 +1,11 @@
-function [audio] = ImBat_ConcatAudio;
+function [ audioConCat, ttlConCat] = ImBat_ConcatAudio
 
 % concat audio once in the audio folde
 
 
 % Get all files in dir.
 
-filePath = cd;
+filePath = cd; %'C:\Users\Tobias\Desktop\analysis\flight\audio_flight\test\song\';
 
 %mic = 1;
 fs = 192000;
@@ -17,21 +17,13 @@ if plotFlag == 1
 end
 
 % Get bat and session name:
-sla2find = strfind(filePath,'\'); % get this based on the directory ( windows)
+sla2find = strfind(filePath,'/'); % get this based on the directory
 dateSesh = filePath(sla2find(end-1)+1:sla2find(end)-1);%  dateSesh = '200522';
 batName = filePath(sla2find(end-2)+1:sla2find(end-1)-1); % batName = 'Gen';
 
 
 for mic_i = 4%:4
-    try
-        fileFirst = load([filePath '/_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
-    catch
-        try
-            fileFirst = load([filePath '/',batName,'_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
-        catch
-            fileFirst = load([filePath '/Gen_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
-        end
-    end
+    fileFirst = load([filePath '/_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
     ttlConCat = fileFirst.recbuf(:,end);
     audioConCat = fileFirst.recbuf(:,mic_i);
     for file_i = firstFileNum:lastFileNum
@@ -41,15 +33,8 @@ for mic_i = 4%:4
         else
             fileCur = fileNext;
         end
-        try
-            fileNext = load([filePath '/_' dateSesh '_audio_trial_' num2str(file_i+1) '.mat']);
-        catch
-            try
-                fileNext = load([filePath '/',batName,'_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
-            catch
-                fileNext = load([filePath '/Gen_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
-            end
-        end
+        fileNext = load([filePath '/_' dateSesh '_audio_trial_' num2str(file_i+1) '.mat']);
+        
         fs=fileCur.fs;
         event_ttls_cur = fileCur.recbuf(:,end); %trial data for current file
         audioMicCur = fileCur.recbuf(:,mic_i);
@@ -74,42 +59,38 @@ for mic_i = 4%:4
             cutOut = round(extra_end+extra_start2-(3*fs));
         end
         %concatenate the ttl and audio streams
-        try
         ttlConCat = vertcat(ttlConCat,event_ttls_next(cutOut+1:end));
         audioConCat = vertcat(audioConCat,audioMicNext(cutOut+1:end));
-        catch
-            disp('End of file');
-        end
         
         if plotFlag == 1
-            %plot current file ttls
-            subplot(4,1,1);
-            plot(event_ttls_cur);
-            hold on
-            for i = 1:length(LTcur)
-                plot(LTcur(i)*fs,0,'o')
-            end
-            title(['File num ' num2str(file_i)]);
-            %plot next file ttls
-            subplot(4,1,2);
-            plot(event_ttls_next);
-            hold on
-            for i = 1:length(LTnext)
-                plot(LTnext(i)*fs,0,'o');
-            end
-            title(['File num ' num2str(file_i+1)]);
-            %plot the next file with the 'proper time' cut out
-            subplot(4,1,3);
-            plot(event_ttls_next(cutOut+1:end))
-            title(['Cut version of file num ' num2str(file_i+1)]);
-            %plot the fully concatenated version
-            subplot(4,1,4);
-            plot(ttlConCat);
-            title('All files connected');
-            drawnow
-            
-            pause
-            clf
+        %plot current file ttls
+        subplot(4,1,1);
+        plot(event_ttls_cur);
+        hold on
+        for i = 1:length(LTcur)
+            plot(LTcur(i)*fs,0,'o')
+        end
+        title(['File num ' num2str(file_i)]);
+        %plot next file ttls
+        subplot(4,1,2);
+        plot(event_ttls_next);
+        hold on
+        for i = 1:length(LTnext)
+            plot(LTnext(i)*fs,0,'o');
+        end
+        title(['File num ' num2str(file_i+1)]);
+        %plot the next file with the 'proper time' cut out
+        subplot(4,1,3);
+        plot(event_ttls_next(cutOut+1:end))
+        title(['Cut version of file num ' num2str(file_i+1)]);
+        %plot the fully concatenated version
+        subplot(4,1,4);
+        plot(ttlConCat);
+        title('All files connected');
+        drawnow
+        
+        pause
+        clf
         end
     end
     
@@ -139,44 +120,6 @@ for mic_i = 4%:4
     %play(micObj);
     %pause
 end
-
-[audio] = ImBat_formatAudio(audioConCat,ttlConCat,dateSesh,batName,fs);
-
-
-function [audio] = ImBat_formatAudio(audioConCat,ttlConCat,dateSesh,batName,fs);
-
-% Format audio and align timestamps to flight data
-
-% create time vector, set first ttl to zero
-time_vect = 1:length(ttlConCat);
-time_vect = time_vect/fs;
-ds_factor = 1000;
-ttl_ds = downsample(ttlConCat,1000);
-[a, b] = findpeaks(abs(ttl_ds),'MinPeakProminence',0.3,'MinPeakDistance',50);
-
-% % test time diff:
-% [a2, b2] = findpeaks(ttlConCat,'MinPeakProminence',0.3,'MinPeakDistance',50);
-
-% figure();
-% hold on;
-% plot(abs(ttl_ds));
-% plot(b,a,'*');
-
-offset_t = b(1)/(fs/ds_factor);
-time_vect = time_vect-offset_t;
-
-% data
-audio.data = audioConCat;
-audio.time_vect = time_vect;
-% downsampled data
-% audio.data = audioConCat_DS;
-% audio.time_vect_DS
-
-% metadata
-audio.fs = fs;
-audio.batName = batName;
-audio.session = dateSesh;
-
 
 
 

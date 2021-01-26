@@ -24,14 +24,11 @@ batName = filePath(sla2find(end-2)+1:sla2find(end-1)-1); % batName = 'Gen';
 
 for mic_i = 4%:4
     try
-        fileFirst = load([filePath '/_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
+    fileFirst = load([filePath '/_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
     catch
-        try
-            fileFirst = load([filePath '/',batName,'_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
-        catch
-            fileFirst = load([filePath '/Gen_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
-        end
-    end
+        sla2find2 = strfind(filePath,'_'); % get this based on the directory ( windows)
+            fileFirst = load([filePath '/_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
+
     ttlConCat = fileFirst.recbuf(:,end);
     audioConCat = fileFirst.recbuf(:,mic_i);
     for file_i = firstFileNum:lastFileNum
@@ -41,15 +38,8 @@ for mic_i = 4%:4
         else
             fileCur = fileNext;
         end
-        try
-            fileNext = load([filePath '/_' dateSesh '_audio_trial_' num2str(file_i+1) '.mat']);
-        catch
-            try
-                fileNext = load([filePath '/',batName,'_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
-            catch
-                fileNext = load([filePath '/Gen_' dateSesh '_audio_trial_' num2str(firstFileNum) '.mat']);
-            end
-        end
+        fileNext = load([filePath '/_' dateSesh '_audio_trial_' num2str(file_i+1) '.mat']);
+        
         fs=fileCur.fs;
         event_ttls_cur = fileCur.recbuf(:,end); %trial data for current file
         audioMicCur = fileCur.recbuf(:,mic_i);
@@ -74,42 +64,38 @@ for mic_i = 4%:4
             cutOut = round(extra_end+extra_start2-(3*fs));
         end
         %concatenate the ttl and audio streams
-        try
         ttlConCat = vertcat(ttlConCat,event_ttls_next(cutOut+1:end));
         audioConCat = vertcat(audioConCat,audioMicNext(cutOut+1:end));
-        catch
-            disp('End of file');
-        end
         
         if plotFlag == 1
-            %plot current file ttls
-            subplot(4,1,1);
-            plot(event_ttls_cur);
-            hold on
-            for i = 1:length(LTcur)
-                plot(LTcur(i)*fs,0,'o')
-            end
-            title(['File num ' num2str(file_i)]);
-            %plot next file ttls
-            subplot(4,1,2);
-            plot(event_ttls_next);
-            hold on
-            for i = 1:length(LTnext)
-                plot(LTnext(i)*fs,0,'o');
-            end
-            title(['File num ' num2str(file_i+1)]);
-            %plot the next file with the 'proper time' cut out
-            subplot(4,1,3);
-            plot(event_ttls_next(cutOut+1:end))
-            title(['Cut version of file num ' num2str(file_i+1)]);
-            %plot the fully concatenated version
-            subplot(4,1,4);
-            plot(ttlConCat);
-            title('All files connected');
-            drawnow
-            
-            pause
-            clf
+        %plot current file ttls
+        subplot(4,1,1);
+        plot(event_ttls_cur);
+        hold on
+        for i = 1:length(LTcur)
+            plot(LTcur(i)*fs,0,'o')
+        end
+        title(['File num ' num2str(file_i)]);
+        %plot next file ttls
+        subplot(4,1,2);
+        plot(event_ttls_next);
+        hold on
+        for i = 1:length(LTnext)
+            plot(LTnext(i)*fs,0,'o');
+        end
+        title(['File num ' num2str(file_i+1)]);
+        %plot the next file with the 'proper time' cut out
+        subplot(4,1,3);
+        plot(event_ttls_next(cutOut+1:end))
+        title(['Cut version of file num ' num2str(file_i+1)]);
+        %plot the fully concatenated version
+        subplot(4,1,4);
+        plot(ttlConCat);
+        title('All files connected');
+        drawnow
+        
+        pause
+        clf
         end
     end
     
@@ -149,15 +135,15 @@ function [audio] = ImBat_formatAudio(audioConCat,ttlConCat,dateSesh,batName,fs);
 
 % create time vector, set first ttl to zero
 time_vect = 1:length(ttlConCat);
-time_vect = time_vect/fs;
+time_vect = time_vect/fs; 
 ds_factor = 1000;
 ttl_ds = downsample(ttlConCat,1000);
 [a, b] = findpeaks(abs(ttl_ds),'MinPeakProminence',0.3,'MinPeakDistance',50);
 
-% % test time diff:
+% % test time diff: 
 % [a2, b2] = findpeaks(ttlConCat,'MinPeakProminence',0.3,'MinPeakDistance',50);
 
-% figure();
+% figure(); 
 % hold on;
 % plot(abs(ttl_ds));
 % plot(b,a,'*');
