@@ -112,7 +112,7 @@ for i = 1:length(Locations2Use);
                         clear Xb
                         Xb = subFolders4b(contains({subFolders4b.name},'processed_'));
                        
-                        if length(Xb)>0; % if there is something here, process it
+                        if length(Xb)>0; % TO DO: address special case where there is no processed folders
                         X_toCompare_02 = Xb(length(Xb));
                         
                         % NOW copy the bigger folder

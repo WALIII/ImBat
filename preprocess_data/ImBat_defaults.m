@@ -22,4 +22,4 @@ metadata.moco.itter = 5;
 metadata.moco.bin_width = 200;
 
 metadata.processed_FN = 'temp';
-mkdir(metadata.processed_FN);
+%mkdir(metadata.processed_FN);
