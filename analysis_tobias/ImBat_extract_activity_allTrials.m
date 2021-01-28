@@ -22,12 +22,16 @@ if strcmp(batId,'Gal')
 elseif strcmp(batId,'Gen')
     nDays = [1:5];
     nRois = [1:20];%size(ROIs_manual(day_i,:),2); %number of ROIs
+elseif strcmp(batId,'Gi')
+    nDays = [1:10];
+    nRois = [1:5];%size(ROIs_manual(day_i,:),2); %number of ROIs
 elseif strcmp(batId,'Z2')
     nDays = [1:10]; %which days to look at
     nRois = [1:10];
 elseif strcmp(batId,'Za')
     nDays = [1:5]; %which days to look at
-    nRois = [1:10];end
+    nRois = [1:10];
+end
 %dayCounter = 1; %start the
 if strcmp(batId,'Gal')
     % 15 stable manually selected ROIs across 9 days for Gal
@@ -78,6 +82,19 @@ elseif strcmp(batId,'Za')
         1 2 3 4 5 6 7 8 9 10;
         1 2 3 4 5 6 7 8 9 10];
         dirTop = dir('za*');
+elseif strcmp(batId,'Gi')
+    % 15 stable manually selected ROIs across 9 days for Gal
+    ROIs_manual = [1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10;
+        1 2 3 4 5 6 7 8 9 10];
+        dirTop = dir('Gi*');
 end
 if plotFlag == 1
     fig1 = figure();   set(gcf, 'units','normalized','outerposition',[0.2 0 0.5 1]);
@@ -105,17 +122,13 @@ for day_i = 1:length(nDays) %for each day
         
         cd(flyFolders(end).name);
         dirProcessed = dir('processed_*');
-        if strcmp(batName{day_i}(1),'G')
-            cd(dirProcessed(end).name);
-        else
             cd(dirProcessed(end).name); %can change this if need to look at earlier or later processed folders based on batname, date, etc
-        end
     catch
         cd(dirTop(nDays(day_i)).name);
         flyFolders = dir('*fly*extraction');
-        batName{day_i} = flyFolders(end).name(1:5);%(1:3);
-        dateSesh{day_i} = flyFolders(end).name(7:12);%(5:10);
-        sessionType{day_i} = flyFolders(end).name(14:18); %(12:16);
+        batName{day_i} = flyFolders(end).name(1:3);
+        dateSesh{day_i} = flyFolders(end).name(5:10);
+        sessionType{day_i} = flyFolders(end).name(12:16);
         
         cd(flyFolders(end).name);
         dirProcessed = dir('processed_*');
@@ -328,23 +341,26 @@ activity_allTrials.maxMeanFrames_dur = maxMeanFrames_dur;
 activity_allTrials.YmaxFull = YmaxFull;
 
 %flightAligned_vidData.frames_pre = frames_pre;
-flightAligned_vidData.framesRaw_dur = framesRaw_dur;
+%flightAligned_vidData.framesRaw_dur = framesRaw_dur;
 %flightAligned_vidData.framesFilt_dur = framesFilt_dur;
 %flightAligned_vidData.frames_post = frames_post;
 
 if saveFlag == 1
     if strcmp(batId,'Gal')
         save([saveDir 'Gal_200311to200324_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials','-v7.3');
-        save([saveDir 'Gal_200311to200324_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
+       % save([saveDir 'Gal_200311to200324_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
     elseif strcmp(batId,'Gen')
         save([saveDir 'Gen_200319to200324_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials','-v7.3');
-        save([saveDir 'Gen_200319to200324_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
+      %  save([saveDir 'Gen_200319to200324_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
     elseif strcmp(batId,'Z2')
         save([saveDir 'Z2_190701to190808_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials','-v7.3');
-        save([saveDir 'Z2_190319to190808_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
+      %  save([saveDir 'Z2_190319to190808_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
     elseif strcmp(batId,'Za')
         save([saveDir 'Za_190524to190530_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials','-v7.3');
-        save([saveDir 'Za_190524to190530_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
+      %  save([saveDir 'Za_190524to190530_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
+    elseif strcmp(batId,'Gi')
+        save([saveDir 'Gi_200407to200418_activity_allTrials_allClusts_' saveTag '.mat'],'activity_allTrials','-v7.3');
+      %  save([saveDir 'Za_190524to190530_flightAligned_vidData_' saveTag '.mat'],'flightAligned_vidData','-v7.3');
     end
 end
 

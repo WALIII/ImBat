@@ -1,8 +1,7 @@
 function [YmaxFullAllDays] = ImBat_extract_YmaxFull_AllDays(batId)
 saveFlag = 1; %do you want to save the figures and output structure?
-rest1Flag = 1; %do you want to include the rest1 session too?
 
-saveTag = 'rest';
+saveTag = 'Ymed';
 if saveFlag == 1
     %saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
     saveDir1 = '\\169.229.54.11\server_home\users\tobias\flight\data_processed\topQualityData\ForTobias\plots\';
@@ -29,7 +28,7 @@ elseif strcmp(batId, 'Zu')
     dirTop = dir('zu*');
 elseif strcmp(batId,'Za')
     nDays = [1:5];
-    dirTop = dir('za*');
+    dirTop = dir('za');
 end
 
 
@@ -38,10 +37,10 @@ for day_i = 1:length(nDays) %[50,51,66,67,76,77]%[2,3,27,28,33,34]%for each day
     try %extract metadata names and enter processed folder
         cd([dirTop(nDays(day_i)).name filesep 'extracted'])
         flyFolders = dir('*fly*extraction');
-        rest1Folders = dir('*rest1*extraction');
-        batName{day_i} = flyFolders(end).name(1:4);
-        dateSesh{day_i} = flyFolders(end).name(6:11);
-        sessionType{day_i} = flyFolders(end).name(13:17);
+        rest1Folders = dir('rest1*extraction');
+        batName{day_i} = flyFolders(end).name(1:5);
+        dateSesh{day_i} = flyFolders(end).name(7:12);
+        sessionType{day_i} = flyFolders(end).name(14:18);
         
         cd(flyFolders(end).name);
         dirProcessed = dir('processed_*');
@@ -49,7 +48,7 @@ for day_i = 1:length(nDays) %[50,51,66,67,76,77]%[2,3,27,28,33,34]%for each day
     catch
         cd(dirTop(nDays(day_i)).name);
         flyFolders = dir('*fly*extraction');
-        rest1Folders = dir('*rest1*extraction');
+        rest1Folders = dir('rest1*extraction');
         batName{day_i} = flyFolders(end).name(1:3);%(1:3);
         dateSesh{day_i} = flyFolders(end).name(5:10);%(5:10);
         sessionType{day_i} = flyFolders(end).name(12:16); %(12:16);
@@ -86,7 +85,7 @@ for day_i = 1:length(nDays) %[50,51,66,67,76,77]%[2,3,27,28,33,34]%for each day
     cd(dirProcessed(end).folder);
     disp(num2str(day_i))
     clear vidData;
-    cd ..
+    
     if rest1Flag == 1
         cd(rest1Folders(end).name);
         dirProcessed = dir('processed_*');
@@ -124,9 +123,6 @@ YmaxFullAllDays.batName = batName;
 YmaxFullAllDays.sessionType = sessionType;
 YmaxFullAllDays.dateSesh = dateSesh;
 YmaxFullAllDays.YmaxFull = YmaxFull;
-if rest1Flag == 1
-    YmaxFullAllDays.YmaxRest = YmaxRest;
-end
 
 if saveFlag == 1
     if strcmp(batId,'Gal')
@@ -138,8 +134,6 @@ if saveFlag == 1
         save([saveDir 'Z2_190701to190822_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');
      elseif strcmp(batId,'Zu')
         save([saveDir 'Zu_190704to190820_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');
-     elseif strcmp(batId,'Za')
-        save([saveDir 'Za_190524to190530_YmaxFull_' saveTag '.mat'],'YmaxFullAllDays','-v7.3');    
     end
 end
 

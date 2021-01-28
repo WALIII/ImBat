@@ -135,7 +135,7 @@ end
 
 save([filename, '.mat'],'ROI_Data')
 %save([filename,'.mat'],'ROI_Data')
-cd(LD)
+
 end
 
 %% Cell Sort to get 'similar ROIs'
