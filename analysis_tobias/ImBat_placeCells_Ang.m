@@ -256,7 +256,7 @@ if p_val_analysis
             S_Info(1,id_cluster_SI,cell_n) = info(1);
             S_Info(2,id_cluster_SI,cell_n) = length(find(info>=info(1)))/n_rep;
             
-            drawnow();      saveas(gcf,[figures_directory1, '/', batName '_' dateSesh '_' sessionType '_ROI_' num2str(cell_n) '_cluster_' num2str(id_cluster_SI) '.tif']);
+            drawnow();      saveas(gcf,[figures_directory1, '/', batName '_' dateSesh '_' sessionType '_ROI_' num2str(cell_n) '_cluster_' num2str(id_cluster_SI) '.jpg']);
         end
     end
     close all;
@@ -273,7 +273,7 @@ if p_val_analysis
     pp_cells_activity = round(normalize(sp_bnd_response(:,pp_cells),1,'range'),5)'; %normalize activity between 0-1 for putative place fields along 30 space fields
     [sorted_rows,~] = find(pp_cells_activity==1);   sorted_pp_fields = pp_cells_activity(sorted_rows,:);
     figure();   imagesc(sorted_pp_fields,[0 1]);         colormap(viridis); %plots the normalized activity sorted of putative place fields (cells sig/trajectory)
-    saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_pfields_sorted.tif']);
+    saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_pfields_sorted.jpg']);
     
     %Visualize place fields and calculate centroids
     %outputs every place field as a centroid heatmap along each trajectory
@@ -288,7 +288,7 @@ if p_val_analysis
     %ppre_cells_activity = round(normalize(bnd_act_pre(:,ppre_cells),1,'range'),5)'; %normalize activity between 0-1 for putative place fields along 30 space fields
     %[sorted_rows_pre,~] = find(ppre_cells_activity==1);   sorted_ppre_fields = ppre_cells_activity(sorted_rows_pre,:);
     %figure();   imagesc(sorted_ppre_fields,[0 1]);         colormap(viridis); %plots the normalized activity sorted of putative place fields (cells sig/trajectory)
-    %saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_prefields_sorted.tif']);
+    %saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_prefields_sorted.jpg']);
     [clus_pre,cellNum_pre] = find(ppre_cells); %outputs which cells and which clusters have spatial selectivity
     
     %Putative post cells(**pre activity & Peak Firing > 3 average firing)
@@ -298,7 +298,7 @@ if p_val_analysis
     %ppost_cells_activity = round(normalize(bnd_act_pst(:,ppost_cells),1,'range'),5)'; %normalize activity between 0-1 for putative place fields along 30 space fields
     %[sorted_rows_post,~] = find(ppost_cells_activity==1);   sorted_ppost_fields = ppost_cells_activity(sorted_rows_post,:);
     %figure();   imagesc(sorted_ppost_fields,[0 1]);         colormap(viridis); %plots the normalized activity sorted of putative place fields (cells sig/trajectory)
-    %saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_postfields_sorted.tif']);
+    %saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_postfields_sorted.jpg']);
     [clus_post,cellNum_post] = find(ppost_cells); %outputs which cells and which clusters have spatial selectivity
      
     %putative place cells but not looking at spatial info, only based on p-val
@@ -350,7 +350,7 @@ if p_val_analysis
         Place_field(clus_i).cell = cellNum(clus_i);
         Place_field(clus_i).clus = clus(clus_i);
         
-        saveas(gcf,[figures_directory1, '/',batName '_' dateSesh '_' sessionType '_Place_field' num2str(clus_i) '.tif']);
+        saveas(gcf,[figures_directory1, '/',batName '_' dateSesh '_' sessionType '_Place_field' num2str(clus_i) '.jpg']);
     end
     close all;
     
@@ -392,7 +392,7 @@ if p_val_analysis
     ax1.Title.String = 'Pre-Flight';        ax2.Title.String = 'During-Flight'; ax3.Title.String = 'Post-Flight';
     ax1.XLabel.String = 'Bin';              ax2.XLabel.String = 'Bin';          ax3.XLabel.String = 'Bin';
     ax1.YLabel.String = 'Neuron x Flight #';ax2.YTickLabel= [];                 ax3.YTickLabel= [];
-    saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_activity_sorted.tif']);
+    saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_activity_sorted.jpg']);
     
     
     %save the variables in a structure
