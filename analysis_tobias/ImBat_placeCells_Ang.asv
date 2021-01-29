@@ -36,7 +36,7 @@ end
 
 % P_value calculation params
 n_bins = 10;     %good around here                                                           %number of bins to divide the pre-during-post flight interval
-n_rep = 5;    %can lower to 10 for debugging                                                           %number of shufflings
+n_rep = 500;    %can lower to 10 for debugging                                                           %number of shufflings
 alfa = 0.05;     %can lower to 0.01 or 0.1                                                           %significance level
 pre_dur = 3;     %play with 3-5                                                           %duration of the pre flight period (s):     comparable with flight dur
 pst_dur = 3;     %play with 3-5                                                           %duration of the post flight period (s):    but shorter than half interflight
@@ -200,21 +200,21 @@ if p_val_analysis
                 info(n) = sum(lambda.*prob.*log2((lambda+1e-20)./(lambda_ave+1e-20))); %bits/second
                 
                 %Concatenate activities and plot
-                bnd_act = [bnd_act_pre;bnd_act_dur;bnd_act_pst];
+                bnd_act = [bnd_act_pre(1:end-1,:);bnd_act_dur(1:end-1,:);bnd_act_pst(1:end-1,:)];
                 subplot(4,4,[1 2 3 5 6 7 9 10 11]);
-                plot(linspace(1,100,3*n_bins),filter(w,1,median(bnd_act,2)),'k');  hold on;
+                plot(linspace(1,90,(3*n_bins)-3),filter(w,1,median(bnd_act,2)),'k');  hold on;
                 if n ==  1 %save specific names for first rep to use for plotting with shaded area
-                    avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,mean(bnd_act,2));
+                    avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,median(bnd_act,2));
                     sp_bnd_response(:,id_cluster_SI,cell_n) = filter(w,1,lambda);
                     sp_bnd_response_pre(:,id_cluster_SI,cell_n) = filter(w,1,lambda_pre);
                     sp_bnd_response_pst(:,id_cluster_SI,cell_n) = filter(w,1,lambda_pst);
                     
                     sp_bnd_velCel{id_cluster_SI} = sp_bnd_vel;
-                    
-                    ciplot(filter(w,1,mean(bnd_act,2))-std(bnd_act,[],2)./sqrt(size(id,1)),filter(w,1,mean(bnd_act,2))+std(bnd_act,[],2)./sqrt(size(id,1)),linspace(1,100,3*n_bins));
+                    %standard error mean for bounded line
+                    ciplot(filter(w,1,median(bnd_act,2))-std(bnd_act,[],2)./sqrt(size(id,1)),filter(w,1,median(bnd_act,2))+std(bnd_act,[],2)./sqrt(size(id,1)),linspace(1,90,(3*n_bins)-3));
                     alpha(0.3);
-                    line([33,33], [-max(mean(bnd_act,2)),max(mean(bnd_act,2))],'Color', 'k','LineStyle','--');
-                    line([66,66], [-max(mean(bnd_act,2)),max(mean(bnd_act,2))],'Color', 'k','LineStyle','--');
+                    line([30,30], [-max(median(bnd_act,2)),max(median(bnd_act,2))],'Color', 'k','LineStyle','--');
+                    line([60,60], [-max(median(bnd_act,2)),max(median(bnd_act,2))],'Color', 'k','LineStyle','--');
                     xlabel('Flight phase');    ylabel('Activity');
                     
                     subplot(4,4,13);   imagesc([sp_bnd_act_pre; sp_bnd_act; sp_bnd_act_pst]');  title('PreDurPost Raster');              %set(gca,'xtick',[]);
@@ -225,9 +225,9 @@ if p_val_analysis
                 %Integrated activity in the pre-during-post periods
                 %measure of average firing rate of cell in pre,dur, and
                 %post epochs
-                spikes(n,1) = sum(mean(bnd_act_pre,2))/pre_dur;
-                spikes(n,2) = sum(mean(bnd_act_dur,2))/mean(flight_dur); %uses average flight duration
-                spikes(n,3) = sum(mean(bnd_act_pst,2))/pst_dur;
+                spikes(n,1) = sum(median(bnd_act_pre,2))/pre_dur; %mean vs median
+                spikes(n,2) = sum(median(bnd_act_dur,2))/mean(flight_dur); %uses average flight duration
+                spikes(n,3) = sum(median(bnd_act_pst,2))/pst_dur;
             end
             
             fig_ord = get(gca,'Children');  set(gca,'Children',circshift(fig_ord,2,1)); hold off;
@@ -256,7 +256,7 @@ if p_val_analysis
             S_Info(1,id_cluster_SI,cell_n) = info(1);
             S_Info(2,id_cluster_SI,cell_n) = length(find(info>=info(1)))/n_rep;
             
-            drawnow();      saveas(gcf,[figures_directory1, '/', batName '_' dateSesh '_' sessionType '_ROI_' num2str(cell_n) '_cluster_' num2str(id_cluster_SI) '.tif']);
+            drawnow();      saveas(gcf,[figures_directory1, '/', batName '_' dateSesh '_' sessionType '_ROI_' num2str(cell_n) '_cluster_' num2str(id_cluster_SI) '.jpg']);
         end
     end
     close all;
@@ -273,7 +273,7 @@ if p_val_analysis
     pp_cells_activity = round(normalize(sp_bnd_response(:,pp_cells),1,'range'),5)'; %normalize activity between 0-1 for putative place fields along 30 space fields
     [sorted_rows,~] = find(pp_cells_activity==1);   sorted_pp_fields = pp_cells_activity(sorted_rows,:);
     figure();   imagesc(sorted_pp_fields,[0 1]);         colormap(viridis); %plots the normalized activity sorted of putative place fields (cells sig/trajectory)
-    saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_pfields_sorted.tif']);
+    saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_pfields_sorted.jpg']);
     
     %Visualize place fields and calculate centroids
     %outputs every place field as a centroid heatmap along each trajectory
@@ -288,7 +288,7 @@ if p_val_analysis
     %ppre_cells_activity = round(normalize(bnd_act_pre(:,ppre_cells),1,'range'),5)'; %normalize activity between 0-1 for putative place fields along 30 space fields
     %[sorted_rows_pre,~] = find(ppre_cells_activity==1);   sorted_ppre_fields = ppre_cells_activity(sorted_rows_pre,:);
     %figure();   imagesc(sorted_ppre_fields,[0 1]);         colormap(viridis); %plots the normalized activity sorted of putative place fields (cells sig/trajectory)
-    %saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_prefields_sorted.tif']);
+    %saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_prefields_sorted.jpg']);
     [clus_pre,cellNum_pre] = find(ppre_cells); %outputs which cells and which clusters have spatial selectivity
     
     %Putative post cells(**pre activity & Peak Firing > 3 average firing)
@@ -298,7 +298,7 @@ if p_val_analysis
     %ppost_cells_activity = round(normalize(bnd_act_pst(:,ppost_cells),1,'range'),5)'; %normalize activity between 0-1 for putative place fields along 30 space fields
     %[sorted_rows_post,~] = find(ppost_cells_activity==1);   sorted_ppost_fields = ppost_cells_activity(sorted_rows_post,:);
     %figure();   imagesc(sorted_ppost_fields,[0 1]);         colormap(viridis); %plots the normalized activity sorted of putative place fields (cells sig/trajectory)
-    %saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_postfields_sorted.tif']);
+    %saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_postfields_sorted.jpg']);
     [clus_post,cellNum_post] = find(ppost_cells); %outputs which cells and which clusters have spatial selectivity
      
     %putative place cells but not looking at spatial info, only based on p-val
@@ -350,7 +350,7 @@ if p_val_analysis
         Place_field(clus_i).cell = cellNum(clus_i);
         Place_field(clus_i).clus = clus(clus_i);
         
-        saveas(gcf,[figures_directory1, '/',batName '_' dateSesh '_' sessionType '_Place_field' num2str(clus_i) '.tif']);
+        saveas(gcf,[figures_directory1, '/',batName '_' dateSesh '_' sessionType '_Place_field' num2str(clus_i) '.jpg']);
     end
     close all;
     
@@ -392,7 +392,7 @@ if p_val_analysis
     ax1.Title.String = 'Pre-Flight';        ax2.Title.String = 'During-Flight'; ax3.Title.String = 'Post-Flight';
     ax1.XLabel.String = 'Bin';              ax2.XLabel.String = 'Bin';          ax3.XLabel.String = 'Bin';
     ax1.YLabel.String = 'Neuron x Flight #';ax2.YTickLabel= [];                 ax3.YTickLabel= [];
-    saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_activity_sorted.tif']);
+    saveas(gcf,[pwd, '/', batName '_' dateSesh '_' sessionType '_activity_sorted.jpg']);
     
     
     %save the variables in a structure

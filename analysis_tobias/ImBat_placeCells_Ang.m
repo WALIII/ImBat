@@ -35,7 +35,7 @@ if loadFlag == 1
 end
 
 % P_value calculation params
-n_bins = 10;     %good around here                                                           %number of bins to divide the pre-during-post flight interval
+n_bins = 30;     %good around here                                                           %number of bins to divide the pre-during-post flight interval
 n_rep = 500;    %can lower to 10 for debugging                                                           %number of shufflings
 alfa = 0.05;     %can lower to 0.01 or 0.1                                                           %significance level
 pre_dur = 3;     %play with 3-5                                                           %duration of the pre flight period (s):     comparable with flight dur
@@ -122,7 +122,7 @@ if p_val_analysis
     frames_to_shift(1)=0;     frames_to_shift(2:n_rep) = randi([10*CNMFe_Fs T-10*CNMFe_Fs],1,n_rep-1);   %Shifting in time (longer than 10s)
     p_val = zeros(3,until_cluster,N); %pre(1),during(2),post(3)/#cluster/#nueron                       %p values for pre, during, post active neurons
     response = zeros(3,until_cluster,N); %sum of each phase                   %Integrated response during pre, during, post periods 'sum(median(Rate)'
-    avg_bnd_act = zeros(3*n_bins,until_cluster,N);   %n_bins per section, for each pre/dur/post and for each cluster & cell       %Activity across bins from pre to post
+    avg_bnd_act = zeros((3*n_bins)-3,until_cluster,N);   %n_bins per section, for each pre/dur/post and for each cluster & cell       %Activity across bins from pre to post
     sp_bnd_response = zeros(n_space_bins,until_cluster,N);  %Spatially binned activity along the trajectory
     sp_bnd_velCel = cell(until_cluster,1);
     S_Info = zeros(2,until_cluster,N); %2 b/c 1dim=actual info, 2dim=p-val                     %bits and p value for spatial information
@@ -200,21 +200,21 @@ if p_val_analysis
                 info(n) = sum(lambda.*prob.*log2((lambda+1e-20)./(lambda_ave+1e-20))); %bits/second
                 
                 %Concatenate activities and plot
-                bnd_act = [bnd_act_pre;bnd_act_dur;bnd_act_pst];
+                bnd_act = [bnd_act_pre(1:end-1,:);bnd_act_dur(1:end-1,:);bnd_act_pst(1:end-1,:)];
                 subplot(4,4,[1 2 3 5 6 7 9 10 11]);
-                plot(linspace(1,90,3*n_bins),filter(w,1,median(bnd_act,2)),'k');  hold on;
+                plot(linspace(1,90,(3*n_bins)-3),filter(w,1,median(bnd_act,2)),'k');  hold on;
                 if n ==  1 %save specific names for first rep to use for plotting with shaded area
-                    avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,mean(bnd_act,2));
+                    avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,median(bnd_act,2));
                     sp_bnd_response(:,id_cluster_SI,cell_n) = filter(w,1,lambda);
                     sp_bnd_response_pre(:,id_cluster_SI,cell_n) = filter(w,1,lambda_pre);
                     sp_bnd_response_pst(:,id_cluster_SI,cell_n) = filter(w,1,lambda_pst);
                     
                     sp_bnd_velCel{id_cluster_SI} = sp_bnd_vel;
-                    
-                    ciplot(filter(w,1,mean(bnd_act,2))-std(bnd_act,[],2)./sqrt(size(id,1)),filter(w,1,mean(bnd_act,2))+std(bnd_act,[],2)./sqrt(size(id,1)),linspace(1,90,3*n_bins));
+                    %standard error mean for bounded line
+                    ciplot(filter(w,1,median(bnd_act,2))-std(bnd_act,[],2)./sqrt(size(id,1)),filter(w,1,median(bnd_act,2))+std(bnd_act,[],2)./sqrt(size(id,1)),linspace(1,90,(3*n_bins)-3));
                     alpha(0.3);
-                    line([30,30], [-max(mean(bnd_act,2)),max(mean(bnd_act,2))],'Color', 'k','LineStyle','--');
-                    line([60,60], [-max(mean(bnd_act,2)),max(mean(bnd_act,2))],'Color', 'k','LineStyle','--');
+                    line([30,30], [-max(median(bnd_act,2)),max(median(bnd_act,2))],'Color', 'k','LineStyle','--');
+                    line([60,60], [-max(median(bnd_act,2)),max(median(bnd_act,2))],'Color', 'k','LineStyle','--');
                     xlabel('Flight phase');    ylabel('Activity');
                     
                     subplot(4,4,13);   imagesc([sp_bnd_act_pre; sp_bnd_act; sp_bnd_act_pst]');  title('PreDurPost Raster');              %set(gca,'xtick',[]);
@@ -225,9 +225,9 @@ if p_val_analysis
                 %Integrated activity in the pre-during-post periods
                 %measure of average firing rate of cell in pre,dur, and
                 %post epochs
-                spikes(n,1) = sum(mean(bnd_act_pre,2))/pre_dur;
-                spikes(n,2) = sum(mean(bnd_act_dur,2))/mean(flight_dur); %uses average flight duration
-                spikes(n,3) = sum(mean(bnd_act_pst,2))/pst_dur;
+                spikes(n,1) = sum(median(bnd_act_pre,2))/pre_dur; %mean vs median
+                spikes(n,2) = sum(median(bnd_act_dur,2))/mean(flight_dur); %uses average flight duration
+                spikes(n,3) = sum(median(bnd_act_pst,2))/pst_dur;
             end
             
             fig_ord = get(gca,'Children');  set(gca,'Children',circshift(fig_ord,2,1)); hold off;

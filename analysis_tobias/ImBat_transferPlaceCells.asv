@@ -1,3 +1,6 @@
+extractedPlaceCells = dir('*ExtractedPlaceCells*');
+load(extractedPlaceCells.name);
+cd([pwd filesep 'Spatial_information']);
 
 nClust =size(placeCells.pp_cells,1)-1; %number of clusters to look at excluding the first cluster
 %initialize cells
@@ -41,38 +44,57 @@ for clust_i = 1:nClust
     ppre_cells = find(placeCells.ppre_cells(clust_i+1,:));
     ppost_cells = find(placeCells.ppost_cells(clust_i+1,:));
     
-   %find the different combos of pre, place, and post cells 
-   cells_prePlacePost{clust_i,:} = intersect(intersect(pp_cells,ppre_cells),ppost_cells);
-   for cell_i = 1:length(cells_prePlacePost{clust_i,:})
-       sourceFile = dir(['*_ROI_' num2str(cells_prePlacePost{clust_i,cell_i}) '_cluster_' num2str(clust_i+1) '.tif']);
-        movefile(sourceFile(cell_i).name,[pwd filesep 'cells_prePlacePost' filesep 'prePlacePost' filesep sourceFile(cell_i).name]);
-   end
-   cells_prePlace{clust_i,:} = setdiff(intersect(pp_cells,ppre_cells),cells_prePlacePost{clust_i,:});
-   for cell_i = 1:length(cells_prePlace{clust_i,:})
-       sourceFile = dir(['*_ROI_' num2str(cells_prePlace{clust_i,cell_i}) '_cluster_' num2str(clust_i+1) '.tif']);
-        movefile(sourceFile(cell_i).name,[pwd filesep 'cells_prePlacePost' filesep 'prePlace' filesep sourceFile(cell_i).name]);
-   end
-   cells_prePost{clust_i,:} = setdiff(intersect(ppre_cells,ppost_cells),cells_prePlacePost{clust_i,:});
-   for cell_i = 1:length(cells_prePost{clust_i,:})
-       sourceFile = dir(['*_ROI_' num2str(cells_prePost{clust_i,cell_i}) '_cluster_' num2str(clust_i+1) '.tif']);
-        movefile(sourceFile(cell_i).name,[pwd filesep 'cells_prePlacePost' filesep 'prePost' filesep sourceFile(cell_i).name]);
-   end
-   cells_pre{clust_i,:} = setdiff(setdiff(ppost_cells,cells_placePost{clust_i,:}),cells_prePost{clust_i,:});
-   for cell_i = 1:length(cells_pre{clust_i,:})
-       sourceFile = dir(['*_ROI_' num2str(cells_pre{clust_i,cell_i}) '_cluster_' num2str(clust_i+1) '.tif']);
-        movefile(sourceFile(cell_i).name,[pwd filesep 'cells_prePlacePost' filesep 'pre' filesep sourceFile(cell_i).name]);
-   end
-   cells_place{clust_i,:} = setdiff(setdiff(pp_cells,cells_placePost{clust_i,:}),cells_prePlace{clust_i,:});
-   for cell_i = 1:length(cells_place{clust_i,:})
-       sourceFile = dir(['*_ROI_' num2str(cells_place{clust_i,cell_i}) '_cluster_' num2str(clust_i+1) '.tif']);
-        movefile(sourceFile.name,[pwd filesep 'cells_prePlacePost' filesep 'place' filesep sourceFile.name]);
-   end   
-   cells_post{clust_i,:} = setdiff(setdiff(ppre_cells,cells_prePlace{clust_i,:}),cells_prePost{clust_i,:});
-   for cell_i = 1:length(cells_post{clust_i,:})
-       sourceFile = dir(['*_ROI_' num2str(cells_post{clust_i,cell_i}) '_cluster_' num2str(clust_i+1) '.tif']);
-        movefile(sourceFile.name,[pwd filesep 'cells_prePlacePost' filesep 'post' filesep sourceFile.name]);
-   end
-   
-   
+    %find the different combos of pre, place, and post cells
+    cells_prePlacePost{clust_i,:} = intersect(intersect(pp_cells,ppre_cells),ppost_cells);
+    for cell_i = 1:length(cells_prePlacePost{clust_i,:})
+        sourceFile = dir(['*_ROI_' num2str(cells_prePlacePost{clust_i}(cell_i)) '_cluster_' num2str(clust_i+1) '.tif']);
+        if ~isempty(sourceFile)
+            movefile(sourceFile.name,[pwd filesep 'cells_prePlacePost' filesep 'prePlacePost' filesep sourceFile.name]);
+        end
+    end
+    cells_prePlace{clust_i,:} = setdiff(intersect(pp_cells,ppre_cells),cells_prePlacePost{clust_i,:});
+    for cell_i = 1:length(cells_prePlace{clust_i,:})
+        sourceFile = dir(['*_ROI_' num2str(cells_prePlace{clust_i}(cell_i)) '_cluster_' num2str(clust_i+1) '.tif']);
+        if ~isempty(sourceFile)
+            movefile(sourceFile.name,[pwd filesep 'cells_prePlacePost' filesep 'prePlace' filesep sourceFile.name]);
+        end
+    end
+    cells_prePost{clust_i,:} = setdiff(intersect(ppre_cells,ppost_cells),cells_prePlacePost{clust_i,:});
+    for cell_i = 1:length(cells_prePost{clust_i,:})
+        sourceFile = dir(['*_ROI_' num2str(cells_prePost{clust_i}(cell_i)) '_cluster_' num2str(clust_i+1) '.tif']);
+        if ~isempty(sourceFile)
+            movefile(sourceFile.name,[pwd filesep 'cells_prePlacePost' filesep 'prePost' filesep sourceFile.name]);
+        end
+    end
+    cells_placePost{clust_i,:} = setdiff(intersect(pp_cells,ppost_cells),cells_prePlacePost{clust_i,:});
+    for cell_i = 1:length(cells_placePost{clust_i,:})
+        sourceFile = dir(['*_ROI_' num2str(cells_placePost{clust_i}(cell_i)) '_cluster_' num2str(clust_i+1) '.tif']);
+        if ~isempty(sourceFile)
+            movefile(sourceFile.name,[pwd filesep 'cells_prePlacePost' filesep 'placePost' filesep sourceFile.name]);
+        end
+    end    
+    cells_pre{clust_i,:} = setdiff(setdiff(ppre_cells,cells_prePlace{clust_i,:}),cells_prePost{clust_i,:});
+    for cell_i = 1:length(cells_pre{clust_i,:})
+        sourceFile = dir(['*_ROI_' num2str(cells_pre{clust_i}(cell_i)) '_cluster_' num2str(clust_i+1) '.tif']);
+        if ~isempty(sourceFile)
+            movefile(sourceFile.name,[pwd filesep 'cells_prePlacePost' filesep 'pre' filesep sourceFile.name]);
+        end
+    end
+    cells_place{clust_i,:} = setdiff(setdiff(pp_cells,cells_placePost{clust_i,:}),cells_prePlace{clust_i,:});
+    for cell_i = 1:length(cells_place{clust_i,:})
+        sourceFile = dir(['*_ROI_' num2str(cells_place{clust_i}(cell_i)) '_cluster_' num2str(clust_i+1) '.tif']);
+        if ~isempty(sourceFile)
+            movefile(sourceFile.name,[pwd filesep 'cells_prePlacePost' filesep 'place' filesep sourceFile.name]);
+        end
+    end
+    cells_post{clust_i,:} = setdiff(setdiff(ppost_cells,cells_placePost{clust_i,:}),cells_prePost{clust_i,:});
+    for cell_i = 1:length(cells_post{clust_i,:})
+        sourceFile = dir(['*_ROI_' num2str(cells_post{clust_i}(cell_i)) '_cluster_' num2str(clust_i+1) '.tif']);
+        if ~isempty(sourceFile)
+            movefile(sourceFile.name,[pwd filesep 'cells_prePlacePost' filesep 'post' filesep sourceFile.name]);
+        end
+    end
+    
+    
 end
 
