@@ -158,7 +158,7 @@ for ii = 1:length(cellData.results.S(:,1)); % for each cell
     end
     % Save 'place cells' as jpg and fig files..
     %set(findall(gcf,'-property','FontSize'),'FontSize',20);
-    saveas(plotFiringTrajectoryIndiv,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.tif']);
+    saveas(plotFiringTrajectoryIndiv,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.jpg']);
     savefig(plotFiringTrajectoryIndiv,[pwd filesep batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.fig']);
    % saveas(plotFiringTrajectoryIndiv,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_' num2str(ii) '.svg']);
     
@@ -169,7 +169,7 @@ end
 
 % Save 'place cells' as jpg and fig files..
 %set(findall(gcf,'-property','FontSize'),'FontSize',20);
-saveas(plotFiringTrajectory,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_all.tif']);
+saveas(plotFiringTrajectory,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_all.jpg']);
 savefig(plotFiringTrajectory,[pwd filesep batName '_' dateSesh '_' sessionType '_placeCell_all.fig']);
 %saveas(plotFiringTrajectory,[pwd '\' batName '_' dateSesh '_' sessionType '_placeCell_all.svg']);
 

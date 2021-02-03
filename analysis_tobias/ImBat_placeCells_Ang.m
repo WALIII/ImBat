@@ -35,7 +35,7 @@ if loadFlag == 1
 end
 
 % P_value calculation params
-n_bins = 30;     %good around here                                                           %number of bins to divide the pre-during-post flight interval
+n_bins = 10;     %good around here                                                           %number of bins to divide the pre-during-post flight interval
 n_rep = 500;    %can lower to 10 for debugging                                                           %number of shufflings
 alfa = 0.05;     %can lower to 0.01 or 0.1                                                           %significance level
 pre_dur = 3;     %play with 3-5                                                           %duration of the pre flight period (s):     comparable with flight dur
@@ -129,7 +129,7 @@ if p_val_analysis
     
     %Binning in time and space, p values calculation
     figure();   set(gcf, 'units','normalized','outerposition',[0.2 0 0.5 1]);
-    for id_cluster_SI = 2:until_cluster %for each cluster
+    for id_cluster_SI = 4:until_cluster %for each cluster
         id = [];    %id = find(flight_clus.id==id_cluster_SI); %find all flights that belong to that cluster
         id = flightPaths.clusterIndex{id_cluster_SI};
         for cell_n = 1:N %for each cell, initialize the below matrices
@@ -191,7 +191,7 @@ if p_val_analysis
                 end
                 
                 %Spatial information (CRITICAL CALCULATION!)
-                prob = 1./mean(sp_bnd_vel,2)*(1/sum(1./mean(sp_bnd_vel,2)));
+                prob = 1./median(sp_bnd_vel,2)*(1/sum(1./((median(sp_bnd_vel,2)+1e-10))));
                 sp_bnd_lambda = sp_bnd_act;
                 lambda =  median(sp_bnd_lambda,2);
                 lambda_pre = median(sp_bnd_act_pre,2);
@@ -225,9 +225,9 @@ if p_val_analysis
                 %Integrated activity in the pre-during-post periods
                 %measure of average firing rate of cell in pre,dur, and
                 %post epochs
-                spikes(n,1) = sum(median(bnd_act_pre,2))/pre_dur; %mean vs median
-                spikes(n,2) = sum(median(bnd_act_dur,2))/mean(flight_dur); %uses average flight duration
-                spikes(n,3) = sum(median(bnd_act_pst,2))/pst_dur;
+                spikes(n,1) = max(median(bnd_act_pre,2))/pre_dur; %mean vs median
+                spikes(n,2) = max(median(bnd_act_dur,2))/mean(flight_dur); %uses average flight duration
+                spikes(n,3) = max(median(bnd_act_pst,2))/pst_dur;
             end
             
             fig_ord = get(gca,'Children');  set(gca,'Children',circshift(fig_ord,2,1)); hold off;

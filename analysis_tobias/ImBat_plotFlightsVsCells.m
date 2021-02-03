@@ -124,7 +124,7 @@ smoothVelocity = zscore(smooth(flightPaths.batSpeed,100));
     linkaxes([a1, a2, a3], 'x');
     if saveFlag == 1
         saveas(flightVsVelocity, [pwd '\' analysis_Folder '\flights\' label '_flightVsVelocity_handPicked.svg']);
-        saveas(flightVsVelocity, [pwd '\' analysis_Folder '\flights\' label '_flightVsVelocity_handPicked.tif']);
+        saveas(flightVsVelocity, [pwd '\' analysis_Folder '\flights\' label '_flightVsVelocity_handPicked.jpg']);
         savefig(flightVsVelocity, [pwd '\' analysis_Folder '\flights\' label '_flightVsVelocity_handPicked.fig']);
     end
 

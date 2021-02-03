@@ -1,5 +1,8 @@
+if ~exist('placeCells')
 extractedPlaceCells = dir('*ExtractedPlaceCells*');
 load(extractedPlaceCells.name);
+end
+
 cd([pwd filesep 'Spatial_information']);
 
 nClust =size(placeCells.pp_cells,1)-1; %number of clusters to look at excluding the first cluster

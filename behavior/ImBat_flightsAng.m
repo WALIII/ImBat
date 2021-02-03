@@ -389,21 +389,21 @@ if saveFlag == 1
     analysis_folder = [pwd '\analysis_' datestr(now,'yyyy_mm_dd__hhMM')];
     mkdir([analysis_folder '\flights']);
     %set(findall(plotFlightPathsAll,'-property','FontSize'),'FontSize',20);
-    saveas(plotFlightPathsAll,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.tif']);
+    saveas(plotFlightPathsAll,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.jpg']);
     savefig(plotFlightPathsAll,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.fig']);
     saveas(plotFlightPathsAll,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsAll_full.svg']);
     %set(findall(plotFlightPathsClusterEach,'-property','FontSize'),'FontSize',20);
-    saveas(plotFlightPathsClusterEach,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.tif']);
+    saveas(plotFlightPathsClusterEach,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.jpg']);
     savefig(plotFlightPathsClusterEach,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.fig']);
     saveas(plotFlightPathsClusterEach,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsClusterEach_full.svg']);
     %set(findall(plotFlightPathsClusterAll,'-property','FontSize'),'FontSize',20);
-    saveas(plotFlightPathsStartStop,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.tif']);
+    saveas(plotFlightPathsStartStop,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.jpg']);
     savefig(plotFlightPathsStartStop,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.fig']);
     saveas(plotFlightPathsStartStop,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.svg']);
-    saveas(plotFlightTimeline,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.tif']);
+    saveas(plotFlightTimeline,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.jpg']);
     savefig(plotFlightTimeline,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.fig']);
     saveas(plotFlightTimeline,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.svg']);
-    saveas(plotClusterDistance,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.tif']);
+    saveas(plotClusterDistance,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.jpg']);
     savefig(plotClusterDistance,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.fig']);
     saveas(plotClusterDistance,[analysis_folder '\flights\' batName '_' dateSesh '_' sessionType '_flightPathsStartStop_full.svg']);
 

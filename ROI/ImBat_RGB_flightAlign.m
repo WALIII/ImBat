@@ -732,7 +732,7 @@ for i = 1:length(dayROI);
     dayROITitle = [dayROITitle '_' dayROI{i}]; 
 end
 if saveFlag == 1
-   saveas(plotCompareTimeSeries,[saveDir filesep batId '_corrROIS_days' dayROITitle '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+   saveas(plotCompareTimeSeries,[saveDir filesep batId '_corrROIS_days' dayROITitle '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
    savefig(plotCompareTimeSeries,[saveDir filesep batId '_corrROIS_days' dayROITitle '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);  
 end
 inputGo = input('Go?');
@@ -742,96 +742,96 @@ end
 %%
 if saveFlag == 1
     if strcmp(batId,'Gal')
-        saveas(plotDay123_unaligned,[saveDir filesep 'Gal_200227and200404_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_unaligned,[saveDir filesep 'Gal_200227and200404_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_unaligned,[saveDir filesep 'Gal_200227and200404_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_aligned,[saveDir filesep 'Gal_200227and200404_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_aligned,[saveDir filesep 'Gal_200227and200404_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_aligned,[saveDir filesep 'Gal_200227and200404_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_diffs,[saveDir filesep 'Gal_200227and200404_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_diffs,[saveDir filesep 'Gal_200227and200404_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_diffs,[saveDir filesep 'Gal_200227and200404_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_progression,[saveDir filesep 'Gal_200227and200404_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_progression,[saveDir filesep 'Gal_200227and200404_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_progression,[saveDir filesep 'Gal_200227and200404_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_centroids,[saveDir filesep 'Gal_200227and200404_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_centroids,[saveDir filesep 'Gal_200227and200404_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_centroids,[saveDir filesep 'Gal_200227and200404_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_all,[saveDir filesep 'Gal_200227and200404_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_all,[saveDir filesep 'Gal_200227and200404_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_all,[saveDir filesep 'Gal_200227and200404_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotOverlapTimeSeries,[saveDir filesep 'Gal_200227and200404_timeSeriesOverlap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotOverlapTimeSeries,[saveDir filesep 'Gal_200227and200404_timeSeriesOverlap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotOverlapTimeSeries,[saveDir filesep 'Gal_200227and200404_timeSeriesOverlap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotCnmfeSeries,[saveDir filesep 'Gal_200227and200404_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotCnmfeSeries,[saveDir filesep 'Gal_200227and200404_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotCnmfeSeries,[saveDir filesep 'Gal_200227and200404_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
                 if rigidFlag == 0
-            saveas(figNonrigid,[saveDir filesep 'Gal_200227and200404_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+            saveas(figNonrigid,[saveDir filesep 'Gal_200227and200404_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
             savefig(figNonrigid,[saveDir filesep 'Gal_200227and200404_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         end
     elseif strcmp(batId,'Gen')
-        %saveas(plotDay123_unaligned,[saveDir filesep 'Gen_200305and200311_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotDay123_unaligned,[saveDir filesep 'Gen_200305and200311_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         %savefig(plotDay123_unaligned,[saveDir filesep 'Gen_200305and200311_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_aligned,[saveDir filesep 'Gen_200305and200311_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_aligned,[saveDir filesep 'Gen_200305and200311_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_aligned,[saveDir filesep 'Gen_200305and200311_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotDay123_diffs,[saveDir filesep 'Gen_200305and200311_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotDay123_diffs,[saveDir filesep 'Gen_200305and200311_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_diffs,[saveDir filesep 'Gen_200305and200311_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_progression,[saveDir filesep 'Gen_200305and200311_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_progression,[saveDir filesep 'Gen_200305and200311_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_progression,[saveDir filesep 'Gen_200305and200311_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_all,[saveDir filesep 'Gen_200305and200311_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_all,[saveDir filesep 'Gen_200305and200311_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_all,[saveDir filesep 'Gen_200305and200311_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_centroids,[saveDir filesep 'Gen_200305and200311_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_centroids,[saveDir filesep 'Gen_200305and200311_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_centroids,[saveDir filesep 'Gen_200305and200311_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotOverlapTimeSeries,[saveDir filesep 'Gen_200305and200311_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotOverlapTimeSeries,[saveDir filesep 'Gen_200305and200311_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotOverlapTimeSeries,[saveDir filesep 'Gen_200305and200311_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotCnmfeSeries,[saveDir filesep 'Gen_200305and200311_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotCnmfeSeries,[saveDir filesep 'Gen_200305and200311_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         %savefig(plotCnmfeSeries,[saveDir filesep 'Gen_200305and200311_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         elseif strcmp(batId,'Z2')
-        %saveas(plotDay123_unaligned,[saveDir filesep 'Zo2_200701and822_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotDay123_unaligned,[saveDir filesep 'Zo2_200701and822_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         %savefig(plotDay123_unaligned,[saveDir filesep 'Zo2_200701and822_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_aligned,[saveDir filesep 'Zo2_200701and822_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_aligned,[saveDir filesep 'Zo2_200701and822_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_aligned,[saveDir filesep 'Zo2_200701and822_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotDay123_diffs,[saveDir filesep 'Zo2_200701and822_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotDay123_diffs,[saveDir filesep 'Zo2_200701and822_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_diffs,[saveDir filesep 'Zo2_200701and822_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_progression,[saveDir filesep 'Zo2_200701and822_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_progression,[saveDir filesep 'Zo2_200701and822_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_progression,[saveDir filesep 'Zo2_200701and822_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_all,[saveDir filesep 'Zo2_200701and822_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_all,[saveDir filesep 'Zo2_200701and822_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_all,[saveDir filesep 'Zo2_200701and822_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_centroids,[saveDir filesep 'Zo2_200701and822_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_centroids,[saveDir filesep 'Zo2_200701and822_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_centroids,[saveDir filesep 'Zo2_200701and822_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotOverlapTimeSeries,[saveDir filesep 'Zo2_200701and822_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotOverlapTimeSeries,[saveDir filesep 'Zo2_200701and822_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotOverlapTimeSeries,[saveDir filesep 'Zo2_200701and822_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotCnmfeSeries,[saveDir filesep 'Zo2_200701and822_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotCnmfeSeries,[saveDir filesep 'Zo2_200701and822_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         %savefig(plotCnmfeSeries,[saveDir filesep 'Zo2_200701and822_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         elseif strcmp(batId,'Zu')
-        %saveas(plotDay123_unaligned,[saveDir filesep 'Zu_200704and820_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotDay123_unaligned,[saveDir filesep 'Zu_200704and820_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         %savefig(plotDay123_unaligned,[saveDir filesep 'Zu_200704and820_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_aligned,[saveDir filesep 'Zu_200704and820_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_aligned,[saveDir filesep 'Zu_200704and820_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_aligned,[saveDir filesep 'Zu_200704and820_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotDay123_diffs,[saveDir filesep 'Zu_200704and820_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotDay123_diffs,[saveDir filesep 'Zu_200704and820_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_diffs,[saveDir filesep 'Zu_200704and820_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_progression,[saveDir filesep 'Zu_200704and820_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_progression,[saveDir filesep 'Zu_200704and820_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_progression,[saveDir filesep 'Zu_200704and820_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_all,[saveDir filesep 'Zu_200704and820_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_all,[saveDir filesep 'Zu_200704and820_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_all,[saveDir filesep 'Zu_200704and820_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_centroids,[saveDir filesep 'Zu_200704and820_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_centroids,[saveDir filesep 'Zu_200704and820_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_centroids,[saveDir filesep 'Zu_200704and820_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotOverlapTimeSeries,[saveDir filesep 'Zu_200704and820_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotOverlapTimeSeries,[saveDir filesep 'Zu_200704and820_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotOverlapTimeSeries,[saveDir filesep 'Zu_200704and820_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotCnmfeSeries,[saveDir filesep 'Zu_200704and820_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotCnmfeSeries,[saveDir filesep 'Zu_200704and820_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         %savefig(plotCnmfeSeries,[saveDir filesep 'Zu_200704and820_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         elseif strcmp(batId,'Za')
-        %saveas(plotDay123_unaligned,[saveDir filesep 'Za_200524and530_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotDay123_unaligned,[saveDir filesep 'Za_200524and530_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         %savefig(plotDay123_unaligned,[saveDir filesep 'Za_200524and530_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_aligned,[saveDir filesep 'Za_200524and530_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_aligned,[saveDir filesep 'Za_200524and530_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_aligned,[saveDir filesep 'Za_200524and530_overLap_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotDay123_diffs,[saveDir filesep 'Za_200524and530_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotDay123_diffs,[saveDir filesep 'Za_200524and530_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_diffs,[saveDir filesep 'Za_200524and530_diffs_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_progression,[saveDir filesep 'Za_200524and530_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_progression,[saveDir filesep 'Za_200524and530_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_progression,[saveDir filesep 'Za_200524and530_progression_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_all,[saveDir filesep 'Za_200524and530_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_all,[saveDir filesep 'Za_200524and530_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_all,[saveDir filesep 'Za_200524and530_allPlots_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        saveas(plotDay123_centroids,[saveDir filesep 'Za_200524and530_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        saveas(plotDay123_centroids,[saveDir filesep 'Za_200524and530_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotDay123_centroids,[saveDir filesep 'Za_200524and530_centroids_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotOverlapTimeSeries,[saveDir filesep 'Za_200524and530_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotOverlapTimeSeries,[saveDir filesep 'Za_200524and530_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         savefig(plotOverlapTimeSeries,[saveDir filesep 'Za_200524and530_overlapTimeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
-        %saveas(plotCnmfeSeries,[saveDir filesep 'Za_200524and530_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+        %saveas(plotCnmfeSeries,[saveDir filesep 'Za_200524and530_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
         %savefig(plotCnmfeSeries,[saveDir filesep 'Za_200524and530_timeSeries_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         if rigidFlag == 0
-            saveas(figNonrigid,[saveDir filesep 'Gen_200305and200311_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.tif']);
+            saveas(figNonrigid,[saveDir filesep 'Gen_200305and200311_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
             savefig(figNonrigid,[saveDir filesep 'Gen_200305and200311_nonrigidAlign_day' num2str(day1) '_day' num2str(day2) '_day' num2str(day3) '_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
         end
     end
