@@ -47,7 +47,7 @@ function ImBat_PlotTrackedMasks(ROI_Data,CombinedROI,cell_registered_struct,days
 
 %ROI2plot = (:,:,zeros(length(Atemp(1,:)));
 % get ROI centroids for top 30%;
-
+for iiii = 1:2;
 % think it is better to use arrows:
 col = jet(size(cells2use,2));
 counter = 1;
@@ -63,7 +63,7 @@ for i = 1: size(days2use,2) % = 1:5;
     hold on;
     
 % Plot Max projection
-    E = mat2gray(ROI_Data{day2use}.MaxProj_flights);
+   % E = mat2gray(ROI_Data{day2use}.MaxProj_flights);
 % Plot PNR projection
     E =  imresize(mat2gray(ROI_Data{day2use}.ROIs.results.Cn),4);
 
@@ -97,7 +97,12 @@ for iii = 1:size(cells2use,2)%[8 22 32 50] %[1 3 11 37 22]; unique ID
     for ii = 1:length(ROI_coords)
         try
             p = plot(ROI_coords{ii,1},ROI_coords{ii,2},'LineWidth',5,'color', col(iii,:));
+            if iiii ==1
             p.Color(4) = 0.1;
+            else
+            p.Color(4) = 1;
+            end
+
         catch
         end
     end
@@ -108,6 +113,7 @@ end
 end
 end
 
+end
 
 
 % 
