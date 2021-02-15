@@ -4,7 +4,7 @@ function out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined)
 close all
 counter = 1;
 min_flight_number = 10; % min number of flights needed
-min_prom = 0.5
+min_prom = 0.25;
 
 % NOTE: there may be more than one peak per ROI!
 
@@ -14,23 +14,25 @@ for ii = 1:size(FlightAlignedROI_combined{1}.C,1) % first 10 cells:
     
     % plot mean of ROI data
     % Zscore data:
-    AllColZ = zscore(out.data2.AllCol);
+    AllColZ = (out.data2.AllCol);
     %remove zeros
     xtemp = mean(AllColZ);
-    clear h1 h2
+    clear h1 h2 Bpks Blocs h1 h2
     h1 = find(xtemp ==0);
     h2 = find(xtemp ~=0);
     AllColZ(:,h1) = [];
-    
+    clear x
     if size(AllColZ,2)<min_flight_number % remove if not enough flights
         x = zeros(size(AllColZ,1),size(AllColZ,2));
+        x = mean(x,2);
+    else
+         x = mean(AllColZ,2);
     end
-    x = mean(AllColZ,2);
     
     
     % get peaks
     [Bpks,Blocs] = findpeaks(x,'MinPeakProminence',min_prom,'MinPeakDistance',1);
-    
+     clear x AllColZ
     % only use peaks in the flight pad ( exclude reward...
     % Blocs(Blocs<250) = [];
     % Blocs(Blocs>1200) = [];
@@ -52,7 +54,7 @@ for ii = 1:size(FlightAlignedROI_combined{1}.C,1) % first 10 cells:
     if isempty(Blocs)
     else
         for iii = 1: size(Blocs,1);
-            calPeaks = out.data2.AllCol(Blocs(iii),:);
+            calPeaks = mean(out.data2.AllCol(Blocs(iii)-20:Blocs(iii)+20,:));
             flPeaksX = squeeze(out.data2.AllFlight(Blocs(iii),1,:));
             flPeaksY = squeeze(out.data2.AllFlight(Blocs(iii),2,:));
             flPeaksZ = squeeze(out.data2.AllFlight(Blocs(iii),3,:));
@@ -96,39 +98,43 @@ end
 
 
 %% Plotting: ( will also work outside of function)
-
+try
 figure();
+counter = 1;
 for i = 1: size(out2.D,2)
     
     % remove zeros
     xx = out2.calPeaks{i};
     h = find(xx ==0);
-    
     F2use = out2.D{i};
     C2use = out2.calPeaks{i};
     F2use(h) = [];
     C2use(h) = [];
     
+    if size(F2use,2)>1;
     % normalize calcium from 0-1
      %C2use = [min_prom C2use]; % concat a zero to scale from 0->max
     C2use_raw = C2use;
-    C2use = mat2gray(C2use);
+    C2use = (C2use);
     
         %C2use(:,1) = []; % remove that zero..
     % ..now take the mean, and variance...
     
-    varF(i) = var(F2use);
-    varC(i) = std(C2use);
-    varCr(i) = std(C2use_raw);
+    varF(counter) = var(F2use);
+    varC(counter) = std(C2use);
+    varCr(counter) = std(C2use_raw);
     
-    meanF(i) = mean(F2use);
-    meanC(i) = mean(C2use);
-    meanCr(i) = mean(C2use_raw);
-    
-    Loca(i) = out2.calPeakLoc{i};
+    meanF(counter) = mean(F2use);
+    meanC(counter) = mean(C2use);
+    meanCr(counter) = mean(C2use_raw);
+    FanoFactor(counter) = varF(counter)/meanF(counter);
+
+    Loca(counter) = out2.calPeakLoc{i};
+    counter = counter+1;
+end
 end
 Loca = mat2gray(Loca);
-
+meanC = mat2gray(meanC);
 % figure()
 % plot(meanF,varC,'*');
 % %
@@ -191,10 +197,13 @@ xlabel(' Flight Phase');
 
 
 figure(); hold on;
-plot(Loca(g2),zscore(smooth(meanC(g2),30,'lowess')),'LineWidth',3);
-plot(Loca(g2),zscore(smooth(meanF(g2),30,'lowess')),'LineWidth',3);
+plot(Loca(g2),zscore(smooth(meanC(g2),50,'rlowess')),'LineWidth',3);
+plot(Loca(g2),zscore(smooth(meanF(g2),50,'rlowess')),'LineWidth',3);
 legend('Calcium consistancy','Flight Variability');
 ylabel('normalized units (z)');
 xlabel(' Flight Phase');
 title('Code Stability vs Flight Variability ');
+catch
+   out2 = [] 
+end
 

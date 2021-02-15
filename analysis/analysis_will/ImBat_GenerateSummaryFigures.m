@@ -20,7 +20,10 @@ dirFlags = [files.isdir];
 subFolders = files(dirFlags);
 % Print folder names to command window.
 
-
+% Init data Variables:
+FirstThreeClusters = [];
+Clust2save = []; % for plotting clusters over time in session
+AllFLights2save = []; % for plotting clusters over time in session
 counter = 1;
 if extract_data ==1;
     disp(' extracting and aligning data to flights');
@@ -37,8 +40,6 @@ if extract_data ==1;
         if exist('Saved_Data','dir')>6
             disp('Data already extracted, moving on');
         else
-            
-            
             tmp=dir(fullfile(pwd,'*.mat'));
             file_list={tmp(:).name};
             
@@ -76,18 +77,26 @@ end
 if make_plots ==1
     disp('Perfoming Summary analysis');
     
-    col = hsv(7);
+    col = hsv(length(subFolders)+1);
     for i = 1 : length(subFolders)
         load([subFolders(i).name, '/CellReg_files/ROI_Data/Saved_Data/Aligned_Data.mat'])
+        load([subFolders(i).name, '/CellReg_files/ROI_Data/ROI_Data.mat'])
         
         for ii = 1:3
             % 1: FLight STATS
             combined.flights{i}.FL_consistancy{ii} = ImBat_FlightStats(FlightAlignedROI{ii});
-        
+            
             % 2: Calcium STATS
             combined.calcium{i}.ScoreMatrix{ii} = ImBat_BuildScoreMatrix(CombinedROI,FlightAlignedROI{ii});
         end
         
+        close all
+        % Get more(!) flight stats
+        [Clust2save(:,:,i), AllFLights2save(:,:,i)] = ImBat_Session_FlightRate(flightPaths);
+        
+        
+        FL_Stats = ImBat_Quantify_Flights(flightPaths,ROI_Data);
+        FirstThreeClusters = cat(1,FirstThreeClusters,FL_Stats.FirstThreeClusters);
         
         % combined.calcium = 0
         
@@ -103,7 +112,7 @@ if make_plots ==1
             ImBat_Plot_FlightStats(combined.flights{ii}.FL_consistancy{iii},col(ii,:));
             grid on;
             %xlim([0 6]);
-
+            
         end
     end
     grid on
@@ -120,19 +129,55 @@ if make_plots ==1
             hold on;
             ImBat_Tuning_Stability( combined.calcium{ii}.ScoreMatrix{iii},col(ii,:));
             grid on;
-                xlim([0 6]);
-                ylim([-0.2 1.05]);
+            xlim([0 6]);
+            ylim([-0.2 1.05]);
         end
     end
     grid on
     
     
+    % Plot top FLights percentages/day:
+    figure();
+    FirstThreeClustersT = FirstThreeClusters;
+    FirstThreeClustersT(FirstThreeClustersT==0) = NaN;
+    plotSpread(FirstThreeClustersT,'showMM',4);
+    title('Flightpath Sorted by session');
+    
+    %     % NOW, resort based on max for that day:
+    FirstThreeClustersT2 = FirstThreeClusters(:,2:end);
+    FirstThreeClustersT2 = sort(FirstThreeClustersT2,2,'descend');
+    FirstThreeClustersT2 = cat(2,FirstThreeClustersT(:,1),FirstThreeClustersT2);
+    %
+    figure();
+    FirstThreeClustersT2(FirstThreeClustersT2==0) = NaN;
+    plotSpread(FirstThreeClustersT2,'showMM',4);
+    title('Flightpath Sorted by day');
     
     %legend('Bat 1','Bat 1', 'Bat 1','Bat 1','Bat 1','Bat 1','Bat 1'
     
-    % 2: Calcium plots
+    %%  flights over session time:
+ for i = 1: size(Clust2save,3);
+NormClust2save(:,:,i) =  squeeze(Clust2save(:,:,i))./squeeze(AllFLights2save(:,:,i));
+ end
+ NormClust2save2(1,:,:) = NormClust2save(1,:,:);
+ NormClust2save2(2,:,:) = sum(NormClust2save(2:end,:,:),1);
+ figure();
+    hold on;
     
-end
+    for i = 1:size(NormClust2save2,1)
+        clear adata
+        adata = squeeze(NormClust2save2(i,1:50,:))';
+        adata(isnan(adata)) = 0.1;
+        L = size(adata,2);
+        se = nanstd(adata)/2;%sqrt(length(adata));
+        mn = nanmedian(adata);
+        mn = smooth(mn,10)';
+        se = smooth(se,10)';
+        h = fill([1:L L:-1:1],[mn-se fliplr(mn+se)],col(i,:)); alpha(0.5);
+        plot(mn,'Color',col(i,:));
+    end
+    
+    
 end
 
 

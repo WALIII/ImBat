@@ -123,4 +123,38 @@ days2use{i} = find(AllFlights_List(:,i)>1);
 end
 
 output.days2use = days2use; % for max projection creation
+[FL_ID FirstThreeClusters]  = ImBat_FlightNum_OverDays(flightPaths);
+output.FL_ID = FL_ID;
+output.FirstThreeClusters = FirstThreeClusters;
+
+
+function [FL_ID FirstThreeClusters] = ImBat_FlightNum_OverDays(flightPaths);
+%  ImBat_FlightNum_OverDays.m
+
+% Time of day:
+
+
+% ratio of flights
+for i = 1:max(flightPaths.day); % days
+    todaysFlightsID = find(flightPaths.day==i);
+    
+todaysFlights = flightPaths.id(todaysFlightsID);
+
+for ii = 1: max(todaysFlights);
+    FL_ID(i,ii) = size(find(todaysFlights == ii),1);
+end
+end
+
+figure(); 
+plot(sum(FL_ID,2));
+title('Num of flight');
+
+UniqueFlights = FL_ID(:,1);
+ClusterdFlights = sum(FL_ID(:,2:end),2);
+FirstThreeClusters = FL_ID(:,1:4)./sum(FL_ID,2);
+
+figure();
+plotSpread(FirstThreeClusters);
+title('Ratio of top flights');
+
 

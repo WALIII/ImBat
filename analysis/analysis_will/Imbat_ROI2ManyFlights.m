@@ -15,16 +15,33 @@ function [ out_data stats] = Imbat_ROI2ManyFlights(FlightAlignedROI);
 %% ---------------------------------------------------------------------- %
 
 % User inputs
-clusters_2_use = 3;
+clusters_2_use = [1 2 3];
 
 % get behavioral correlation for each flight cluster
-for i = 1:clusters_2_use;
+counter = 1; 
+for i = clusters_2_use;
     FlightAlignedROI_combined{1} = FlightAlignedROI{i};
-    out{i} = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined);
+    out{counter} = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined);
+    counter = counter+1;
 end
 
 %ImBat_ClusterCalciumVar(FlightAlignedROI,8);
-
+% check if out is empty:
+counter = 1;
+for i = 1:size(out,2)
+    if isempty(out{i})
+    else
+        out2{counter} = out{i};
+        counter = counter+1;
+    end
+end
+try
+out = out2;
+catch
+    out_data = [];
+    disp(' no data here...')
+    return
+end
 
 %% Cocncatonate data:
 out_f.D = [];
@@ -43,10 +60,12 @@ ROI_idx = cell2mat(out_f.calROI_ID);
 figure();
 keep_calPeaks = [];
 keep_D = [];
+R1 = [];
+R2 = [];
 hold on;
 for i = 1:max(cell2mat(out_f.calROI_ID))
     % first in out1;
-    idx2try = find(ROI_idx ==i)
+    idx2try = find(ROI_idx ==i);
     if size(idx2try,2)>1; % if there is more than one peak for this cell
         counter = 1;
         for ii = 1:size(idx2try,2)
@@ -55,13 +74,21 @@ for i = 1:max(cell2mat(out_f.calROI_ID))
             counter = counter+1;
         end
         
+         % Make ratio
+        temp_R1 = temp_calPeaks(1)./temp_D(1);
+        temp_R2 = temp_calPeaks(2)./temp_D(2);
+        
         % Subtract One of the Two 
         temp_calPeaks = temp_calPeaks-temp_calPeaks(2);
         temp_D = temp_D-temp_D(2);
-        plot(temp_D,temp_calPeaks,'o')
+       
+        plot(temp_D,temp_calPeaks,'ob')
         keep_calPeaks = [keep_calPeaks,temp_calPeaks];
         keep_D = [keep_D,temp_D];
-        clear temp_D temp_calPeaks a b G1 G2        
+        R1 = [R1, temp_R1];
+        R2 = [R2, temp_R2];
+
+        clear temp_D temp_calPeaks a b G1 G2 temp_R1 temp_R2        
     end
 end
 plot([0 0],[-2 2],'--r')
@@ -82,4 +109,5 @@ ylabel('Frequency');
 % Stats on the histograms:
 [pval_combined_data,~] = ranksum(G1,G2)
 
-
+out_data = [];
+stats = pval_combined_data;

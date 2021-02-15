@@ -1,7 +1,7 @@
 function out = ImBat_FlightStats(FlightAlignedROI);
 
 % Get fight stas over time for the top 3-4 flights..
-plot_data = 0;
+plot_data = 1;
 
 % Compute PCA:
 t2use = ['Sorting based on PCA'];
@@ -29,7 +29,7 @@ for i = 1:max(FlightAlignedROI.CutCells_date)
     end
     tdF = squeeze(VV(:,cF));
     if i ==FirstDay;
-    meanFlight = median(tdF,2);
+    meanFlight = mean(tdF,2);
     end
     for ii = 1: size(tdF,2);
         R{dayindex}(ii) = corr2(meanFlight,tdF(:,ii));

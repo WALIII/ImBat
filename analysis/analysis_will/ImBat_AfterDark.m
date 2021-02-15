@@ -44,6 +44,12 @@ for i = 1:size(FlightPaths,2)+1
     xlim([0 60]);
 end
 
+% All flights:
+figure();
+FF2 = flightPaths.flight_starts_idx(:);
+histout_all = histogram(flightPaths.AllFlightsTime(FF2)/60,'NumBins',60,'BinLimits',[1,60]);
+
+
 
 
 
@@ -69,19 +75,19 @@ out.HistData = histout;
 
 
 
-
 % some basic plotting
-%% Plot unclustered Ratio
+%% Plot unclustered to top 3 Ratio
 figure();
 hold on;
 %plot(medfilt1(histout{1}.Values./(histout{1}.Values+histout{2}.Values+histout{3}.Values),1,[],2))
-plot(smooth(histout{1}.Values./(histout{1}.Values+histout{2}.Values+histout{3}.Values+histout{4}.Values),7),'--r')
+plot(smooth(histout{1}.Values./(histout{1}.Values+histout{2}.Values+histout{3}.Values+histout{4}.Values),3),'--r')
 
 xlabel('time (min)');
 ylabel('proportion of unique flights');
 title(['proportion of unique flights to top flights']);
 plot([20 20],[0 1],'-b')
 plot([40 40],[0 1],'-b')
+
 
 %% Plot Flights
 
@@ -144,6 +150,7 @@ end
 for ii = 1: length(Ind2use2);
     bound2 = flightPaths.flight_starts_idx(Ind2use2(ii)):flightPaths.flight_ends_idx(Ind2use2(ii));
     plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col{i},'LineWidth',2); % plot all flights
+    Flights2save{i}{1}(:,:,ii) = A(:,bound2(1):bound2(1)+600);
 end
 title('Lights ON');
 axis off
@@ -161,6 +168,7 @@ end
 for ii = 1: length(Ind2use2);
     bound2 = flightPaths.flight_starts_idx(Ind2use2(ii)):flightPaths.flight_ends_idx(Ind2use2(ii));
     plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col{i},'LineWidth',2); % plot all flights
+    Flights2save{i}{2}(:,:,ii) = A(:,bound2(1):bound2(1)+600);
 end
 title('Lights Off');
 axis off
@@ -178,10 +186,13 @@ end
 for ii = 1: length(Ind2use2);
     bound2 = flightPaths.flight_starts_idx(Ind2use2(ii)):flightPaths.flight_ends_idx(Ind2use2(ii));
     plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col{i},'LineWidth',2); % plot all flights
+    Flights2save{i}{3}(:,:,ii) = A(:,bound2(1):bound2(1)+600);
 end
 title('Lights Return on');
 end
 axis off
+
+out.Flights2save = Flights2save; %data on flights
 
 % reate custom color:
 col2use(1,:) = [0 0 0];
@@ -221,4 +232,58 @@ for K = 1 : length(b);
     end
 end
 
+
+% Plot overlays:
+col2(1,:) = [0 1 1];
+col2(2,:) = [1 0 0];
+col2(3,:) = [0 0 1];
+
+figure();
+hold on;
+for ii = 1:3; 
+    for iii = 1:3;
+        subplot(1,3,iii);
+        hold on;
+adata =  squeeze(Flights2save{1}{ii}(iii,:,:))'+iii;
+L = size(adata,2);
+se = std(adata);%sqrt(length(adata));
+mn = mean(adata);
+mn = smooth(mn,1)';
+h = fill([1:L L:-1:1],[mn-se fliplr(mn+se)],col2(ii,:)); alpha(0.5);
+plot(mn,'Color',col2(ii,:));
+    end
+end
+
+%% Stability across phases:
+% concat
+% correlation
+counter = 1;
+for flight2use = 1:3;
+    clear Mf
+Mf = cat(3,Flights2save{flight2use}{1}(:,:,:),Flights2save{flight2use}{2}(:,:,:),Flights2save{flight2use}{3}(:,:,:));
+MF = squeeze(mean(Mf,3));
+
+for LDL = 1:3; % 1: light, 2: dark, 3:light2
+for i = 1: size(Flights2save{flight2use}{LDL}(:,:,:),3)
+    try
+MC_fX = corrcoef(squeeze(Flights2save{flight2use}{LDL}(1,:,i)),MF(1,:));
+MC_fY = corrcoef(squeeze(Flights2save{flight2use}{LDL}(2,:,i)),MF(2,:));
+MC_fZ = corrcoef(squeeze(Flights2save{flight2use}{LDL}(3,:,i)),MF(3,:));
+MC_fX(2);
+MC_f_all(counter,LDL) = (MC_fX(2)+MC_fY(2)+ MC_fZ(2))/3;
+counter = counter+1;
+    catch
+        disp(' no flights in this cluster');
+    end
+end
+end
+end
+
+figure();
+MC_f_all(MC_f_all == 0) = NaN;
+plotSpread(MC_f_all);
+
+
+    out.PlotSpread = MC_f_all;
+    
 
