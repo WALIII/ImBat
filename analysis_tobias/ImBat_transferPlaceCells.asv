@@ -1,6 +1,10 @@
-if 
+function [placeCells] = ImBat_transferPlaceCells(placeCells)
+
+if ~exist('placeCells')
 extractedPlaceCells = dir('*ExtractedPlaceCells*');
 load(extractedPlaceCells.name);
+end
+
 cd([pwd filesep 'Spatial_information']);
 
 nClust =size(placeCells.pp_cells,1)-1; %number of clusters to look at excluding the first cluster
@@ -98,4 +102,14 @@ for clust_i = 1:nClust
     
     
 end
+
+placeCells.cells_place = cells_place;
+placeCells.cells_pre
+placeCells.cells_post
+placeCells.cells_prePlace
+placeCells.cells_prePost
+placeCells.cells_placePost
+placeCells.cells_prePlacePost
+
+
 

@@ -1,7 +1,8 @@
-allBatsTag = 1;
+allBatsTag = 0;
+inspectNoTuneFlag = 0;
 batId = 'Ge';
 saveFlag = 1;
-saveTag = 'test';
+saveTag = 'mean-bitsPerSec-max-noSignifPlace';
 
 if saveFlag == 1
     %saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
@@ -20,11 +21,10 @@ if allBatsTag == 1
    nBats = length(allBats);
 else
     nBats = 1;
-    
 end
 
+nDays = 2;%length(dayDir);
 %initialize matrices
-nDays = length(dayDir);
 percPre = nan(nBats,nDays);
 percPlace = nan(nBats,nDays);
 percFlight = nan(nBats,nDays);
@@ -33,15 +33,16 @@ percAny = nan(nBats,nDays);
 percNone = nan(nBats,nDays);
 
 
-%for each day
-for day_i = 1:length(dayDir)
+
+%for each day, calculate percentages of each phase
+for day_i = 1:2%length(dayDir)
    cd([dayDir(day_i).name filesep 'extracted']);
    %find all fly directories and enter last one
    flyDir = dir('*_fly-*_extraction');
    cd(flyDir(end).name);
    %find and enter last analysis folder
    analysisDir = dir('analysis_*');
-   cd([analysisDir(end).name filesep 'placeCellsAng']);
+   cd([analysisDir(end-4).name filesep 'placeCellsAng']);
    %load placeCell structure for % analysis
    placeCellStruct = dir('*_ExtractedPlaceCells_*');
    load(placeCellStruct.name);
@@ -55,24 +56,51 @@ for day_i = 1:length(dayDir)
    percAny(day_i) = 1 - placeCells.perc_none;
    
    %transfer the pre/place/post cells into respective folders
-   ImBat_transferPlaceCells
-   
+   [placeCells ] = ImBat_transferPlaceCells(placeCells)
+  
+   %find all the cells not tuned to any phase
+   [placeCells] = ImBat_extract_noResponseCells(placeCells)
+   cd ..;
+   save(placeCellStruct.name,'placeCells');
    cd(dayDir(day_i).folder);
    
+   if inspectNoTuneFlag == 1
+       % ImBat_inspect_noTuneCells(placeCells)
+   end
+   
 end
-%concatenate and average all the days
+
+%% concatenate and average all the days
 percMean = [nanmean(percPre); nanmean(percPlace); nanmean(percPost); nanmean(percAny)];
-percSEM = [nanstd(percPre,2)./sqrt(size(percPre,2)); nanstd(percPlace,2)./sqrt(size(percPlace,2)); nanstd(percPost,2)./sqrt(size(percPost,2)); nanstd(percAny,2)./sqrt(size(percAny,2))];
+percSEM = [nanstd(percPre)./sqrt(size(percPre,2)); nanstd(percPlace)./sqrt(size(percPlace,2)); nanstd(percPost)./sqrt(size(percPost,2)); nanstd(percAny)./sqrt(size(percAny,2))];
 percAll = [percPre' percPlace' percFlight' percPost' percAny' percNone'];
 %make figure for percentages
 figPercMean = figure();
-bar(1:nDays,percMean);
+bar(percMean);
 hold on;
-errorbar(1:nDays,percMean,percSEM);
+er = errorbar(percMean,percSEM);
+er.Color = [0 0 0];                            
+er.LineStyle = 'none';  
 xlabel('Flight phase');
 ylabel('%');
 xticklabels({'Pre', 'Place', 'Post', 'Any'});
-title([batId ': % of Pre, Place, Post Cells across ' num2str(nDays) ' days']);
+title([batId ': Mean % of Pre, Place, Post Cells across ' num2str(nDays) ' days ' saveTag]);
+
+figPercAll = figure();
+bar(percAll);
+hold on;
+xlabel('Day');
+ylabel('%');
+legend({'Pre', 'Place','Flight','Post', 'Any','None'});
+title([batId ': % of Pre, Place, Post Cells across ' num2str(nDays) ' days ' saveTag]);
+
+%save figs
+if saveFlag == 1
+savefig(figPercMean,[saveDir batId '_percPrePlacePostCells_mean_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+saveas(figPercMean, [saveDir batId '_percPrePlacePostCells_mean_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
+savefig(figPercAll,[saveDir batId '_percPrePlacePostCells_all_' saveTag '_' datestr(now,'yymmdd-HHMM') '.fig']);
+saveas(figPercAll, [saveDir batId '_percPrePlacePostCells_all_' saveTag '_' datestr(now,'yymmdd-HHMM') '.jpg']);
+end
 
 
 

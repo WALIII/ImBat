@@ -1,3 +1,5 @@
+function [placeCells] = ImBat_transferPlaceCells(placeCells)
+
 if ~exist('placeCells')
 extractedPlaceCells = dir('*ExtractedPlaceCells*');
 load(extractedPlaceCells.name);
@@ -100,4 +102,14 @@ for clust_i = 1:nClust
     
     
 end
+
+placeCells.cells_place = cells_place;
+placeCells.cells_pre = cells_pre;
+placeCells.cells_post = cells_post;
+placeCells.cells_prePlace = cells_prePlace;
+placeCells.cells_prePost = cells_prePost;
+placeCells.cells_placePost = cells_placePost;
+placeCells.cells_prePlacePost = cells_prePlacePost;
+
+
 

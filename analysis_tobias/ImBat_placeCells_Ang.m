@@ -6,6 +6,7 @@ sessionType = [];
 loadFlag = 0; %do you want to load and save the data individually outside of ImBatAnalyze
 p_val_analysis = 1;
 save_data = 1;
+flightCircFlag = 1;
 
 % User inputs overrides
 nparams=length(varargin);
@@ -35,7 +36,7 @@ if loadFlag == 1
 end
 
 % P_value calculation params
-n_bins = 10;     %good around here                                                           %number of bins to divide the pre-during-post flight interval
+n_bins = 30;     %good around here                                                           %number of bins to divide the pre-during-post flight interval
 n_rep = 500;    %can lower to 10 for debugging                                                           %number of shufflings
 alfa = 0.05;     %can lower to 0.01 or 0.1                                                           %significance level
 pre_dur = 3;     %play with 3-5                                                           %duration of the pre flight period (s):     comparable with flight dur
@@ -122,14 +123,14 @@ if p_val_analysis
     frames_to_shift(1)=0;     frames_to_shift(2:n_rep) = randi([10*CNMFe_Fs T-10*CNMFe_Fs],1,n_rep-1);   %Shifting in time (longer than 10s)
     p_val = zeros(3,until_cluster,N); %pre(1),during(2),post(3)/#cluster/#nueron                       %p values for pre, during, post active neurons
     response = zeros(3,until_cluster,N); %sum of each phase                   %Integrated response during pre, during, post periods 'sum(median(Rate)'
-    avg_bnd_act = zeros((3*n_bins)-3,until_cluster,N);   %n_bins per section, for each pre/dur/post and for each cluster & cell       %Activity across bins from pre to post
+    avg_bnd_act = zeros((3*n_bins),until_cluster,N);   %n_bins per section, for each pre/dur/post and for each cluster & cell       %Activity across bins from pre to post
     sp_bnd_response = zeros(n_space_bins,until_cluster,N);  %Spatially binned activity along the trajectory
     sp_bnd_velCel = cell(until_cluster,1);
     S_Info = zeros(2,until_cluster,N); %2 b/c 1dim=actual info, 2dim=p-val                     %bits and p value for spatial information
-    
+    S_Info_corrected = zeros(until_cluster,N); %make corrected info vector
     %Binning in time and space, p values calculation
     figure();   set(gcf, 'units','normalized','outerposition',[0.2 0 0.5 1]);
-    for id_cluster_SI = 4:until_cluster %for each cluster
+    for id_cluster_SI = 2:until_cluster %for each cluster
         id = [];    %id = find(flight_clus.id==id_cluster_SI); %find all flights that belong to that cluster
         id = flightPaths.clusterIndex{id_cluster_SI};
         for cell_n = 1:N %for each cell, initialize the below matrices
@@ -148,8 +149,58 @@ if p_val_analysis
             spikes = zeros(n_rep,3);
             info = zeros(n_rep,1);
             
+            if flightCircFlag == 1
+                Act_flights{cell_n} = [];   
+                for flight_i = 1:size(id,1)
+                    [minValueStart,closestIndexStart] = min(abs(CNMF_time_even-alignment.out.Location_time(flightPaths.flight_starts_idx(id(flight_i)))));%min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(id(flight_i)))));
+                    [minValueEnd,closestIndexEnd] = min(abs(CNMF_time_even-alignment.out.Location_time(flightPaths.flight_ends_idx(id(flight_i)))));%min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(id(flight_i)))));
+                    Act_start{cell_n}(flight_i) = length(Act_flights{cell_n}) + 1;
+                    if closestIndexEnd+pst_dur*CNMFe_Fs > length(Rate)
+                        Act_flights{cell_n} = [Act_flights{cell_n} Rate(cell_n,closestIndexStart-pre_dur*CNMFe_Fs:length(Rate))];
+                    else
+                        Act_flights{cell_n} =  [Act_flights{cell_n} Rate(cell_n,closestIndexStart-pre_dur*CNMFe_Fs:closestIndexEnd+pst_dur*CNMFe_Fs)];
+                    end
+                    Act_end{cell_n}(flight_i) = length(Act_flights{cell_n});
+                end
+            end
+            
+%             if flightCircFlag == 1
+%                                 for flight_i=1:size(id,1) %for all flights within the cluster, define the following vectors
+% 
+%                 [minValueStart,closestIndexStart] = min(abs(CNMF_time_even-alignment.out.Location_time(flightPaths.flight_starts_idx(id(flight_i)))));%min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(id(flight_i)))));
+%                 [minValueEnd,closestIndexEnd] = min(abs(CNMF_time_even-alignment.out.Location_time(flightPaths.flight_ends_idx(id(flight_i)))));%min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(id(flight_i)))));
+%                 Act_pre = [];   Act_dur = [];   Act_pst = [];   v_trj = [];
+%                 Act_pre =  Rate(cell_n,closestIndexStart-pre_dur*CNMFe_Fs:closestIndexStart-1);
+%                 if closestIndexEnd-closestIndexStart == 0 %if flight is 0 frames?
+%                     Act_dur =  Rate(cell_n,closestIndexStart:closestIndexEnd+1);
+%                 else
+%                     Act_dur =  Rate(cell_n,closestIndexStart:closestIndexEnd);
+%                 end
+%                 if closestIndexEnd+pst_dur*CNMFe_Fs > length(Rate(cell_n,:))
+%                     Act_pst = Rate(cell_n,closestIndexEnd+1:length(Rate(cell_n,:)));
+%                 else
+%                     Act_pst =  Rate(cell_n,closestIndexEnd+1:closestIndexEnd+pst_dur*CNMFe_Fs);
+%                 end
+%                 
+%                 %Temporally binned activity for pre-during-post
+%                     flight_dur(1,flight_i) = flightPaths.dur(id(flight_i)); %this comes from the flightPaths output
+%                     bnd_act_pre(:,flight_i) = interp1(linspace(1,100,size(Act_pre,1)),Act_pre,linspace(1,100,n_bins),'linear')';
+%                     bnd_act_dur(:,flight_i) = interp1(linspace(1,100,size(Act_dur,1)),Act_dur,linspace(1,100,n_bins),'linear')';
+%                     bnd_act_pst(:,flight_i) = interp1(linspace(1,100,size(Act_pst,1)),Act_pst,linspace(1,100,n_bins),'linear')';
+%                     sp_bnd_act(:,flight_i) = interp1(linspace(1,flightPaths.length(id(flight_i)),size(Act_dur,1)),Act_dur,linspace(1,flightPaths.length(id(flight_i)),n_space_bins),'linear')';
+%                     sp_bnd_act_pre(:,flight_i) = interp1(linspace(1,size(Act_pre,1),size(Act_pre,1)),Act_pre,linspace(1,size(Act_pre,1),n_space_bins),'linear')';
+%                     sp_bnd_act_pst(:,flight_i) = interp1(linspace(1,size(Act_pst,1),size(Act_pst,1)),Act_pst,linspace(1,size(Act_pst,1),n_space_bins),'linear')';
+%                     sp_bnd_act_flights(:,flight_i) = [sp_bnd_act_pre(:,flight_i) sp_bnd_act(:,flight_i) sp_bnd_act_pst(:,flight_i)];
+%                 
+%             end
+%             end
+
             for n = 1:n_rep %for each repetition %repetition 1 is nonshuffled repetition
-                Rate_sh = circshift(Rate(cell_n,:),frames_to_shift(n),2)'; %take rate of cell after doing circular shift by frames_to_shift vector
+                if flightCircFlag == 1
+                    Rate_sh = circshift(Act_flights{cell_n},frames_to_shift(n))';%2)';
+                else
+                    Rate_sh = circshift(Rate(cell_n,:),frames_to_shift(n),2)'; %take rate of cell after doing circular shift by frames_to_shift vector
+                end
                 flight_dur = zeros(1,size(id,1));
                 
                 for flight_i=1:size(id,1) %for all flights within the cluster, define the following vectors
@@ -159,16 +210,23 @@ if p_val_analysis
                     [minValueStart,closestIndexStart] = min(abs(CNMF_time_even-alignment.out.Location_time(flightPaths.flight_starts_idx(id(flight_i)))));%min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(id(flight_i)))));
                     [minValueEnd,closestIndexEnd] = min(abs(CNMF_time_even-alignment.out.Location_time(flightPaths.flight_ends_idx(id(flight_i)))));%min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(id(flight_i)))));
                     Act_pre = [];   Act_dur = [];   Act_pst = [];   v_trj = [];
-                    Act_pre =  Rate_sh(closestIndexStart-pre_dur*CNMFe_Fs:closestIndexStart-1);
-                    if closestIndexEnd-closestIndexStart == 0 %if flight is 0 frames?
-                        Act_dur =  Rate_sh(closestIndexStart:closestIndexEnd+1); 
+                    if flightCircFlag == 1
+                        Act_pre = Rate_sh(Act_start{cell_n}(flight_i):Act_start{cell_n}(flight_i)+pre_dur*CNMFe_Fs);
+                        Act_dur = Rate_sh(1+Act_start{cell_n}(flight_i)+pre_dur*CNMFe_Fs:...
+                           Act_end{cell_n}(flight_i)-(pst_dur*CNMFe_Fs));
+                        Act_pst = Rate_sh(Act_end{cell_n}(flight_i)-(pst_dur*CNMFe_Fs)+1:Act_end{cell_n}(flight_i));
                     else
-                        Act_dur =  Rate_sh(closestIndexStart:closestIndexEnd);
-                    end
-                    if closestIndexEnd+pst_dur*CNMFe_Fs > length(Rate_sh)
-                        Act_pst = Rate_sh(closestIndexEnd+1:length(Rate_sh));
-                    else
-                        Act_pst =  Rate_sh(closestIndexEnd+1:closestIndexEnd+pst_dur*CNMFe_Fs);
+                        Act_pre =  Rate_sh(closestIndexStart-pre_dur*CNMFe_Fs:closestIndexStart-1);
+                        if closestIndexEnd-closestIndexStart == 0 %if flight is 0 frames?
+                            Act_dur =  Rate_sh(closestIndexStart:closestIndexEnd+1);
+                        else
+                            Act_dur =  Rate_sh(closestIndexStart:closestIndexEnd);
+                        end
+                        if closestIndexEnd+pst_dur*CNMFe_Fs > length(Rate_sh)
+                            Act_pst = Rate_sh(closestIndexEnd+1:length(Rate_sh));
+                        else
+                            Act_pst =  Rate_sh(closestIndexEnd+1:closestIndexEnd+pst_dur*CNMFe_Fs);
+                        end
                     end
                     
                     %Temporally binned activity for pre-during-post
@@ -191,18 +249,21 @@ if p_val_analysis
                 end
                 
                 %Spatial information (CRITICAL CALCULATION!)
-                prob = 1./median(sp_bnd_vel,2)*(1/sum(1./((median(sp_bnd_vel,2)+1e-10))));
+                %prob = 1./sum(sp_bnd_vel,2)*(1/sum(1./(sum(sp_bnd_vel,2))));
+                prob = 1./mean(sp_bnd_vel,2)*(1/sum(1./(mean(sp_bnd_vel,2)))); %1./mean... normalization factor by summing all the prob in each spatial bin to sum up to 1
                 sp_bnd_lambda = sp_bnd_act;
-                lambda =  median(sp_bnd_lambda,2);
-                lambda_pre = median(sp_bnd_act_pre,2);
-                lambda_pst = median(sp_bnd_act_pst,2);
+                lambda =  mean(sp_bnd_lambda,2);%median(sp_bnd_lambda,2);
+                lambda_pre = mean(sp_bnd_act_pre,2);%median(sp_bnd_act_pre,2);
+                lambda_pst = mean(sp_bnd_act_pst,2);%median(sp_bnd_act_pst,2);
                 lambda_ave = lambda'*prob;
-                info(n) = sum(lambda.*prob.*log2((lambda+1e-20)./(lambda_ave+1e-20))); %bits/second
+                info(n) = sum((lambda.*prob).*log2((lambda+1e-20)./(lambda_ave+1e-20))); %bits/second
+                %info(n) = sum((prob.*((lambda+1e-20)./(lambda_ave+1e-20))).*log2((lambda+1e-20)./(lambda_ave+1e-20))); %bits/second
                 
                 %Concatenate activities and plot
-                bnd_act = [bnd_act_pre(1:end-1,:);bnd_act_dur(1:end-1,:);bnd_act_pst(1:end-1,:)];
+                bnd_act = [bnd_act_pre(1:end,:);bnd_act_dur(1:end,:);bnd_act_pst(1:end,:)];
+                bnd_act_concat = reshape(bnd_act', [], 1)';
                 subplot(4,4,[1 2 3 5 6 7 9 10 11]);
-                plot(linspace(1,90,(3*n_bins)-3),filter(w,1,median(bnd_act,2)),'k');  hold on;
+                plot(linspace(1,90,(3*n_bins)),filter(w,1,median(bnd_act,2)),'k');  hold on;
                 if n ==  1 %save specific names for first rep to use for plotting with shaded area
                     avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,median(bnd_act,2));
                     sp_bnd_response(:,id_cluster_SI,cell_n) = filter(w,1,lambda);
@@ -211,7 +272,7 @@ if p_val_analysis
                     
                     sp_bnd_velCel{id_cluster_SI} = sp_bnd_vel;
                     %standard error mean for bounded line
-                    ciplot(filter(w,1,median(bnd_act,2))-std(bnd_act,[],2)./sqrt(size(id,1)),filter(w,1,median(bnd_act,2))+std(bnd_act,[],2)./sqrt(size(id,1)),linspace(1,90,(3*n_bins)-3));
+                    ciplot(filter(w,1,median(bnd_act,2))-std(bnd_act,[],2)./sqrt(size(id,1)),filter(w,1,median(bnd_act,2))+std(bnd_act,[],2)./sqrt(size(id,1)),linspace(1,90,(3*n_bins)));
                     alpha(0.3);
                     line([30,30], [-max(median(bnd_act,2)),max(median(bnd_act,2))],'Color', 'k','LineStyle','--');
                     line([60,60], [-max(median(bnd_act,2)),max(median(bnd_act,2))],'Color', 'k','LineStyle','--');
@@ -225,9 +286,9 @@ if p_val_analysis
                 %Integrated activity in the pre-during-post periods
                 %measure of average firing rate of cell in pre,dur, and
                 %post epochs
-                spikes(n,1) = max(median(bnd_act_pre,2))/pre_dur; %mean vs median
-                spikes(n,2) = max(median(bnd_act_dur,2))/mean(flight_dur); %uses average flight duration
-                spikes(n,3) = max(median(bnd_act_pst,2))/pst_dur;
+                spikes(n,1) = sum(mean(bnd_act_pre,2))/pre_dur;%max(median(bnd_act_pre,2))/pre_dur; %mean vs median
+                spikes(n,2) = sum(mean(bnd_act_dur,2))/mean(flight_dur);%max(median(bnd_act_dur,2))/mean(flight_dur); %uses average flight duration
+                spikes(n,3) = sum(mean(bnd_act_pst,2))/pst_dur;%max(median(bnd_act_pst,2))/pst_dur;
             end
             
             fig_ord = get(gca,'Children');  set(gca,'Children',circshift(fig_ord,2,1)); hold off;
@@ -252,6 +313,8 @@ if p_val_analysis
             
             %Spatial info analysis
             subplot(4,4,16);    hi = histogram(info,'Normalization','pdf'); hold on;
+            %*****bias correction to subtract mean from observed info
+            S_Info_corrected(id_cluster_SI,cell_n) = info(1)-mean(info(2:end));
             stem(info(1),1);   hold off;    title('Spatial Info');
             S_Info(1,id_cluster_SI,cell_n) = info(1);
             S_Info(2,id_cluster_SI,cell_n) = length(find(info>=info(1)))/n_rep;
@@ -269,7 +332,7 @@ if p_val_analysis
     %Putative place cells(**during activity & **spatial info & Peak Firing > 3 average firing)
     %pp_cells is matrix of 0 and 1 to show if cell within each cluster
     %(ncluster x ncells)
-    pp_cells = [false(1,N); squeeze(S_Info(2,2:end,:)<alfa) & squeeze(p_val(2,2:end,:)<alfa) & squeeze(max(sp_bnd_response(:,2:end,:),[],1))>3*mean(Rate(:,:),2)']; %false for cluster #1
+    pp_cells = [false(1,N); squeeze(S_Info(2,2:end,:)<alfa) & squeeze(max(sp_bnd_response(:,2:end,:),[],1))>3*mean(Rate(:,:),2)']; %false for cluster #1 & squeeze(p_val(2,2:end,:)<alfa)
     pp_cells_activity = round(normalize(sp_bnd_response(:,pp_cells),1,'range'),5)'; %normalize activity between 0-1 for putative place fields along 30 space fields
     [sorted_rows,~] = find(pp_cells_activity==1);   sorted_pp_fields = pp_cells_activity(sorted_rows,:);
     figure();   imagesc(sorted_pp_fields,[0 1]);         colormap(viridis); %plots the normalized activity sorted of putative place fields (cells sig/trajectory)
@@ -396,6 +459,9 @@ if p_val_analysis
     
     
     %save the variables in a structure
+    placeCells.batName = batName;
+    placeCells.dateSesh = dateSesh;
+    placeCells.sessionType = sessionType;
     placeCells.p_val = p_val;
     placeCells.perc_place = perc_place;
     placeCells.perc_pre = perc_pre;
@@ -417,6 +483,7 @@ if p_val_analysis
     placeCells.bnd_act_dur = bnd_act_dur;
     placeCells.bnd_act_post = bnd_act_pst;
     placeCells.S_Info = S_Info;
+    placeCells.S_Info_corrected = S_Info_corrected;
     placeCells.response = response;
     placeCells.avg_bnd_act = avg_bnd_act;
     placeCells.sp_bnd_response = sp_bnd_response;
