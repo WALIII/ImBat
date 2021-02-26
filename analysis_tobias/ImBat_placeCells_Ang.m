@@ -265,7 +265,7 @@ if p_val_analysis
                 subplot(4,4,[1 2 3 5 6 7 9 10 11]);
                 plot(linspace(1,90,(3*n_bins)),filter(w,1,median(bnd_act,2)),'k');  hold on;
                 if n ==  1 %save specific names for first rep to use for plotting with shaded area
-                    avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,median(bnd_act,2));
+                    avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,mean(bnd_act,2));
                     sp_bnd_response(:,id_cluster_SI,cell_n) = filter(w,1,lambda);
                     sp_bnd_response_pre(:,id_cluster_SI,cell_n) = filter(w,1,lambda_pre);
                     sp_bnd_response_pst(:,id_cluster_SI,cell_n) = filter(w,1,lambda_pst);

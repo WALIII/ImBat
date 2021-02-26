@@ -2,7 +2,7 @@ allBatsTag = 0;
 inspectNoTuneFlag = 0;
 batId = 'Ge';
 saveFlag = 1;
-saveTag = 'mean-bitsPerSec-max-noSignifPlace';
+saveTag = 'newSI';
 
 if saveFlag == 1
     %saveDir1 = '/Volumes/Tobias_flig/topQualityData/analysis_done/plots/';
@@ -23,6 +23,8 @@ else
     nBats = 1;
 end
 
+dayDir = dir([batId(1:2) '*']);
+
 nDays = 2;%length(dayDir);
 %initialize matrices
 percPre = nan(nBats,nDays);
@@ -42,7 +44,7 @@ for day_i = 1:2%length(dayDir)
    cd(flyDir(end).name);
    %find and enter last analysis folder
    analysisDir = dir('analysis_*');
-   cd([analysisDir(end-4).name filesep 'placeCellsAng']);
+   cd([analysisDir(end).name filesep 'placeCellsAng']);
    %load placeCell structure for % analysis
    placeCellStruct = dir('*_ExtractedPlaceCells_*');
    load(placeCellStruct.name);

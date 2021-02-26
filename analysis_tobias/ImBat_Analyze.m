@@ -23,19 +23,19 @@ analysisFlag = 1;
 reAnalyze = 1;
 flightFixedFlag = 0;
 %roi plot flags
-plotROIFlag = 0;
-centroidFlag = 0;
-roiHeatFlag = 0;
-binaryMaskFlag = 0;
+plotROIFlag = 1;
+centroidFlag = 1;
+roiHeatFlag = 1;
+binaryMaskFlag = 1;
 %flight plot flags
-plotFlightsFlag = 1;
-flightPathsAllFlag = 1;
+plotFlightsFlag = 0;
+flightPathsAllFlag = 0;
 clustManualFlag = 0;
 flightPathsFeederFlag = 0;
 plotFlightvsCellsFlag = 0;
 %place cells plot flags
 plotPlaceCellsFlag = 0;
-plotPlaceCellsAng = 1;
+plotPlaceCellsAng = 0;
 %snake/schnitz plot flags
 plotSnakesFlag = 0;
 plotSnakesManualFlag = 0;
@@ -300,7 +300,8 @@ for i = 1:2%length(subFolders)%[51,52,67,68,77,78]%[2,3,27,28,33,34]%
         if plotPlaceCellsAng == 1 && strcmp(extractBefore(sessionType,'-'),'fly')
             mkdir([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCellsAng']);
             cd([imageFolders(kk).folder,'/',imageFolders(kk).name,'/' analysis_Folder '/placeCellsAng']);
-            ImBat_placeCells_Ang(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
+            %ImBat_placeCells_Ang(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
+            ImBat_placeCells_Will(flightPaths, cellData, alignment,'batname',batName,'datesesh',dateSesh,'sessiontype',sessionType)
             
         end
         
