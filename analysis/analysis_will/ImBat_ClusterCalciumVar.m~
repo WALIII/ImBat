@@ -1,4 +1,4 @@
-function [c, c_sort]= ImBat_ClusterCalciumVar(FlightAlignedROI,roi2plot);
+function [c c_sort]= ImBat_ClusterCalciumVar(FlightAlignedROI,roi2plot);
 
 CutCells = FlightAlignedROI.C_raw;
 CutFlights = FlightAlignedROI.ClustFlight;
@@ -23,7 +23,7 @@ figure(); hold on;
 imagesc(cell2plot(bound2plot,bb)');
 colormap(parula.^2);
   ax = gca;
-  c_sort = bb; % the sort 
+  bb
     % Set where ticks will be
     ax.XTick = [ROI_ON-60 ROI_ON-30 ROI_ON ROI_ON+30 ROI_ON+60  ROI_ON+90 ROI_ON+120 ROI_ON+150 ROI_ON+180];
     % Set TickLabels;

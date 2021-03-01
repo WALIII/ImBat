@@ -67,7 +67,7 @@ for i = 1: size(days2use,2) % = 1:5;
 % Plot PNR projection
     E =  imresize(mat2gray(ROI_Data{day2use}.ROIs.results.Cn),4);
 
-imagesc(E); colormap(gray)
+imagesc(E,[0.25 1]); colormap(gray)
 axis tight ;
 counter = 1;
 

@@ -149,7 +149,7 @@ if make_plots ==1
     
     figure();
     ImBat_Tuning_Stability(consol_calcium,col(ii,:))
-    ImBat_Tuning_Stability(consol_calcium_sorted,col(ii-1,:))
+        ImBat_Tuning_Stability(consol_calcium_sorted,col(ii,:))
 
      ylim([-0.4 1.05]);
      title('Tuning Stability to day 1');

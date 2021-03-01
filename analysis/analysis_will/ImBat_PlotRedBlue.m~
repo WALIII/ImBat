@@ -27,7 +27,7 @@ for i = 1:size(out_data.x_2save,1);
         x1 = out_data.x_2save(i,ii);
          y1 = i;%y1 = out_data.y_2save(i,ii);
         err1 = out_data.err_2save(i,ii);
-        errorbar(x1,y1,err1,'horizontal','o','color',col(ii,:),'CapSize',1,'MarkerSize',1);
+        errorbar(x1,y1,err1,'horizontal','o','color',col(ii,:),'MarkerFaceColor',col(ii,:),'CapSize',1);
         
     end
     counter = counter+1;
@@ -67,7 +67,7 @@ for i = 1:size(out_data.x_2save,1);
         x1 = out_data.x_2save(i,ii);
          y1 = i;%y1 = out_data.y_2save(i,ii);
         err1 = out_data.err_2save(i,ii);
-        errorbar(x1,y1,err1,'horizontal','o','color',col(ii,:),'CapSize',1,'MarkerSize',1);
+        errorbar(x1,y1,err1,'horizontal','.','color',col(ii,:),'CapSize',1);
         
     end
     counter = counter+1;
@@ -104,7 +104,7 @@ for i = 1:size(out_data.x_2save,1);
         x1 = out_data.x_2save(i,ii);
         y1 = i; %y1 = out_data.y_2save(i,ii);
         err1 = out_data.err_2save(i,ii);
-        errorbar(x1,y1,err1,'horizontal','o','color',col(ii,:),'CapSize',1,'MarkerSize',1);
+        errorbar(x1,y1,err1,'horizontal','.','color',col(ii,:),'CapSize',1);
         
     end
     counter = counter+1;

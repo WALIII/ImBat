@@ -8,7 +8,6 @@ plot_things = 0;
 
 stop_time = 1;
 sub2plot = 5;
-TrackScoreThresh = 0.75;
 
 disp ('performing pairwise comparisons');
 
@@ -26,7 +25,7 @@ max_date = max(FlightAlignedROI.CutCells_date);
 
 % get bound to plot
 bound2plot = round(FlightAlignedROI.ROI_ON-30:FlightAlignedROI.ROI_ON+mean(FlightAlignedROI.FlightLength)/120*30+60);
-trial_cutoff = 10; % min trial number accepted;
+trial_cutoff = 20; % min trial number accepted;
 counter = 1;
 col = hsv(size(transition_points,2)+1);
 counter = 1
@@ -40,7 +39,7 @@ for i = 1:max_date; % for every day, compair pairs
    for ii = 1:size(CutCells,1); %for every cell
        % first, check tracking score
        Trackscore = CombinedROI.p_same_registered_pairs{ii}(i,i2);
-if  isnan(Trackscore) || Trackscore<TrackScoreThresh
+if  isnan(Trackscore) || Trackscore<0.25
     ScoreMatrix(1,counter) = NaN;
     ScoreMatrix(2,counter) = NaN;
     ScoreMatrix(3,counter) = NaN;
@@ -59,8 +58,8 @@ if size(idx2use_d1,2)<trial_cutoff || size(idx2use_d2,2)< trial_cutoff;
  ScoreMatrix(4,counter) = NaN;
  ScoreMatrix(5,counter) = NaN;
 else    
-M_adata_d1 = smooth(mean(adata_d1,1),30)'; % day 1 mean
-M_adata_d2 = smooth(mean(adata_d2,1),30)'; % day 2 mean
+M_adata_d1 = smooth(mean(adata_d1,1),20)'; % day 1 mean
+M_adata_d2 = smooth(mean(adata_d2,1),20)'; % day 2 mean
     
 % within day corr:
 M_adata_d1e = mean(adata_d1(1:2:end,:),1); % day 1 even mean

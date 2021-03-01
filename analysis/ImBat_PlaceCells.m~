@@ -11,13 +11,12 @@ ROI2Plot = 1;%1:size(neuron.C_raw,1);
 day2use = 1;
 out = ROI_Data{day2use}.Alignment.out;
 neuron = ROI_Data{day2use}.ROIs.results;
-shade2use = 0.35;
-Spk_Thresh = 0.025;
-az = -38;
-el = 17;
+shade2use = 0.5;
+az = -11 
+-1
 % get general data on ROI traces
 
-offset = -.100; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
+offset = -.500; % account for slow calcium estimation ~move locations back 100ms in time... This is the knob to turn for 'prospective' coding...
 
 
  nparams=length(varargin);
@@ -108,7 +107,7 @@ out.Location2 = out.flights;
       hold on;
 plot3(out.flights(:,1),out.flights(:,2),out.flights(:,3),'color',[0 0 0 shade2use]);% plot the flight trajectory in space
 
-[~,xy] = find(neuron.S(ii,:)>Spk_Thresh);  % get time neuron is active
+[~,xy] = find(neuron.S(ii,:)>0.025);  % get time neuron is active
 peak_heights = neuron.S(ii,xy);
 Spike_times = out.video_times(xy)-offset; % convert this to 'spike time'
 
