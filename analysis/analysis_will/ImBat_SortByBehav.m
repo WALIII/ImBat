@@ -56,7 +56,7 @@ c=cluster(l,'maxclust',3);
 [aa,bb]=sort(c);
 % bound2use = diff(aa);
 %line2plot = find(bound2use==1);
-idx = flipud(bb); % the sort 
+idx = (bb); % the sort 
 
  Gmean = mean(Fl1(:,:,(find(c==1))),3);
     clear aa bb c l

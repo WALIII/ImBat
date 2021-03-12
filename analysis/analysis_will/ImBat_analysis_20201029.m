@@ -1,7 +1,7 @@
 %% take the first, and last detected day, take the S matrix of first and last cell  (STD)
 function out = ImBat_analysis_20201029(CombinedROI,flightPaths,clst)
 
-peak_thresh = 1; % SNR threshold
+peak_thresh = 2.75; % SNR threshold
 counter = 1;
 % find first day
 [FlightAlignedROI] = ImBat_Align_FC(CombinedROI,flightPaths,clst);
@@ -151,9 +151,19 @@ plot([ROI_ON+fl_length ROI_ON+fl_length],[0 i+1],'--k')
 
 
 % Export data
+try
 out.fl_length = fl_length;
 out.ROI_ON = ROI_ON;
 out.x_2save = x_2save;
 out.y_2save = y_2save;
 out.err_2save = err_2save;
 out.fl_length = fl_length;
+catch
+    disp(' no data exported at this thireshold value')
+    out.fl_length = fl_length;
+out.ROI_ON = ROI_ON;
+out.x_2save = [];
+out.y_2save = [];
+out.err_2save = [];
+end
+    

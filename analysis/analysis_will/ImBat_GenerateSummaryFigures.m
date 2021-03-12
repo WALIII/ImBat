@@ -82,6 +82,38 @@ if make_plots ==1
         load([subFolders(i).name, '/CellReg_files/ROI_Data/Saved_Data/Aligned_Data.mat'])
         load([subFolders(i).name, '/CellReg_files/ROI_Data/ROI_Data.mat'])
         
+        
+        %% generate Null data:
+        FlightAligned_FL_Sorted = FlightAlignedROI;  % random sort flights
+        FlightAligned_ROI_Sorted = FlightAlignedROI; % random sort Ca ID
+        FlightAlighed_Sorted = ImBat_SortByBehav(FlightAlignedROI); %  sort Ca by tuning
+        
+
+for iii = 1:3;
+    % shuffle Day index
+    h = FlightAlignedROI{iii}.CutCells_date;
+    fakeInd = randperm((size(h,2)));
+    FlightAligned_FL_Sorted{iii}.CutCells_date = FlightAlignedROI{iii}.CutCells_date(fakeInd);
+    
+    % shuffle ROI index
+for iv = 1:max(h)
+ idx2use = find(h==iv);
+ h2a = size(FlightAlignedROI{iii}.C,1);
+h2b = size(FlightAlignedROI{iii}.C,3);
+
+fakeInd_1 = randperm(h2a);
+fakeInd_2 = randperm(h2b);
+
+FlightAligned_ROI_Sorted{iii}.C(:,:,idx2use) = FlightAlignedROI{iii}.C(fakeInd_1,:,idx2use);
+FlightAligned_ROI_Sorted{iii}.C_raw(:,:,idx2use) = FlightAlignedROI{iii}.C_raw(fakeInd_1,:,idx2use);
+FlightAligned_ROI_Sorted{iii}.S(:,:,idx2use) = FlightAlignedROI{iii}.S(fakeInd_1,:,idx2use);
+end
+clear h fakeInd h2 fakeInd_Ca  fakeInd_1 fakeInd_2
+end
+        
+        
+        %% Get aggregtaed stats
+        
         for ii = 1:3
             % 1: FLight STATS
             combined.flights{i}.FL_consistancy{ii} = ImBat_FlightStats(FlightAlignedROI{ii});
@@ -89,10 +121,15 @@ if make_plots ==1
             % 2: Calcium STATS
             combined.calcium{i}.ScoreMatrix{ii} = ImBat_BuildScoreMatrix(CombinedROI,FlightAlignedROI{ii});
             
-            % 3. Calcium STATS sorted by behav:
-            FlightAlighed_Sorted = ImBat_SortByBehav(FlightAlignedROI);
-           combined.calcium_sorted{i}.ScoreMatrix{ii} = ImBat_BuildScoreMatrix(CombinedROI,FlightAlighed_Sorted{ii});
-
+            % 2b. Calcium STATS sorted by ROI tuning:
+            combined.calcium_sorted{i}.ScoreMatrix{ii} = ImBat_BuildScoreMatrix(CombinedROI,FlightAlighed_Sorted{ii});
+            % 2c. Calcium randominzing ROIs ( null):
+            combined.calcium_Ca_shuffled{i}.ScoreMatrix{ii} = ImBat_BuildScoreMatrix(CombinedROI,FlightAligned_ROI_Sorted{ii});
+            % 2d. Calcium randominzing Flights:
+            combined.calcium_Fl_shuffled{i}.ScoreMatrix{ii} = ImBat_BuildScoreMatrix(CombinedROI,FlightAligned_FL_Sorted{ii});
+            
+            
+            
         end
         
         close all
@@ -108,24 +145,55 @@ if make_plots ==1
     end
     
     %% Plotting... save in 'Processed/Figures'
+    temp_FL_m = [];
+    temp_FL_std = [];
+    temp_FL_s = [];
+    counter =1;
     figure();
     hold on;
+    consol_flights.toPlot = [];
+        consol_flights.pval_combined_data = [];
+
     for ii = 1 : length(subFolders)
         % 1: Flight plots
         for iii = 1:3%: length(combined.flights{i}.FL_consistancy);
             subplot(1,4,iii);
             ImBat_Plot_FlightStats(combined.flights{ii}.FL_consistancy{iii},col(ii,:));
             grid on;
-            %xlim([0 6]);
-            
+            %consolidate flights
+            if iii <4; % ==1;
+            try
+                temp_FL_m(counter,1:length(combined.flights{ii}.FL_consistancy{iii}.toPlot(1,:))) = combined.flights{ii}.FL_consistancy{iii}.toPlot(1,:);
+                temp_FL_std(counter,1:length(combined.flights{ii}.FL_consistancy{iii}.toPlot(2,:))) = combined.flights{ii}.FL_consistancy{iii}.toPlot(2,:);
+                temp_FL_s(counter,1:length(combined.flights{ii}.FL_consistancy{iii}.toPlot(3,:))) = combined.flights{ii}.FL_consistancy{iii}.toPlot(3,:);
+                counter = counter+1;
+            catch
+                disp('error')
+            end   
+            end
         end
     end
     grid on
+    
+    temp_FL_m(temp_FL_m==0) = NaN;
+    temp_FL_std(temp_FL_std==0) = NaN;
+    ind2small = temp_FL_s<10; % remove really small indexes too.
+    temp_FL_m(ind2small) = NaN;
+    temp_FL_std(ind2small) = NaN;
+    
+    consol_flights.toPlot(1,:) = nanmedian(temp_FL_m);
+    consol_flights.toPlot(2,:) = nanmedian(temp_FL_std);
+    consol_flights.toPlot(3,:) = ones(1,size(mean(temp_FL_m),2));
+    % plot all flights together:
+    figure(); ImBat_Plot_FlightStats(consol_flights,col(ii,:));
+
     
     
     %% Plot calcium stuff:
     consol_calcium = [];
     consol_calcium_sorted = [];
+    consol_calcium_Ca_shuffled = [];
+    consol_calcium_Fl_shuffled = [];
     
     figure();
     hold on;
@@ -138,9 +206,12 @@ if make_plots ==1
             xlim([0 11]);
             ylim([-0.4 1.05]);
             try
-            consol_calcium = cat(2,consol_calcium,combined.calcium{ii}.ScoreMatrix{iii});
-            consol_calcium_sorted = cat(2,consol_calcium_sorted,combined.calcium_sorted{ii}.ScoreMatrix{iii});
-
+                consol_calcium = cat(2,consol_calcium,combined.calcium{ii}.ScoreMatrix{iii});
+                consol_calcium_sorted = cat(2,consol_calcium_sorted,combined.calcium_sorted{ii}.ScoreMatrix{iii});
+                
+                consol_calcium_Ca_shuffled = cat(2,consol_calcium_Ca_shuffled,combined.calcium_Ca_shuffled{ii}.ScoreMatrix{iii});
+                consol_calcium_Fl_shuffled = cat(2,consol_calcium_Fl_shuffled,combined.calcium_Fl_shuffled{ii}.ScoreMatrix{iii});
+                
             catch
             end
         end
@@ -150,9 +221,11 @@ if make_plots ==1
     figure();
     ImBat_Tuning_Stability(consol_calcium,col(ii,:))
     ImBat_Tuning_Stability(consol_calcium_sorted,col(ii-1,:))
-
-     ylim([-0.4 1.05]);
-     title('Tuning Stability to day 1');
+    ImBat_Tuning_Stability(consol_calcium_Ca_shuffled,col(ii-2,:))
+    ImBat_Tuning_Stability(consol_calcium_Fl_shuffled,col(ii-3,:))
+    
+    ylim([-0.4 1.05]);
+    title('Tuning Stability to day 1');
     ylabel('Corr to day 1')
     
     % Display all stability:
@@ -178,12 +251,12 @@ if make_plots ==1
     %legend('Bat 1','Bat 1', 'Bat 1','Bat 1','Bat 1','Bat 1','Bat 1'
     
     %%  flights over session time:
- for i = 1: size(Clust2save,3);
-NormClust2save(:,:,i) =  squeeze(Clust2save(:,:,i))./squeeze(AllFLights2save(:,:,i));
- end
- NormClust2save2(1,:,:) = NormClust2save(1,:,:);
- NormClust2save2(2,:,:) = sum(NormClust2save(2:end,:,:),1);
- figure();
+    for i = 1: size(Clust2save,3);
+        NormClust2save(:,:,i) =  squeeze(Clust2save(:,:,i))./squeeze(AllFLights2save(:,:,i));
+    end
+    NormClust2save2(1,:,:) = NormClust2save(1,:,:);
+    NormClust2save2(2,:,:) = sum(NormClust2save(2:end,:,:),1);
+    figure();
     hold on;
     
     for i = 1:size(NormClust2save2,1)

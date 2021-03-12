@@ -113,7 +113,7 @@ plot([0 1],[0 1],'.-r')
 % 1. check if cell is detected
 % 2. check if cell is detected the next day
 % 3. internal check, across day check, save this
-plotting = 0;
+plotting = plot_things;
 
 if plotting == 1
 % do some quantitative analysis
