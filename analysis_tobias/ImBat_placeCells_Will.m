@@ -34,24 +34,22 @@ if loadFlag == 1
     load([pwd '/' analysis_Folder '/' label '_flightPaths.mat']);
 end
 
-% Rough late-night Spatial information calculation
 % P_value calculation params
 n_rep = 100; % # of itterations for the shuffle can lower to 10 for debugging
-n_bins = 30;     %good around here                                                           %number of bins to divide the pre-during-post flight interval
-alfa = 0.05;     %can lower to 0.01 or 0.1                                                           %significance level
-pre_dur = 3;     %play with 3-5                                                           %duration of the pre flight period (s):     comparable with flight dur
-pst_dur = 3;     %play with 3-5                                                           %duration of the post flight period (s):    but shorter than half interflight
-w = gausswin(1); %keep at 1 for no smoothing                                                           %witdh of the gaussian filter (number of bins), use odd values. 1=no filtering
+n_bins = 30;     %good around here  %number of bins to divide the pre-during-post flight interval
+alfa = 0.05;     %can lower to 0.01 or 0.1  %significance level
+pre_dur = 3;     %play with 3-5    %duration of the pre flight period (s):     comparable with flight dur
+pst_dur = 3;     %play with 3-5    %duration of the post flight period (s):    but shorter than half interflight
+w = gausswin(1); %keep at 1 for no smoothing     %witdh of the gaussian filter (number of bins), use odd values. 1=no filtering
 n_space_bins = 30;  %correlates with space resolution but good around 30 (20cm chunks)                                                        %number of spatial bins
 until_cluster = 4;%min(length(flightPaths.clusterIndex),100);   %change this if you want less clusters
 
-%converting Angelo's variables to mine
+%neural data variables
 N = size(cellData.results.C_raw,1); %number of ROIs
 T = size(cellData.results.C_raw,2); %length of each neural trace
 CNMFe_Fs = cellData.results.Fs; %imaging sampling rate
-%dsFactor =4; %convert from 120hz behavior start frame to 30hz imaging start frame
 
-%% resample the neural data to account for lost frames
+%% resample the neural data to make all the trials the same length
 %Extract variables from Alignment
 img_times = alignment.out.video_times';
 img_sampling = diff(img_times);
@@ -65,9 +63,7 @@ CNMF_time = downsample(img_times,round(img_Fs/CNMF_Fs_real));
 %Generate evenly spaced times
 t_even = linspace(img_times(1),img_times(end),length(img_times));
 CNMF_time_even = downsample(t_even,round(img_Fs/CNMF_Fs_real));
-%normalize firing rate by size of neuron
-%A = reshape(cellData.results.A,size(cellData.results.A,2),2); A = permute(A, [3 1 2]);   %Spatial footprints: cell# x pixels x pixels
-%fr_area = sum(A,[2 3])./sum(A,'all');%sum(cellData.results.A,[2 3])./sum(cellData.results.A,'all');                               %Fractional area for each Spatial footprint
+
 FC_raw = cellData.results.C_raw;%.*fr_area;                                %Raw fluorescence (normalized)
 FC = cellData.results.C;%.*fr_area;                                        %Denoised fluorescence (normalized)
 S = full(cellData.results.S);%.*fr_area;                                         %Deconvolved spike trace (normalized)
@@ -112,6 +108,7 @@ if p_val_analysis
     sp_bnd_velCel = cell(until_cluster,1);
     S_Info = zeros(2,until_cluster,N); %2 b/c 1dim=actual info, 2dim=p-val                     %bits and p value for spatial information
     S_Info_corrected = zeros(until_cluster,N); %make corrected info vector
+    
     %Binning in time and space, p values calculation
     figure();   set(gcf, 'units','normalized','outerposition',[0.2 0 0.5 1]);
     for id_cluster_SI = 2:until_cluster %for each cluster
@@ -138,15 +135,14 @@ if p_val_analysis
             info = zeros(n_rep,3);
             %for i = 1: n_rep;
             for flight_i=1:size(id,1) %for all flights within the cluster, define the following vectors
-                %grabbing and binning the velocity and activity along
-                %with other variables
+                %grabbing and binning the velocity and activity along with other variables
                 %convert from behavior time to imaging time
                 [minValueStart,closestIndexStart] = min(abs(CNMF_time_even-alignment.out.Location_time(flightPaths.flight_starts_idx(id(flight_i)))));%min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_starts_idx(id(flight_i)))));
                 [minValueEnd,closestIndexEnd] = min(abs(CNMF_time_even-alignment.out.Location_time(flightPaths.flight_ends_idx(id(flight_i)))));%min(abs(alignment.out.video_times-alignment.out.Location_time(flightPaths.flight_ends_idx(id(flight_i)))));
                 Act_pre = [];   Act_dur = [];   Act_pst = [];   v_trj = [];
                 
                 Act_pre =  Rate(cell_n,closestIndexStart-pre_dur*CNMFe_Fs:closestIndexStart-1)';
-                if closestIndexEnd-closestIndexStart == 0 %if flight is 0 frames?
+                if closestIndexEnd-closestIndexStart == 0 %if flight is 0 frames
                     Act_dur =  Rate(cell_n,closestIndexStart:closestIndexEnd+1)';
                 else
                     Act_dur =  Rate(cell_n,closestIndexStart:closestIndexEnd)';
@@ -175,6 +171,7 @@ if p_val_analysis
                 sp_bnd_path(:,flight_i) = linspace(1,flightPaths.length(id(flight_i)),n_space_bins)';
             end
             
+            %concatenate the data and shuffle the true matrix
             sp_bnd_concat = cat(1, sp_bnd_act_pre, sp_bnd_act, sp_bnd_act_pst)';
             frames_to_shift = randi(size(sp_bnd_concat,2),1,size(sp_bnd_concat,1));
             sp_bnd_concat_sh1=cell2mat(arrayfun(@(x) circshift(sp_bnd_concat(x,:),[1 frames_to_shift(x)]),(1:numel(frames_to_shift))','un',0));
@@ -216,24 +213,20 @@ if p_val_analysis
                     sp_bnd_concat_sh(i,:,:) = cell2mat(arrayfun(@(x) circshift(sp_bnd_concat(x,:),[1 frames_to_shift(x)]),(1:numel(frames_to_shift))','un',0));
                 end
                 plot(squeeze(mean(sp_bnd_concat_sh(i,:,:),2)),'b');
-                %Gx_shuff(i,:) = (mean(sp_bnd_concat_sh(i,:,:),2)); % shuffled PSTHs
-                %Gx_shuff_mean = mean(Gx_shuff(i,:)); %mean shuffled PSTHs ( firing rate proxy
-                %Spatial information (CRITICAL CALCULATION!)
-                %prob = 1./sum(sp_bnd_vel,2)*(1/sum(1./(sum(sp_bnd_vel,2))));
+                
+                %spatial info calc
                 prob = 1./mean(sp_bnd_vel,2)*(1/sum(1./(mean(sp_bnd_vel,2)))); %1./mean... normalization factor by summing all the prob in each spatial bin to sum up to 1
                 sp_bnd_lambda = sp_bnd_act_sh(i,:,:);
                 lambda =  mean(sp_bnd_lambda,3)';%median(sp_bnd_lambda,2);
                 lambda_pre = mean(sp_bnd_act_pre_sh(i,:,:),3);%median(sp_bnd_act_pre,2);
                 lambda_pst = mean(sp_bnd_act_pst_sh(i,:,:),3);%median(sp_bnd_act_pst,2);
                 lambda_ave = lambda'*prob;
-                %spatial info calc
+                %during flight using flight occupancy
                 info(i,2) = sum((lambda.*prob).*log2((lambda+1e-20)./(lambda_ave+1e-20))); %bits/second
+                %pre and post flight info calc adapted from Will
                 info(i,1) = abs(nansum((mean(sp_bnd_act_pre_sh(1,:,:),3)./(lambda_pre+1e-20)).*log2(mean(sp_bnd_act_pre_sh(1,:,:),3)+1e-20)./(lambda_pre+1e-20)));
                 info(i,3) = abs(nansum((mean(sp_bnd_act_pst_sh(1,:,:),3)./(lambda_pst+1e-20)).*log2(mean(sp_bnd_act_pst_sh(1,:,:),3)+1e-20)./(lambda_pst+1e-20)));
-                
-                %nansum((Gx_true./(Gx_shuff_mean+1e-20)).*log2(Gx_true./(Gx_shuff_mean+1e-20)))
-                %info(n) = sum((prob.*((lambda+1e-20)./(lambda_ave+1e-20))).*log2((lambda+1e-20)./(lambda_ave+1e-20))); %bits/second
-                %ShuffSI(i) = nansum((Gx_shuff(i,:)./(Gx_shuff_mean+1e-20)).*log2(Gx_shuff(i,:)./(Gx_shuff_mean+1e-20)));
+                %if true data for first rep, use the original calculated values
                 if i == 1
                     avg_bnd_act(:,id_cluster_SI, cell_n) = filter(w,1,mean(sp_bnd_concat));
                     sp_bnd_response(:,id_cluster_SI,cell_n) = filter(w,1,lambda);
@@ -242,15 +235,12 @@ if p_val_analysis
                     sp_bnd_velCel{id_cluster_SI} = sp_bnd_vel;
                 end
 
-                
                 %Integrated activity in the pre-during-post periods
                 %measure of average firing rate of cell in pre,dur, and
                 %post epochs
                 spikes(i,1) = sum(mean(sp_bnd_act_pre_sh(i,:,:),3))/pre_dur;%max(median(bnd_act_pre,2))/pre_dur; %mean vs median
                 spikes(i,2) = sum(mean(sp_bnd_act_sh(i,:,:),3))/mean(flight_dur);%max(median(bnd_act_dur,2))/mean(flight_dur); %uses average flight duration
-                spikes(i,3) = sum(mean(sp_bnd_act_pst_sh(i,:,:),3))/pst_dur;%max(median(bnd_act_pst,2))/pst_dur;
-                
-                
+                spikes(i,3) = sum(mean(sp_bnd_act_pst_sh(i,:,:),3))/pst_dur;%max(median(bnd_act_pst,2))/pst_dur;     
             end
             plot(squeeze(mean(sp_bnd_concat_sh(1,:,:),2)),'r','LineWidth',4); % plot again so line is on top..
             plot(squeeze(mean(sp_bnd_concat_sh(1,:,:),2)),'b');
