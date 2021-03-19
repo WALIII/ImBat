@@ -32,11 +32,11 @@ out3.err1 = out3.err1(sort_idx,:);
 out3.FL = out3.FL(sort_idx,:);
 
 % EXPORT:
-        out_final.forward.x_2save = out3.x1;
-        out_final.forward.y_2save = out3.y1;
-        out_final.forward.err_2save = out3.err1;
-        out_final.forward.FL = out3.FL;
-        out_final.forward.ROI_ON = out_1.ROI_ON;
+        out_final_forward.x_2save = out3.x1;
+        out_final_forward.y_2save = out3.y1;
+        out_final_forward.err_2save = out3.err1;
+        out_final_forward.FL = out3.FL;
+        out_final_forward.ROI_ON = out_1.ROI_ON;
         
 % Plot data
 col = [1,0,0; 0,0,1];
@@ -50,7 +50,7 @@ for i = 1:size(out3.x1,1) % for all pairs:
         x1 = out3.x1(i,ii);
         y1 = i;
         err1 = out3.err1(i,ii);
-        errorbar(x1,y1,err1,'horizontal','.','color',col(ii,:),'CapSize',1,'MarkerSize',10);
+        errorbar(x1,y1,err1,'horizontal','o','color',col(ii,:),'CapSize',1);
 
         end
 end
@@ -67,20 +67,13 @@ ax.XTickLabel = {'-2','-1','0','1','2','3','4','5','6'};
 
 %% now plot by the reward
 
-out3.x1 = out3.x1-out3.FL+1;
+out3.x1 = out3.x1-out3.FL;
 
 [~, sort_idx] = sort(out3.x1(:,1),'descend');
 out3.x1 = out3.x1(sort_idx,:);
 out3.y1 = out3.y1 (sort_idx,:);
 out3.err1 = out3.err1(sort_idx,:);
 out3.FL = out3.FL(sort_idx,:);
-
-% EXPORT:
-        out_final.reverse.x_2save = out3.x1;
-        out_final.reverse.y_2save = out3.y1;
-        out_final.reverse.err_2save = out3.err1;
-        out_final.reverse.FL = out3.FL;
-        out_final.reverse.ROI_ON = out_1.ROI_ON;
 % Plot data
 col = [1,0,0; 0,0,1];
 ROI_ON = out_1.ROI_ON;
@@ -93,7 +86,7 @@ for i = 1:size(out3.x1,1) % for all pairs:
         x1 = out3.x1(i,ii);
         y1 = i;
         err1 = out3.err1(i,ii);
-        errorbar(x1,y1,err1,'horizontal','.','color',col(ii,:),'CapSize',1,'MarkerSize',10);
+        errorbar(x1,y1,err1,'horizontal','o','color',col(ii,:),'CapSize',1);
 
         end
 end

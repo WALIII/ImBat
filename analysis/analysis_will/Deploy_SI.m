@@ -2,7 +2,7 @@ function [out] = Deploy_SI(FlightAlignedROI)
 % to calculate SI for a single day
 
 % calculating Spatial Information
-clear sigCell sigCell2 sigCell3
+clear sigCell sigCell2 sigCell3 sigCell4
 
 % params 
 offset2use = 15; % frames of offset from flight to reward
@@ -23,6 +23,11 @@ input_dat2(find(mean(input_dat2')==0),:) = [];
  input_dat3 = squeeze(FlightAlignedROI{ii}.S(i,FlightAlignedROI{ii}.ROI_ON+mean(FlightAlignedROI{ii}.FlightLength)/120*30+offset2use:FlightAlignedROI{ii}.ROI_ON+mean(FlightAlignedROI{ii}.FlightLength)/120*30+90,:))';
 input_dat3(find(mean(input_dat3')==0),:) = [];
  [sigCell3(i,ii),~,~,tSI3(i,ii)] = fTS_SI(input_dat3);
+ 
+ % pre flight
+  input_dat4 = squeeze(FlightAlignedROI{ii}.S(i,FlightAlignedROI{ii}.ROI_ON-90:FlightAlignedROI{ii}.ROI_ON-10,:))';
+input_dat4(find(mean(input_dat4')==0),:) = [];
+ [sigCell4(i,ii),~,~,tSI4(i,ii)] = fTS_SI(input_dat4);
 
  close all 
 end
@@ -81,4 +86,6 @@ set( gca, 'XTick', xTicks )
 set( gca, 'XTickLabel', str )
 out.Reward = sigCell3;
 
+
+out.Pre = sigCell4;
 

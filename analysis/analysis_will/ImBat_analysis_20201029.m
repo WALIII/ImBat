@@ -1,14 +1,14 @@
 %% take the first, and last detected day, take the S matrix of first and last cell  (STD)
 function out = ImBat_analysis_20201029(CombinedROI,flightPaths,clst)
 
-peak_thresh = 2.75; % SNR threshold
+peak_thresh = 1.5; % SNR threshold
 counter = 1;
 % find first day
 [FlightAlignedROI] = ImBat_Align_FC(CombinedROI,flightPaths,clst);
 
 % %% ROI Analysis
 CutCells = FlightAlignedROI.S;
-Pre_bound2use = 60; % 2 seond pad
+Pre_bound2use = 120; % 2 seond pad
 Post_boud2use = 120;
 % get dates:
 transition_points = find((diff(FlightAlignedROI.CutCells_date)>=1));  %?

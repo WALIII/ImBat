@@ -95,21 +95,21 @@ out_final4.x_2save(dat2remove,:) = [];
 ImBat_PlotRedBlue(out_final3);
 title('removing pre and post ROIs');
 
-D2  = ImBat_PlotRedBlue(out_final4);
+ImBat_PlotRedBlue(out_final4);
 
-% % now reverse the order:
-% % Now, align to reward, and reverse sort:
-% out_final4 = out_final3;
-% offset2use = 120;
-% out_final4.ROI_ON = out_final4.ROI_ON+offset2use;;
-% out_final4.x_2save = out_final4.x_2save-out_final4.FL+offset2use-20;
-% [~, sort_idx] = sort(out_final4.x_2save(:,1),'descend');
-% out_final4.x_2save = out_final4.x_2save(sort_idx,:);
-% out_final4.y_2save = out_final4.y_2save (sort_idx,:);
-% out_final4.err_2save = out_final4.err_2save(sort_idx,:);
-% out_final4.FL = out_final4.FL(sort_idx,:);
-% D2 = ImBat_PlotRedBlue(out_final4);
-% title('removing pre and post ROIs');
+% now reverse the order:
+% Now, align to reward, and reverse sort:
+out_final4 = out_final3;
+offset2use = 120;
+out_final4.ROI_ON = out_final4.ROI_ON+offset2use;;
+out_final4.x_2save = out_final4.x_2save-out_final4.FL+offset2use-20;
+[~, sort_idx] = sort(out_final4.x_2save(:,1),'descend');
+out_final4.x_2save = out_final4.x_2save(sort_idx,:);
+out_final4.y_2save = out_final4.y_2save (sort_idx,:);
+out_final4.err_2save = out_final4.err_2save(sort_idx,:);
+out_final4.FL = out_final4.FL(sort_idx,:);
+D2 = ImBat_PlotRedBlue(out_final4);
+title('removing pre and post ROIs');
 
 
 %% Shuffle and more stats:

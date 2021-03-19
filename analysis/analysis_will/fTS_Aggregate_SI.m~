@@ -4,10 +4,13 @@ function fTS_Aggregate_SI
 % D02/18/21
 % WAL3
 
+warning off
+
 % initialize vars
 Reward1 = [];
 All1 = [];
 Flight1 = [];
+Pre1 = [];
 
 DIR = pwd;
 files = dir(pwd);
@@ -35,6 +38,9 @@ subFolders = files(dirFlags);
         Reward1 = cat(1,Reward1,out.Reward);
         Flight1 = cat(1,Flight1,out.Flight);
         All1 = cat(1,All1,out.All);
+        Pre1 = cat(1,Pre1,out.Pre);
+
+        
         % agg dat
         out_agg{i} = out;
         
@@ -113,13 +119,17 @@ for ii = 1: size(out_agg,2)
      h2p = sum(out_agg{ii}.Reward');
     h2p(h2p>0) = 1;
     RW(ii) = sum(h2p)/size(h2p,2); clear h2p
+    
+    h2p = sum(out_agg{ii}.Pre');
+    h2p(h2p>0) = 1;
+    PR(ii) = sum(h2p)/size(h2p,2); clear h2p
 end
 
 figure();
-boxplot([FL' RW' AL'],'Labels',{'Flight','Reward','All'})
+boxplot([PR' FL' RW' AL'],'Labels',{'Pre' 'Flight','Reward','All'})
 ylim([0 1]);   
 
   figure();
-plotSpread([FL' RW' AL'])%,'Labels',{'Flight','Reward','All'})
+plotSpread([PR' FL' RW' AL'],'showMM',4)%,'Labels',{'Flight','Reward','All'})
 ylim([0 1]);
 
