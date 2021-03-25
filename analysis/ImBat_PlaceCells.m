@@ -108,7 +108,7 @@ figure();
 for ii = ROI2Plot; % for each cell
     clf
     hold on;
-    plot3(out.flights(:,1),out.flights(:,2),out.flights(:,3),'color',[0 0 0 shade2use]);% plot the flight trajectory in space
+    plot3(out.Flights_Repaired(:,1),out.Flights_Repaired(:,2),out.Flights_Repaired(:,3),'color',[0 0 0 shade2use]);% plot the flight trajectory in space
     
     [~,xy] = find(neuron.S(ii,:)>Spk_Thresh);  % get time neuron is active
     peak_heights = neuron.S(ii,xy);

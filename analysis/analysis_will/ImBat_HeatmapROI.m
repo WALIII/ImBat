@@ -12,6 +12,7 @@ function out = ImBat_HeatmapROI(FlightAlignedROI,roi2plot);
 %        a cell array
 
 
+% compensate for legacy input format
 if length(FlightAlignedROI) == 1;
     FlightAlignedROI2{1} = FlightAlignedROI;
     clear FlightAlignedROI;
