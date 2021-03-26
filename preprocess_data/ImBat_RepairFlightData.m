@@ -1,6 +1,9 @@
 function ROI_Data = ImBat_RepairFlightData(ROI_Data);
 % Repair flight data
 
+% WAL3
+% 10/20/2020
+
 n = 100; % minimum length of gap to repair:
 hang1 = 3;%overhang
 

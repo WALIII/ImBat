@@ -1,5 +1,5 @@
 
-function ImBat_PlotAllPix(FlightAlignedY);
+function ImBat_PlotAllPix(FlightAlignedY,ROI_Data);
 % Plot all pix data for entire clustered series
 
 filt2use = 10;
@@ -18,7 +18,7 @@ for i = 1:numClust
        BG = min(squeeze(YIM1(:,:,:,ii)),[],3);
        BG=imfilter(BG,h,'circular');
        YIM1(:,:,:,ii) = squeeze(YIM1(:,:,:,ii))./(BG+.01);
-       YIM1(:,:,:,ii) = medfilt3(squeeze(YIM(:,:,:,ii)),[3 3 3]);
+       YIM1(:,:,:,ii) = medfilt3(squeeze(YIM(:,:,:,ii)),[3 3 5]);
        % Better version?
 %         BG = min(squeeze(YIM1(:,:,:,ii)),[],3);
 %        BG2 = max(squeeze(YIM1(:,:,1:125,ii)),[],3);
@@ -32,7 +32,7 @@ for i = 1:numClust
     % figure(); plot(mean(squeeze(mean(YIM_4PNR(1:40,1:40,:),1)))')
     YIM_4PNR = squeeze(median(YIM1(:,:,50:end-100),4));
     YIM1 = squeeze(median(YIM1,4));
-    YIM2 = YIM1(:,:,100:450);
+    YIM2 = YIM1(:,:,150:450);
     
     [Cn, PNR, PNR_mov] = ImBat_correlation_image(imresize(YIM_4PNR,2));
     YIM_max = imresize(PNR,0.5);%std(YIM2,[],3);

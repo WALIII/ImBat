@@ -1,4 +1,4 @@
-function ImBat_ClusterCalciumVar(FlightAlignedROI,roi2plot);
+function [c, c_sort]= ImBat_ClusterCalciumVar(FlightAlignedROI,roi2plot);
 
 CutCells = FlightAlignedROI.C_raw;
 CutFlights = FlightAlignedROI.ClustFlight;
@@ -23,6 +23,7 @@ figure(); hold on;
 imagesc(cell2plot(bound2plot,bb)');
 colormap(parula.^2);
   ax = gca;
+  c_sort = bb; % the sort 
     % Set where ticks will be
     ax.XTick = [ROI_ON-60 ROI_ON-30 ROI_ON ROI_ON+30 ROI_ON+60  ROI_ON+90 ROI_ON+120 ROI_ON+150 ROI_ON+180];
     % Set TickLabels;
@@ -58,19 +59,33 @@ hold on;
 col = {'r','g','b'};
 for i = 1:3
 ind2use = find(c==i);
-fakeInd = randi(size(CutFlights,3),size(ind2use,1),1);
+fakeInd = randperm((size(CutFlights,3)));
+%fakeInd = fakeInd(1:size(ind2use,1)*2);
 plot3(squeeze(CutFlights(:,1,ind2use)),squeeze(CutFlights(:,2,ind2use)),squeeze(CutFlights(:,3,ind2use)),'color',col{i});
-A(:,i,1) = mean(squeeze(CutFlights(:,1,ind2use)),2);
-A(:,i,2) = mean(squeeze(CutFlights(:,2,ind2use)),2);
-A(:,i,3) = mean(squeeze(CutFlights(:,3,ind2use)),2);
 
-Afake(:,i,1) = mean(squeeze(CutFlights(:,1,fakeInd)),2);
-Afake(:,i,2) = mean(squeeze(CutFlights(:,2,fakeInd)),2);
-Afake(:,i,3) = mean(squeeze(CutFlights(:,3,fakeInd)),2);
+A{i}(:,:,:) = squeeze(CutFlights(1:550,:,ind2use));
+Afake{i}(:,:,:) = squeeze(CutFlights(1:550,:,fakeInd));
+
 
 end
 
-% 
+Afake2{i}(:,:,:) = squeeze(CutFlights(1:550,:,fakeInd));
+
+% get Euclidian distance between each group and its mean,
+for i =3;
+Mtrue = mean(squeeze(A{i}(:,:,:)),3);
+Mshuff = mean(squeeze(Afake{i}(:,:,:)),3);
+   for ii = 1:size(A{i},3)
+            % Euclidian distance
+            FL(ii) = sum(sqrt(sum(squeeze(A{i}(:,:,ii))-Mtrue(:,:)) .^ 2));
+            FL_shuff(ii) = sum(sqrt(sum(squeeze(Afake{i}(:,:,ii))-Mshuff(:,:)).^ 2));
+   end
+end
+
+figure();
+hold on;
+histogram(FL,20,'Normalization','probability','BinWidth',10000);
+histogram(FL_shuff,20,'Normalization','probability','BinWidth',10000);
 % figure(); 
 % hold on;
 % D  = sqrt(sum((squeeze(A(:,1,:))' - squeeze(A(:,3,:))') .^ 2));

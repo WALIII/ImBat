@@ -39,7 +39,7 @@ close all
 %% Save data
  mkdir('Saved_Data')
  save('Saved_Data/Aligned_Data.mat','flightPaths','CombinedROI','FlightAlignedROI','-v7.3');
- save('ROI_Data.mat', ROI_Data); % Save fixed flights
+ save('ROI_Data.mat', 'ROI_Data'); % Save fixed flights
 
 
 % Basics of loaded and aligned data;

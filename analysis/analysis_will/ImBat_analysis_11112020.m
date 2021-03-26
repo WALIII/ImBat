@@ -1,27 +1,10 @@
-function out = ImBat_HeatmapROI(FlightAlignedROI,roi2plot);
-% ImBat_HeatmapROI.m
+function out = ImBat_analysis_11112020(FlightAlignedROI,roi2plot);
+
 % Make heat maps of ROI data on Cells
-
-% WAL3
-% 01/10/2021
-
-
-% TO DO: Seperate flgihts just by time
-% TO DO: plot as a function of DAYS
-% TO DO: check FlightAlignedROI, have some redundancy measure if it is not
-%        a cell array
-
-
-% compensate for legacy input format
-if length(FlightAlignedROI) == 1;
-    FlightAlignedROI2{1} = FlightAlignedROI;
-    clear FlightAlignedROI;
-    FlightAlignedROI{1} = FlightAlignedROI2{1}
-end
 
 fl_counter = 0;
 hold on;
-PlotBoth = 1;
+PlotBoth = 0;
 for ii = roi2plot;%1:size(CutCells,1);
 hold on;
 bound2use = 1:1400;
@@ -35,8 +18,8 @@ hold on;
 ClustFlight = FlightAlignedROI{iii}.ClustFlight_withPads;
 
 % upsample the calcium
-CutCells = FlightAlignedROI{iii}.C_raw;
-%CutCells = FlightAlignedROI{iii}.S;
+%CutCells = FlightAlignedROI{iii}.C_raw;
+CutCells = FlightAlignedROI{iii}.S;
 
 
 
@@ -57,6 +40,7 @@ x = exampFlight(:,1)';
 y = exampFlight(:,2)';
 z = exampFlight(:,3)';
 col = zscore(exampCell)-min(zscore(exampCell));  % This is the color, vary with x in this case.
+col_raw = exampCell-min((exampCell));
 if sum(abs(diff(col)))>1;
 p = surface([x;x],[y;y],[z;z],[col;col],...
         'facecol','no',...
@@ -110,7 +94,8 @@ set(p4,'edgealpha',0.2)
  out.data{i}.exampFlight = exampFlight;
  out.data{i}.col = col;
  out.data2.AllFlight(:,:,i)  = exampFlight;
- out.data2.AllCol(:,i) = col;
+ out.data2.AllCol(:,i) = col; % normalized traces
+ out.data2.AllCol_raw(:,i)= col_raw; % raw spike counts
 end
 grid on;
 end
@@ -119,4 +104,4 @@ end
 end
 
 title(['ROI: ',num2str(roi2plot), ' , ', num2str(fl_counter), ' Flights total']);
-fl_counter % report how many flights there are
+fl_counter; % report how many flights there are

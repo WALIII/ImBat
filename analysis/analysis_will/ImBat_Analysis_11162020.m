@@ -3,7 +3,7 @@ function ImBat_Analysis_11162020(FlightAlignedROI)
 % Cluster based on the difference of Flights
 % prereq: [FlightAlignedROI] = ImBat_Align_FC(CombinedROI,flightPaths,2);
 
-nclust = 8;
+nclust = 3;
 xyz2use = 4; % x = 1, y = 2; z = 3;
 
 

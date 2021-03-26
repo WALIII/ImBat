@@ -16,7 +16,6 @@ audio = 1;
 DS = 0.25;
 TS = 1;
 
-mkdir('processed');
 % User pram:
 nparams=length(varargin);
 for i=1:2:nparams
@@ -81,7 +80,7 @@ if video ==1;
     % Save un-aligned videos:
     save([metadata.processed_FN,'/uncorrected_Data.mat'],'Yf','-v7.3');
     % Save and remove video from ram
-    CNMFe_align(Yf,metadata);
+       CNMFe_align(Yf,metadata);
     
     %FS_tiff(Yf,'fname','processed/RAW_Video.tif');
     clear Yf;

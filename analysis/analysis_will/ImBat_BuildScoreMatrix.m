@@ -8,12 +8,13 @@ plot_things = 0;
 
 stop_time = 1;
 sub2plot = 5;
+TrackScoreThresh = 0.75;
 
 disp ('performing pairwise comparisons');
 
 
 % %% ROI Analysis
-CutCells = FlightAlignedROI.C_raw;
+CutCells = FlightAlignedROI.C;
 ROI_ON = FlightAlignedROI.ROI_ON;
 
 % get dates:
@@ -22,11 +23,10 @@ transition_points = [1 transition_points size(CutCells,3)];
 
 % %% ROI Analysis
 max_date = max(FlightAlignedROI.CutCells_date);
-CutCells = FlightAlignedROI.C_raw;
-ROI_ON = FlightAlignedROI.ROI_ON;
+
 % get bound to plot
-bound2plot = 1:450;
-trial_cutoff = 2; % min trial number accepted;
+bound2plot = round(FlightAlignedROI.ROI_ON-30:FlightAlignedROI.ROI_ON+mean(FlightAlignedROI.FlightLength)/120*30+60);
+trial_cutoff = 10; % min trial number accepted;
 counter = 1;
 col = hsv(size(transition_points,2)+1);
 counter = 1
@@ -40,19 +40,18 @@ for i = 1:max_date; % for every day, compair pairs
    for ii = 1:size(CutCells,1); %for every cell
        % first, check tracking score
        Trackscore = CombinedROI.p_same_registered_pairs{ii}(i,i2);
-if  isnan(Trackscore)
+if  isnan(Trackscore) || Trackscore<TrackScoreThresh
     ScoreMatrix(1,counter) = NaN;
     ScoreMatrix(2,counter) = NaN;
     ScoreMatrix(3,counter) = NaN;
     ScoreMatrix(4,counter) = NaN;
     ScoreMatrix(5,counter) = NaN;
-
-
 else
 
 adata_d1 = zscore(squeeze(CutCells(ii,bound2plot,idx2use_d1)),[],1)';
 adata_d2 = zscore(squeeze(CutCells(ii,bound2plot,idx2use_d2)),[],1)';
 
+%TO DO add track score cutoff
 if size(idx2use_d1,2)<trial_cutoff || size(idx2use_d2,2)< trial_cutoff;
  ScoreMatrix(1,counter) = NaN;
  ScoreMatrix(2,counter) = NaN;
@@ -60,8 +59,8 @@ if size(idx2use_d1,2)<trial_cutoff || size(idx2use_d2,2)< trial_cutoff;
  ScoreMatrix(4,counter) = NaN;
  ScoreMatrix(5,counter) = NaN;
 else    
-M_adata_d1 = mean(adata_d1,1); % day 1 mean
-M_adata_d2 = mean(adata_d2,1); % day 2 mean
+M_adata_d1 = smooth(mean(adata_d1,1),30)'; % day 1 mean
+M_adata_d2 = smooth(mean(adata_d2,1),30)'; % day 2 mean
     
 % within day corr:
 M_adata_d1e = mean(adata_d1(1:2:end,:),1); % day 1 even mean
@@ -114,7 +113,7 @@ plot([0 1],[0 1],'.-r')
 % 1. check if cell is detected
 % 2. check if cell is detected the next day
 % 3. internal check, across day check, save this
-plotting = 0;
+plotting = plot_things;
 
 if plotting == 1
 % do some quantitative analysis
