@@ -227,7 +227,11 @@ for i = 1:numItterations
     %% Calculation
     
     
+ 
+            
     if isempty(b)==0 || isempty(b2)==0 || isempty(b3)==0
+                if (size(b,2)+size(b3,2))/2 > numSpontanSpikes*.5% rate is less than spon rate...
+
         try
             
             R(counter) = corr2(PM1,PM3); % compare light conditions
@@ -246,7 +250,7 @@ for i = 1:numItterations
         catch
             disp('oo')
         end
-        
+                end
     end
     
     

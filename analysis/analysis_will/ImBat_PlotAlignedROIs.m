@@ -1,4 +1,4 @@
-function out = ImBat_PlotAlignedROIs(FlightAlignedROI,ROI_Data,flightPaths,varargin);
+function out = ImBat_PlotAlignedROIs(FlightAlignedROI,varargin);
 % ImBat_PlotAlignedROIs
 
 % Plot individual ROIs aligned to flights from FlightAlignedROI, Rde lines
@@ -176,6 +176,7 @@ if manSort ==1; % sort based on manual inputs:
         clear adata
     end
 end
+
 
 
 
