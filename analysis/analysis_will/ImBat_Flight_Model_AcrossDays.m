@@ -12,9 +12,9 @@ function [R, R3, M] = ImBat_Flight_Model_AcrossDays(flightPaths1,day2use);
 % Default Model Paramaters:
 sizeOfField = 500; % in mm
 fireProb = 5; % 1 is highest 120 = 1 per s
-numItterations = 2000;
+numItterations = 1000;
 numSpontanSpikes = 100; % max number of spontanious spikes
-degree2use = 180;
+degree2use = 90;
 
 
 
