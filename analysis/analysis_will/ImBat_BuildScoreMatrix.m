@@ -39,7 +39,11 @@ for i = 1:max_date; % for every day, compair pairs
 
    for ii = 1:size(CutCells,1); %for every cell
        % first, check tracking score
+       try
        Trackscore = CombinedROI.p_same_registered_pairs{ii}(i,i2);
+       catch
+           Trackscore = 1; % if we sim data this will exceede bounds...
+       end
 if  isnan(Trackscore) || Trackscore<TrackScoreThresh
     ScoreMatrix(1,counter) = NaN;
     ScoreMatrix(2,counter) = NaN;
