@@ -21,7 +21,7 @@ end
 
 fl_counter = 0;
 hold on;
-PlotBoth = 1;
+PlotBoth = 0;
 for ii = roi2plot;%1:size(CutCells,1);
 hold on;
 bound2use = 1:1400;
@@ -57,6 +57,7 @@ x = exampFlight(:,1)';
 y = exampFlight(:,2)';
 z = exampFlight(:,3)';
 col = zscore(exampCell)-min(zscore(exampCell));  % This is the color, vary with x in this case.
+%col = col.^1.2;
 if sum(abs(diff(col)))>1;
 p = surface([x;x],[y;y],[z;z],[col;col],...
         'facecol','no',...
@@ -83,7 +84,7 @@ y2 = exampFlight(:,2)';
 y3 = exampFlight(:,3)';
 z = zeros(size(x));
 col = zscore(exampCell)-min(zscore(exampCell));  % This is the color, vary with x in this case.
-%col = exampCell.^(1);  % This is the color, vary with x in this case.
+%col = exampCell.^(2);  % This is the color, vary with x in this case.
 p2 = surface([x;x],[y;y],[z;z],[col;col],...
         'facecol','no',...
         'edgecol','interp',...
