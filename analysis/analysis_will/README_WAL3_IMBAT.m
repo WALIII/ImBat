@@ -65,7 +65,7 @@ output = ImBat_Quantify_Flights(flightPaths,ROI_Data);
 
 % Now, use the integrated function to find good ( or bad) cells. 
 % FlightAlignedROI{1} is the first clustered flight:
-ImBat_PlotAlignedROIs(FlightAlignedROI{1},ROI_Data,flightPaths);
+ImBat_PlotAlignedROIs(FlightAlignedROI{1});
 
 
 
@@ -74,7 +74,8 @@ ImBat_analysis_10212020(flightPaths,ROI_Data,CombinedROI,2);
 
 % STATs and tracking quality:
 ScoreMatrix = ImBat_analysis_10212026(flightPaths,ROI_Data,CombinedROI,2);
-ImBat_Tuning_Stability(ScoreMatrix); % migrate into this funciton 
+figure();
+ImBat_Tuning_Stability(ScoreMatrix,'r'); % migrate into this funciton
 
 % plot heat map on flights:
 ImBat_analysis_11062020(flightPaths,ROI_Data,CombinedROI,2);
@@ -91,5 +92,7 @@ out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined)
 [out_markov] = ImBat_New_Markov(flightPaths);
 ImBat_ProbSuffixTree(out_markov,5);
 
-ImBat_ClusterCalciumVar(FlightAlignedROI,1);
-ImBat_PlotMarkov(out_markov,FlightAlignedROI,1)
+roi_2_use = 1;
+
+ImBat_ClusterCalciumVar(FlightAlignedROI{1},roi_2_use); % check the flights
+ImBat_PlotMarkov(out_markov,FlightAlignedROI{1},roi_2_use); % check the roi

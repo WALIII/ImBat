@@ -4,7 +4,8 @@ function out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined)
 close all
 counter = 1;
 min_flight_number = 10; % min number of flights needed
-min_prom = 0.25;
+min_prom = 1;
+disp(min_prom);
 
 % NOTE: there may be more than one peak per ROI!
 

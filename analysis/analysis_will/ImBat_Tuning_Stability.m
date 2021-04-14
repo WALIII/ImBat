@@ -8,7 +8,7 @@ function ImBat_Tuning_Stability(ScoreMatrix,col);
 % Plot correlation over days
 plot_things = 1;
 plot_all_things = 0;
-plot_error_bars = 0; % shadded error instead if zero
+plot_error_bars = 1; % shadded error instead if zero
 
 % Variables:
 

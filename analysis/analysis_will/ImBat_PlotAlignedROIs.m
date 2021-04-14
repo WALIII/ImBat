@@ -15,6 +15,8 @@ nparams=length(varargin);
 manIn = 0; % manual inputs
 manSort = 0; % manual inputs
 smooth_data = 0;
+ScaleData = 0; % scale PSTH heatmap data
+atemp = []
 % User input
 for i=1:2:nparams
     switch lower(varargin{i})
@@ -41,7 +43,7 @@ hold on;
 
 
 % %% ROI Analysis
-CutCells = FlightAlignedROI.C;
+CutCells = FlightAlignedROI.C_raw;
 ROI_ON = FlightAlignedROI.ROI_ON;
 
 % smooth data
@@ -63,7 +65,7 @@ transition_points = [1 transition_points size(CutCells,3)];
 % get bound to plot
 bound2plot = 1:500;
 counter = 1;
-col = hsv(size(transition_points,2)+1);
+col = summer(size(transition_points,2)+1);
 figure();
 if manIn ==1;
 else
@@ -82,13 +84,20 @@ for i = 1:length(cells2use)
         mn = nanmean(adata);
         h = fill([1:L L:-1:1],[mn-se fliplr(mn+se)],col(ii,:)); alpha(0.5);
         plot(mn,'Color',col(ii,:));
+        atemp = cat(1,atemp,adata);
     end
     hold off
     subplot(10,1,3:10);
     
     adata = zscore(squeeze(CutCells(i,bound2plot,:)),[],1)';
     %     adata = adata-median(adata(:,500:600)')';
-    imagesc(adata,[-3 4]);
+    if ScaleData ==1;
+        imagesc(adata,[-3 4]);
+    else
+        imagesc(adata);
+    end
+    
+    
     % draw date lines:
     colormap(parula.^2)
     hold on;
@@ -153,7 +162,11 @@ if manSort ==1; % sort based on manual inputs:
         out.transition = transition_points;
         counter = counter+1;
         %     adata = adata-median(adata(:,500:600)')';
-        imagesc(adata,[-3 4]);
+        if ScaleData ==1;
+            imagesc(adata,[-3 4]);
+        else
+            imagesc(adata);
+        end;
         % draw date lines:
         colormap(parula.^2)
         hold on;
