@@ -12,7 +12,7 @@ rmpath(genpath('C:\Users\WAL3\Documents\MATLAB\CaImAn-MATLAB'));
 catch
     disp(' not using Wills computer..');
 end
-parseFiles = 0; % MAC ONLY
+parseFiles = 1; % MAC ONLY
 HomeDir = cd;
 % Get all folders in directory
 files = dir(pwd);
@@ -40,8 +40,10 @@ for i = 1:length(subFolders);
         
     elseif parseFiles ==1; % mac only 
             %   extract .mov files:
-            FS_AV_Parse_batch(pwd,'mat_dir','/extracted')
+         %   FS_AV_Parse_batch(pwd,'mat_dir','/extracted')
             %   extract c3d files:
+             mkdir('extracted');
+
             processed_dir = [pwd,'/extracted/'];
             
             c3dList = dir([pwd filesep '*.c3d']);
