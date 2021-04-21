@@ -88,6 +88,17 @@ ImBat_analysis_11122020(CombinedROI,flightPaths);
 out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined)
 
 
+
+
+% % ROIs
+
+% Manually selected ROIs to investigate 
+cells2use = [ 24 26 39 48 49 51 61 70 82 87]; % Unstable ROIs to use
+
+% Create Labeled dff projections:
+ImBat_PlotTrackedMasks(ROI_Data,CombinedROI,cell_registered_struct,output.days2use{3}',cells2use); % # 3 is cluster 2 is 
+
+
 %% Markov analysis
 [out_markov] = ImBat_New_Markov(flightPaths);
 ImBat_ProbSuffixTree(out_markov,5);
