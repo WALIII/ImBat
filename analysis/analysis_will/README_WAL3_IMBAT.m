@@ -32,7 +32,7 @@ close all
 
 %% 
 % find first day % Align Flight data to the top 3 flight clusters:
-  for flight_cluster = 1:3;
+  for flight_cluster = 1:4;
     [FlightAlignedROI{flight_cluster}] = ImBat_Align_FC(CombinedROI,flightPaths,flight_cluster+1);
   end 
 
@@ -68,6 +68,11 @@ output = ImBat_Quantify_Flights(flightPaths,ROI_Data);
 ImBat_PlotAlignedROIs(FlightAlignedROI{1});
 
 
+days2use = [1 2 3]; % days to use
+cells2use = [42]; % ROIs to use
+ImBat_PlotTrackedMasks(ROI_Data,CombinedROI,cell_registered_struct,days2use,cells2use);
+
+TEMP_flights(flightPaths,[2 3 4],[1 2 3]);
 
 % Figure 1: plot Flights across days, and PLOT ROIs
 ImBat_analysis_10212020(flightPaths,ROI_Data,CombinedROI,2);
