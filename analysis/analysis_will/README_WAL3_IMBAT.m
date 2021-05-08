@@ -32,7 +32,7 @@ close all
 
 %% 
 % find first day % Align Flight data to the top 3 flight clusters:
-  for flight_cluster = 1:3;
+  for flight_cluster = 1:4;
     [FlightAlignedROI{flight_cluster}] = ImBat_Align_FC(CombinedROI,flightPaths,flight_cluster+1);
   end 
 
@@ -68,6 +68,11 @@ output = ImBat_Quantify_Flights(flightPaths,ROI_Data);
 ImBat_PlotAlignedROIs(FlightAlignedROI{1});
 
 
+days2use = [1 2 3]; % days to use
+cells2use = [42]; % ROIs to use
+ImBat_PlotTrackedMasks(ROI_Data,CombinedROI,cell_registered_struct,days2use,cells2use);
+
+TEMP_flights(flightPaths,[2 3 4],[1 2 3]);
 
 % Figure 1: plot Flights across days, and PLOT ROIs
 ImBat_analysis_10212020(flightPaths,ROI_Data,CombinedROI,2);
@@ -86,6 +91,17 @@ ImBat_analysis_11122020(CombinedROI,flightPaths);
 
 % stats between variability in ROIs and in flight
 out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined)
+
+
+
+
+% % ROIs
+
+% Manually selected ROIs to investigate 
+cells2use = [ 24 26 39 48 49 51 61 70 82 87]; % Unstable ROIs to use
+
+% Create Labeled dff projections:
+ImBat_PlotTrackedMasks(ROI_Data,CombinedROI,cell_registered_struct,output.days2use{3}',cells2use); % # 3 is cluster 2 is 
 
 
 %% Markov analysis

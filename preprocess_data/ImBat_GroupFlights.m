@@ -65,6 +65,7 @@ for i = 1: size(ROI_Data,2);
     plot3(A(:,1),A(:,2),A(:,3),'Color',col(i,:));
     
     D = ROI_Data{1, i}.Alignment.out.video_times(1:end-1); % align timestamps
+    E = ROI_Data{1, i}.Alignment.out.Location_time(ROI_Data{1, i}.Alignment.out.RewardTime); % reward
     % trim the end, otherwise the flights will be longer or shorter than the
     % calcium..
     if max(D)>max(B); disp('adding extra timepoint to flight data');

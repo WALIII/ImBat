@@ -141,5 +141,3 @@ ylim([0 1]);
 plotSpread([PR' FL' RW' AL'],'showMM',4)%,'Labels',{'Flight','Reward','All'})
 ylim([0 1]);
 
-FL_total2 = round(FL_total*0.7087); % flight, all_flight_phase, reward, pre, all_cells
-

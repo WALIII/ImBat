@@ -3,10 +3,14 @@ function [dark_cluster, out] = ImBat_AfterDark(flightPaths,varargin)
 
 % Assumption is the lights are turned off exactly 20min, then back on at
 % 40min
+close all
 
 % Get flightpaths of type:
 FF = flightPaths.flight_starts_idx;
 FlightPaths = 2;
+pad2use = 100;
+
+subplotting = 1; 
 
 % User Inputs:
 nparams=length(varargin);
@@ -77,6 +81,7 @@ out.HistData = histout;
 
 % some basic plotting
 %% Plot unclustered to top 3 Ratio
+try
 figure();
 hold on;
 %plot(medfilt1(histout{1}.Values./(histout{1}.Values+histout{2}.Values+histout{3}.Values),1,[],2))
@@ -87,6 +92,9 @@ ylabel('proportion of unique flights');
 title(['proportion of unique flights to top flights']);
 plot([20 20],[0 1],'-b')
 plot([40 40],[0 1],'-b')
+catch
+    disp('not enought flightpaths to plot stats');
+end
 
 
 %% Plot Flights
@@ -96,31 +104,52 @@ hold on;
 A = flightPaths.tracjectoriesRaw*1000;
 
 % Pre-Light
-subplot(1,3,1); hold on;
+if subplotting ==1;
+subplot(1,3,1); 
+else
+    figure();
+end
+
+hold on;
 Ind2use = out.Light_all.FirstLight;
 for iii = 1:length(Ind2use)  
-    bound = flightPaths.flight_starts_idx(Ind2use(iii)):flightPaths.flight_ends_idx(Ind2use(iii));
+    bound = flightPaths.flight_starts_idx(Ind2use(iii))-pad2use:flightPaths.flight_ends_idx(Ind2use(iii))+pad2use;
     plot1 =  plot3(A(1,bound),A(2,bound),A(3,bound),'color',[0 0 0 0.1]); % plot all flights
 end
+axis tight
 axis off
+
 title('Lights ON');
 % Darkness
-subplot(1,3,2); hold on;
+if subplotting ==1;
+subplot(1,3,2); 
+else
+    figure();
+end
+hold on;
 Ind2use = out.Light_all.Darkness;
 for iii = 1:length(Ind2use)
-    bound = flightPaths.flight_starts_idx(Ind2use(iii)):flightPaths.flight_ends_idx(Ind2use(iii));
+    bound = flightPaths.flight_starts_idx(Ind2use(iii))-pad2use:flightPaths.flight_ends_idx(Ind2use(iii))+pad2use;
     plot1 =  plot3(A(1,bound),A(2,bound),A(3,bound),'color',[0 0 0 0.1]); % plot all flights
 end
 title('Lights Off');
+axis tight
 axis off
+
 % Last Light
-subplot(1,3,3); hold on;
+if subplotting ==1;
+subplot(1,3,3); 
+else
+    figure();
+end
+hold on;
 Ind2use = out.Light_all.LastLight;
 for iii = 1:length(Ind2use)
-    bound = flightPaths.flight_starts_idx(Ind2use(iii)):flightPaths.flight_ends_idx(Ind2use(iii));
+    bound = flightPaths.flight_starts_idx(Ind2use(iii))-pad2use:flightPaths.flight_ends_idx(Ind2use(iii))+pad2use;
     plot1 =  plot3(A(1,bound),A(2,bound),A(3,bound),'color',[0 0 0 0.1]); % plot all flights
 end
 title('Lights Return on');
+axis tight
 axis off
 %% Now, Plot the same figure, but overlay the clustered flights:
 
@@ -136,61 +165,82 @@ hold on;
 A = flightPaths.tracjectoriesRaw*1000;
 
 % Pre-Light
-subplot(1,3,1); hold on;
+if subplotting ==1;
+subplot(1,3,1); 
+else
+    figure(30);
+end
+hold on;
 Ind2use = out.Light_all.FirstLight;
 Ind2use2 = out.Light_cluster{cluster}.FirstLight  ;
 axis off
 if i ==1;
 for iii = 1:length(Ind2use)  
-    bound = flightPaths.flight_starts_idx(Ind2use(iii)):flightPaths.flight_ends_idx(Ind2use(iii));
+    bound = flightPaths.flight_starts_idx(Ind2use(iii))-pad2use:flightPaths.flight_ends_idx(Ind2use(iii))+pad2use;
     plot1 =  plot3(A(1,bound),A(2,bound),A(3,bound),'color',[0 0 0 0.1]); % plot all flights
 
 end
 end
 for ii = 1: length(Ind2use2);
-    bound2 = flightPaths.flight_starts_idx(Ind2use2(ii)):flightPaths.flight_ends_idx(Ind2use2(ii));
+    bound2 = flightPaths.flight_starts_idx(Ind2use2(ii))-pad2use:flightPaths.flight_ends_idx(Ind2use2(ii))+pad2use;
     plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col{i},'LineWidth',2); % plot all flights
     Flights2save{i}{1}(:,:,ii) = A(:,bound2(1):bound2(1)+600);
 end
 title('Lights ON');
+axis tight
 axis off
 
+
 % Darkness
-subplot(1,3,2); hold on;
+if subplotting ==1;
+subplot(1,3,2); 
+else
+    figure(31);
+end
+hold on;
 Ind2use = out.Light_all.Darkness;
 Ind2use2 = out.Light_cluster{cluster}.Darkness;
 if i ==1;
 for iii = 1:length(Ind2use)  
-    bound = flightPaths.flight_starts_idx(Ind2use(iii)):flightPaths.flight_ends_idx(Ind2use(iii));
+    bound = flightPaths.flight_starts_idx(Ind2use(iii))-pad2use:flightPaths.flight_ends_idx(Ind2use(iii))+pad2use;
     plot1 =  plot3(A(1,bound),A(2,bound),A(3,bound),'color',[0 0 0 0.1]); % plot all flights
 end
 end
 for ii = 1: length(Ind2use2);
-    bound2 = flightPaths.flight_starts_idx(Ind2use2(ii)):flightPaths.flight_ends_idx(Ind2use2(ii));
+    bound2 = flightPaths.flight_starts_idx(Ind2use2(ii))-pad2use:flightPaths.flight_ends_idx(Ind2use2(ii))+pad2use;
     plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col{i},'LineWidth',2); % plot all flights
     Flights2save{i}{2}(:,:,ii) = A(:,bound2(1):bound2(1)+600);
 end
 title('Lights Off');
+axis tight
 axis off
 
+
 % Last Light
-subplot(1,3,3); hold on;
+if subplotting ==1;
+subplot(1,3,3); 
+else
+    figure(33);
+end
+hold on;
 Ind2use = out.Light_all.LastLight;
 Ind2use2 = out.Light_cluster{cluster}.LastLight;
 if i ==1;
 for iii = 1:length(Ind2use)  
-    bound = flightPaths.flight_starts_idx(Ind2use(iii)):flightPaths.flight_ends_idx(Ind2use(iii));
+    bound = flightPaths.flight_starts_idx(Ind2use(iii))-pad2use:flightPaths.flight_ends_idx(Ind2use(iii))+pad2use;
     plot1 =  plot3(A(1,bound),A(2,bound),A(3,bound),'color',[0 0 0 0.1]); % plot all flights
 end
 end
 for ii = 1: length(Ind2use2);
-    bound2 = flightPaths.flight_starts_idx(Ind2use2(ii)):flightPaths.flight_ends_idx(Ind2use2(ii));
+    bound2 = flightPaths.flight_starts_idx(Ind2use2(ii))-pad2use:flightPaths.flight_ends_idx(Ind2use2(ii))+pad2use;
     plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col{i},'LineWidth',2); % plot all flights
     Flights2save{i}{3}(:,:,ii) = A(:,bound2(1):bound2(1)+600);
 end
 title('Lights Return on');
 end
+axis tight
 axis off
+
 
 out.Flights2save = Flights2save; %data on flights
 
@@ -258,7 +308,7 @@ end
 % concat
 % correlation
 counter = 1;
-for flight2use = 1:3;
+for flight2use = 1:length(FlightPaths);
     clear Mf
 Mf = cat(3,Flights2save{flight2use}{1}(:,:,:),Flights2save{flight2use}{2}(:,:,:),Flights2save{flight2use}{3}(:,:,:));
 MF = squeeze(mean(Mf,3));

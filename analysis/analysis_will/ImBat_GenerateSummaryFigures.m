@@ -307,6 +307,9 @@ SumData.Stability.ShuffledFlights_numItter = numItter;
 
 % number of flights...
 
+% Now, get basic things about the flights:
+[dat] = ImBat_Totals
+
 
 % COMBINEING ANIMALS:
 % 1. All place cell tracking ( how many can we track, and for how long)

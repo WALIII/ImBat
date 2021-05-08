@@ -43,7 +43,7 @@ hold on;
 
 
 % %% ROI Analysis
-CutCells = FlightAlignedROI.C_raw;
+CutCells = FlightAlignedROI.C;
 ROI_ON = FlightAlignedROI.ROI_ON;
 
 % smooth data
