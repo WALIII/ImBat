@@ -25,3 +25,6 @@ for i = 1: size(flightPaths.RewardIdx,1);
     in = flightPaths.AllFlightsMasterTime(in);
     plot([in;in],[ones(size(in));zeros(size(in))+flights2plot+1],'-r','LineWidth',0.03)
 end
+
+xlabel('time (s)');
+ylabel('flight paths')
