@@ -99,6 +99,17 @@ if plot_things ==1;
         title('Tuning stability over days, for best (r) and worst ( g) and all ( b) tracked cells');
         xlabel('days');
         ylabel('tuning stability to day 1');
+        
+        % STATS
+        % STATS
+
+X1 = [1:size(Var5,2)]';
+y = Var5';
+x1 = ones(size(Var5,2),1);
+X = [x1 X1];    % Includes column of ones
+[b,~,~,~,stats] = regress(y,X)
+
+
     else
         hold on;
         L = size(Var5,2);
@@ -218,13 +229,7 @@ if plot_all_things ==1;
     
 end
 
-% STATS
 
-X1 = x1';
-y = y1';
-x1 = ones(size(X1,1),1);
-X = [x1 X1];    % Includes column of ones
-[~,~,~,~,stats] = regress(y,X);
 %
 % % Plot correlation over days
 % clear Var1 Var2
