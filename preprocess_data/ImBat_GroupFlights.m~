@@ -126,12 +126,11 @@ flightPaths.AllFlightsMasterTime = AllFlightsMasterTime;
 flightPaths.Dates = flightDates;
 flightPaths.batID = batID;
 flightPaths.RewardVect = RewardVect;
-% calculate Reward IDX:
-[Bpks,Blocs] = findpeaks(RewardVect,'MinPeakProminence',2,'MinPeakDistance',1);
-flightPaths.RewardIdx = Blocs;
-
-
+% calculate Reward times:
+[Bpks,Blocs] = findpeaks(x,'MinPeakProminence',min_prom,'MinPeakDistance',1);
 % Plot all flight occurances:
+flightPaths.Rewardidx = Bpks;
+
 
 % for i = 1:size(ROI_Data,2)
 %     qq(i) = size(out.day(out.day ==i),1);
