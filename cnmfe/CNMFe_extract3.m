@@ -47,7 +47,7 @@ pars_envs = struct('memory_size_to_use', 20, ...  % GB, memory space you allow t
 % -------------------------      SPATIAL      -------------------------  %
 
 metadata.cnmfe.gSig = 3;           % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
-metadata.cnmfe.gSiz = 4*metadata.cnmfe.gSig+1;    % pixel, approximate neuron diameter
+metadata.cnmfe.gSiz = 2*metadata.cnmfe.gSig+1;    % pixel, approximate neuron diameter
 metadata.cnmfe.ssub = 1;           % spatial downsampling factor
 
 
@@ -91,7 +91,7 @@ metadata.cnmfe.bg_ssub = 2;                                    % downsample back
 K = [];                         % maximum number of neurons per patch. when K=[], take as many as possible.
 % metadata.cnmfe.min_corr = 0.85;                % minimum local correlation for a seeding pixel
 % metadata.cnmfe.min_pnr = 40;                   % minimum peak-to-noise ratio for a seeding pixel (low values are discouraged)
-metadata.cnmfe.min_pixel = 6*metadata.cnmfe.gSig^2;           % minimum number of nonzero pixels for each neuron (was gSig^2)
+metadata.cnmfe.min_pixel = metadata.cnmfe.gSig^2;           % minimum number of nonzero pixels for each neuron (was gSig^2)
 bd = 8;                         % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
 frame_range = [];               % when [], uses all frames
 save_initialization = false;    % save the initialization procedure as a video.
@@ -109,7 +109,7 @@ metadata.cnmfe.merge_thr_spatial = [0.9, 0.6, -inf];  % merge components with hi
 
 % -------------------------  Residual   -------------------------  %
 metadata.cnmfe.min_corr_res = 0.6;
-metadata.cnmfe.min_pnr_res = 10;
+metadata.cnmfe.min_pnr_res = 1;
 seed_method_res = 'manual';  % method for initializing neurons from the residual
 update_sn = true;
 
