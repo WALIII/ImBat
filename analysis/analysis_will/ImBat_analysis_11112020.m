@@ -1,7 +1,7 @@
 function out = ImBat_analysis_11112020(FlightAlignedROI,roi2plot);
 
 % Make heat maps of ROI data on Cells
-
+plotIt = 0;
 fl_counter = 0;
 hold on;
 PlotBoth = 0;
@@ -42,12 +42,14 @@ z = exampFlight(:,3)';
 col = zscore(exampCell)-min(zscore(exampCell));  % This is the color, vary with x in this case.
 col_raw = exampCell-min((exampCell));
 if sum(abs(diff(col)))>1;
+   if plotIt ==1;
 p = surface([x;x],[y;y],[z;z],[col;col],...
         'facecol','no',...
         'edgecol','interp',...
         'linew',2);%'AlphaData',mat2gray(col), 'FaceAlpha','flat');
     set(p,'facealpha',0.2)
 set(p,'edgealpha',0.2)
+   end
 fl_counter = fl_counter+1;
 end
 % TO DO set p == 0 if there is no detected activity... 

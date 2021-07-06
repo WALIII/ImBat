@@ -100,7 +100,7 @@ for ii = 1:size(FlightAlignedROI_combined{1}.C,1) % first 10 cells:
     end
     
 end
-out2.numPeaks = numPeaks;
+
 
 %% Plotting: ( will also work outside of function)
 try

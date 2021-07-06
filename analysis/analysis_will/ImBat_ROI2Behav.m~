@@ -1,0 +1,39 @@
+function [out, stats] = ImBat_ROI2Behav(FlightAlignedROI,cell_registered_struct);
+% Breakout for computing the ROI to behavior correlation for our dataset
+
+
+stats = [];
+out = [];
+
+
+% I.  first, get the real ROIs for this dataset, and  prune the
+% flightAligned ROIs of ROIs that only exist on one day..
+FlightAlignedROI2 = FlightAlignedROI;
+G = cell_registered_struct.cell_to_index_map;
+G(G>0) = 1;
+G2 = sum(G');
+% G2(G2>1) = [];
+for i = 1:size(FlightAlignedROI,2)
+FlightAlignedROI{i}.C_raw = FlightAlignedROI{i}.C_raw(:,:,G2(G2>1));
+FlightAlignedROI{i}.C = FlightAlignedROI{i}.C(:,:,G2(G2>1));
+FlightAlignedROI{i}.S = FlightAlignedROI{i}.S(:,:,G2(G2>1));
+FlightAlignedROI{i}.ClustFlight_withPads = FlightAlignedROI{i}.ClustFlight_withPads(:,:,G2(G2>1));
+end
+
+dat2use{1} = FlightAlignedROI2{1};
+out2 = ImBat_ROI_Behav_Correlation(dat2use)
+
+
+
+
+
+% II. OPTIONAL: find cells with high probability tracking transitions 
+
+
+% III. run the correlation for each dataset for the top flightpaths 
+
+
+
+% IV. aggregate the stats
+
+

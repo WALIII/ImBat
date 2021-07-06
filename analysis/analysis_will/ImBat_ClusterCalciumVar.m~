@@ -83,23 +83,23 @@ Mshuff = mean(squeeze(Afake{i}(:,:,:)),3);
             FL(ii) = sum(sqrt(sum(squeeze(A{i}(:,:,ii))-Mtrue(:,:)) .^ 2));
             FL_shuff(ii) = sum(sqrt(sum(squeeze(Afake{i}(:,:,ii))-Mshuff(:,:)).^ 2));
    end
-   for ii = 1:size(A{clust2use},3) % change this to 2, o3 for the histogram 
+   for ii = 1:size(A{2},3)
             % Euclidian distance
-               FL2(ii) = sum(sqrt(sum(squeeze(A{clust2use}(:,:,ii))-Mtrue(:,:)) .^ 2));
+               FL2(ii) = sum(sqrt(sum(squeeze(A{2}(:,:,ii))-Mtrue(:,:)) .^ 2));
    end
-%      for ii = 1:size(A{1},3)
-%             % Euclidian distance
-%                FL3(ii) = sum(sqrt(sum(squeeze(A{1}(:,:,ii))-Mtrue(:,:)) .^ 2));
-%      end
+     for ii = 1:size(A{1},3)
+            % Euclidian distance
+               FL3(ii) = sum(sqrt(sum(squeeze(A{1}(:,:,ii))-Mtrue(:,:)) .^ 2));
+     end
 end
 
 figure();
 hold on;
 histogram(FL,20,'Normalization','probability','BinWidth',10000,'FaceColor','b');
 histogram(FL2,20,'Normalization','probability','BinWidth',10000,'FaceColor','g');
-%histogram(FL3,20,'Normalization','probability','BinWidth',10000,'FaceColor','r');
+histogram(FL3,20,'Normalization','probability','BinWidth',10000,'FaceColor','r');
 
-[pval_combined_data_DR,~] = ranksum(FL,FL2)
+[pval_combined_data_DR,~] = ranksum(FL,FL3)
 % All-all corr
 
 
