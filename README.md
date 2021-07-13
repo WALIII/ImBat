@@ -2,9 +2,9 @@
 Repository for code used for acquisition and analysis of data from wireless miniature microscopes in freely flying bats
 
 
-![ScreenShot](images/Wireless_Bat-01.png)
+![ScreenShot](images/Wireless_Bat03.png)
 
-![ScreenShot](images/PlaceCells03.png)
+![ScreenShot](images/PlaceCells-01.png)
 
 
 ### Dependancies:
