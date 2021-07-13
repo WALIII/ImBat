@@ -5,15 +5,15 @@ axis off
 h = gcf;
 h.Color = 'w';
 filename = 'TestGif_new.gif';
-set(gca,'YTickLabel',[]);
-set(gca,'XTickLabel',[]);
+% set(gca,'YTickLabel',[]);
+% set(gca,'XTickLabel',[]);
 axis off
 
 % go from view (1,1:10) first:
 for i = flip(10:2:90)
 view(1,i)
-xlim([-2900 2900])
-ylim([-2900 2900]);
+% xlim([-2900 2900])
+% ylim([-2900 2900]);
 % axis tight
  % Capture the plot as an image 
       frame = getframe(h); 
@@ -31,8 +31,8 @@ end
 
 for i = 1:1:360
 view(i,10)
-xlim([-2900 2900])
-ylim([-2900 2900]);
+% xlim([-2900 2900])
+% ylim([-2900 2900]);
 % axis tight
  % Capture the plot as an image 
       frame = getframe(h); 
@@ -53,8 +53,8 @@ end
 % go from view (1,1:10) first:
 for i = (10:2:90)
 view(1,i)
-xlim([-2900 2900])
-ylim([-2900 2900]);
+% xlim([-2900 2900])
+% ylim([-2900 2900]);
 % axis tight
  % Capture the plot as an image 
       frame = getframe(h); 

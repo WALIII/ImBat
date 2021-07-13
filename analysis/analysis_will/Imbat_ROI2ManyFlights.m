@@ -48,9 +48,12 @@ out_f.D = [];
 out_f.calPeaks = [];
 out_f.calROI_ID = [];
 for iii = 1: size(out,2)
+    try
     out_f.D = cat(2,out_f.D,out{iii}.D);
     out_f.calPeaks = cat(2,out_f.calPeaks,out{iii}.calPeaks);
     out_f.calROI_ID = cat(2,out_f.calROI_ID,out{iii}.calROI_ID);
+    catch
+    end
 end
 
 ROI_idx = cell2mat(out_f.calROI_ID);
@@ -106,8 +109,22 @@ legend('Higher Variance Flights','Lower Varaince flights');
 xlabel('     less <---    [ ROI consistancy ]   ---> more ');
 ylabel('Frequency');
 
+try
 % Stats on the histograms:
 [pval_combined_data,~] = ranksum(G1,G2)
 
-out_data = [];
+out_data.keep_calPeaks = keep_calPeaks;
+out_data.keep_D = keep_D;
+out_data.G1 = G1;
+out_data.G2 = G2;
+
 stats = pval_combined_data;
+catch
+    
+out_data.keep_calPeaks = [];
+out_data.keep_D = [];
+out_data.G1 = [];
+out_data.G2 = [];
+stats = [];
+end
+    

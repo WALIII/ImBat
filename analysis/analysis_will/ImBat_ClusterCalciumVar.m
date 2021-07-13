@@ -1,4 +1,4 @@
-function [c, c_sort]= ImBat_ClusterCalciumVar(FlightAlignedROI,roi2plot);
+function [pval_combined_data_DR,c, c_sort]= ImBat_ClusterCalciumVar(FlightAlignedROI,roi2plot);
 
 CutCells = FlightAlignedROI.C_raw;
 CutFlights = FlightAlignedROI.ClustFlight;
@@ -9,13 +9,17 @@ cell2plot(:,ind2Remove) = [];
 CutFlights(:,:,ind2Remove) = [];
 ROI_ON  = 150;
 bound2plot = 1:350;
+clust2use = 3;
+pval_combined_data_DR = 1;
+
+ROI2Compare2 = 1;
 try
-l = linkage(cell2plot(100:300,:)', 'ward');
+l = linkage(cell2plot(150:250,:)','ward');
 catch
     disp('NO DATA');
     return
 end
-c=cluster(l,'maxclust',3);
+c=cluster(l,'maxclust',clust2use);
 [aa,bb]=sort(c);
 bound2use = diff(aa);
 line2plot = find(bound2use==1);
@@ -36,7 +40,7 @@ line([1 max(bound2plot)],[line2plot(i) line2plot(i)],'color','r','LineWidth',3)
 end
 axis tight
 figure(); 
-for i = 1:3
+for i = 1:clust2use
 subplot(2,3,i);
 ind2use = find(c==i);
 imagesc(cell2plot(bound2plot,ind2use)');
@@ -56,13 +60,12 @@ colormap(parula.^2);
 figure();
 % subplot(2,3,4:6);
 hold on;
-col = {'r','g','b'};
-for i = 1:3
+col = {[1, 0, 0, 0.2],[0, 1, 0, 0.2],[0, 0, 1, 0.2],'c','m','k'};
+for i = 1:clust2use
 ind2use = find(c==i);
 fakeInd = randperm((size(CutFlights,3)));
 %fakeInd = fakeInd(1:size(ind2use,1)*2);
-plot3(squeeze(CutFlights(:,1,ind2use)),squeeze(CutFlights(:,2,ind2use)),squeeze(CutFlights(:,3,ind2use)),'color',col{i});
-
+plot3(squeeze(CutFlights(:,1,ind2use)),squeeze(CutFlights(:,2,ind2use)),squeeze(CutFlights(:,3,ind2use)),'color',col{i},'LineWidth',2);
 A{i}(:,:,:) = squeeze(CutFlights(1:550,:,ind2use));
 Afake{i}(:,:,:) = squeeze(CutFlights(1:550,:,fakeInd));
 
@@ -72,20 +75,35 @@ end
 Afake2{i}(:,:,:) = squeeze(CutFlights(1:550,:,fakeInd));
 
 % get Euclidian distance between each group and its mean,
-for i =3;
-Mtrue = mean(squeeze(A{i}(:,:,:)),3);
+for i =ROI2Compare2;
+Mtrue = median(squeeze(A{i}(:,:,:)),3);
 Mshuff = mean(squeeze(Afake{i}(:,:,:)),3);
    for ii = 1:size(A{i},3)
             % Euclidian distance
             FL(ii) = sum(sqrt(sum(squeeze(A{i}(:,:,ii))-Mtrue(:,:)) .^ 2));
             FL_shuff(ii) = sum(sqrt(sum(squeeze(Afake{i}(:,:,ii))-Mshuff(:,:)).^ 2));
    end
+   for ii = 1:size(A{clust2use},3) % change this to 2, o3 for the histogram 
+            % Euclidian distance
+               FL2(ii) = sum(sqrt(sum(squeeze(A{clust2use}(:,:,ii))-Mtrue(:,:)) .^ 2));
+   end
+%      for ii = 1:size(A{1},3)
+%             % Euclidian distance
+%                FL3(ii) = sum(sqrt(sum(squeeze(A{1}(:,:,ii))-Mtrue(:,:)) .^ 2));
+%      end
 end
 
 figure();
 hold on;
-histogram(FL,20,'Normalization','probability','BinWidth',10000);
-histogram(FL_shuff,20,'Normalization','probability','BinWidth',10000);
+histogram(FL,20,'Normalization','probability','BinWidth',10000,'FaceColor','b');
+histogram(FL2,20,'Normalization','probability','BinWidth',10000,'FaceColor','g');
+%histogram(FL3,20,'Normalization','probability','BinWidth',10000,'FaceColor','r');
+
+[pval_combined_data_DR,~] = ranksum(FL,FL2)
+% All-all corr
+
+
+
 % figure(); 
 % hold on;
 % D  = sqrt(sum((squeeze(A(:,1,:))' - squeeze(A(:,3,:))') .^ 2));

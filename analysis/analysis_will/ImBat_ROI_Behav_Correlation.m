@@ -3,8 +3,8 @@ function out2 = ImBat_ROI_Behav_Correlation(FlightAlignedROI_combined)
 % find if there is a correlation to the ROI and behavioral variance
 close all
 counter = 1;
-min_flight_number = 10; % min number of flights needed
-min_prom = 1;
+min_flight_number = 30; % min number of flights needed
+min_prom = 0.25;
 disp(min_prom);
 
 % NOTE: there may be more than one peak per ROI!
@@ -32,18 +32,18 @@ for ii = 1:size(FlightAlignedROI_combined{1}.C,1) % first 10 cells:
     
     
     % get peaks
-    [Bpks,Blocs] = findpeaks(x,'MinPeakProminence',min_prom,'MinPeakDistance',1);
+    [Bpks,Blocs] = findpeaks(x,'MinPeakProminence',min_prom,'MinPeakDistance',120);
      clear x AllColZ
     % only use peaks in the flight pad ( exclude reward...
     % Blocs(Blocs<250) = [];
     % Blocs(Blocs>1200) = [];
     flightInterval = mean(FlightAlignedROI_combined{1}.FlightLength);
     stTime = 550;
-    stpTime = stTime+flightInterval-60;
+    stpTime = stTime+flightInterval;
     Blocs(Blocs<stTime) = [];
     Blocs(Blocs>stpTime) = [];
     % Blocs(Blocs>1050) = [];
-    
+    numPeaks(ii) = size(Blocs,1);
     
     % figure();
     % hold on;
@@ -55,7 +55,7 @@ for ii = 1:size(FlightAlignedROI_combined{1}.C,1) % first 10 cells:
     if isempty(Blocs)
     else
         for iii = 1: size(Blocs,1);
-            calPeaks = mean(out.data2.AllCol(Blocs(iii)-20:Blocs(iii)+20,:));
+            calPeaks = (mean(out.data2.AllCol(Blocs(iii)-20:Blocs(iii)+20,:)));
             flPeaksX = squeeze(out.data2.AllFlight(Blocs(iii),1,:));
             flPeaksY = squeeze(out.data2.AllFlight(Blocs(iii),2,:));
             flPeaksZ = squeeze(out.data2.AllFlight(Blocs(iii),3,:));
@@ -72,10 +72,14 @@ for ii = 1:size(FlightAlignedROI_combined{1}.C,1) % first 10 cells:
             % figure();
             % plot(a1,calPeaks,'*r')
             
+            % try to center on the field center...
+            idx2use = find(calPeaks>prctile(calPeaks,90));
+            %idx2use = h2;
+
             % get  position to mean point
-            meanPoint(1) = mean(flPeaksX(h2));
-            meanPoint(2) = mean(flPeaksY(h2));
-            meanPoint(3) = mean(flPeaksZ(h2));
+            meanPoint(1) = median(flPeaksX(idx2use));
+            meanPoint(2) = median(flPeaksY(idx2use));
+            meanPoint(3) = median(flPeaksZ(idx2use));
             
             for i = 1: size(flPeaksZ,1)
                 currPoint(1) = flPeaksX(i);
@@ -96,7 +100,7 @@ for ii = 1:size(FlightAlignedROI_combined{1}.C,1) % first 10 cells:
     end
     
 end
-
+out2.numPeaks = numPeaks;
 
 %% Plotting: ( will also work outside of function)
 try
@@ -125,17 +129,29 @@ for i = 1: size(out2.D,2)
     varC(counter) = std(C2use);
     varCr(counter) = std(C2use_raw);
     
-    meanF(counter) = mean(F2use);
+    meanF(counter) = mean(F2use);%mean(zscore(F2use)-min(zscore(F2use)));
     meanC(counter) = mean(C2use);
     meanCr(counter) = mean(C2use_raw);
     FanoFactor(counter) = varF(counter)/meanF(counter);
 
     Loca(counter) = out2.calPeakLoc{i};
+    %%% sig value:
+    X1 = F2use';
+    y = (C2use');
+    % y(X1>300) = [];
+    % X1(X1>300) = [];
+    x1 = ones(size(X1,1),1);
+    X = [x1 X1];    % Includes column of ones
+    
+    [~,~,~,~,stats] = regress(y,X);
+    stats2keep(counter) = stats(3);
+
+
     counter = counter+1;
 end
 end
 Loca = mat2gray(Loca);
-meanC = mat2gray(meanC);
+%meanC = mat2gray(meanC);
 % figure()
 % plot(meanF,varC,'*');
 % %
@@ -208,3 +224,12 @@ catch
    out2 = [] 
 end
 
+try
+out2.meanF = meanF;
+out2.meanC = meanC;
+out2.stats2keep = stats2keep;
+catch
+    out2.meanF = [];
+out2.meanC = [];
+out2.stats2keep = [];
+end

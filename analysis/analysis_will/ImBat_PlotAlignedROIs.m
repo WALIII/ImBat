@@ -84,7 +84,12 @@ for i = 1:length(cells2use)
         mn = nanmean(adata);
         h = fill([1:L L:-1:1],[mn-se fliplr(mn+se)],col(ii,:)); alpha(0.5);
         plot(mn,'Color',col(ii,:));
+        try
         atemp = cat(1,atemp,adata);
+        catch
+                    
+
+        end
     end
     hold off
     subplot(10,1,3:10);
