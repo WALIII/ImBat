@@ -101,7 +101,7 @@ for iiii = 1:2;
                         try
                             p = plot(ROI_coords{ii,1},ROI_coords{ii,2},'LineWidth',5,'color', col(iii,:));
                             if iiii ==1
-                                p.Color(4) = 0.1;
+                                p.Color(4) = 0;
                             else
                                 p.Color(4) = 1;
                             end
