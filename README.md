@@ -4,7 +4,7 @@ Repository for code used for acquisition and analysis of data from wireless mini
 
 ![ScreenShot](images/Wireless_Bat-01.png)
 
-![ScreenShot](images/PlaceCells-01.png)
+![ScreenShot](images/PlaceCells03.png)
 
 
 ### Dependancies:
