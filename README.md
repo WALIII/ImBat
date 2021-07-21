@@ -7,7 +7,7 @@ Repository for code used for acquisition and analysis of data from wireless mini
 ![ScreenShot](images/PlaceCells-01.png)
 
 <p align="center" width="100%">
-    <img width="50%" src="https://github.com/gardner-lab/FinchScope/blob/master/FinchScope/SupplimentalVideo01.gif">
+    <img width="200%" src="https://github.com/gardner-lab/FinchScope/blob/master/FinchScope/SupplimentalVideo01.gif">
 </p>
 
 ### Dependencies:
