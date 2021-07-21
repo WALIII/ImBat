@@ -26,6 +26,9 @@ Rewards = TS(:,1);
 TS = TS(:,2);
 
 % TO DO: check which channel the audio is. Currenlty hard coded at ch2:
+% Downample the audio data (which is the TTL input to the framegrabber in
+% the imaging setup) to the rate of Cortex, 120Hz. The sample rate of the
+% audio data is 48000Hz.
 if size(audio.data,2)>1
 audio_data = audio.data(:,2);
 else

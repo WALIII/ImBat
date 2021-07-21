@@ -1,9 +1,6 @@
+function [flightPaths] = ImBat_flightsAngelo_noaudio_MCS(AllFlights,AllFlightsTime,rewind_value,outliers,varargin)
 
-function [flightPaths] = ImBat_flightsAngelo(AllFlights,AllFlightsTime,varargin)
-
-% 
-
-% Default paramaters:
+% Used in the Sequences workflow
 
 % Clustering params
 ds_clus = 6;                                                                %number of 3D-points/flight for clustering 
@@ -34,7 +31,6 @@ for i=1:2:nparams
     end
 end
 
-
 % General Params
 CNMF_Fs = fs;                                                              % Acquisition frequency (Hz) Ca-imaging (after CNMF-e)
 t = AllFlightsTime;
@@ -63,7 +59,8 @@ tracking_Fs = VideoFrameRate;
 v = diff(x_spl,1,2)./[diff(new_t);diff(new_t);diff(new_t)]; v=[zeros(3,1) v];
 v_abs = vecnorm(v,2,1);
 
-nonflying = find(v_abs < 1);        toofast = find(v_abs > 30);
+nonflying = find(v_abs < 1);        
+toofast = find(v_abs > 30);
 x_flying = x_spl;                   x_flying(:,[nonflying toofast]) = nan;
 batspeed = v_abs;                   batspeed([nonflying toofast]) = nan;
 bflying=~isnan(batspeed)';           %vector of 1s when the bat is flying
@@ -83,10 +80,13 @@ fUT(length(R)) = length(allsums);
 F(length(R)) = F(length(F));
 end
 flight_starts = round(rLT+tracking_Fs/2);
+flight_starts_new = round(rLT+tracking_Fs/2);%-rewind_value;
 flight_ends = round(fLT+tracking_Fs/2); %... +Fs is a sistematic correction, useful
 num_flights = size(R,2);
 ref = ones(size(flight_starts));
 avg_flight_time = mean((flight_ends-flight_starts)./tracking_Fs);
+
+% Plot the velocity at the normal flight starts and at the rewound flight starts
 
 
 %% Plot results
@@ -122,19 +122,53 @@ ylabel('v (m/s)');
 ylabel('Rewards');
 linkaxes([ax1,ax2,ax3],'x');    xlabel('Samples');
 
+% MCS Plot session timeline
+[new_t_s,new_t_s_idx] = sort(new_t);
+figure(); hold on; plot(new_t(new_t_s_idx),v_abs,'.'); 
+fs_new_t = new_t(new_t_s_idx);
+stem(fs_new_t(flight_starts),ref); 
+disp(fs_new_t(flight_starts(1:5)));
 
+% MCS Plot Zoomed in outlier velocity traces
+flight_starts_new = flight_starts;
+for out_i=1:size(outliers,2)
+    i=outliers(out_i);
+   
+    %figure(); hold on; title(strcat("Outlier ",num2str(out_i))); 
+    st_temp = fs_new_t(flight_starts(i));
+    %plot((fs_new_t(flight_starts(i)-rewind_value*2:flight_starts(i+1))),v_abs(flight_starts(i)-rewind_value*2:flight_starts(i+1)),'.'); 
+    %stem(fs_new_t(flight_starts(i)),1);
+    %stem(fs_new_t(flight_starts(i)-rewind_value),1);
+    new_outlier_flight_start = fs_new_t(flight_starts(i)-rewind_value);
+    for j=1:max(flight_starts)
+        if fs_new_t(j) == new_outlier_flight_start
+            new_temp_flight_start = j;
+            flight_starts_new(outliers(out_i)) = new_temp_flight_start;
+        end
+    end
+    if i == size(flight_starts,2)
+        continue
+    else
+        figure(); hold on; title(strcat("New Flight Start ",num2str(out_i))); 
+        st_temp = fs_new_t(flight_starts(i));
+        plot((fs_new_t(flight_starts(i)-rewind_value*2:flight_starts(i+1))),v_abs(flight_starts(i)-rewind_value*2:flight_starts(i+1)),'.'); 
+        stem(fs_new_t(flight_starts_new(i)),1);
+    end
+end
+
+%flight_starts = flight_starts_new;
 % Plot flights in color time order
 plotFlightPathsStartStop = figure();
 if size(R,2) > 0
     CM = jet(size(R,2));
     for nf = 1 : size(R,2)
         hold on
-        plot3(x_spl(1,flight_starts(nf):flight_ends(nf)),x_spl(2,flight_starts(nf):flight_ends(nf)),x_spl(3,flight_starts(nf):flight_ends(nf)),'LineWidth',1,'Color',CM(nf,:))
+        plot3(x_spl(1,flight_starts_new(nf):flight_ends(nf)),x_spl(2,flight_starts_new(nf):flight_ends(nf)),x_spl(3,flight_starts_new(nf):flight_ends(nf)),'LineWidth',1,'Color',CM(nf,:))
         hold on
         
-        fstartxyz(nf,1) = x_spl(1,flight_starts(nf)); %round(nanmean(x_spl(1,flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
-        fstartxyz(nf,2) = x_spl(2,flight_starts(nf)); %round(nanmean(x_spl(2,flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
-        fstartxyz(nf,3) = x_spl(3,flight_starts(nf)); %round(nanmean(x_spl(3,flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
+        fstartxyz(nf,1) = x_spl(1,flight_starts_new(nf)); %round(nanmean(x_spl(1,flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
+        fstartxyz(nf,2) = x_spl(2,flight_starts_new(nf)); %round(nanmean(x_spl(2,flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
+        fstartxyz(nf,3) = x_spl(3,flight_starts_new(nf)); %round(nanmean(x_spl(3,flight_starts(nf):flight_starts(nf)+trackData.VideoFrameRate/2)));
         
         fendxyz(nf,1) = x_spl(1,flight_ends(nf)); %round(nanmean(x_spl(1,flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
         fendxyz(nf,2) = x_spl(2,flight_ends(nf)); %round(nanmean(x_spl(2,flight_ends(nf):flight_ends(nf)+trackData.VideoFrameRate/2)));
@@ -165,23 +199,29 @@ hold off
 
 %% Clustering flights
 %Cut out flights, downsample to ds_clus positions per flight
-all_flights = NaN(3,max(flight_ends-flight_starts),num_flights);    %3D matrix with all flights
+all_flights = NaN(3,max(flight_ends-flight_starts_new),num_flights);    %3D matrix with all flights
 all_flights_ds = NaN(3,ds_clus,num_flights);                        %3D matrix with all flights(downsampled)
 
 for nf = 1 : size(all_flights,3)
-    trajectory = x_spl(:,flight_starts(nf):flight_ends(nf));
-    velocity = v_abs(:,flight_starts(nf):flight_ends(nf));
-    all_flights(:,1:(flight_ends(nf)-flight_starts(nf))+1,nf) = trajectory;
-    all_flights_vel(1,1:(flight_ends(nf)-flight_starts(nf)+1),nf) = velocity;
+    trajectory = x_spl(:,flight_starts_new(nf):flight_ends(nf));
+    velocity = v_abs(:,flight_starts_new(nf):flight_ends(nf));
+    all_flights(:,1:(flight_ends(nf)-flight_starts_new(nf))+1,nf) = trajectory;
+    all_flights_vel(1,1:(flight_ends(nf)-flight_starts_new(nf)+1),nf) = velocity;
     all_flights_ds(:,:,nf) = interp1(linspace(1,3,size(trajectory,2)),trajectory',linspace(1,3,ds_clus),'spline')';
-    
+    trajectory_og = x_spl(:,flight_starts(nf):flight_ends(nf));
+    velocity_og = v_abs(:,flight_starts(nf):flight_ends(nf));
+    all_flights_og(:,1:(flight_ends(nf)-flight_starts(nf))+1,nf) = trajectory_og;
+    all_flights_vel_og(1,1:(flight_ends(nf)-flight_starts(nf)+1),nf) = velocity_og;
+    all_flights_ds_og(:,:,nf) = interp1(linspace(1,3,size(trajectory_og,2)),trajectory_og',linspace(1,3,ds_clus),'spline')';
    
-    %     %Uncomment if you want to see how the downsampled flights look like
-    %     plot3(all_flights(1,:,nf),all_flights(2,:,nf),all_flights(3,:,nf),'Color','b');
-    %     hold on;
-    %     plot3(all_flights_ds(1,:,nf),all_flights_ds(2,:,nf),all_flights_ds(3,:,nf),'Color','r');
-    %     hold off;
-    %     w = waitforbuttonpress;
+    %Uncomment if you want to see how the downsampled flights look like
+%     figure(); hold on;
+%     plot3(all_flights(1,:,nf),all_flights(2,:,nf),all_flights(3,:,nf),'Color','b');
+%     plot3(all_flights_ds(1,:,nf),all_flights_ds(2,:,nf),all_flights_ds(3,:,nf),'Color','r');
+%     
+%     plot3(all_flights_og(1,:,nf),all_flights_og(2,:,nf),all_flights_og(3,:,nf),'Color','g');
+%     plot3(all_flights_ds_og(1,:,nf),all_flights_ds_og(2,:,nf),all_flights_ds_og(3,:,nf),'Color','c');
+    
 end
 
 % Define X matrix of features for clustering (downsampled coordinates, stacked together)
@@ -207,8 +247,8 @@ else
 end
 
 % Create structure with flight start stop frames, id of the trajectory
-clear flight;
-flight.strt_frame = ceil(flight_starts)';
+clear flight 
+flight.strt_frame = ceil(flight_starts_new)';
 flight.stop_frame = ceil(flight_ends)';
 flight.pos = all_flights;
 flight.vel = all_flights_vel;
@@ -241,7 +281,6 @@ flightPaths.vel = flight_sorted.vel;
 flightPaths.Fs = flight_sorted.Fs;
 flightPaths.N = flight_sorted.N;
 flightPaths.day = day_index(flightPaths.flight_starts_idx);% this is the day index...
-
 
 for jj=1:n_surv_clusters;
     flightPaths.id(flight_sorted.id == id_surv_clusters(jj)) = jj;
@@ -280,7 +319,6 @@ flightPaths.tracjectoriesRaw = x_mean;
 flightPaths.batSpeed = v_abs';
 flightPaths.flight_starts_xyz = flightPaths.pos(:,1,:); %starting position of each flight
 flightPaths.flight_ends_xyz = zeros(length(flightPaths.pos(1,1,:)),3); %make matrix for landing position for each flight 
-
 for i = 1:length(flightPaths.pos(1,1,:))
     try
         flightPaths.flight_ends_xyz(i,:) = flightPaths.pos(:,find(isnan(flightPaths.pos(1,:,i)),1)-1,i); %find last xyz position
@@ -347,6 +385,6 @@ for jj=1:n_surv_clusters;
 end
 
 flightPaths.flightPathsClusterEach = plotFlightPathsClusterEach;
-
 %save([analysis_folder '\' batName '_' dateSesh '_' sessionType '_flightPaths.mat'],'flightPaths')
+
 end

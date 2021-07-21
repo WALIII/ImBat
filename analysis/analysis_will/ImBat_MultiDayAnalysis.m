@@ -17,12 +17,12 @@ ST3_3 = 1; %
 ST3_5 = 1;
 
 % local Directory:
-LD =  '/Users/ARGO/Desktop/Processed'
+LD =  '/Users/madeeleinesnyder/Desktop/Processed_Ge_200305/'
 %LD = '/Users/ARGO/Documents/DATA/Bat_Data_ZuZu';
 mkdir(LD);
 
 % Cell array containing strings of the days you want to look at ( MANUAL)
-% days = {'190528','190529','190530'};
+days = {'200305'};%{'190528','190529','190530'};
 % Get all folders in directory
 files = dir(pwd);
 files(ismember( {files.name}, {'.', '..','Processed'})) = [];  %remove . and .. and Processed

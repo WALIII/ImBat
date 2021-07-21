@@ -1,4 +1,8 @@
-function [flightPaths] = ImBat_GroupFlights(ROI_Data,varargin);
+function [flightPaths_r] = ImBat_MCS_Groupflights_Rewind(ROI_Data,rewind_value,outliers,varargin)
+    
+% Basically a copy of imbat_groupflights but with the capacity to reward
+% certain flights back a certain amount... MCS updated 6/21/21
+
 % Group flights across days, now w/ Angelo's function
 % updated 10/20/2020
 
@@ -9,28 +13,16 @@ n_splines = 20;
 dist_met = 1.2; %1.2 % lower is more selective ( more clusters)
 
 pause(2);
-do_mtf =1;
-% Manual inputs
-% vin=varargin;
-% for i=1:length(vin)
-%     if isequal(vin{i},'mtf') % manually inputing a sort order
-%         MTF=vin{i+1};
-%         do_mtf = 1;
-%     end
-%
-% end
+do_mtf =0;
+
 
 % User inputs overrides
 nparams=length(varargin);
 for i=1:2:nparams
     switch lower(varargin{i})
         case 'mtf'
-            if mtf == 0
-                do_mtf=0;
-            else
-                MTF=varargin{i+1};
-                do_mtf = 1;
-            end
+            MTF=varargin{i+1};
+            do_mtf = 1;
         case 'dist'
             dist_met=varargin{i+1};
             disp(['WARNING: distance metric set to: ', num2str(dist_met), ' default is 1.2']);
@@ -73,12 +65,12 @@ for i = 1: size(ROI_Data,2);
     E = ROI_Data{1, i}.Alignment.out.Location_time(ROI_Data{1, i}.Alignment.out.RewardTime); % reward
     % trim the end, otherwise the flights will be longer or shorter than the
     % calcium..
-    if max(D)>max(B); disp('adding extra timepoint to flight data');
+    if max(D)>max(B); %disp('adding extra timepoint to flight data');
         A = cat(1,A,A(end,:));
         R = cat(1,R,R(end,:));
         B = cat(1,B,max(D));
     else
-        disp(' Calcium is shorter than flights, trimming data'); % cut flight data down
+        %disp(' Calcium is shorter than flights, trimming data'); % cut flight data down
         % find closest
         [minValue_1,closestIndex_1] = min(abs(D(end)-B));
         % cut off trailing data
@@ -122,8 +114,7 @@ colorbar;
 
 %[out] =  ImBat_SegTrajectories(AllFlights,AllFlightsTime,'nclusters',8,'day_index',DayIndex);
 Fs = ROI_Data{1, 1}.ROIs.results.metadata.cnmfe.Fs;
-%[flightPaths] = ImBat_flightsAngelo_MCS(AllFlights,AllFlightsTime,'fs',Fs,'n_splines',n_splines,'dist',dist_met,'day_index',DayIndex);
-[flightPaths] = ImBat_flightsAngelo(AllFlights,AllFlightsTime,'fs',Fs,'n_splines',n_splines,'dist',dist_met,'day_index',DayIndex);
+[flightPaths] = ImBat_flightsAngelo_noaudio_MCS(AllFlights,AllFlightsTime,rewind_value,outliers,'fs',Fs,'n_splines',n_splines,'dist',dist_met,'day_index',DayIndex);
 
 flightPaths.AllFlights = AllFlights;
 flightPaths.AllFlightsTime = AllFlightsTime;
@@ -177,31 +168,6 @@ title('Distribution of most common sterotyped flight paths');
 xlabel('days')
 ylabel('Number of flights');
 
-for K = 1 : length(b); b(K).FaceColor = colors(K,:).'; end
+flightPaths_r = flightPaths;
 
-% 
-% % Resort based on time
-% [aa ab] = sort(flightPaths.flight_starts_idx);
-% 
-% flightPaths.day = flightPaths.day(ab);
-% flightPaths.id = flightPaths.id(ab);
-% flightPaths.flight_starts_idx = flightPaths.flight_starts_idx(ab);
-% flightPaths.flight_ends_idx = flightPaths.flight_ends_idx(ab);
-% flightPaths.pos= flightPaths.pos(:,:,ab); 
-% flightPaths.vel = flightPaths.vel(:,:,ab);
-% flightPaths.day = flightPaths.day(ab);
-% 
-% flightPaths.length = flightPaths.length(ab);
-% flightPaths.dur = flightPaths.dur(ab);
-% %flightPaths.ifd = flightPaths.ifd(ab);
-%                      
-% for i = 1: size(flightPaths.clusterIndex,2)
-%     XX = flightPaths.clusterIndex{i};
-%     flightPaths.clusterIndex2{i} = ab(XX)';
-%     clear XX;
-% end
-% flightPaths.clusterIndex = flightPaths.clusterIndex2;
-%               
-% flightPaths.flight_starts_xyz = flightPaths.flight_starts_xyz(:,:,ab); 
-% flightPaths.flight_ends_xyz = flightPaths.flight_ends_xyz(ab,3); 
-
+end

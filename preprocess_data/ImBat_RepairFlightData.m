@@ -90,16 +90,16 @@ end
 for i = 1:3
 Flights_fixed(:,i) = smooth(Flights_fixed(:,i),50);
 end
-figure();
-hold on;
-plot(Flights_Original(:,1),'k--');
-
-plot(Flights_new(:,1),'b--');
-plot(Flights_fixed(:,1),'r');
-
- legend('original','smoothed','repaired');
- title(['day: ',num2str(day2use)]);
- hold off
+% figure();
+% hold on;
+% plot(Flights_Original(:,1),'k--');
+% 
+% plot(Flights_new(:,1),'b--');
+% plot(Flights_fixed(:,1),'r');
+% 
+% legend('original','smoothed','repaired');
+% title(['day: ',num2str(day2use)]);
+% hold off
 ROI_Data{day2use}.Alignment.out.Flights_Repaired = [];
  ROI_Data{day2use}.Alignment.out.Flights_Repaired(:,:) = Flights_fixed;
  
