@@ -1,5 +1,5 @@
 # ImBat: Calcium Imaging in Bats
-Repository for code used for acquisition and analysis of data from wireless miniature microscopes in freely flying bats.
+Repository for code used for acquisition and analysis of data from wireless miniature microscopes in freely flying bats in the [Yartsev Lab](https://www.michaelyartsev.com) at UC Berkeley.
 
 ![ScreenShot](images/Wireless_Bat03.png)
 
@@ -14,14 +14,12 @@ Examples of 3D Place cells:
 
 
 
-
-
 ### Dependencies:
     CNMF-E: https://github.com/zhoupc/CNMF_E
     Noremcorre: https://github.com/flatironinstitute/NoRMCorre
     FinchScope (Liberti Branch) : https://github.com/gardner-lab/FinchScope/tree/Liberti
 
 ### Getting Started:
-A detailed analysis walk-thorugh can be found [here](https://github.com/WALIII/ImBat/wiki),  
+A detailed analysis walk-through can be found [here](https://github.com/WALIII/ImBat/wiki).
 
-You can find more information about the wireless miniscope on [the FreedScope page](https://github.com/WALIII/FreedomScope),
+Learn more about wireless miniature microscopy and other neuro-photonics tools on [the FreedomScope page](https://github.com/WALIII/FreedomScope).
