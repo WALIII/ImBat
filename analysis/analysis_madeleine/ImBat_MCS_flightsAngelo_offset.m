@@ -1,5 +1,5 @@
 
-function [flightPaths] = ImBat_flightsAngelo_MCS(AllFlights,AllFlightsTime,MicrophoneVect,MicrophoneTime,EcholocationVect,rewind_value,outliers,cluster_to_plot,audioConCat,ROI_Data,varargin)
+function [flightPaths] = ImBat_MCS_flightsAngelo_offset(AllFlights,AllFlightsTime,MicrophoneVect,MicrophoneTime,EcholocationVect,rewind_value,outliers,cluster_to_plot,audioConCat,ROI_Data,varargin)
 
 % 
 
@@ -204,18 +204,40 @@ xlabel('m'); ylabel('m');
 
 hold off
 
+% Plot an example flight with the microphone trace underneath it
+% Can't define MicrophoneVect or EcholocationVect with the indexes of
+% flight_starts (different vector lenghts)
+figure();
+subplot(2,1,1); hold on;
+plot3(x_spl(1,flight_starts_new(1):flight_ends(1)),x_spl(2,flight_starts_new(1):flight_ends(1)),x_spl(3,flight_starts_new(1):flight_ends(1)),'LineWidth',1,'Color',CM(1,:))
+subplot(2,1,2);  hold on;
+plot(MicrophoneVect(flight_starts_new(1):flight_ends(1)));
+plot(EcholocationVect(flight_starts_new(1):flight_ends(1)),'*r');
+
+% Plot each flight the with echolocation pips on the trace
+% One example:
+figure();
+hold on;
+plot3(x_spl(1,flight_starts_new(1):flight_ends(1)),x_spl(2,flight_starts_new(1):flight_ends(1)),x_spl(3,flight_starts_new(1):flight_ends(1)),'LineWidth',1,'Color',CM(1,:))
+echo_idxs = find(EcholocationVect==0.01);
+echo_1 = echo_idxs(echo_idxs>flight_starts_new(1));
+echo_2 = echo_1(echo_1<flight_ends(1));
+scatter3(x_spl(1,echo_2),x_spl(2,echo_2),x_spl(3,echo_2),'*r');
+scatter3(x_spl(1,flight_starts_new(1)),x_spl(2,flight_starts_new(1)),x_spl(3,flight_starts_new(1)),'ob');
+
+
 %% Clustering flights
 %Cut out flights, downsample to ds_clus positions per flight
 all_flights = NaN(3,max(flight_ends-flight_starts_new),num_flights);    %3D matrix with all flights
 all_flights_ds = NaN(3,ds_clus,num_flights);                        %3D matrix with all flights(downsampled)
-%all_echolocations =  NaN(1,max(flight_ends-flight_starts_new),num_flights);
-%all_mic_data = NaN(1,max(flight_ends-flight_starts_new),num_flights);
+all_echolocations =  NaN(1,max(flight_ends-flight_starts_new),num_flights);
+all_mic_data = NaN(1,max(flight_ends-flight_starts_new),num_flights);
 
 for nf = 1 : size(all_flights,3)
     trajectory = x_spl(:,flight_starts_new(nf):flight_ends(nf));
     velocity = v_abs(:,flight_starts_new(nf):flight_ends(nf));
-%    echolocations = EcholocationVect(flight_starts_new(nf):flight_ends(nf));
-%    mic_data = MicrophoneVect(flight_starts_new(nf):flight_ends(nf));
+    echolocations = EcholocationVect(flight_starts_new(nf):flight_ends(nf));
+    mic_data = MicrophoneVect(flight_starts_new(nf):flight_ends(nf));
     try
         joint_echolocations = JT(:,flight_starts_new(nf):flight_ends(nf));
     catch
@@ -224,8 +246,8 @@ for nf = 1 : size(all_flights,3)
     all_flights(:,1:(flight_ends(nf)-flight_starts_new(nf))+1,nf) = trajectory;
     all_flights_vel(1,1:(flight_ends(nf)-flight_starts_new(nf)+1),nf) = velocity;
     all_flights_ds(:,:,nf) = interp1(linspace(1,3,size(trajectory,2)),trajectory',linspace(1,3,ds_clus),'spline')';
- %   all_echolocations(:,1:(flight_ends(nf)-flight_starts_new(nf))+1,nf) = echolocations;
- %   all_mic_data(:,1:(flight_ends(nf)-flight_starts_new(nf))+1,nf) = mic_data;
+    all_echolocations(:,1:(flight_ends(nf)-flight_starts_new(nf))+1,nf) = echolocations;
+    all_mic_data(:,1:(flight_ends(nf)-flight_starts_new(nf))+1,nf) = mic_data;
     try
         all_joint_echolocations(:,1:(flight_ends(nf)-flight_starts_new(nf))+1,nf) = joint_echolocations;
     catch
@@ -237,7 +259,7 @@ for nf = 1 : size(all_flights,3)
     all_flights_og(:,1:(flight_ends(nf)-flight_starts(nf))+1,nf) = trajectory_og;
     all_flights_vel_og(1,1:(flight_ends(nf)-flight_starts(nf)+1),nf) = velocity_og;
     all_flights_ds_og(:,:,nf) = interp1(linspace(1,3,size(trajectory_og,2)),trajectory_og',linspace(1,3,ds_clus),'spline')';
-    %mic_data_og = MicrophoneVect(flight_starts_new(nf):flight_ends(nf));
+    mic_data_og = MicrophoneVect(flight_starts_new(nf):flight_ends(nf));
     
     %Uncomment if you want to see how the downsampled flights look like
 %     figure(); hold on;
@@ -279,21 +301,21 @@ flight.pos = all_flights;
 flight.vel = all_flights_vel;
 flight.id = idx;
 flight.Fs = tracking_Fs;
-%flight.echo = all_echolocations;
-%flight.mic = all_mic_data;
+flight.echo = all_echolocations;
+flight.mic = all_mic_data;
 try
     flight.JT = all_joint_echolocations;
 catch
     disp("No JT");
 end
 
-% no_echos=0;
-% for i=1:size(flight.echo,3)
-%     if nansum(all_echolocations(1,:,i))*100 == 0
-%         no_echos = no_echos+1;
-%     end
-% end
-% disp(strcat("Considering one microphone, ",num2str(100-(no_echos/size(flight.echo,3)*100)),"% of flights have echolocations"));
+no_echos=0;
+for i=1:size(flight.echo,3)
+    if nansum(all_echolocations(1,:,i))*100 == 0
+        no_echos = no_echos+1;
+    end
+end
+disp(strcat("Considering one microphone, ",num2str(100-(no_echos/size(flight.echo,3)*100)),"% of flights have echolocations"));
 
 try
     no_echos=0;
@@ -328,8 +350,8 @@ flight_sorted.pos = flight.pos(:,:,I);
 flight_sorted.vel = flight.vel(:,:,I);
 flight_sorted.Fs = flight.Fs;
 flight_sorted.N = size(flight_sorted.id,1);
-%flight_sorted.echos = flight.echo(:,:,I);
-%flight_sorted.mic = flight.mic(:,:,I);
+flight_sorted.echos = flight.echo(:,:,I);
+flight_sorted.mic = flight.mic(:,:,I);
 try
     flight_sorted.JT = flight.JT(:,:,I);
 catch
@@ -352,8 +374,8 @@ flightPaths.vel = flight_sorted.vel;
 flightPaths.Fs = flight_sorted.Fs;
 flightPaths.N = flight_sorted.N;
 flightPaths.day = day_index(flightPaths.flight_starts_idx);% this is the day index...
-%flightPaths.echos = flight_sorted.echos;
-%flightPaths.mic = flight_sorted.mic;
+flightPaths.echos = flight_sorted.echos;
+flightPaths.mic = flight_sorted.mic;
 try
     flightPaths.JT = flight_sorted.JT;
 catch
@@ -433,6 +455,7 @@ for jj=1:n_surv_clusters;
         hold on;
     end
     take_off = mean(avg_take_off,2);
+    %textscatter3(take_off(1),take_off(2),take_off(3),"Take-off");
     
     plot3(x_spl(1,:),x_spl(2,:),x_spl(3,:),':','Color',[0.7 0.7 0.7],'MarkerSize',0.001);
     xlim([-3 3]); ylim([-3 3]); zlim([0 2.5]);
@@ -449,6 +472,7 @@ for jj=1:n_surv_clusters;
         hold on;
     end
     take_off = mean(avg_take_off,2);
+    %textscatter3(take_off(1),take_off(2),take_off(3),"Take-off");
     
     plot3(x_spl(1,:),x_spl(2,:),x_spl(3,:),':','Color',[0.7 0.7 0.7],'MarkerSize',0.001);
     xlim([-3 3]); ylim([-3 3]); zlim([0 2.5]);
@@ -462,158 +486,124 @@ end
 
 flightPaths.flightPathsClusterEach = plotFlightPathsClusterEach;
 
-%% Plot the mic and echolocation vectors and put lines where the
-% flights are. 
-flightpath_starts_binary = NaN(size(flightPaths.trajectoriesSpline,2),1);
-flightpath_starts_binary(flightPaths.flight_starts_idx) = .45;
-flightpath_ends_binary = NaN(size(flightPaths.trajectoriesSpline,2),1);
-flightpath_ends_binary(flightPaths.flight_ends_idx) = .4;
-figure(); hold on;
-plot(et,MicrophoneVect);
-plot(t,flightpath_starts_binary,'og');
-plot(t,flightpath_ends_binary,'om');
-plot(et,EcholocationVect(:,1),'*r'); plot(et,EcholocationVect(:,2),'*r'); plot(et,EcholocationVect(:,3),'*r'); plot(et,EcholocationVect(:,4),'*r'); plot(et,EcholocationVect(:,5),'*r');
-
-% Interpolate the EcholocationVec and et vectors to be the size of the
-% flightpath vectors. Then segment the echolocation data.
-% Collapse EcholocationVect into one
-if size(EcholocationVect,2)>1
-    aa = EcholocationVect(:,1); 
-    bb = EcholocationVect(:,2); 
-    cc = EcholocationVect(:,3);
-    dd = EcholocationVect(:,4);
-    gg = EcholocationVect(:,5);
-    aa(isnan(aa)) = bb(isnan(aa)); aa(isnan(aa)) = cc(isnan(aa)); aa(isnan(aa)) = dd(isnan(aa)); aa(isnan(aa)) = gg(isnan(aa));
+% Plot the specified cluster type with the echolocations over laid
+% If there is a JT matrix for this (flight_echoVect_joint) use this!
+cluster_to_plot = 1%cluster_to_plot;
+figure(); title(strcat("Echolocations on Cluster ",num2str(cluster_to_plot)," flights"));
+flight_subset = find(flightPaths.id==cluster_to_plot);
+for i=1:size(flight_subset,1)
+    EF = flightPaths.echos(:,:,flight_subset(i));
+    ef = EF(~isnan(EF));
+    ef_2 = ef(ef~=0);
+    subplot(round(sqrt(size(flight_subset,1)))+1,round(sqrt(size(flight_subset,1))),i);
+    hold on; 
+    if isempty(ef_2)
+        title('No Echolocations for this flight');
+    end
+    %for j=1:size(ef_2,2)
+        fpe = squeeze(flightPaths.echos(:,:,flight_subset(i)));
+        fpe(fpe==0)=NaN;
+        fpe_loc = find(~isnan(fpe));
+%         fidx_1 = flightPaths.flight_starts_idx-ef(j);
+%         fidx_1(fidx_1 < 0) = 1000000;
+%         fidx_2 = find(fidx_1 == min(fidx_1));
+%         fidx_3 = find(flightPaths.flight_starts_idx == flightPaths.flight_starts_idx(fidx_2));
+        plot3(flightPaths.pos(1,:,flight_subset(i)),flightPaths.pos(2,:,flight_subset(i)),flightPaths.pos(3,:,flight_subset(i)));
+        scatter3(flightPaths.pos(1,fpe_loc,flight_subset(i)), flightPaths.pos(2,fpe_loc,flight_subset(i)),flightPaths.pos(3,fpe_loc,flight_subset(i)),'*r');
+    %end
 end
 
-if size(EcholocationVect,2)>1
-    Full_EcholocationVect = squeeze(aa);
-else
-    Full_EcholocationVect = EcholocationVect;
-end
-   
-goal_size = length(t);
-current_size = length(et);
-% In this case we will just add NaN values to the beginning of the vector
-% because we have no echolocation data about that.
-nans_to_add = NaN(goal_size-current_size,1);
-% This adds this many seconds of nans to the beginning
-size(nans_to_add,1)/120;
-et_padded = [nans_to_add;et];
-EcholocationVect_padded = [nans_to_add;Full_EcholocationVect];
-% Now et_padded is the size of goal_size and we can use the flight_starts and flight_ends indexes 
 
-% Replot to make sure NaN values didn't mess it up
-flightpath_starts_binary = NaN(size(flightPaths.trajectoriesSpline,2),1);
-flightpath_starts_binary(flightPaths.flight_starts_idx) = .45;
-flightpath_ends_binary = NaN(size(flightPaths.trajectoriesSpline,2),1);
-flightpath_ends_binary(flightPaths.flight_ends_idx) = .4;
+% Try JT thing
+% cluster_to_plot = cluster_to_plot;
+% figure(); title(strcat("Echolocations from all mics on Cluster ",num2str(cluster_to_plot)," flights"));
+% flight_subset = find(flightPaths.id==cluster_to_plot);
+% for i=1:size(flight_subset,1)
+%     EF = flightPaths.JT(:,:,flight_subset(i));
+%     ef = EF(~isnan(EF));
+%     ef_2 = ef(ef~=0);
+%     subplot(round(sqrt(size(flight_subset,1)))+1,round(sqrt(size(flight_subset,1))),i);
+%     hold on; 
+%     if isempty(ef_2)
+%         title('No Echolocations for this flight');
+%     end
+%     %for j=1:size(ef_2,2)
+%         fpe = squeeze(flightPaths.JT(:,:,flight_subset(i)));
+%         fpe_loc = find(fpe==0.01);
+% %         fidx_1 = flightPaths.flight_starts_idx-ef(j);
+% %         fidx_1(fidx_1 < 0) = 1000000;
+% %         fidx_2 = find(fidx_1 == min(fidx_1));
+% %         fidx_3 = find(flightPaths.flight_starts_idx == flightPaths.flight_starts_idx(fidx_2));
+%         plot3(flightPaths.pos(1,:,flight_subset(i)),flightPaths.pos(2,:,flight_subset(i)),flightPaths.pos(3,:,flight_subset(i)));
+%         scatter3(flightPaths.pos(1,fpe_loc,flight_subset(i)), flightPaths.pos(2,fpe_loc,flight_subset(i)),flightPaths.pos(3,fpe_loc,flight_subset(i)),'*r');
+%     %end
+% end
+
+% Test- plot the mic and echolocation vectors and put lines where the
+% flights are
+
+% %Upsample echolocation vect
+% EV = find(EcholocationVect==0.5);
+% EV_UP = EV*1600;
+% EE = NaN(size(audioConCat,1),1);
+% EE(EV_UP) = 0.5;
+% 
+% y = upsample(ROI_Data{1}.Alignment.metrics.ttl_tv_offset,1600)
+% ttl_offset_zero_point = find(ROI_Data{1}.Alignment.metrics.ttl_tv_offset == 0);
+% 
+% % Offset things?
+% ACC = [audioConCat(ttl_offset_zero_point+1:end);NaN(ttl_offset_zero_point,1)];
+% EEE = [EE(ttl_offset_zero_point+1:end);NaN(ttl_offset_zero_point,1)];
+% for i=2:size(flightPaths.pos,3) 
+%     FSI(i) = (flightPaths.flight_starts_idx(i)-ttl_offset_zero_point)*1600;
+%     FSTI(i) = (flightPaths.flight_ends_idx(i)-ttl_offset_zero_point)*1600;
+% end
+% FSVect = NaN(size(EEE,1),1);
+% FSTIVect = NaN(size(EEE,1),1);
+% FSVect(FSI) = 1;
+% FSTIVect(FSTI) = 1;
+% 
+% figure(); hold on; 
+% plot(ACC(1000000:2000000));%(1:round(size(EE,1)/4)));
+% plot(EEE(1000000:2000000),'*r');%(1:round(size(EE,1)/4)),'*r');
+% for i=2:size(flightPaths.pos,3) 
+%     FSI = (flightPaths.flight_starts_idx(i)-ttl_offset_zero_point)*1600;
+%     FSTI = (flightPaths.flight_ends_idx(i)-ttl_offset_zero_point)*1600;
+%     xline(FSI,'g','LineWidth',3);
+%     xline(FSTI,'m');   
+% end
+
+% Turn flightpaths starts into a binary vector
+% Plots this
+
 figure(); hold on;
-plot(et,MicrophoneVect);
-plot(t,flightpath_starts_binary,'og');
-plot(t,flightpath_ends_binary,'om');
-plot(t,EcholocationVect_padded,'*r');
-plot(et,Full_EcholocationVect,'*b');
+title("All Flight Starts and Stops Aligned with Echolocation Vector");
+for i=2:size(flightPaths.pos,3) 
+    plot(flightPaths.flight_starts_idx(i)-ttl_offset_zero_point));
+%     FSTI = (flightPaths.flight_ends_idx(i)-ttl_offset_zero_point)*1600;
 
-% Do this for audioConCat
-nans_to_add = NaN(length(nans_to_add)*1600,1);
-audioConCat_padded = [nans_to_add;audioConCat];
 
-%% Try to plot one flight 
-flightnumber_to_plot = 2;
+% Do a test; play the sound of that flight, plot that flight and
+% echolocations
+for i=2:30
+flightnumber_to_plot = i;
+fpe = squeeze(flightPaths.echos(:,:,flightnumber_to_plot));
+fpe(fpe==0)=NaN;
+fpe_loc = find(~isnan(fpe));
+
+ee = find(isnan(flightPaths.pos(1,:,flightnumber_to_plot)));
+flight_length = ee(1)-1;
+flight_length_upsampled = flight_length*1600;
+flight_starting_index = 1;
+sound(audioConCat(flightPaths.flight_starts_idx(flightnumber_to_plot)*1600:flightPaths.flight_ends_idx(flightnumber_to_plot)*1600),fs);
 
 figure(); hold on;
 plot3(flightPaths.pos(1,:,flightnumber_to_plot),flightPaths.pos(2,:,flightnumber_to_plot),flightPaths.pos(3,:,flightnumber_to_plot));
-plot3(flightPaths.trajectoriesSpline(1,flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)),flightPaths.trajectoriesSpline(2,flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)),flightPaths.trajectoriesSpline(3,flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)),':');
-fpe = EcholocationVect_padded(flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot));
-fpe(fpe==0)=NaN;
-fpe_idxs = [flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)];
-for i=1:size(fpe,1)
-    if fpe(i)==0.5000
-        plot3(flightPaths.trajectoriesSpline(1,fpe_idxs(i)),flightPaths.trajectoriesSpline(2,fpe_idxs(i)),flightPaths.trajectoriesSpline(3,fpe_idxs(i)),'*g');
-    end
-end     
-title(strcat("Plotting flight #",num2str(flightnumber_to_plot)));
-
-%% Plot a cluster 
-% Plot the specified cluster type with the echolocations over laid
-flightPaths.flight_starts_idx_sorted = sort(flightPaths.flight_starts_idx);
-flightPaths.flight_ends_idx_sorted = sort(flightPaths.flight_ends_idx);
-
-plot_counter=0;
-cluster_to_plot = 1;%cluster_to_plot;
-figure(); hold on; title(strcat("Echolocations on Cluster ",num2str(cluster_to_plot)," flights"));
-flight_subset = find(flightPaths.id==cluster_to_plot);
-for i=1:size(flightPaths.id,1)
-    if flightPaths.id(i)==cluster_to_plot
-        timeline_idx = find(flightPaths.flight_starts_idx_sorted==flightPaths.flight_starts_idx(i));
-        plot_counter = plot_counter+1;
-    	subplot(round(sqrt(size(flight_subset,1)))+1,round(sqrt(size(flight_subset,1))),plot_counter);
-        hold on; 
-        title(num2str(timeline_idx));
-        plot3(flightPaths.pos(1,:,i),flightPaths.pos(2,:,i),flightPaths.pos(3,:,i));
-        plot3(flightPaths.trajectoriesSpline(1,flightPaths.flight_starts_idx(i):flightPaths.flight_ends_idx(i)),flightPaths.trajectoriesSpline(2,flightPaths.flight_starts_idx(i):flightPaths.flight_ends_idx(i)),flightPaths.trajectoriesSpline(3,flightPaths.flight_starts_idx(i):flightPaths.flight_ends_idx(i)),':');
-        fpe = EcholocationVect_padded(flightPaths.flight_starts_idx(i):flightPaths.flight_ends_idx(i));
-        fpe(fpe==0)=NaN;
-        fpe_idxs = [flightPaths.flight_starts_idx(i):flightPaths.flight_ends_idx(i)];
-        for j=1:size(fpe,1)
-            if fpe(j)==0.5000
-                plot3(flightPaths.trajectoriesSpline(1,fpe_idxs(j)),flightPaths.trajectoriesSpline(2,fpe_idxs(j)),flightPaths.trajectoriesSpline(3,fpe_idxs(j)),'*r');
-            end
-        end  
-    end
+scatter3(flightPaths.pos(1,fpe_loc,flightnumber_to_plot), flightPaths.pos(2,fpe_loc,flightnumber_to_plot),flightPaths.pos(3,fpe_loc,flightnumber_to_plot),'*r');
+pause;
+sound(audioConCat(flightPaths.flight_ends_idx(flightnumber_to_plot)*1600:flightPaths.flight_starts_idx(flightnumber_to_plot+1)*1600),fs);
+pause;
 end
 
-flightPaths.EcholocationVect_padded = EcholocationVect_padded;
-
-save('flightPaths.mat','flightPaths');
-
-%%
-% Do a test; play the sound of that flight, plot that flight and
-% echolocations
-% for i=3:30
-%     flightnumber_to_plot = i;
-%     figure(); subplot(2,1,1); hold on;
-%     plot3(flightPaths.pos(1,:,flightnumber_to_plot),flightPaths.pos(2,:,flightnumber_to_plot),flightPaths.pos(3,:,flightnumber_to_plot));
-%     plot3(flightPaths.trajectoriesSpline(1,flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)),flightPaths.trajectoriesSpline(2,flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)),flightPaths.trajectoriesSpline(3,flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)),':');
-%     fpe = EcholocationVect_padded(flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot));
-%     fpe(fpe==0)=NaN;
-%     fpe_idxs = [flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)];
-%     for i=1:size(fpe,1)
-%         if fpe(i)==0.5000
-%             plot3(flightPaths.trajectoriesSpline(1,fpe_idxs(i)),flightPaths.trajectoriesSpline(2,fpe_idxs(i)),flightPaths.trajectoriesSpline(3,fpe_idxs(i)),'*g');
-%         end
-%     end     
-%     subplot(2,1,2);
-%     plot(flightPaths.vel(1,:,flightnumber_to_plot));
-%     title(strcat("Plotting flight #",num2str(flightnumber_to_plot)));
-% 
-%     sound(audioConCat_padded(flightPaths.flight_starts_idx(flightnumber_to_plot)*1600:flightPaths.flight_ends_idx(flightnumber_to_plot)*1600),fs);
-%     pause;
-% end
-% 
-% %% With sorted flight indexes
-% ff=100;
-% for i=1:30
-%     flightnumber_to_plot = i;
-%     figure(); subplot(3,1,1); hold on;
-%     %plot3(flightPaths.pos(1,:,flightnumber_to_plot),flightPaths.pos(2,:,flightnumber_to_plot),flightPaths.pos(3,:,flightnumber_to_plot));
-%     plot3(flightPaths.trajectoriesSpline(1,flightPaths.flight_starts_idx_sorted(flightnumber_to_plot)-ff:flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)+ff),flightPaths.trajectoriesSpline(2,flightPaths.flight_starts_idx_sorted(flightnumber_to_plot)-ff:flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)+ff),flightPaths.trajectoriesSpline(3,flightPaths.flight_starts_idx_sorted(flightnumber_to_plot)-ff:flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)+ff),':');
-%     fpe = EcholocationVect_padded(flightPaths.flight_starts_idx_sorted(flightnumber_to_plot)-ff:flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)+ff);
-%     fpe(fpe==0)=NaN;
-%     fpe_idxs = [flightPaths.flight_starts_idx_sorted(flightnumber_to_plot)-ff:flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)+ff];
-%     for j=1:size(fpe,1)
-%         if fpe(j)==0.5000
-%             plot3(flightPaths.trajectoriesSpline(1,fpe_idxs(j)),flightPaths.trajectoriesSpline(2,fpe_idxs(j)),flightPaths.trajectoriesSpline(3,fpe_idxs(j)),'*g');
-%         end
-%     end     
-%     title(strcat("Plotting flight #",num2str(flightnumber_to_plot)));
-% 
-%     subplot(3,1,2); hold on; 
-%     plot(audioConCat_padded(flightPaths.flight_starts_idx_sorted(flightnumber_to_plot)*1600:flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)*1600));
-%     subplot(3,1,3); hold on;
-%     plot(flightPaths.batSpeed(flightPaths.flight_starts_idx_sorted(flightnumber_to_plot):flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)));
-%     sound(audioConCat_padded(flightPaths.flight_starts_idx_sorted(flightnumber_to_plot)*1600:flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)*1600),fs);
-%     pause;
-% end
+%save([analysis_folder '\' batName '_' dateSesh '_' sessionType '_flightPaths.mat'],'flightPaths')
 end

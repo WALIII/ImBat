@@ -1,14 +1,15 @@
-function [echolocation_idxs] = ImBat_MCS_extract_echolocations(audioConCat)
+function [echolocation_idxs,echolocation_vector_DS] = ImBat_MCS_extract_echolocations(audioConCat,out)
 
 % Break audio into 2minute segments. Analyze each segment. Poop out the
 % vector of peaks. NON-Downsampled.
 
+clear echolocation_idxs
 fs = 192000; ds_factor=10;
 seconds = size(audioConCat,1)/fs;
 two_minutes = ceil(seconds/120);
 echolocation_idxs = [];
 
-for i=1:two_minutes
+for i=1:two_minutes-1
     clear pks locs;
     if i==two_minutes-1
         short_seg = audioConCat(120*(i-1)*fs+1:end);
@@ -37,45 +38,52 @@ for i=1:two_minutes
     % Make binary vector of peaks
     pkvect = NaN(1,length(short_seg));
     pkvect(locs) = 0.01;
-%     figure(); hold on; plot(short_seg);
-%     plot(pkvect,'*r');
-    %plot(conv_mic_data);
+    figure(); hold on; plot(short_seg);
+    plot(pkvect,'*r');
+    plot(conv_mic_data);
 
-    % #-part spectrogram plot
-%     figure(); % make spectrogram..
-%     ax1 = subplot(3,1,1)
-% 
-%     [b,a]=ellip(5,.2,80,[100]/(fs/2),'high'); 
-%     %[b,a]=ellip(5,.2,80,[3515]/(fs/2),'high'); % filter above 3515
-%     [IMAGE,F,T] = fb_pretty_sonogram(filtfilt(b,a,short_seg./abs(max(short_seg))),fs,'low',2.9,'zeropad',0);
-%     colormap(hot)
-%     imagesc(T,F,log(abs(IMAGE)+1e+2));set(gca,'YDir','normal');
-%     ylabel('kHz')
-%     xlabel('time (s)');
-%     title('Spectrogram of manually selected audio subsegment');
-% 
-%     % now plot RMS below
-%     [b,a]=butter(8,2*[40e3 80e3]./fs,'bandpass');
-%     convy=filter(b,a,short_seg);
-%     temp1 = zscore(zftftb_rms(convy',fs))*500;
-%     temp1(temp1<10) = 0; % get rid of filter artifacts..
-%     hold on;
-% 
-%     ax2 = subplot(3,1,2);
-%     plot((30:size(temp1,2))/fs,temp1(30:end),'b','LineWidth',3)
-%     %linkaxes([ax1,ax2],'x'); axis tight
-% 
-%     % plot the OG data
-%     ax3 = subplot(3,1,3); hold on; 
-%     plot((30:size(temp1,2))/fs,short_seg(30:end)); plot((30:size(temp1,2))/fs,pkvect(30:end),'*r');
-%     %plot(pk_vect,'*r'); 
-%     linkaxes([ax1,ax2,ax3],'x'); axis tight
+    %%#-part spectrogram plot
+    figure(); % make spectrogram..
+    ax1 = subplot(3,1,1)
 
-    % Listen to segment:
-    %sound(short_seg*3, fs);
+    [b,a]=ellip(5,.2,80,[100]/(fs/2),'high'); 
+    %[b,a]=ellip(5,.2,80,[3515]/(fs/2),'high'); % filter above 3515
+    [IMAGE,F,T] = fb_pretty_sonogram(filtfilt(b,a,short_seg./abs(max(short_seg))),fs,'low',2.9,'zeropad',0);
+    colormap(hot)
+    imagesc(T,F,log(abs(IMAGE)+1e+2));set(gca,'YDir','normal');
+    ylabel('kHz')
+    xlabel('time (s)');
+    title('Spectrogram of manually selected audio subsegment');
+
+    % now plot RMS below
+    [b,a]=butter(8,2*[40e3 80e3]./fs,'bandpass');
+    convy=filter(b,a,short_seg);
+    temp1 = zscore(zftftb_rms(convy',fs))*500;
+    temp1(temp1<10) = 0; % get rid of filter artifacts..
+    hold on;
+
+    ax2 = subplot(3,1,2);
+    plot((30:size(temp1,2))/fs,temp1(30:end),'b','LineWidth',3)
+    %linkaxes([ax1,ax2],'x'); axis tight
+
+    % plot the OG data
+    ax3 = subplot(3,1,3); hold on; 
+    plot((30:size(temp1,2))/fs,short_seg(30:end)); plot((30:size(temp1,2))/fs,pkvect(30:end),'*r');
+    %plot(pk_vect,'*r'); 
+    linkaxes([ax1,ax2,ax3],'x'); axis tight
+
+    %Listen to segment:
+    sound(short_seg*3, fs);
     
     % Re-align the locations to be for the full vector
     locs = locs + (i-1)*120*fs;
     echolocation_idxs = [echolocation_idxs,locs];
+end
+
+iii = NaN(length(audioConCat),1);
+for i=1:length(echolocation_idxs)
+    iii(echolocation_idxs(i)-800:echolocation_idxs(i)+800) = 0.5;
+end
+echolocation_vector_DS = downsample(iii,1600);
 
 end

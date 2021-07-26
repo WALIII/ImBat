@@ -1,4 +1,4 @@
-function [flightPaths] = ImBat_MCS_GroupFlights(ROI_Data,cluster_to_plot,audioConCat,varargin);
+function [flightPaths] = ImBat_MCS_GroupFlights(ROI_Data,cluster_to_plot,audioConCat,echolocation_vector_DS,varargin);
 % Group flights across days, now w/ Angelo's function
 % updated 10/20/2020
 
@@ -73,7 +73,7 @@ for i = 1: size(ROI_Data,2);
     
     D = ROI_Data{1, i}.Alignment.out.video_times(1:end-1); % align timestamps
     E = ROI_Data{1, i}.Alignment.out.Location_time(ROI_Data{1, i}.Alignment.out.RewardTime); % reward
-    G = ROI_Data{1, i}.Alignment.out.EcholocationVector;
+    G = echolocation_vector_DS;
     
     % trim the end, otherwise the flights will be longer or shorter than the
     % calcium..
@@ -81,9 +81,9 @@ for i = 1: size(ROI_Data,2);
         A = cat(1,A,A(end,:));
         R = cat(1,R,R(end,:));
         B = cat(1,B,max(D));
-        M = cat(1,M,repmat(M(end,:),[size(R,1)-size(G,1),1]));%max(M));
-        N = cat(1,N,repmat(N(end,:),[size(R,1)-size(G,1),1]));%max(N));
-        G = cat(1,G,repmat(G(end,:),[size(R,1)-size(G,1),1]));%max(G));
+        M = cat(1,M,max(M)); %cat(1,M,repmat(M(end,:),[size(R,1)-size(G,1),1]));
+        N = cat(1,N,max(N)); %cat(1,N,repmat(N(end,:),[size(R,1)-size(G,1),1]));
+        G = cat(1,G,max(G));
     else
         disp(' Calcium is shorter than flights, trimming data'); % cut flight data down
         % find closest
@@ -98,9 +98,9 @@ for i = 1: size(ROI_Data,2);
         A = cat(1,A,A(end,:));
         R = cat(1,R,R(end,:));
         B = cat(1,B,max(D));
-        M = cat(1,M,repmat(M(end,:),[size(R,1)-size(G,1),1]));%max(M));
-        N = cat(1,N,repmat(N(end,:),[size(R,1)-size(G,1),1]));%max(N));
-        G = cat(1,G,repmat(G(end,:),[size(R,1)-size(G,1),1]));%max(G));
+        M = cat(1,M,max(M)); %cat(1,M,repmat(M(end,:),[size(R,1)-size(G,1),1]));
+        N = cat(1,N,max(N)); %cat(1,N,repmat(N(end,:),[size(R,1)-size(G,1),1]));
+        G = cat(1,G,max(G)); %cat(1,G,repmat(G(end,:),[size(R,1)-size(G,1),1]));
         
         % add closest timepoint
     end
@@ -128,7 +128,7 @@ for i = 1: size(ROI_Data,2);
         RewardVect = cat(1, RewardVect,RewardVectTemp);
         Microphone_Time = cat(1, Microphone_Time, Microphone_TimeTemp);
         MicrophoneVect = cat(1,MicrophoneVect,MicrophoneVectTemp);
-        EcholocationVect = cat(1,EcholocationVect,EcholocationVectTemp);
+        EcholocationVect = cat(1,EcholocationVect,EcholocationVectTemp); % MCS FIX
         DayIndex = cat(1,DayIndex,DayIndexTemp);  
     end
     clear A AllFlightsTemp AllFlightsTimeTemp
@@ -138,20 +138,12 @@ grid on;
 colormap(jet)
 colorbar;
 
-% Extract Echolocations
-MicrophoneVector = ROI_Data{1}.Alignment.out.MicrophoneVector;
-MicrophoneTimeVector = ROI_Data{1}.Alignment.out.Microphone_Time;
-EcholocationVector = ROI_Data{1}.Alignment.out.EcholocationVector;
-
 % Segregate flights:
-
 %[out] =  ImBat_SegTrajectories(AllFlights,AllFlightsTime,'nclusters',8,'day_index',DayIndex);
 Fs = ROI_Data{1, 1}.ROIs.results.metadata.cnmfe.Fs;
 rewind_value=0;
 outliers=[];
 % Load in concatenated echolocation vector if exists
-%echoVect = load('flight_echoVect_joint.mat');
-%[flightPaths] = ImBat_flightsAngelo_MCS(AllFlights,AllFlightsTime,'fs',Fs,'n_splines',n_splines,'dist',dist_met,'day_index',DayIndex);
 [flightPaths] = ImBat_flightsAngelo_MCS(AllFlights,AllFlightsTime,MicrophoneVect,Microphone_Time,EcholocationVect,rewind_value,outliers,cluster_to_plot,audioConCat,ROI_Data,'fs',Fs,'n_splines',n_splines,'dist',dist_met,'day_index',DayIndex);
 
 flightPaths.AllFlights = AllFlights;
@@ -161,7 +153,7 @@ flightPaths.Dates = flightDates;
 flightPaths.batID = batID;
 flightPaths.RewardVect = RewardVect;
 flightPaths.MicrophoneVect = MicrophoneVect;
-flightPaths.MicrophoneTime = MicrophoneTime;
+flightPaths.MicrophoneTime = Microphone_Time;
 flightPaths.EcholocationVect = EcholocationVect;
 % calculate Reward IDX:
 [Bpks,Blocs] = findpeaks(RewardVect,'MinPeakProminence',2,'MinPeakDistance',1);

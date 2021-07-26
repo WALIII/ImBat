@@ -1,48 +1,52 @@
-% Workflow for extracting echolocations from flights
+% Workflow for extracting echolocations from microphone data and aligning
+% it to flights.
 
-% Concatinate the microphone data and save it
-% audio_concat on MCS_PC in lab
-clear all; 
-audiofile = 5;
-thedate = '200305';
+clear all;
 
-load(strcat('audioConCat_',num2str(audiofile),'.mat'));
-load('ttlConCat.mat');
+%% Variables to change:
+thedate = '200518';
 load(strcat('../extracted/Gen_',thedate,'_fly-1_track.mat'));
-% CHANGE T
-load(strcat('../extracted/Gen_',thedate,'_fly-1_extraction/processed_2020_12_18__1231/AV_data.mat');
+% CHANGE THIS TO MATCH THE FLIGHT DATA
+%load(strcat('../extracted/Gen_',thedate,'_fly-1_extraction/processed_2020_12_18__1231/AV_data.mat'));
+load(strcat('../extracted/processed_2021_01_28__0917/AV_data.mat'));
 
-% Re-create the alignment.mat file
-% Manually load in
-%   AV_data.mat
-%   Alignment.mat
-%   ...track.mat
-%   audioConCat.mat
-%   ttlConCat.mat
+%% DO NOT CHANGE
+All_echolocation_vector_DS = [];
+for xx=1:5
+    
+    audiofile = xx;
 
-TS = AnalogSignals;
-[out, metrics] = ImBat_MCS_alignTimeStamps(audio,video,TS,Markers,audioConCat,ttlConCat);
+    % Load in the audioConCat file and ttlConCat file
+    load(strcat('audioConCat_',num2str(audiofile),'.mat'));
+    load('ttlConCat.mat');
+
+    % Align the Cortex TTL (TS), Framegrabber TTL (audio), Microphone TTL (ttl)
+    TS = AnalogSignals;
+    [out, metrics] = ImBat_MCS_alignTimeStamps(audio,video,TS,Markers,audioConCat,ttlConCat);
+
+    % Extract echolocation peaks from the audioConCat data
+    [echolocation_peaks,echolocation_vector_DS] = ImBat_MCS_extract_echolocations(audioConCat,out);
+
+    disp("Adding");
+    % Add this microphone's echolocation indexes to a joint vector
+    All_echolocation_vector_DS = [All_echolocation_vector_DS,echolocation_vector_DS];
+
+    % Plot things to make sure the mic/ttl alignment looks correct
+    figure(); hold on;
+    title(strcat("Microphone #",num2str(xx)));
+    plot(metrics.E_TS_tv_offset,metrics.TS_infer+0.02);
+    plot(metrics.E_ttl_tv_offset,metrics.ttl_infer);
+    plot(out.Microphone_Time,downsample(audioConCat,1600));
+    plot(out.Microphone_Time,echolocation_vector_DS,'*r');
+    clear audioConCat out metrics;
+end
 
 % Group the flights and in the flightpaths struct include the microphone
-% data
+% data and echolocation data
 clear ROI_Data
 ROI_Data{1}.date = thedate;
 ROI_Data{1}.Alignment = load('Alignment.mat');
 ROI_Data{1, 1}.ROIs.results.metadata.cnmfe.Fs = 192000;
 cluster_to_plot=1;
-flightPaths34 = ImBat_MCS_GroupFlights(ROI_Data,cluster_to_plot,'dist',1.1);
-temp_flight_echos = flightPaths34.echos;
-temp_flight_echos_vector = flightPaths34.EcholocationIdx;
-save(strcat('flight_echos_',num2str(audiofile)),'temp_flight_echos');
-save(strcat('flight_echoVect_',num2str(audiofile)),'temp_flight_echos_vector');
+flightPaths34 = ImBat_MCS_GroupFlights(ROI_Data,cluster_to_plot,audioConCat,All_echolocation_vector_DS,'dist',2.1);
 
-Echolocation_Analysis(flightPaths34)
-
-
-num_clust = size(flightPaths34.clusterIndex,2);
-% Create vector of all flight cluster IDs 
-true_times = flightPaths34.AllFlightsMasterTime(flightPaths34.flight_starts_idx(:));
-[tts,tts_idx]  = sort(true_times(:));
-c_s_34 = flightPaths34.id(tts_idx);
-
-% Parse each segment of microphone data for echolocation pips

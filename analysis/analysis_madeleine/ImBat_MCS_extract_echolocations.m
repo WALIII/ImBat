@@ -1,8 +1,9 @@
-function [echolocation_idxs] = ImBat_MCS_extract_echolocations(audioConCat)
+function [echolocation_idxs,echolocation_vector_DS] = ImBat_MCS_extract_echolocations(audioConCat,out)
 
 % Break audio into 2minute segments. Analyze each segment. Poop out the
 % vector of peaks. NON-Downsampled.
 
+clear echolocation_idxs
 fs = 192000; ds_factor=10;
 seconds = size(audioConCat,1)/fs;
 two_minutes = ceil(seconds/120);
@@ -37,11 +38,11 @@ for i=1:two_minutes-1
     % Make binary vector of peaks
     pkvect = NaN(1,length(short_seg));
     pkvect(locs) = 0.01;
-%     figure(); hold on; plot(short_seg);
-%     plot(pkvect,'*r');
-    %plot(conv_mic_data);
+    figure(); hold on; plot(short_seg);
+    plot(pkvect,'*r');
+    plot(conv_mic_data);
 
-    % #-part spectrogram plot
+    %%#-part spectrogram plot
 %     figure(); % make spectrogram..
 %     ax1 = subplot(3,1,1)
 % 
@@ -70,12 +71,19 @@ for i=1:two_minutes-1
 %     plot((30:size(temp1,2))/fs,short_seg(30:end)); plot((30:size(temp1,2))/fs,pkvect(30:end),'*r');
 %     %plot(pk_vect,'*r'); 
 %     linkaxes([ax1,ax2,ax3],'x'); axis tight
-
-    % Listen to segment:
-    %sound(short_seg*3, fs);
+% 
+%     %Listen to segment:
+%     sound(short_seg*3, fs);
     
     % Re-align the locations to be for the full vector
     locs = locs + (i-1)*120*fs;
     echolocation_idxs = [echolocation_idxs,locs];
+end
+
+iii = NaN(length(audioConCat),1);
+for i=1:length(echolocation_idxs)
+    iii(echolocation_idxs(i)-800:echolocation_idxs(i)+800) = 0.5;
+end
+echolocation_vector_DS = downsample(iii,1600);
 
 end
