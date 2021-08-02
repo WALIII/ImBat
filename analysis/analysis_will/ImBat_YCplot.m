@@ -6,8 +6,8 @@ idx2use = find(out_markov.FlightIDVector == flight2use);
 % col = colormap(lines(max(out_markov.FlightIDVector)));
 % col = cat(1,[0.7 0.7 0.7],col);
 
- cmap3 = colormap(lines(10));
- cmap1 = colormap(cubehelix((max(out_markov.FlightIDVector)-10),1.5,3,4,1,[0.29,0.92]));
+ cmap3 = colormap(lines(7));
+ cmap1 = colormap(cubehelix((max(out_markov.FlightIDVector)-7),1.5,3,4,1,[0.29,0.92]));
 
  col = cat(1,cmap3,cmap1);
 col = cat(1,[0.7 0.7 0.7],col);
@@ -21,10 +21,10 @@ col = cat(1,[0.7 0.7 0.7],col);
 
 figure();
 hold on;
-LineW = 1/size(idx2use,2)*300;
+LineW = 1/size(idx2use,2)*500;
 
 % resort based on:
-resort_IDX = 3;
+resort_IDX = 2;
 if resort_IDX ==1
 %1. length of flight: 
 [a2 b2] = sort(out_markov.FL_len(idx2use),'ascend');
