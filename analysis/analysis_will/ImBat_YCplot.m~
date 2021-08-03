@@ -3,17 +3,25 @@ function ImBat_YCplot(out_markov,flight2use);
 
 idx2use = find(out_markov.FlightIDVector == flight2use);
 
-%col = colormap(lines(max(out_markov.FlightIDVector)));
-% cmap1 = jet(max(out_markov.FlightIDVector));
-% cmap3 = colormap(lines());
-% 
-% col = cat(1,cmap1,cmap3);
-col = colormap(cubehelix((max(out_markov.FlightIDVector),[0.9,-1.5,8,1]));
+% col = colormap(lines(max(out_markov.FlightIDVector)));
+% col = cat(1,[0.7 0.7 0.7],col);
 
+ cmap3 = colormap(lines(7));
+ cmap1 = colormap(cubehelix((max(out_markov.FlightIDVector)-7),1.5,3,4,1,[0.29,0.92]));
+
+ col = cat(1,cmap3,cmap1);
 col = cat(1,[0.7 0.7 0.7],col);
+
+% % Try CUBEHELIX
+% col = colormap(cubehelix((max(out_markov.FlightIDVector)),1.5,3,4,1,[0.29,0.92]));
+% col(1:3,:) = [];
+% col = cat(1,col,[0.7 0.7 0.7],[0.7 0.7 0.7],[0.7 0.7 0.7]);
+% col(1,:) = [0.7 0.7 0.7];
+
+
 figure();
 hold on;
-LineW = 1/size(idx2use,2)*300;
+LineW = 1/size(idx2use,2)*500;
 
 % resort based on:
 resort_IDX = 2;
@@ -71,10 +79,14 @@ Lpost = round(out_markov.FL_len(idx2use(i))*100:(out_markov.FL_len(idx2use(i))+o
 plot(Lpre,ones(1,length(Lpre))*i,'color',col(col2use_pre,:),'LineWidth',LineW);
 plot(Lactual,ones(1,length(Lactual))*i,'color',col(col2use,:),'LineWidth',LineW)
 plot(Lpost,ones(1,length(Lpost))*i,'color',col(col2use_post,:),'LineWidth',LineW);
+    if PltTxt ==1;
+        text(-7500, i, cellstr(num2str()), 'FontSize', 10, 'Color', 'r');
+
     catch
         disp('missing data')
     end
 end
 xlabel('time (ms)');
 ylabel('Flights');
+
 

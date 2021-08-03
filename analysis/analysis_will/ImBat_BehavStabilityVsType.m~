@@ -1,0 +1,27 @@
+
+function [Q1 Q4] = ImBat_BehavStabilityVsType(out_markov,flightPaths,flight2use)
+% look at the stability of behavior over time
+
+
+
+idx2use = find(out_markov.FlightIDVector == flight2use);
+% build flight paths:
+for i = 1:size(flightPaths.flight_starts_idx,2) 
+try
+    Flights2Use(:,:,i) =  flightPaths.AllFlights(flightPaths.flight_starts_idx(i)-120:flightPaths.flight_starts_idx(i)+(10*120),:);
+catch
+    Flights2Use(:,:,i) =  flightPaths.AllFlights(flightPaths.flight_starts_idx(i-1)-120:flightPaths.flight_starts_idx(i-1)+(10*120),:);
+end
+end
+
+Flights2Use = Flights2Use(:,:,out_markov.out_sort); % get the right flights in the right order
+Flights2Use = Flights2Use(:,:,idx2use);
+
+
+pre_sort_idx = out_markov.FlightIDVector(idx2use-1);
+%[a2 b2] = sort(out_markov.FlightIDVector(idx2use-1),'ascend');
+% idx2use = idx2use(b2);
+
+G1 = unique(pre_sort_idx);
+for i = 1:size(G1,1);
+    

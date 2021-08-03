@@ -1,6 +1,10 @@
 function ImBat_YCplot(out_markov,flight2use);
 
 
+
+% User inputs:
+PltTxt = 1;
+
 idx2use = find(out_markov.FlightIDVector == flight2use);
 
 % col = colormap(lines(max(out_markov.FlightIDVector)));
@@ -79,10 +83,14 @@ Lpost = round(out_markov.FL_len(idx2use(i))*100:(out_markov.FL_len(idx2use(i))+o
 plot(Lpre,ones(1,length(Lpre))*i,'color',col(col2use_pre,:),'LineWidth',LineW);
 plot(Lactual,ones(1,length(Lactual))*i,'color',col(col2use,:),'LineWidth',LineW)
 plot(Lpost,ones(1,length(Lpost))*i,'color',col(col2use_post,:),'LineWidth',LineW);
+    if PltTxt ==1;
+        text(-7500, i, cellstr(num2str(11)), 'FontSize', 10, 'Color', 'r');
+    end
     catch
         disp('missing data')
     end
 end
 xlabel('time (ms)');
 ylabel('Flights');
+
 
