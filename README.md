@@ -6,7 +6,7 @@ Repository for code used for acquisition and analysis of data from wireless mini
 Below is a data sample of the raw (left) and background subtracted ( right) streamed imaging data.
 
 <p align="center" width="100%">
-    <img width="75%" src="https://github.com/WALIII/WALIII.github.io/tree/master/images/SupplimentalVideo01.gif">
+    <img width="50%" src="https://github.com/WALIII/WALIII.github.io/tree/master/images/SupplimentalVideo01.gif">
 </p>
 
 Examples of 3D Place cells:
