@@ -63,10 +63,16 @@ end
 % sort based on times.. 
 
 
-Seq = zeros(1,size(flightPaths.flight_ends_idx,2));
+% Seq = zeros(1,size(flightPaths.flight_ends_idx,2));
+% for i = 1:size(flightPaths.clusterIndex,2)
+%     Seq(flightPaths.clusterIndex{i}) = i; %create single vector of flight IDs
+%     Seq_time(flightPaths.clusterIndex{i}) = flightPaths.flight_starts_idx(flightPaths.clusterIndex{i});
+% Col2use(i) = size(flightPaths.clusterIndex{i},1);
+% end
+
+Seq = flightPaths.id'; %create single vector of flight IDs
+Seq_time = flightPaths.flight_starts_idx(:)';
 for i = 1:size(flightPaths.clusterIndex,2)
-    Seq(flightPaths.clusterIndex{i}) = i; %create single vector of flight IDs
-    Seq_time(flightPaths.clusterIndex{i}) = flightPaths.flight_starts_idx(flightPaths.clusterIndex{i});
 Col2use(i) = size(flightPaths.clusterIndex{i},1);
 end
 
@@ -132,6 +138,23 @@ L = cellfun(@length,T);
 %%extract cells of length 5 
 iwant = T(L==2);
 
+% % flight lengths 
+% for i = 1:max(flightPaths.id)
+% ID_len(i) = mean(flightPaths.flight_ends_idx(find(flightPaths.id==i))-flightPaths.flight_starts_idx(find(flightPaths.id==i)))/120;
+% end
+
+ % less robust:
+% for i = 1:length(flightPaths.flight_ends_idx)
+%     FL_len(i) = flightPaths.flight_ends_idx(i)-flightPaths.flight_starts_idx(i);
+% end
+
+% % more robust:
+G = squeeze((flightPaths.vel(:,:,:)));
+for i = 1:length(flightPaths.flight_ends_idx)
+    glen = find(G(100:end,i)<0.3);
+    FL_len(i) = glen(2)+100;
+    clear glen
+end
 
 % Output variables:
 out_markov.T =T; 
@@ -139,8 +162,10 @@ out_markov.VA = VA; % vector of flight identities
 out_markov.out_sort = ab;
 
 out_markov.FlightIDVector = Seq;
-out_markov.FlightTimeVector = Seq_time
-
+out_markov.FlightTimeVector = Seq_time;
+% dont forget to sort!
+% out_markov.ID_Len = ID_len; % length of each flight ID in time
+out_markov.FL_len = FL_len(ab); %length of each individual flight in time
 
 
 

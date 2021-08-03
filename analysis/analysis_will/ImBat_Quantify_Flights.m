@@ -1,4 +1,4 @@
-function output = ImBat_Quantify_Flights(flightPaths,ROI_Data);
+function output = ImBat_Quantify_Flights(flightPaths);
 
 % TO DO:
 
@@ -6,13 +6,13 @@ function output = ImBat_Quantify_Flights(flightPaths,ROI_Data);
 % 2. Ratio of top clusters to all flights
 % 3. Ratio of top clusters to all clustered flights
 
-DateString = ROI_Data{1}.date(3:end);
+DateString = flightPaths.Dates{1, 1};
 formatIn = 'yymmdd';
 
 compare_date = datenum(DateString,formatIn);
 
-for i = 1:size(ROI_Data,2)
-    DateString = ROI_Data{i}.date(3:end);
+for i = 1:size(flightPaths.Dates,2)
+    DateString = flightPaths.Dates{i};
     temp_date = datenum(DateString,formatIn);
     diff_date(i) = temp_date-compare_date;
 end
