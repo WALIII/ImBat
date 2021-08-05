@@ -74,23 +74,24 @@ end
 
 
 % calculate occupancy:
-filt = 1;
+filt = 200;
 x1 = TData2.cursorA(:,:);
 y1 = -TData2.cursorB(:,:);
-%h=fspecial('gaussian',filt,filt);
-x1 = [ -3000 x1 3000];
-y1 = [-3000 y1 3000];
+h=fspecial('gaussian',filt,filt);
+x1 = [ -2900 x1 2900];
+y1 = [-2900 y1 2900];
 [valuesF, centersF] = hist3([x1(:) y1(:)],[50 50]);
 valuesF = valuesF+1;
-valuesF2 = imgaussfilt(valuesF,filt);
+valuesF2 = imgaussfilt(valuesF,2);
 %imagesc((valuesF2));
 
 
 
 % Make heatplot
+Sz = 10 ;
 
 %figure(2);
-%h=fspecial('gaussian',filt,filt);
+h=fspecial('gaussian',filt,filt);
 try
 x = BinR(1,:);
 y = BinR(2,:);
@@ -99,17 +100,15 @@ catch
     return
 end
 
-x = [ -3000 x 3000];
-y = [-3000 y 3000];
+x = [ -2500 x 2500];
+y = [-2500 y 2500];
 [values, centers] = hist3([x(:) y(:)],[50 50]);
 values(1,1) = 0;
 values(50,50) = 0;
 %values2=imfilter(values,h,'circular');
-values2 = imgaussfilt(values,filt);
+values2 = imgaussfilt(values,2);
 %imagesc((values2));
 NormRateMat = (values2./valuesF2);
-NormRateMat = imgaussfilt(NormRateMat,filt);
-
 % imagesc(NormRateMat);
 
 % %filter artifacts
