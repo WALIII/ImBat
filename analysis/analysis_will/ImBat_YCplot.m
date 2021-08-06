@@ -21,7 +21,7 @@ col = cat(1,[0.7 0.7 0.7],col);
 
 figure();
 hold on;
-LineW = 1/size(idx2use,2)*500;
+LineW = 1/size(idx2use,2)*1000;
 
 % resort based on:
 resort_IDX = 2;
