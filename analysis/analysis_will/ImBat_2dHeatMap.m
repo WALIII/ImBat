@@ -74,7 +74,7 @@ end
 
 
 % calculate occupancy:
-filt = 1;
+filt = 1.5;
 x1 = TData2.cursorA(:,:);
 y1 = -TData2.cursorB(:,:);
 %h=fspecial('gaussian',filt,filt);
