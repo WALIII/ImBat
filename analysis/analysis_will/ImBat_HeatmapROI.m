@@ -35,7 +35,7 @@ hold on;
 ClustFlight = FlightAlignedROI{iii}.ClustFlight_withPads;
 
 % upsample the calcium
-CutCells = FlightAlignedROI{iii}.C_raw;
+CutCells = FlightAlignedROI{iii}.S;
 %CutCells = FlightAlignedROI{iii}.S;
 
 

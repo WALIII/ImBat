@@ -27,12 +27,12 @@ for i = 1:length(subFolders);
     cd([subFolders(i).folder,'/',subFolders(i).name]);
     
     % check if any mov has been extracted,if not,
-    if exist('extracted')>1
-        disp('.mov files already extracted...');
-    else
-     %   extract .mov files:
-      % FS_AV_Parse_batch(pwd,'mat_dir','/extracted')
-      mkdir('extracted');
+%     if exist('extracted')>1
+%         disp('.mov files already extracted...');
+%     else
+%      %   extract .mov files:
+%       % FS_AV_Parse_batch(pwd,'mat_dir','/extracted')
+%       mkdir('extracted');
      %   extract c3d files:
         processed_dir = [pwd,'/extracted/'];
         

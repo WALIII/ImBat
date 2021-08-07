@@ -76,7 +76,11 @@ for iii = 1:length(Ind2use)
 end
 for ii = 1: length(Ind2use2);
     bound2 = flightPaths.flight_starts_idx(Ind2use2(ii)):flightPaths.flight_ends_idx(Ind2use2(ii));
+try
     plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col{clust2use-1},'LineWidth',2); % plot all flights
+catch
+        plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',[ 0.3 0.3 0 0.5],'LineWidth',2); % plot all flights
+end
 end
    % view( -37.5000,30)
 
