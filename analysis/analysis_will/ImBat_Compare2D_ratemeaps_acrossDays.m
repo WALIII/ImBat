@@ -48,7 +48,7 @@ for iiii = 1:length(days2use);
     Spk = find(Spikes ==1);
 
     NormRateMat =  ImBat_2dHeatMap(Flights',Spk');
-    figure(); imagesc(((NormRateMat')))
+    %figure(); imagesc(((NormRateMat')))
     Map2save(:,:,iiii) = NormRateMat';
     clear Spikes Flights exampCell CutCells exampFlight ind2use
    % re-initialize vars..
@@ -108,7 +108,7 @@ for iiii = 1:2
     Spk = find(Spikes ==1);
 
     NormRateMat =  ImBat_2dHeatMap(Flights',Spk');
-    figure(); imagesc(((NormRateMat')))
+    %figure(); imagesc(((NormRateMat')))
     Map2save_EO(:,:,iiii) = NormRateMat';
     clear Spikes Flights exampCell CutCells exampFlight ind2use
    % re-initialize vars..
