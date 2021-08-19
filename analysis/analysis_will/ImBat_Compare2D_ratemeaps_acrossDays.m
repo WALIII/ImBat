@@ -1,11 +1,14 @@
 
-function [R] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI,roi2plot,cluster);
+function [R,Map2save,occupancyMap2save] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI,roi2plot,cluster);
 
 
 Flights = [];
 Spikes =  [];
 % cluster = 1;
 days2use = unique(FlightAlignedROI{cluster}.CutCells_date);
+
+NormRateMat = NaN(50,50);
+occupancyMap = zeros(50,50);
 
 for iiii = 1:length(days2use);
     
@@ -32,7 +35,9 @@ for iiii = 1:length(days2use);
             exampCell = CutCells(cell2use,:,trial2use);
             exampCell = interp(exampCell,4);
             exampCell = exampCell(1:size(exampFlight,1));
-            
+            % get rid of edges
+            exampCell(1:500) = 0;
+            exampCell(end-300:end) = 0;
             Flights = cat(1,Flights, exampFlight);
             Spikes = cat(1,Spikes, exampCell');
             
@@ -41,16 +46,26 @@ for iiii = 1:length(days2use);
 
     
     % binarie spikes
-    Spikes = zscore(Spikes);
-    Spikes(Spikes>1) = 1;
-    Spikes(Spikes<1) = 0;
-    
-    Spk = find(Spikes ==1);
 
-    NormRateMat =  ImBat_2dHeatMap(Flights',Spk');
+   % Spikes = Spikes*1000;
+%     Spikes(Spikes>1) = 1;
+%     Spikes(Spikes<1) = 0;
+   Spikes = zscore(Spikes);
+     Spikes = round(Spikes);
+   [Spk] = find(Spikes>1);
+   val = Spikes(Spk);
+  % val = ones(length(Spk)); 
+try
+   [NormRateMat, occupancyMap] =  ImBat_2dHeatMap(Flights',Spk',val);
+catch
+    disp('');
+end
     figure(); imagesc(((NormRateMat')))
     Map2save(:,:,iiii) = NormRateMat';
-    clear Spikes Flights exampCell CutCells exampFlight ind2use
+    occupancyMap2save(:,:,iiii) = occupancyMap';
+    NormRateMat = NaN(50,50);
+
+    clear Spikes Flights exampCell CutCells exampFlight ind2use 
    % re-initialize vars..
     Flights = [];
     Spikes = [];
@@ -101,15 +116,21 @@ for iiii = 1:2
 
     
     % binarie spikes
-    Spikes = zscore(Spikes);
-    Spikes(Spikes>1) = 1;
-    Spikes(Spikes<1) = 0;
-    
-    Spk = find(Spikes ==1);
+%     Spikes = zscore(Spikes);
+%     Spikes(Spikes>1) = 1;
+%     Spikes(Spikes<1) = 0;
+%     
+%     Spk = find(Spikes ==1);
 
-    NormRateMat =  ImBat_2dHeatMap(Flights',Spk');
+   Spikes = zscore(Spikes);
+     Spikes = round(Spikes);
+   [Spk] = find(Spikes>1);
+   val = Spikes(Spk);
+
+ NormRateMat =  ImBat_2dHeatMap(Flights',Spk',val);
     figure(); imagesc(((NormRateMat')))
     Map2save_EO(:,:,iiii) = NormRateMat';
+    NormRateMat = NaN(50,50);
     clear Spikes Flights exampCell CutCells exampFlight ind2use
    % re-initialize vars..
     Flights = [];

@@ -26,8 +26,8 @@ load([subFolders(ii).name, '/CellReg_files/ROI_Data/Saved_Data/Aligned_Data.mat'
 [FlightAlignedROI_rando] = ImBat_Align_FC(CombinedROI,flightPaths,1);
 FlightAlignedROI_rando1{1} = FlightAlignedROI_rando;
 for i = 1:10;
-[R{ii}(i,:)] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI,i,1);
-[R2{ii}(i,:)] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI_rando1,i,1);
+[R{ii}(i,:),M2S{i}] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI,i,1);
+[R2{ii}(i,:),M2S2{i}] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI_rando1,i,1);
 close all
 end
 end

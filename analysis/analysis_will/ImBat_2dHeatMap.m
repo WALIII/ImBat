@@ -1,8 +1,15 @@
-function NormRateMat =  ImBat_2dHeatMap(flights,spikes)
+function [NormRateMat, occupancyMap]=  ImBat_2dHeatMap(flights,spikes,val)
 % Where do indirect neurons 'live' in 2D space?
 % Load in the extracted direct neurons, and the indirect cells
 
 % get the indirect cell you want, and find when it is active
+
+filt = 1.3;
+
+% pre-allocate maps with Nans
+NormRateMat = NaN(50,50);
+occupancyMap = NaN(50,50);
+
 
 stdx = 1;
 
@@ -38,19 +45,23 @@ TData2.cursorB = flights(2,:); %(zscore(roi_ave2.interp_dff(5,:)) + zscore(roi_a
 % TData2.cursorB = (zscore(roi_ave.F_dff(5,:)) + zscore(roi_ave.F_dff(6,:)))  - (zscore(roi_ave.F_dff(7,:)) + zscore(roi_ave.F_dff(8,:)));
 
 
+counter = 1;
 
 % index into the 2D point in the direct cells, save the index
 Rperm = randi(size(TData2.cursorA,2),1,size(locs,2)); % random timestamps
 for i = 1:size(locs,2)
 
 % Bin the location
-BinR(1,i) = TData2.cursorA(:,locs(i));
-BinR(2,i) = -TData2.cursorB(:,locs(i));
+for ii = 1:val;
+BinR(1,counter) = TData2.cursorA(:,locs(i));
+BinR(2,counter) = -TData2.cursorB(:,locs(i));
 
 % Randomize...
-rBinR(1,i) = TData2.cursorA(:,Rperm(i));
-rBinR(2,i) = -TData2.cursorB(:,Rperm(i));
+rBinR(1,counter) = TData2.cursorA(:,Rperm(i));
+rBinR(2,counter) = -TData2.cursorB(:,Rperm(i));
 
+counter = counter+1;
+end
 % % Get the angle
 % u = TData2.cursorA(:,(locs(i)-1):(locs(i)+1));
 % v = TData2.cursorB(:,(locs(i)-1):(locs(i)+1));
@@ -74,7 +85,6 @@ end
 
 
 % calculate occupancy:
-filt = 1.5;
 x1 = TData2.cursorA(:,:);
 y1 = -TData2.cursorB(:,:);
 %h=fspecial('gaussian',filt,filt);
@@ -82,6 +92,7 @@ x1 = [ -3000 x1 3000];
 y1 = [-3000 y1 3000];
 [valuesF, centersF] = hist3([x1(:) y1(:)],[50 50]);
 valuesF = valuesF+1;
+occ2use = valuesF;
 valuesF2 = imgaussfilt(valuesF,filt);
 %imagesc((valuesF2));
 
@@ -109,6 +120,13 @@ values2 = imgaussfilt(values,filt);
 %imagesc((values2));
 NormRateMat = (values2./valuesF2);
 NormRateMat = imgaussfilt(NormRateMat,filt);
+
+occupancyMap = occ2use;
+occupancyMap(1,1) = 0;
+occupancyMap(50,50) = 0;
+occupancyMap = imgaussfilt(occupancyMap,filt);
+occupancyMap(occupancyMap>1) = 2;
+occupancyMap(occupancyMap<1.1) = NaN;
 
 % imagesc(NormRateMat);
 
