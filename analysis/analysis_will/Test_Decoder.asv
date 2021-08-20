@@ -3,14 +3,14 @@
 % create random flights
 %[FlightAlignedROI_rando] = ImBat_Align_FC(CombinedROI,flightPaths,1);
 
-ds_factor = 20;
+ds_factor = 50;
 
 % get aligned data
 [S2save,F2save,other] =  ImBat_Spikes(FlightAlignedROI);
 
 % train on distance:
-Y = round(other.T_dist,ds_factor*2);
-Y = round(downsample(Y,ds_factor)/100);
+Y = other.T_dist/100;
+Y = downsample(Y,ds_factor);
 
 X = downsample(S2save,ds_factor);
 X = round(X);
