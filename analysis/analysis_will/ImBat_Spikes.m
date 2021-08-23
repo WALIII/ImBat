@@ -67,6 +67,7 @@ S=sqrt((x2-x1).^2+(y2-y1).^2+(z2-z1).^2);
 S(S>40) = 0;
 spd = smooth(squeeze(S),20)';
 dist = cumsum(spd);
+dist = dist-min(dist);
         
         
 % TO DO Direct distance to the reward:
