@@ -1,7 +1,7 @@
-function [FlightAlignedROI_new2] = ImBat_Combine_Clusters(CombinedROI,flightPaths);
+function [FlightAlignedROI_new2] = ImBat_Combine_Clusters(CombinedROI,flightPaths,FL2use);
 
 
-FL2use = [2:6]; % use the two largest flight clusters:
+%FL2use = [1:6]; % use the two largest flight clusters:
 
 
 

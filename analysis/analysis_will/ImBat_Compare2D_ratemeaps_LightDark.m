@@ -52,7 +52,7 @@ for iiii = 1:length(condition2use);
                 Spikes = cat(1,Spikes, exampCell');
                 
             else
-               % disp('not enought spikes');
+                % disp('not enought spikes');
             end
             
         end
@@ -60,16 +60,25 @@ for iiii = 1:length(condition2use);
     
     
     % binarie spikes
+    %     Spikes = zscore(Spikes);
+    %     Spikes(Spikes>1) = 1;
+    %     Spikes(Spikes<1) = 0;
+    %     Spk = find(Spikes ==1);
+    %     val = ones(length(Spk),1);
+    %%%  Count Spikes
     Spikes = zscore(Spikes);
-    Spikes(Spikes>1) = 1;
-    Spikes(Spikes<1) = 0;
+    Spikes = round(Spikes);
+    [Spk] = find(Spikes>1);
+    val = Spikes(Spk);
     
-    Spk = find(Spikes ==1);
     
-    [NormRateMat, occupancyMap] =  ImBat_2dHeatMap(Flights',Spk');
-    figure(); imagesc(((NormRateMat')))
-    Map2save(:,:,iiii) = NormRateMat';
-    occupancyMap2save(:,:,iiii) = occupancyMap';
+    try
+        [NormRateMat, occupancyMap] =  ImBat_2dHeatMap(Flights',Spk',val);
+        figure(); imagesc(((NormRateMat')))
+        Map2save(:,:,iiii) = NormRateMat';
+        occupancyMap2save(:,:,iiii) = occupancyMap';
+    catch
+    end
     clear Spikes Flights exampCell CutCells exampFlight ind2use
     % re-initialize vars..
     Flights = [];
@@ -125,24 +134,34 @@ for iiii = 1:2
                 Flights = cat(1,Flights, exampFlight);
                 Spikes = cat(1,Spikes, exampCell');
             else
-           %      disp('not enought spikes');
+                %      disp('not enought spikes');
             end
             
         end
     end
     
     
-    % binarie spikes
+    %%%  binarize spikes
+    %     Spikes = zscore(Spikes);
+    %     Spikes(Spikes>1) = 1;
+    %     Spikes(Spikes<1) = 0;
+    %     Spk = find(Spikes ==1);
+    %     val = ones(length(Spk),1);
+    % count Spikes
     Spikes = zscore(Spikes);
-    Spikes(Spikes>1) = 1;
-    Spikes(Spikes<1) = 0;
+    Spikes = round(Spikes);
+    [Spk] = find(Spikes>1);
+    val = Spikes(Spk);
     
-    Spk = find(Spikes ==1);
-    
-    [NormRateMat occupancyMap] =  ImBat_2dHeatMap(Flights',Spk');
-    figure(); imagesc(((NormRateMat')))
-    Map2save_EO(:,:,iiii) = NormRateMat';
-    clear Spikes Flights exampCell CutCells exampFlight ind2use
+    try
+        [NormRateMat, occupancyMap] =  ImBat_2dHeatMap(Flights',Spk',val);
+        
+        figure(); imagesc(((NormRateMat')))
+        Map2save_EO(:,:,iiii) = NormRateMat';
+        clear Spikes Flights exampCell CutCells exampFlight ind2use
+        
+    catch
+    end
     % re-initialize vars..
     Flights = [];
     Spikes = [];

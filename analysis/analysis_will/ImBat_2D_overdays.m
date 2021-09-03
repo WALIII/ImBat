@@ -1,69 +1,63 @@
 
-
+function ImBat_2D_overdays(CombinedROI,flightPaths,FlightAlignedROI);
 % compare 2D rate maps across days
 
 
-% Generate the unique Flight Cluster:
-[FlightAlignedROI_rando] = ImBat_Align_FC(CombinedROI,flightPaths,1);
-FlightAlignedROI_rando1{1} = FlightAlignedROI_rando;
+% Generate the combined Flight Cluster:
+[FlightAlignedROI_new2] = ImBat_Combine_Clusters(CombinedROI,flightPaths,1:6);
 
+close all
 
+ii = 1;
+maxCell = size(FlightAlignedROI{1}.S,1);%50;
 % Grab 2D rate maps for the top flights 
-for i = 1:50;
-[R{ii}(i,:),M2S{i}] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI,i,1);
-[R{ii}(i,:),M2Sb{i}] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI,i,2);
-[R{ii}(i,:),M2Sc{i}] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI,i,3);
-
-[R2{ii}(i,:),M2S2{i}] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI_rando1,i,1);
+for i = 1:maxCell;
+    disp(['processing ROI ', num2str(i)]);
+[R{ii}(i,:),M2S{i},Occ1{i}] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI,i,1); % primary cluster
+[R1{ii}(i,:),M2S2{i},Occ2{i}] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI_new2,i,1); % all flights
+%[R2{ii}(i,:),M2Sc{i},Occ3{i}] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI,i,3);
+%[R3{ii}(i,:),M2S2{i},Occ4{i}] = ImBat_Compare2D_ratemeaps_acrossDays(FlightAlignedROI_rando1,i,1);
 close all
 end
 
 
-cell2use = 1
+
+roi2plot = 1;
+
 figure(); 
-for i = 1:5;
-subplot(3,5,i);
-imagesc(M2S{cell2use}(:,:,i));
-title(['Day ',num2str(i)]);
-if i ==1;
-    ylabel(['ROI ', num2str(cell2use), ' Top FLight path']);
-end
-axis equal
-axis tight
+for i = 1:5
+    clear G oc2use imAlpha
+subplot(2,5,i);
+G = squeeze(M2S{roi2plot}(:,:,i));
+G(G==0) = NaN;
+% imagesc(G) 
+oc2use = squeeze(Occ1{roi2plot}(:,:,i));
+imAlpha=ones(size(oc2use));
+imAlpha(isnan(oc2use))=0;
+imagesc(G,'AlphaData',imAlpha);
+set(gca,'color',0.9*[1 1 1]);
+title(['Light ROI',num2str(roi2plot)])
+colormap(jet);
 
-subplot(3,5,i+5);
-imagesc(M2Sb{cell2use}(:,:,i));
-title(['Day ',num2str(i)]);
-if i ==1;
-    ylabel(['ROI ', num2str(cell2use), ' Second FLight path ']);
-end
 axis equal
-axis tight
-
-subplot(3,5,i+10);
-imagesc(M2S2{cell2use}(:,:,i));
-title(['Day ',num2str(i)]);
-if i ==1;
-    ylabel(['ROI ', num2str(cell2use), ' Unique FLights']);
-end
-axis equal
-axis tight
-
+ylim([0 50])
+xlim([0 50]);
 end
 
 
 % check for reward or boundry representation
-for i = 1:50;
-   Gu(:,:,i) = mat2gray(mean(M2S2{i}(:,:,:),3));
-   Gc(:,:,i) = mat2gray(mean(M2S{i}(:,:,:),3));
-   Gc2(:,:,i) = mat2gray(mean(M2Sb{i}(:,:,:),3));
-   Gc3(:,:,i) = mat2gray(mean(M2Sc{i}(:,:,:),3));
+for i = 1:maxCell;
+   Gu(:,:,i) = mat2gray(sum(M2S{i}(:,:,:),3)./(sum(Occ1{i}(:,:,:),3)+.05));
+   Gc(:,:,i) = mat2gray(sum(M2S2{i}(:,:,:),3)./(sum(Occ2{i}(:,:,:),3)+.05));
+%    Gc2(:,:,i) = mat2gray(mean(M2Sb{i}(:,:,:),3));
+%    Gc3(:,:,i) = mat2gray(mean(M2Sc{i}(:,:,:),3));
 end
 
-meanGu = mean( Gu(:,:,:),3);
-meanGc = mean( Gc(:,:,:),3);
-meanGc2 = mean( Gc2(:,:,:),3);
-meanGc3 = mean( Gc3(:,:,:),3);
+meanGu = nanmean( Gu(:,:,:),3);
+meanGc = nanmean( Gc(:,:,:),3);
+meanGu(meanGu ==1) = NaN;
+meanGc(meanGc ==1) = NaN;
+
 
 figure(); 
 imagesc(meanGc);
@@ -74,17 +68,45 @@ imagesc(meanGu);
 title('Place field density for Unique flights');
 
 
-figure(); 
-imagesc((meanGc+meanGc2+meanGc3)/3);
-title('Place field density for top3 flights');
+%%% look at behavioral consistancy 
+
+%ImBat_ConsistMap(x1,y1,centersF);
 
 
-figure(); 
-subplot(1,2,1)
-imagesc(meanGc2);
-subplot(1,2,2)
-imagesc(meanGc3);
-title('Place field largest clustered flight');
+
+%%% To DO: Stats, shuffling statistics. 
+
+% shuff:
+id=randi(size(meanGc,2),1,size(meanGc,1));
+meanGu_2=cell2mat(arrayfun(@(x) circshift(meanGc(x,:),[1 id(x)]),(1:numel(id))','un',0));
+
+figure();
+% plot the hist
+for i = 1: 45;
+TrueSI = nansum(meanGu(:,i)/sum(abs(1-isnan(meanGu(:,i)))));
+figure();
+hold on;
+histogram(nansum(meanGu_2,1)./sum(abs(1-isnan(meanGu(:,:)))));
+hold on;
+plot([TrueSI TrueSI],[0 30],'LineWidth',10);
+title('Shuffled SI vs true SI');
+legend('shuffeled','true');
+pause();
+clf
+end
+
+
+% figure(); 
+% imagesc((meanGc+meanGc2+meanGc3)/3);
+% title('Place field density for top3 flights');
+
+
+% figure(); 
+% subplot(1,2,1)
+% imagesc(meanGc2);
+% subplot(1,2,2)
+% imagesc(meanGc3);
+% title('Place field largest clustered flight');
 
 
 
@@ -104,7 +126,7 @@ end
 
 
 subplot(2,5,i+5);
-imagesc(M2Sc{cell2use}(:,:,i));
+imagesc(M2S2{cell2use}(:,:,i));
 title(['Day ',num2str(i)]);
 if i ==1;
     ylabel(['ROI ', num2str(cell2use), ' Unique FLights']);

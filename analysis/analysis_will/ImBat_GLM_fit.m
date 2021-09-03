@@ -57,6 +57,7 @@ X_theta = cat(2,round(downsample(theta,ds_rate)),round(downsample(theta2,ds_rate
 
 X_xyz = cat(2,round(downsample(x1,ds_rate)/ds_place),round(downsample(y1,ds_rate)/ds_place),round(downsample(z1,ds_rate)/ds_place),X_theta);
 X_time_xyz = cat(2,X_time,X_xyz);
+X_time_xyz_vel = cat(2,X_time,X_xyz,X_v);
 
 X = cat(2,round(downsample(x1,ds_rate)/ds_place),round(downsample(y1,ds_rate)/ds_place),round(downsample(z1,ds_rate)/ds_place),round(downsample(spd,ds_rate)),X_time,X_theta,X_dist);
 
@@ -73,7 +74,7 @@ for i = 1:100;
         mdl_xyz = fitglm(X_xyz,y,'Distribution','poisson');
         mdl_time = fitglm(X_time,y,'Distribution','poisson');
         mdl_time_xyz = fitglm(X_time_xyz,y,'Distribution','poisson');
-
+        mdl_time_xyz_vel = fitglm(X_time_xyz_vel,y,'Distribution','poisson');
         mdl_v = fitglm(X_v,y,'Distribution','poisson');
         mdl_r = fitglm(X_r,y,'Distribution','poisson');
         mdl_theta = fitglm(X_theta,y,'Distribution','poisson');
@@ -86,7 +87,7 @@ for i = 1:100;
         p_xyz(counter) = mdl_xyz.Rsquared.Adjusted;
         p_time(counter) = mdl_time.Rsquared.Adjusted;
         p_time_xyz(counter) = mdl_time_xyz.Rsquared.Adjusted;
-
+        p_time_xyz_vel(counter) = mdl_time_xyz_vel.Rsquared.Adjusted;
         p_r(counter) = mdl_r.Rsquared.Adjusted;
         p_theta(counter) = mdl_theta.Rsquared.Adjusted;
         p_dist(counter) = mdl_dist.Rsquared.Adjusted;
@@ -127,20 +128,26 @@ boxplot([p_vel' p_time'  p_dist' p_xyz' p_all'],'Labels',{'vel','time', 'distanc
 ylabel(' R^2')
 title('Spiking variance explained given predictors')
 
+% venn diagram
+scfact = 2; 
+area1 = mean(p_time)*scfact; 
+area2 = mean(p_xyz)*scfact;
+area3 = mean(p_vel)*scfact;
+
+overlap1 = mean(p_time_xyz_vel) - ( (mean(p_time_xyz_vel)-mean(p_xyz)) + (mean(p_time_xyz_vel)-mean(p_vel)))/2;
+overlap2 = mean(p_time_xyz_vel) - ( (mean(p_time_xyz_vel)-mean(p_time)) + (mean(p_time_xyz_vel)-mean(p_vel)))/2;
+overlap3 = mean(p_time_xyz_vel) - ( (mean(p_time_xyz_vel)-mean(p_xyz)) + (mean(p_time_xyz_vel)-mean(p_time)))/2;
+overlap4 = mean(p_time_xyz_vel) - ( (mean(p_time_xyz_vel)-mean(p_xyz)) + (mean(p_time_xyz_vel)-mean(p_time)) + (mean(p_time_xyz_vel)-mean(p_vel)))/2;
+
+figure(); venn([area1 area2 area3], [overlap1 overlap2 overlap3 overlap4 ]);
 
 
+% venn diagram
+area1 = mean(p_time); 
+area2 = mean(p_xyz);
+
+overlap1 = mean(p_xyz)-(mean(p_time_xyz)-mean(p_time));
+overlap2 = mean(p_time)-(mean(p_time_xyz)-mean(p_xyz));
 
 
-
-% figure();
-% hold on;
-% for i = 1:size(p_vel,2);
-% x = [ 1 2];
-% y = [p_vel(i) p_all(i)];;
-% plot(x, y, '-k')
-% hold on
-% scatter(x(1), y(1), 50, 'b', 'filled')
-% scatter(x(2), y(2), 50, 'r', 'filled')
-%
-% end
-%1-var(stats.resid)./var(y);
+figure(); venn([area1 area2], [overlap2 overlap2]);
