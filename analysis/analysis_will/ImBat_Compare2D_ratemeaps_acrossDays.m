@@ -64,7 +64,7 @@ for iiii = 1:length(days2use);
     catch
         disp('');
     end
-    figure(); imagesc(((NormRateMat')))
+    %figure(); imagesc(((NormRateMat')))
     Map2save(:,:,iiii) = NormRateMat';
     occupancyMap2save(:,:,iiii) = occupancyMap';
     NormRateMat = NaN(50,50);
@@ -135,7 +135,7 @@ for iiii = 1:2
     end
     
     NormRateMat =  ImBat_2dHeatMap(Flights',Spk',val);
-    figure(); imagesc(((NormRateMat')))
+   % figure(); imagesc(((NormRateMat')))
     
     Map2save_EO(:,:,iiii) = NormRateMat';
     NormRateMat = NaN(50,50);

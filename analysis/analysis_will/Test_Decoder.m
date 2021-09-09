@@ -3,23 +3,23 @@
 % create random flights
 %[FlightAlignedROI_rando] = ImBat_Align_FC(CombinedROI,flightPaths,1);
 
-ds_factor = 20;
+ds_factor = 10;
 
 % get aligned data
 [S2save,F2save,other] =  ImBat_Spikes(FlightAlignedROI);
 
 % train on distance:
-Y = round(other.T_dist,ds_factor*2);
-Y = round(downsample(Y,ds_factor)/100);
+Y = other.T_dist;
+Y = downsample(Y,ds_factor);
 
 X = downsample(S2save,ds_factor);
 X = round(X);
-% 
-% X2 = X(end-3000:end,:);
-% Y2 = Y(end-3000:end);
-% 
-% X(end-3000:end,:) = [];
-% Y(end-3000:end) = [];
+
+%X2 = X(end-3000:end,:);
+%Y2 = Y(end-3000:end);
+
+%X(end-3000:end,:) = [];
+%Y(end-3000:end) = [];
 
 
 Mdl = fitcnb(X,Y,'Distribution','kernal');
@@ -32,12 +32,12 @@ plot((label))
 plot((Y-10))
 
 
-label2 = predict(Mdl,X2);
-figure();
-hold on;
-plot((label2))
-plot((Y2-10))
-title('witheld data');
+% label2 = predict(Mdl,X2);
+% figure();
+% hold on;
+% plot((label2))
+% plot((Y2-10))
+% title('witheld data');
 % 
 
 
