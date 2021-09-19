@@ -25,7 +25,7 @@ for i = clust; % for this clustered Trajectory ( use one to start)
             FlightLength(:,ii) = flightPaths.flight_ends_idx(idX(ii))-flightPaths.flight_starts_idx(idX(ii));
             %             CutFlights(:,ii) = Velocity(flightPaths.flight_starts_indx(idX(ii))-(ROI_ON/fs)*tfs:flightPaths.flight_starts_indx(idX(ii))+(ROI_OFF/fs)*tfs );
         catch
-             ClustFlight(:,:,ii) = A(flightPaths.flight_starts_idx(idX(ii-1))-ForePad:flightPaths.flight_starts_idx(idX(ii-1))+AftPad,:);
+            ClustFlight(:,:,ii) = A(flightPaths.flight_starts_idx(idX(ii-1))-ForePad:flightPaths.flight_starts_idx(idX(ii-1))+AftPad,:);
             FlightTimes(:,ii) = At(flightPaths.flight_starts_idx(idX(ii-1)));
             FlightLength(:,ii) = flightPaths.flight_ends_idx(idX(ii-1))-flightPaths.flight_starts_idx(idX(ii-1));
             disp('flight too close to end')

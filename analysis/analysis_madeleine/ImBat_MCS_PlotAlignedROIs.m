@@ -37,8 +37,8 @@ for i=1:2:nparams
 end
 
 
-%figure();
-%hold on;
+figure();
+hold on;
 
 
 % %% ROI Analysis
@@ -77,17 +77,10 @@ for i = 1:length(cells2use)
     for ii = 1:size(transition_points,2)-1
         
         adata = zscore(squeeze(CutCells(i,bound2plot,transition_points(ii):transition_points(ii+1))),[],1)';
-        if size(adata,2) ~= 500 & size(adata,1) == 500
-            adata = adata';
-        end
         
         L = size(adata,2);
         se = std(adata)/2;%/10;%sqrt(length(adata));
         mn = nanmean(adata);
-        if se == 0
-            se = zeros(500,1)';
-            mn = zeros(500,1)';
-        end
         h = fill([1:L L:-1:1],[mn-se fliplr(mn+se)],col(ii,:)); alpha(0.5);
         plot(mn,'Color',col(ii,:));
         atemp = cat(1,atemp,adata);

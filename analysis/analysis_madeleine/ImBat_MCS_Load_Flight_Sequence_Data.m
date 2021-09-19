@@ -11,7 +11,7 @@ function [c_s_34,flightPaths34,num_clust,fd] = ImBat_MCS_Load_Flight_Sequence_Da
     % Construct the flightPaths struct (flightPaths34). This script calls
     % ImBat_flightAngelo_MCS which does the flight segregation.
     n_surv_clusters = 35;
-    flightPaths34 = ImBat_GroupFlights(ROI_Data_34,'dist',1.8);
+    flightPaths34 = ImBat_GroupFlights(ROI_Data_34,'dist',1.1);
     
     num_clust = size(flightPaths34.clusterIndex,2);
     % Create vector of all flight cluster IDs 

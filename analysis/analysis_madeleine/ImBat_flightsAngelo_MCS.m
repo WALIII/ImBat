@@ -208,23 +208,15 @@ hold off
 %Cut out flights, downsample to ds_clus positions per flight
 all_flights = NaN(3,max(flight_ends-flight_starts_new),num_flights);    %3D matrix with all flights
 all_flights_ds = NaN(3,ds_clus,num_flights);                        %3D matrix with all flights(downsampled)
-%all_echolocations =  NaN(1,max(flight_ends-flight_starts_new),num_flights);
 %all_mic_data = NaN(1,max(flight_ends-flight_starts_new),num_flights);
 
 for nf = 1 : size(all_flights,3)
     trajectory = x_spl(:,flight_starts_new(nf):flight_ends(nf));
     velocity = v_abs(:,flight_starts_new(nf):flight_ends(nf));
-%    echolocations = EcholocationVect(flight_starts_new(nf):flight_ends(nf));
 %    mic_data = MicrophoneVect(flight_starts_new(nf):flight_ends(nf));
-    try
-        joint_echolocations = JT(:,flight_starts_new(nf):flight_ends(nf));
-    catch
-        disp("No Joint Echolocation Vector loaded");
-    end
     all_flights(:,1:(flight_ends(nf)-flight_starts_new(nf))+1,nf) = trajectory;
     all_flights_vel(1,1:(flight_ends(nf)-flight_starts_new(nf)+1),nf) = velocity;
     all_flights_ds(:,:,nf) = interp1(linspace(1,3,size(trajectory,2)),trajectory',linspace(1,3,ds_clus),'spline')';
- %   all_echolocations(:,1:(flight_ends(nf)-flight_starts_new(nf))+1,nf) = echolocations;
  %   all_mic_data(:,1:(flight_ends(nf)-flight_starts_new(nf))+1,nf) = mic_data;
     try
         all_joint_echolocations(:,1:(flight_ends(nf)-flight_starts_new(nf))+1,nf) = joint_echolocations;
@@ -279,46 +271,8 @@ flight.pos = all_flights;
 flight.vel = all_flights_vel;
 flight.id = idx;
 flight.Fs = tracking_Fs;
-%flight.echo = all_echolocations;
 %flight.mic = all_mic_data;
-try
-    flight.JT = all_joint_echolocations;
-catch
-    disp("No JT");
-end
-
-% no_echos=0;
-% for i=1:size(flight.echo,3)
-%     if nansum(all_echolocations(1,:,i))*100 == 0
-%         no_echos = no_echos+1;
-%     end
-% end
-% disp(strcat("Considering one microphone, ",num2str(100-(no_echos/size(flight.echo,3)*100)),"% of flights have echolocations"));
-
-try
-    no_echos=0;
-    for i=1:size(flight.JT,3)
-        if nansum(all_joint_echolocations(1,:,i))*100 == 0
-            no_echos = no_echos+1;
-        end
-    end
-    disp(strcat("Considering ALL mics, ",num2str(100-(no_echos/size(flight.JT,3)*100)),"% of flights have echolocations"));
-catch
-    disp("Only one mic of data");
-end
     
-
-% Add in the echolocation pip vectors
-% echo_frames = NaN(1,50);
-% echo_idxs = find(EcholocationVect==0.01);
-% for i=1:size(flight_starts_new,2)
-%     echo_1 = echo_idxs(echo_idxs>flight_starts_new(i));
-%     echo_2 = echo_1(echo_1<flight_ends(i));
-%     echo_2_padded = [echo_2,NaN(1,50-size(echo_2,2))];
-%     echo_frames(i,:) = echo_2_padded;
-% end
-% flight.echo_frames = echo_frames;
-
 % Sort structure according to cluster id
 clear flight_sorted;
 [flight_sorted.id,I] = sort(flight.id);
@@ -328,13 +282,7 @@ flight_sorted.pos = flight.pos(:,:,I);
 flight_sorted.vel = flight.vel(:,:,I);
 flight_sorted.Fs = flight.Fs;
 flight_sorted.N = size(flight_sorted.id,1);
-%flight_sorted.echos = flight.echo(:,:,I);
 %flight_sorted.mic = flight.mic(:,:,I);
-try
-    flight_sorted.JT = flight.JT(:,:,I);
-catch
-    disp("No JT");
-end
 
 % Assign isolated clusters to cluster #flights+1
 [Ns,b] = histc(flight_sorted.id,unique(flight_sorted.id));
@@ -352,13 +300,7 @@ flightPaths.vel = flight_sorted.vel;
 flightPaths.Fs = flight_sorted.Fs;
 flightPaths.N = flight_sorted.N;
 flightPaths.day = day_index(flightPaths.flight_starts_idx);% this is the day index...
-%flightPaths.echos = flight_sorted.echos;
 %flightPaths.mic = flight_sorted.mic;
-try
-    flightPaths.JT = flight_sorted.JT;
-catch
-    disp("No JT");
-end
 
 for jj=1:n_surv_clusters;
     flightPaths.id(flight_sorted.id == id_surv_clusters(jj)) = jj;
@@ -474,7 +416,7 @@ plot(t,flightpath_starts_binary,'og');
 plot(t,flightpath_ends_binary,'om');
 plot(et,EcholocationVect(:,1),'*r'); plot(et,EcholocationVect(:,2),'*r'); plot(et,EcholocationVect(:,3),'*r'); plot(et,EcholocationVect(:,4),'*r'); plot(et,EcholocationVect(:,5),'*r');
 
-% Interpolate the EcholocationVec and et vectors to be the size of the
+% Pad the EcholocationVect and et vectors to be the size of the
 % flightpath vectors. Then segment the echolocation data.
 % Collapse EcholocationVect into one
 if size(EcholocationVect,2)>1
@@ -519,15 +461,19 @@ plot(et,Full_EcholocationVect,'*b');
 nans_to_add = NaN(length(nans_to_add)*1600,1);
 audioConCat_padded = [nans_to_add;audioConCat];
 
+% Sort the index flights
+flightPaths.flight_starts_idx_sorted = sort(flightPaths.flight_starts_idx);
+flightPaths.flight_ends_idx_sorted = sort(flightPaths.flight_ends_idx);
+
 %% Try to plot one flight 
 flightnumber_to_plot = 2;
 
 figure(); hold on;
 plot3(flightPaths.pos(1,:,flightnumber_to_plot),flightPaths.pos(2,:,flightnumber_to_plot),flightPaths.pos(3,:,flightnumber_to_plot));
-plot3(flightPaths.trajectoriesSpline(1,flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)),flightPaths.trajectoriesSpline(2,flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)),flightPaths.trajectoriesSpline(3,flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)),':');
-fpe = EcholocationVect_padded(flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot));
+plot3(flightPaths.trajectoriesSpline(1,flightPaths.flight_starts_idx_sorted(flightnumber_to_plot):flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)),flightPaths.trajectoriesSpline(2,flightPaths.flight_starts_idx_sorted(flightnumber_to_plot):flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)),flightPaths.trajectoriesSpline(3,flightPaths.flight_starts_idx_sorted(flightnumber_to_plot):flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)),':');
+fpe = EcholocationVect_padded(flightPaths.flight_starts_idx_sorted(flightnumber_to_plot):flightPaths.flight_ends_idx_sorted(flightnumber_to_plot));
 fpe(fpe==0)=NaN;
-fpe_idxs = [flightPaths.flight_starts_idx(flightnumber_to_plot):flightPaths.flight_ends_idx(flightnumber_to_plot)];
+fpe_idxs = [flightPaths.flight_starts_idx_sorted(flightnumber_to_plot):flightPaths.flight_ends_idx_sorted(flightnumber_to_plot)];
 for i=1:size(fpe,1)
     if fpe(i)==0.5000
         plot3(flightPaths.trajectoriesSpline(1,fpe_idxs(i)),flightPaths.trajectoriesSpline(2,fpe_idxs(i)),flightPaths.trajectoriesSpline(3,fpe_idxs(i)),'*g');
@@ -537,9 +483,6 @@ title(strcat("Plotting flight #",num2str(flightnumber_to_plot)));
 
 %% Plot a cluster 
 % Plot the specified cluster type with the echolocations over laid
-flightPaths.flight_starts_idx_sorted = sort(flightPaths.flight_starts_idx);
-flightPaths.flight_ends_idx_sorted = sort(flightPaths.flight_ends_idx);
-
 plot_counter=0;
 cluster_to_plot = 1;%cluster_to_plot;
 figure(); hold on; title(strcat("Echolocations on Cluster ",num2str(cluster_to_plot)," flights"));

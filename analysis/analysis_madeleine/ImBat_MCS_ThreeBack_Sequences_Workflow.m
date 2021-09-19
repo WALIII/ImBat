@@ -19,7 +19,7 @@
 [c_s_34,flightPaths34,num_clust,fd] = ImBat_MCS_Load_Flight_Sequence_Data(ROI_Data,master_track_file,cell_registered_struct,aligned_data_struct);
 
 % Determine which flight paths have which takeoff locations.
-k=7;
+k=6;
 [takeoff_locations_cpu,pruned_dataset,KC,outliers] = ImBat_MCS_determine_takeoff_locations(flightPaths34,c_s_34,k);
 
 % Rewind in time to see if the outlier takeoff positions have better
@@ -35,10 +35,14 @@ disp(strcat(num2str(100*(size(outliers,2)/size(c_s_34,1))),"% of the flights of 
 % Manually load in KC.mat, takeoff_locations.mat,and pruned_dataset.mat OR
 % rerun ImBat_MCS_determine_takeoff_locations before running next step.
 
-% Determine if the conditional probability of the next flight given the takeoff location 
-% is different from the conditional probability of the next flight taking into account
-% the takeoff location AND the previous flight
-[h,p] = ImBat_MCS_Physically_Possible_v_Actual(c_s_34,pruned_dataset,takeoff_locations_cpu,outliers);
+% Determine if the conditional probability of the next flight given the
+% takeoff location AND the previous flight is different from the
+% conditional probability of the next flight given the takeoff location,
+% previous flight AND previous takeoff location. THis tells us if the
+% actual flight they take from A to B gives us information about what kind
+% of flight they will fly next, while holding constant the locations of
+% where they come from.
+[h,p] = ImBat_MCS_ThreeBack_Physically_Possible_v_Actual(c_s_34,pruned_dataset,takeoff_locations_cpu,outliers);
 
 % Calculate the Transition probability matrix (T matrix) 
 [Fnorm,c_s_Tnorm,c_s_T,OG_Fnorm] = ImBat_MCS_Calculate_T_Matrix(c_s_34,num_clust);
@@ -55,9 +59,14 @@ weighted = 1;
 % is different from the conditional probability of the next flight taking into account
 % the takeoff location AND the previous flights
 sim_outliers = [];
-[H_SIM,P_SIM] = ImBat_MCS_Physically_Possible_v_Actual_simulated(S,pruned_dataset,takeoff_locations_cpu,sim_outliers);
+[H_SIM,P_SIM] = ImBat_MCS_ThreeBack_Physically_Possible_v_Actual_simulated(S,pruned_dataset,takeoff_locations_cpu,sim_outliers);
 
-% See how many S are equal to c_s_34
+
+%% Examine just conditioning on flights not takeoffs
+[h,p] = ImBat_MCS_FlightConditioning_Physically_Possible_v_Actual(c_s_34,pruned_dataset,takeoff_locations_cpu,outliers);
+[H_SIM,P_SIM] = ImBat_MCS_FlightConditioning_Physically_Possible_v_Actual_simul(S,pruned_dataset,takeoff_locations_cpu,sim_outliers);
+
+%% See how many S are equal to c_s_34
 isequal_tally = 0;
 for i=1:size(S,1)
     if isequal(S(i,:)',c_s_34)

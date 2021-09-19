@@ -1,4 +1,4 @@
-function ImBat_MCS_light_conditions(flightPaths)
+function [dark_flights_idx,lite_flights_idx] = ImBat_MCS_light_conditions(flightPaths)
 
 % Function to ask 
 % 1. Are there more echolocations on the flights in the dark in general?

@@ -76,6 +76,7 @@ function [takeoff_locations_cpu,pruned_dataset,KC,outliers] = ImBat_MCS_determin
     figure();
     hold on;
     colormap = jet(k);
+    xlim([-3 3]); ylim([-2.5 2.5]); zlim([0,2.5]);
     for i=1:max(KC)
         scatter3(flight_starts_xyz_pruned(1,find(KC==i)),flight_starts_xyz_pruned(2,find(KC==i)),flight_starts_xyz_pruned(3,find(KC==i)),[], colormap(i,:),'filled','MarkerEdgeColor','k');
     end

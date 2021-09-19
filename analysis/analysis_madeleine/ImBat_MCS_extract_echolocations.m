@@ -27,20 +27,80 @@ for i=1:two_minutes-1
         short_seg(infinite_values) = 0;
     end
     
+    % Remove artifacts based on too-high power in high frequencies?
+    
     % Extract peaks from NON-downsampled audio using bandpass filter and RMS
     % threshold.
-    [b,a]=butter(8,2*[40e3 80e3]./fs,'bandpass');
-    conv_mic_data=filter(b,a,short_seg);
-    RMS_mic_data = zscore(zftftb_rms(conv_mic_data',fs));
-    RMS_mic_data(RMS_mic_data<4) = 0;
-    % Get peak locations from RMS
-    [pks,locs] = findpeaks(RMS_mic_data,'MinPeakProminence',2.5);
-    % Make binary vector of peaks
-    pkvect = NaN(1,length(short_seg));
-    pkvect(locs) = 0.01;
-    figure(); hold on; plot(short_seg);
-    plot(pkvect,'*r');
-    plot(conv_mic_data);
+    
+    % Oilbird filtering ideas: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5451837/
+    
+    
+%     % TEST W SHORTER SEG
+%     shorter_seg = short_seg(6000000:10000000);
+%     
+%     % Filter the raw signal without bandpass and see how the different filters look:
+%     % Smooth with a movmedian filter
+%     kk=20;
+%     MOV_mic_data = movmedian(shorter_seg,kk);
+%     %ABS_MOV_mic_data = downsample(tsmovavg(rms(abs(shorter_seg),2),'s',500,1),100);
+%     RMS_mic_data = tsmovavg(rms(abs(shorter_seg),2),'s',500,1); 
+%     figure('name',"Raw Data"); hold on; x1=subplot(4,1,1); hold on; title("Raw Data"); plot(shorter_seg); x2=subplot(4,1,2); hold on; title("MovMedian Filter"); plot(MOV_mic_data); x3=subplot(4,1,3); hold on; title("RMS"); plot(RMS_mic_data); linkaxes([x1 x2],'x');
+%     subplot(4,1,4); hold on; title("Periodogram")
+%     % Make periodograms
+%     periodogram(shorter_seg); hold off;
+%     
+%     
+%     % Filter the raw signal WITH bandpass and see how the different filters look:
+%     clear b a pxx w periodogram
+%     [b,a]=butter(8,2*[40e3 75e3]./fs,'bandpass');
+%     conv_mic_data=filter(b,a,shorter_seg);
+%     % Smooth the bandpassed data with a movmedian filter
+%     kk=20;
+%     MOV_mic_data = movmedian(conv_mic_data,kk);
+%     %ABS_MOV_mic_data_bp = downsample(tsmovavg(rms(abs(conv_mic_data),2),'s',500,1),100);
+%     RMS_mic_data_bp = tsmovavg(rms(abs(conv_mic_data),2),'s',500,1);
+%     figure('name',"Bandpass Filtered Data"); hold on; x1=subplot(4,1,1); hold on; title("BP Filtered Data"); plot(conv_mic_data); x2=subplot(4,1,2); hold on; title("MovMedian Filter"); plot(MOV_mic_data); x3=subplot(4,1,3); hold on; title("RMS"); plot(RMS_mic_data_bp); linkaxes([x1 x2],'x');
+%     subplot(4,1,4); hold on; title("Periodogram")
+%     % Make periodogram:
+%     periodogram(conv_mic_data); hold off;
+%     
+%     
+%     % Plot spectrograms of raw shorter_seg data
+%     figure('name', 'Raw Data'); 
+%     [IMAGE,F,T] = fb_pretty_sonogram(shorter_seg./abs(max(shorter_seg)),fs,'low',2.9,'zeropad',0);
+%     colormap(hot)
+%     imagesc(T,F,log(abs(IMAGE)+1e+2));set(gca,'YDir','normal');
+%     ylabel('kHz')
+%     xlabel('time (s)');
+%     title('Spectrogram of manually selected audio subsegment');
+%     
+%      % Plot spectrograms of bandpass filtered shorter_seg data
+%     figure('name', 'BandPass Filtered'); 
+%     [IMAGE,F,T] = fb_pretty_sonogram(conv_mic_data./abs(max(conv_mic_data)),fs,'low',2.9,'zeropad',0);
+%     colormap(hot)
+%     imagesc(T,F,log(abs(IMAGE)+1e+2));set(gca,'YDir','normal');
+%     ylabel('kHz')
+%     xlabel('time (s)');
+%     title('Spectrogram of BandPass Filtered Data');
+%     
+%     % From Markowitz using Ofer's software.
+%     % Extract peaks from m_AM
+%     [m_spec_deriv , m_AM, m_FM ,m_Entropy , m_amplitude ,gravity_center, m_PitchGoodness , m_Pitch , Pitch_chose , Pitch_weight ]= sap_features(shorter_seg,192000);
+%     [pks,locs] = findpeaks(abs(m_AM),'MinPeakProminence',0.4);
+%     locs = locs*44;
+%     pkvect = NaN(1,length(shorter_seg));
+%     pkvect(locs) = 0.01;
+%     figure(); hold on; 
+%     subplot(4,1,1); hold on; plot(conv_mic_data); plot(pkvect,'*r');
+%     subplot(4,1,2); hold on; plot(RMS_mic_data); plot(pkvect,'*r');
+%     subplot(4,1,4); hold on; 
+%     [IMAGE,F,T] = fb_pretty_sonogram(shorter_seg./abs(max(shorter_seg)),fs,'low',2.9,'zeropad',0);
+%     colormap(hot)
+%     imagesc(T,F,log(abs(IMAGE)+1e+2));set(gca,'YDir','normal');
+%     ylabel('kHz')
+%     xlabel('time (s)');
+%     title('Spectrogram of manually selected audio subsegment');
+%     sound(shorter_seg*15,fs);
 
     %%#-part spectrogram plot
 %     figure(); % make spectrogram..
@@ -75,9 +135,16 @@ for i=1:two_minutes-1
 %     %Listen to segment:
 %     sound(short_seg*3, fs);
     
+    % Actual filter process:
+    [m_spec_deriv , m_AM, m_FM ,m_Entropy , m_amplitude ,gravity_center, m_PitchGoodness , m_Pitch , Pitch_chose , Pitch_weight ]= sap_features(short_seg,192000);
+    [pks,locs] = findpeaks(abs(m_AM),'MinPeakProminence',0.4);
+    locs = locs*44;
+    pkvect = NaN(1,length(short_seg));
+    pkvect(locs) = 0.01;
+
     % Re-align the locations to be for the full vector
     locs = locs + (i-1)*120*fs;
-    echolocation_idxs = [echolocation_idxs,locs];
+    echolocation_idxs = [echolocation_idxs,locs'];
 end
 
 iii = NaN(length(audioConCat),1);

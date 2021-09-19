@@ -25,12 +25,12 @@ nparams=length(varargin);
 for i=1:2:nparams
     switch lower(varargin{i})
         case 'mtf'
-            if mtf == 0
-                do_mtf=0;
-            else
+            %if mtf == 0
+             %   do_mtf=0;
+            %else
                 MTF=varargin{i+1};
                 do_mtf = 1;
-            end
+            %end
         case 'dist'
             dist_met=varargin{i+1};
             disp(['WARNING: distance metric set to: ', num2str(dist_met), ' default is 1.2']);

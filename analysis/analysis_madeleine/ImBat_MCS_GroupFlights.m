@@ -193,13 +193,23 @@ hist2plot = num2plot-1;% top flights
 colors = hsv(hist2plot+4);
 remains = histDat2 - sum(histDat(:,1:hist2plot)')'; % get remainder
 
-figure();
-b = bar(cat(2,histDat(:,1:hist2plot),remains),'stacked');
-colormap(lines(winter));
-legend('flightpath 1','flightpath 2','flightpath 3','flightpath 4','flightpath 5','flightpath 6','flightpath 7','flightpath 8','flightpath 9','All other flights')
-title('Distribution of most common sterotyped flight paths');
-xlabel('days')
-ylabel('Number of flights');
+if size(ROI_Data,2) ==1
+    figure();
+    b = bar(1,cat(2,histDat(:,1:hist2plot),remains),'stacked');
+    colormap(lines(winter));
+    legend('flightpath 1','flightpath 2','flightpath 3','flightpath 4','flightpath 5','flightpath 6','flightpath 7','flightpath 8','flightpath 9','All other flights')
+    title('Distribution of most common sterotyped flight paths');
+    xlabel('days')
+    ylabel('Number of flights');
+else
+    figure();
+    b = bar(cat(2,histDat(:,1:hist2plot),remains),'stacked');
+    colormap(lines(winter));
+    legend('flightpath 1','flightpath 2','flightpath 3','flightpath 4','flightpath 5','flightpath 6','flightpath 7','flightpath 8','flightpath 9','All other flights')
+    title('Distribution of most common sterotyped flight paths');
+    xlabel('days')
+    ylabel('Number of flights');
+end
 
 for K = 1 : length(b); b(K).FaceColor = colors(K,:).'; end
 

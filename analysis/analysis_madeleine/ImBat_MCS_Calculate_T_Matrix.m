@@ -103,5 +103,17 @@ function [Fnorm34,c_s_Tnorm_34,c_s_T_34,OG_Fnorm] = ImBat_MCS_Calculate_T_Matrix
 
     c_s_Tnorm_34(1,:) = c_s_T_34(1,:)./sum( c_s_T_34(1,:));
     c_s_Tnorm_34(2,:) = c_s_T_34(2,:)./sum( c_s_T_34(2,:));
+    
+    mc = dtmc(c_s_Tnorm_34); 
+    mc.StateNames = [" " " "];
+    figure(); 
+    h = graphplot(mc);
+    c = h.EdgeColor;
+    h.EdgeColor = 'k';
+    mcp = nonzeros(reshape(mc.P,[size(mc.P,1)*size(mc.P,1),1])).*8;
+    h.LineWidth = mcp;
+    h.MarkerSize = [(c_s_T_34(1,1)+c_s_T_34(1,2))/100,
+                    (c_s_T_34(2,1)+c_s_T_34(2,2))/100];
+
 end
 
