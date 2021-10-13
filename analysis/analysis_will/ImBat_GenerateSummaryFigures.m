@@ -143,7 +143,7 @@ end
         [Clust2save(:,:,i), AllFLights2save(:,:,i)] = ImBat_Session_FlightRate(flightPaths);
         
         
-        FL_Stats = ImBat_Quantify_Flights(flightPaths,ROI_Data);
+        FL_Stats = ImBat_Quantify_Flights(flightPaths);
         FirstThreeClusters = cat(1,FirstThreeClusters,FL_Stats.FirstThreeClusters);
         
         % combined.calcium = 0

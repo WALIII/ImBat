@@ -9,7 +9,7 @@ function ImBat_2D_overdays(CombinedROI,flightPaths,FlightAlignedROI);
 close all
 
 ii = 1;
-maxCell = size(FlightAlignedROI{1}.S,1);%50;
+maxCell = 100;%size(FlightAlignedROI{1}.S,1);%50;
 % Grab 2D rate maps for the top flights 
 for i = 1:maxCell;
     disp(['processing ROI ', num2str(i)]);

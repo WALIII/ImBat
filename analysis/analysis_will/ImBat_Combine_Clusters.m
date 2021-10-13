@@ -4,7 +4,10 @@ function [FlightAlignedROI_new2] = ImBat_Combine_Clusters(CombinedROI,flightPath
 %FL2use = [1:6]; % use the two largest flight clusters:
 
 
-
+if exist('FL2use') ==0;
+  disp('Processing all flightpaths');
+  FL2use = [2:6];
+end
 
 % extract the top 6 paths
 for i = 1:6
