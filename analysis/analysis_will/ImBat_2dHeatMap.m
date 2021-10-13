@@ -3,7 +3,7 @@ function [NormRateMat, occupancyMap,C_map]=  ImBat_2dHeatMap(flights,spikes,val,
 
 
 % User params
-filt = 1.5;
+filt = 1.2;
 ConsistMap = 0; % make a behavioral consistancy map
 C_map = [];
 

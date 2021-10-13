@@ -201,7 +201,7 @@ if ST3 == 1
     
     
     mkdir('ROI_Data');
-    save('ROI_Data/ROI_Data','ROI_Data');
+    save('ROI_Data/ROI_Data','ROI_Data','-v7.3');
     % Register Cells by ROI masks:
     CellReg
     

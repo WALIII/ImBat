@@ -51,14 +51,14 @@ R(R <.3) = NaN;
 %R(R > .95) = NaN;
 
 idx = find(R(:,1)>0.01 );
-y1 = nanmean(R(idx,:));
+y1 = nanmedian(R(idx,:));
 x1 = 1:size(R(idx,:),2);
 err1 = nanstd(R(idx,:))/2;
 errorbar(x1,y1,err1,'LineWidth',2,'color','r');
 hold on;
 
 R2(:,1) = (R2(:,1)+ R(:,1))/2;
-y2 = nanmean(R2(idx,:));
+y2 = nanmedian(R2(idx,:));
 x2 = 1:size(R2(idx,:),2);
 err2 = nanstd(R2(idx,:))/2;
 errorbar(x2,y2,err2,'LineWidth',2,'color','b');
@@ -71,4 +71,45 @@ title('Change in 2D corr given stereotyped (r), or unique (b) flights')
 
 ylabel('corr to day 1 (r)');
 xlabel('days');
+
+% plot one at a time
+
+ figure();
+ hold on;
+ y2save = ones(12,12)*NaN;
+  err2save = ones(12,12)*NaN;
+
+for i = 1:8
+try
+R = R_1{i};
+R2 = R_2{i};
+%R2(R > .95) = NaN;
+R2(R <.3) = NaN;
+
+%R(R > .95) = NaN;
+
+R2(:,1) = (R2(:,1)+ R(:,1))/2;
+R = R2;
+
+idx = find(R(:,1)>0.01 );
+y1 = nanmedian(R(idx,:));
+x1 = 1:size(R(idx,:),2);
+err1 = nanstd(R(idx,:))/2;
+errorbar(x1,y1,err1,'LineWidth',1,'color','k');
+hold on;
+
+y2save(1:length(y1),i) = y1;
+err2save(1:length(err1),i) = err1;
+
+clear R R2 x1 x2 y1 y2 err1 err2
+catch
+   disp('missing data for this bat'); 
+end
+end
+title('Change in 2D corr given stereotyped (r), or unique (b) flights')
+
+ylabel('corr to day 1 (r)');
+xlabel('days');
+errorbar(1:12,nanmean(y2save'),nanmean(err2save'),'LineWidth',2,'color','b');
+
 
