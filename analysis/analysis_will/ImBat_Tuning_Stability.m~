@@ -1,5 +1,5 @@
 
-function [dat2export] = ImBat_Tuning_Stability(ScoreMatrix,col);
+function ImBat_Tuning_Stability(ScoreMatrix,col);
 % Plot data stability over days:
 
 % run:
@@ -68,14 +68,13 @@ end
 % concat within day stability on day 1:
 ix1 = find(ScoreMatrix(5,:)==i & ScoreMatrix(1,:)> minROI_TrackingScore & ScoreMatrix(8,:)> minROI_SNR); % find good tracking, and high peak value
 ix2 = find(ScoreMatrix(5,:)==i & ScoreMatrix(1,:)< 0.2 & ScoreMatrix(8,:)> minROI_SNR);
-ix3 = find(ScoreMatrix(5,:)==1 & ScoreMatrix(8,:)> minROI_SNR);
+ix3 = find(ScoreMatrix(5,:)==i & ScoreMatrix(8,:)> minROI_SNR);
 
 
 toAdd = ScoreMatrix(3,ix1);
 toAdd2 = ScoreMatrix(3,ix2);
 toAdd3 = ScoreMatrix(3,ix3);
-dat2export{1} = ScoreMatrix(3,ix3);
-
+ dat2export{1}
 % high corr
 Var1 = cat(2,nanmedian(toAdd),Var1);
 Var2 = cat(2,nanstd(toAdd),Var2);
