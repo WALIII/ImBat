@@ -1,5 +1,5 @@
 
-function [output] = ImBat_2D_overdays(CombinedROI,flightPaths,FlightAlignedROI);
+function ImBat_2D_overdays(CombinedROI,flightPaths,FlightAlignedROI);
 % compare 2D rate maps across days
 
 
@@ -9,7 +9,7 @@ function [output] = ImBat_2D_overdays(CombinedROI,flightPaths,FlightAlignedROI);
 close all
 
 ii = 1;
-maxCell = size(FlightAlignedROI{1}.S,1);%50;
+maxCell = 50;%size(FlightAlignedROI{1}.S,1);%50;
 % Grab 2D rate maps for the top flights 
 for i = 1:maxCell;
     disp(['processing ROI ', num2str(i)]);
@@ -26,7 +26,6 @@ roi2plot = 1;
 
 figure(); 
 for i = 1:5
-    try
     clear G oc2use imAlpha
 subplot(2,5,i);
 G = squeeze(M2S{roi2plot}(:,:,i));
@@ -43,34 +42,29 @@ colormap(jet);
 axis equal
 ylim([0 50])
 xlim([0 50]);
-    catch 
-    end
 end
 
 
 % check for reward or boundry representation
 for i = 1:maxCell;
-   Gu(:,:,i) = mat2gray(nansum(M2S{i}(:,:,:),3)./(nansum(Occ1{i}(:,:,:),3)+2));
-   Gc(:,:,i) = mat2gray(nansum(M2S2{i}(:,:,:),3)./(nansum(Occ2{i}(:,:,:),3)+2));
+   Gu(:,:,i) = mat2gray(nansum(M2S{i}(:,:,:),3)./(nansum(Occ1{i}(:,:,:),3)+.1));
+   Gc(:,:,i) = mat2gray(nansum(M2S2{i}(:,:,:),3)./(nansum(Occ2{i}(:,:,:),3)+.1));
 %    Gc2(:,:,i) = mat2gray(mean(M2Sb{i}(:,:,:),3));
 %    Gc3(:,:,i) = mat2gray(mean(M2Sc{i}(:,:,:),3));
 end
 
-meanGu = nanmean( Gu(:,:,:),3);
-meanGc = nanmean( Gc(:,:,:),3);
+meanGu = nanmedian( Gu(:,:,:),3);
+meanGc = nanmedian( Gc(:,:,:),3);
 meanGu(meanGu ==1) = NaN;
 meanGc(meanGc ==1) = NaN;
 
-output.M_Unclustered = meanGc;
-output.M_Clustered = meanGu;
-
-
-figure(); 
-imagesc(meanGu);
-title('Place field largest clustered flight');
 
 figure(); 
 imagesc(meanGc);
+title('Place field largest clustered flight');
+
+figure(); 
+imagesc(meanGu);
 title('Place field density for Unique flights');
 
 
@@ -81,7 +75,7 @@ title('Place field density for Unique flights');
 
 
 stats2do = 0;
-if stats2do ==1;
+if stats2d0 ==1;
 % shuff:
 id=randi(size(meanGc,2),1,size(meanGc,1));
 meanGu_2=cell2mat(arrayfun(@(x) circshift(meanGc(x,:),[1 id(x)]),(1:numel(id))','un',0));
