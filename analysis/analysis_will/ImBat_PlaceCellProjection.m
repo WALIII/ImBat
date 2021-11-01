@@ -1,4 +1,7 @@
 
+% NOTE: data can be alos found:
+% Load data from Processed/AllDataHeat/matlab.m
+
 % Load data
 
 files = dir(pwd);
@@ -18,3 +21,10 @@ for ii = 1 : length(subFolders)
 [output{ii}] = ImBat_2D_overdays(CombinedROI,flightPaths,FlightAlignedROI);
 clear CombinedROI flightPaths FlightAlignedROI
 end
+
+% Load data from Processed/AllDataHeat/matlab.m
+
+for i = 1:8;
+    G(:,:,i) = output{i}.M_Unclustered;
+end
+figure(); imagesc(mean(G,3));

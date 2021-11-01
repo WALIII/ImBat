@@ -54,10 +54,9 @@ X_dist = round(downsample(other.T_dist(1:end-1),ds_rate));
 X_r = round(downsample(other.T_reward(1:end-1),ds_rate));
 X_time = cat(2,round(downsample(other.T_forward(1:end-1),ds_rate)/ds_place),round(downsample(other.T_reverse(1:end-1),ds_rate)/ds_place));
 X_theta = cat(2,round(downsample(theta,ds_rate)),round(downsample(theta2,ds_rate)),round(downsample(theta3,ds_rate)));
-X_xyz = cat(2,round(downsample(x1,ds_rate)/ds_place),round(downsample(y1,ds_rate)/ds_place),round(downsample(z1,ds_rate)/ds_place));
 
-% Combinations:
 X_xyz_theta = cat(2,round(downsample(x1,ds_rate)/ds_place),round(downsample(y1,ds_rate)/ds_place),round(downsample(z1,ds_rate)/ds_place),X_theta);
+X_xyz = cat(2,round(downsample(x1,ds_rate)/ds_place),round(downsample(y1,ds_rate)/ds_place),round(downsample(z1,ds_rate)/ds_place));
 X_time_xyz = cat(2,X_time,X_xyz);
 X_time_xyz_vel = cat(2,X_time,X_xyz,X_v);
 
@@ -130,7 +129,7 @@ histogram(p_all,'BinWidth',0.05,'Normalization','probability','DisplayStyle','st
 % histogram(p_position,'BinWidth',0.01,'Normalization','probability');
 
 figure();
-boxplot([p_vel' p_time'  p_dist' p_theta' p_xyz' p_xyz_theta' p_time_xyz' p_all'],'Labels',{'vel','time', 'distance','theta','pos','theta+pos', 'time+pos','all'},'Notch','on');
+boxplot([p_vel' p_time'  p_dist' p_theta' p_xyz' p_all'],'Labels',{'vel','time', 'distance','theta','pos', 'all'},'Notch','on');
 ylabel(' R^2')
 title('Spiking variance explained given predictors')
 
