@@ -16,9 +16,10 @@ for i=2:length(flightPaths.id)
     flight_echos(:,i) = [echos;pad];
 end
 figure(); hold on; imagesc(flight_echos'); 
-title("Echolocations per flight. Red lines are start and stop of dark period.");
-ylabel("Flight #");
-xlabel("Time");
+title("Echolocations per flight. Aligned to takeoff (green). Red lines are start and stop of dark period.");
+ylabel("Flight (trial)");
+xlabel("Time (ms)");
+line([20 20], [1 160], 'Color', 'g','LineWidth',2);
 line([1 1100], [dark_flights_idx(1) dark_flights_idx(1)], 'Color', 'r','LineWidth',2);
 line([1 1100], [dark_flights_idx(end) dark_flights_idx(end)], 'Color', 'm','LineWidth',2);
 

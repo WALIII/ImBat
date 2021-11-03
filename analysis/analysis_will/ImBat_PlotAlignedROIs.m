@@ -10,7 +10,7 @@ function out = ImBat_PlotAlignedROIs(FlightAlignedROI,varargin)
 
 % WAL3
 % 01/10/2021
-display_wait = 1; % pause and display
+display_wait = 0; % pause and display
 nparams=length(varargin);
 manIn = 0; % manual inputs
 manSort = 0; % manual inputs

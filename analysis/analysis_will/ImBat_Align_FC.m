@@ -35,20 +35,20 @@ end
 
 
 
-figure();
-hold on;
-for i = 1:size(ClustFlight,3)
-    plot3(squeeze(ClustFlight(ForePad-40:end-AftPad/2,1,i)),squeeze(ClustFlight(ForePad-40:end-AftPad/2,2,i)),squeeze(ClustFlight(ForePad-40:end-AftPad/2,3,i)),'r')
-end
-grid on;
-
-figure();
-hold on;
-for i = 1:size(ClustFlight,3)
-    plot(((1:size(ClustFlight,1))/120)-ForePad/tfs,squeeze(ClustFlight(:,1,i)),'r')
-    plot(((1:size(ClustFlight,1))/120)-ForePad/tfs,squeeze(ClustFlight(:,2,i)),'g')
-    plot(((1:size(ClustFlight,1))/120)-ForePad/tfs,squeeze(ClustFlight(:,3,i)),'b')
-end
+% figure();
+% hold on;
+% for i = 1:size(ClustFlight,3)
+%     plot3(squeeze(ClustFlight(ForePad-40:end-AftPad/2,1,i)),squeeze(ClustFlight(ForePad-40:end-AftPad/2,2,i)),squeeze(ClustFlight(ForePad-40:end-AftPad/2,3,i)),'r')
+% end
+% grid on;
+% 
+% figure();
+% hold on;
+% for i = 1:size(ClustFlight,3)
+%     plot(((1:size(ClustFlight,1))/120)-ForePad/tfs,squeeze(ClustFlight(:,1,i)),'r')
+%     plot(((1:size(ClustFlight,1))/120)-ForePad/tfs,squeeze(ClustFlight(:,2,i)),'g')
+%     plot(((1:size(ClustFlight,1))/120)-ForePad/tfs,squeeze(ClustFlight(:,3,i)),'b')
+% end
 
 
 
@@ -110,7 +110,7 @@ end
 
 col = jet(size(CutCells,1)+3);
 
-figure();
+% figure();
 CutCells_nan = CutCells;
 CutCells_nan(CutCells_nan==0) = NaN;
 hold on;
@@ -124,7 +124,7 @@ L = size(adata,2);
 se = std(adata)/2;%/10;%sqrt(length(adata));
 mn = nanmean(adata);
 h = fill([1:L L:-1:1],[mn-se fliplr(mn+se)],col(i,:)); alpha(0.5);
-plot(mn,'Color',col(i,:));
+% plot(mn,'Color',col(i,:));
 end
 
 mean_dat(isnan(mean_dat))=0;
@@ -138,7 +138,7 @@ first_idx = cat(2,indx2sort,index_rest);
 covert1 = mean_dat(:,first_idx);
 ab = ab(first_idx);
 
-figure(); imagesc(covert1');
+%figure(); imagesc(covert1');
 
 [a2 b2] = sort(ab(1:size(indx2sort,2)),'ascend');
 
@@ -147,7 +147,7 @@ final_idx = cat(2,b2,index_rest2);
 
 covert2 = covert1(:,final_idx);
 
-figure(); imagesc(covert2');
+%figure(); imagesc(covert2');
 % now create the index:
 
 % create index to export:
@@ -156,7 +156,7 @@ IDX = 1:size(covert2,2);
 IDX = IDX(first_idx);
 IDX = IDX(final_idx);
 
-figure(); imagesc(mean_dat(:,IDX)');
+%figure(); imagesc(mean_dat(:,IDX)');
 
 FlightAlignedROI.C = CutCells;
 FlightAlignedROI.C_raw = CutCells2;

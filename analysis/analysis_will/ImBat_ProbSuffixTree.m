@@ -1,4 +1,4 @@
-function ImBat_ProbSuffixTree(out_markov,ord2use);
+function [Tree_] = ImBat_ProbSuffixTree(out_markov,ord2use,p_min_input);
 
 %compute probabalisit suffix tree for output to cytoscape
 
@@ -17,8 +17,11 @@ DATA{1} = letters';
 
 [F_MAT ALPHABET N PI]=pst_build_trans_mat(DATA,ord2use)
 
-TREE=pst_learn(F_MAT,ALPHABET,N,ord2use);
-%pst_export_to_cytoscape(TREE,ALPHABET)
+TREE=pst_learn(F_MAT,ALPHABET,N,ord2use,p_min_input);
+Tree = {};
+for i=1:length(TREE)
+    Tree_{i} = TREE(i).label;
+end
 
 syls = ALPHABET; %convertCharsToStrings(ALPHABET)';
 arrange_tree

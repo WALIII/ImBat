@@ -5,8 +5,8 @@ function TEMP_flights(flightPaths,FlightPaths2plot,Days2use);
 
 
 figure();
-col = {[1 0 0 0.2],[0 0 1 0.2],[0 1 0 0.2],[1 0 1 0.2],[1 1 0 0.2],[1 0 1 0.2],};
-alpha2use = 0.4
+col = distinguishable_colors(length(unique(flightPaths.id)));
+alpha2use = 0.4;
 
 % for all flights
 
@@ -67,6 +67,7 @@ for day2use =  Days2use;
 for clust2use = FlightPaths2plot;
     % Hilight stable flights
 hold on;
+title(strcat("Clusterable flights in color. Day(s): "," ",num2str(Days2use)));
 Ind2use =  find(flightPaths.day == day2use );
 Ind2use2 = find(flightPaths.day == day2use & flightPaths.id == clust2use);
 axis off
@@ -76,7 +77,7 @@ for iii = 1:length(Ind2use)
 end
 for ii = 1: length(Ind2use2);
     bound2 = flightPaths.flight_starts_idx(Ind2use2(ii)):flightPaths.flight_ends_idx(Ind2use2(ii));
-    plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col{clust2use-1},'LineWidth',2); % plot all flights
+    plot2 =  plot3(A(1,bound2),A(2,bound2),A(3,bound2),'color',col(clust2use,:),'LineWidth',1.5); % plot all flights
 end
    % view( -37.5000,30)
 

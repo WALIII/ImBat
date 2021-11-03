@@ -1,15 +1,14 @@
-% Count number of transitions for all the transitions 
+% Script to count all transitions and plot their occurances over the
+% session
 
-load('c_s_34');
-load('flightPaths34');
 c_s_34_seg = c_s_34;
 
 five_percent = round(size(c_s_34,1)*(0.05))
-co = 50;
+co = 11;
 length(c_s_34(c_s_34 > co))
-flightPaths34 = flightPaths
+%flightPaths34 = flightPaths
 
-% Extract every 2-gram possible from the data using sliding window
+%% Extract every 2-gram possible from the data using sliding window
 DGM_all = [];
 window_size=1;
 for i=1:length(c_s_34_seg)-window_size
@@ -68,8 +67,7 @@ power_granting_transition_types = find(DGM_T_Mat_Vec>50);
 figure();hold on; bar(DGM_T_Mat_Vec); yline(50);
     
 
-%%
-% Extract every 3-gram possible from the data using sliding window
+%% Extract every 3-gram possible from the data using sliding window
 c_s_34_seg = c_s_34
 TGM_all = [];
 window_size=2;
@@ -80,7 +78,6 @@ end
 
 % Calculate co based on which flight types make up >5% of the data
 five_percent = round(size(c_s_34,1)*(0.05));
-co = 11;
 colormap = distinguishable_colors(co);
 length(c_s_34(c_s_34 > co))
 
@@ -136,11 +133,12 @@ TGM_T_MATRIX_Vec = reshape(TGM_T_MATRIX,length(TGM_T_MATRIX)*size(TGM_T_MATRIX,2
 
 number_of_power_granting_transition_types_3 = length(TGM_T_MATRIX_Vec(TGM_T_MATRIX_Vec>20));
 power_granting_transition_types_3 = find(TGM_T_MATRIX_Vec>50);
-figure(); hold on; bar(TGM_T_MATRIX_Vec); yline(50);
- %  
+figure(); hold on; bar(TGM_T_MATRIX_Vec); yline(50); 
  
- % For a given cluster, split those into groups based on preceeding flights
-cluster_number = 2; dl = [];
+%% For a given cluster, split the flight sequeunces surrounding that cluster (
+% in this case, TGM) into groups according to the preceeding flight. 
+cluster_number = 2; 
+dl = [];
 for i=1:length(TGM_pruned_2)
     if TGM_pruned_2(i,3) ~= cluster_number 
         dl = [dl;i];
@@ -157,52 +155,42 @@ for i=1:length(TGM_pruned_3)
     end
 end
 
-% Kernal smooth plot
+% Kernal density plot
 figure(); hold on;
 pdSix = fitdist(indexes_of_2,'Kernel','BandWidth',4);
 x = 0:.1:45;
 ySix = pdf(pdSix,x);
 plot(x,ySix,'k-','LineWidth',2,'Color','b');
 
-% Plot each individual pdf and scale its appearance on the plot
-% hold on
-% for i=1:6
-%     pd = makedist('Normal','mu',indexes_of_2(i),'sigma',4);
-%     y = pdf(pd,x);
-%     y = y/6;
-%     plot(x,y,'b:','Color','b')
-% end
-
 pdSix = fitdist(indexes_of_4,'Kernel','BandWidth',4);
 x = 0:.1:45;
 ySix = pdf(pdSix,x);
 plot(x,ySix,'k-','LineWidth',2,'Color','r');
-
-% Plot each individual pdf and scale its appearance on the plot
-% for i=1:6
-%     pd = makedist('Normal','mu',indexes_of_5(i),'sigma',4);
-%     y = pdf(pd,x);
-%     y = y/6;
-%     plot(x,y,'r:','Color','r')
-% end
 
 pdSix = fitdist(indexes_of_5,'Kernel','BandWidth',4);
 x = 0:.1:45;
 ySix = pdf(pdSix,x);
 plot(x,ySix,'k-','LineWidth',2,'Color','g');
 
-% Plot each individual pdf and scale its appearance on the plot
-% for i=1:6
-%     pd = makedist('Normal','mu',indexes_of_4(i),'sigma',4);
-%     y = pdf(pd,x);
-%     y = y/6;
-%     plot(x,y,'g:','Color','g')
-% end
+% Timeline Line Plot
+figure(); hold on; title(strcat("Red 2 2 2; Green 4 2 2; Blue 5 2 2"));
+for i=1:length(c_s_34)
+    if ismember(i,indexes_of_2)
+        line([i i],[4 6],'Color','r','LineWidth',4);
+    elseif ismember(i,indexes_of_4)
+        line([i i],[2 4],'Color','g','LineWidth',4);
+    end
+end
+for i=1:length(c_s_34)
+    if ismember(i,indexes_of_5)
+        line([i i],[0 2],'Color','b','LineWidth',4);
+    end
+end
 
 % Kernal plot of evolution of flights and 1's
-%% Redo to find the 1's in between the 11 and 13's 
-pair_item_1 = 11 
-pair_item_2 = 13
+%% Find and plot the evolution of transitions from having 1's between them to not having 1's between them.
+pair_item_1 = 30 
+pair_item_2 = 32
 
 arbitrary = 50;
 indexes_1 = []; indexes_2 = []; indexes_3 = [];
@@ -216,6 +204,9 @@ for i=1:length(c_s_34)
             elseif c_s_34(i+j) == 1
                 ctr = ctr+1;
             elseif c_s_34(i+j) == pair_item_1
+%                 ctr=0;
+%                 indexes_2 = [indexes_2,i+j];
+%                 break
                 if ctr ~= 0
                     indexes_1 = [indexes_1,i+1:i+j-1];
                     ctr=0;
@@ -246,6 +237,9 @@ for i=1:length(c_s_34)
                 indexes_2 = [indexes_2,i+j];
                 break
             elseif c_s_34(i+j) == pair_item_2
+%                 ctr=0;
+%                 indexes_3 = [indexes_3,i+j];  
+%                 break
                 if ctr ~= 0
                     indexes_1 = [indexes_1,i+1:i+j-1];
                     ctr=0;
@@ -257,31 +251,15 @@ for i=1:length(c_s_34)
     end
 end
 
+% Timeline Line Plot
 figure(); hold on; title(strcat("Red 1; Green ",num2str(pair_item_1),";"," ","Blue "," ",num2str(pair_item_2))); 
 for i=1:length(c_s_34)
     if ismember(i,indexes_1)
-        line([i i],[0 6],'Color','r','LineWidth',4,'LineStyle',':');
+        line([i i],[4 6],'Color','r','LineWidth',4);
     elseif ismember(i,indexes_2)
-        line([i i],[0 4],'Color','g','LineWidth',4);
+        line([i i],[2 4],'Color','g','LineWidth',4);
     elseif ismember(i,indexes_3)
         line([i i],[0 2],'Color','b','LineWidth',4);
     end
 end
-
-clear pdSix ySix
-figure(); hold on; title(strcat("Red 1; Green ",num2str(pair_item_1),";"," ","Blue "," ",num2str(pair_item_2))); 
-pdSix = fitdist(indexes_1','Kernel','BandWidth',4);
-x = min(indexes_1)-500:.1:length(c_s_34);
-ySix = pdf(pdSix,x);
-plot(x,ySix,'k-','LineWidth',2,'Color','r');
-
-pdSix = fitdist(indexes_2','Kernel','BandWidth',4);
-x = min(indexes_1)-500:.1:length(c_s_34);
-ySix = pdf(pdSix,x);
-plot(x,ySix,'k-','LineWidth',2,'Color','g','LineStyle','-.');
-
-pdSix = fitdist(indexes_3','Kernel','BandWidth',4);
-x = min(indexes_1)-500:.1:length(c_s_34);
-ySix = pdf(pdSix,x);
-plot(x,ySix,'k-','LineWidth',2,'Color','b','LineStyle',':');
 

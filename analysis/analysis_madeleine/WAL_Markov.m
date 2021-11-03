@@ -2,7 +2,8 @@
 % format/sort flights
 [out_markov] = ImBat_New_Markov(flightPaths34);
 % Create prob suff tree
-ImBat_ProbSuffixTree(out_markov,5);
+p_min_input = 0.02;
+ImBat_ProbSuffixTree(out_markov,5,p_min_input);
 % Plotting:
 roi_2_use = 1; % which ROI to examine
 

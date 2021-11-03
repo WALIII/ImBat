@@ -5,15 +5,15 @@
 clear all;
 %thedate = '200518';
 %thedate = '200305';
-thedate = '200519';
+thedate = '200518';
 
 load(strcat('../extracted/Gen_',thedate,'_fly-1_track.mat'));
 % CHANGE THIS TO MATCH THE FLIGHT DATA
 %load(strcat('../extracted/Gen_',thedate,'_fly-1_extraction/processed_2020_12_18__1231/AV_data.mat'));
 %Ge200518 - 
-%load(strcat('../extracted/processed_2021_01_28__0917/AV_data.mat'));
+load(strcat('../extracted/processed_2021_01_28__0917/AV_data.mat'));
 %Ge200519 - 
-load(strcat('../extracted/processed_2021_01_28__1843/AV_data.mat'));
+%load(strcat('../extracted/processed_2021_01_28__1843/AV_data.mat'));
 %% Align and extract echolocations
 All_echolocation_vector_DS = [];
 for xx=1:5

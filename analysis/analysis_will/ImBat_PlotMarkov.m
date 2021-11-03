@@ -1,4 +1,4 @@
-function ImBat_PlotMarkov(out_markov,FlightAlignedROI,ROI2use);
+function [out] = ImBat_PlotMarkov(out_markov,FlightAlignedROI,ROI2use);
 
 
 % plot output from:
@@ -6,7 +6,7 @@ function ImBat_PlotMarkov(out_markov,FlightAlignedROI,ROI2use);
 
 % WAL3;
 % d11.25.2020;
-ROI_ON = 120
+ROI_ON = 120;
 
 % get the clust number from aligned ROI..
 
@@ -100,15 +100,16 @@ idX2{6} = f6_a;
 
 
 
-ROIMAT = zscore(squeeze(FlightAlignedROI.C_raw(ROI2use,:,:)));
+ROIMAT = zscore(squeeze(FlightAlignedROI.C(ROI2use,:,:)));
 
-titchr_1 = {'A-->1','A-->2','A-->3','A-->4','A-->5','A-->6'}
+titchr_1 = {'A-->1','A-->2','A-->3','A-->4','A-->5','A-->6'};
 
 figure();
 for i = 1:size(idX,2);
     for ii = 1: size(idX{i},2);
     a(ii) = find(FlightAlignedROI.cluster_idX == sort2use(idX{i}(ii)));
     ROImat(:,ii) = ROIMAT(:,a(ii));
+    Flightmat(:,:,ii) = FlightAlignedROI.ClustFlight_withPads(:,:,a(ii));
     end
 
     try
@@ -117,6 +118,7 @@ for i = 1:size(idX,2);
 aaa = sum(ROImat);
 aaa2rmv = find(aaa ==0);
 ROImat(:,aaa2rmv) = [];
+Flightmat(:,:,aaa2rmv) = [];
 clear aaa aaa2rmv
    imagesc(ROImat',[-2 4]);
        % Get axis handle
@@ -129,13 +131,14 @@ clear aaa aaa2rmv
     xlabel('time from takeoff');
     ax.XTickLabel = {'-2','-1','0','1','2','3','4','5','6'};
    ROImat_pre{i} = ROImat;
-
+   Flightmat_pre{i} = Flightmat;
     catch
         ROImat_pre{i} = 0;
+        Flightmat_pre{i} = 0;
     end
                 title(titchr_1{i});
 
-    clear ROImat;
+    clear ROImat Flightmat;
    clear a;
 end
 
@@ -146,12 +149,16 @@ for i = 1:size(idX2,2);
     for ii = 1: size(idX2{i},2);
     a(ii) = find(FlightAlignedROI.cluster_idX == sort2use(idX2{i}(ii)));
     ROImat(:,ii) = ROIMAT(:,a(ii));
+    Flightmat(:,:,ii) = FlightAlignedROI.ClustFlight_withPads(:,:,a(ii));
+
     end
     try
    subplot(1,size(idX2,2),i)
    aaa = sum(ROImat);
 aaa2rmv = find(aaa ==0);
 ROImat(:,aaa2rmv) = [];
+Flightmat(:,:,aaa2rmv) = [];
+
 clear aaa aaa2rmv
    imagesc(ROImat',[-2 4]);
        % Get axis handle
@@ -163,13 +170,14 @@ clear aaa aaa2rmv
     xlabel('time from takeoff');
     ax.XTickLabel = {'-2','-1','0','1','2','3','4','5','6'};
    ROImat_post{i} = ROImat;
-
+   Flightmat_post{i} = Flightmat;
     catch
            ROImat_post{i} = 0;
+           Flightmat_post{i} = 0;
     end
       title(titchr_2{i});
 
-    clear ROImat;
+    clear ROImat Flightmat;
    clear a;
 end
 
@@ -242,8 +250,12 @@ legend('show'); %create/show legend
 
 end
 
+out.ROImat_pre = ROImat_pre;
+out.ROImat_post = ROImat_post;
+out.Flightmat_pre = Flightmat_pre;
+out.Flightmat_post = Flightmat_post;
 
-% 
+
 % % STATs
 % 
 % adata = ROImat_post{2}';
@@ -267,4 +279,3 @@ end
 % 
 % [pval_combined_data,~] = ranksum(((dist1)), ((dist2)))
 % end
-
