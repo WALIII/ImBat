@@ -34,7 +34,7 @@ for clust2use = FlightPaths2plot;
 hold on;
 Ind2use =  find(flightPaths.day == day2use );
 %Ind2use2 = find(flightPaths.day == day2use & flightPaths.id == clust2use);
-axis off
+% axis off
 for iii = 1:length(Ind2use)  
     bound = flightPaths.flight_starts_idx(Ind2use(iii)):flightPaths.flight_ends_idx(Ind2use(iii));
     plot1 =  plot3(A(1,bound),A(2,bound),A(3,bound),'color',[0 0 0 alpha2use]); % plot all flights
