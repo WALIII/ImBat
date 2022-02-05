@@ -72,7 +72,7 @@ if extract_data ==1;
     end
     
 end
-% Now, you can load the data, and run batch proccessing scripts and make figures
+e% Now, you can load the data, and run batch proccessing scripts and make figures
 
 if make_plots ==1
     disp('Perfoming Summary analysis');
