@@ -85,8 +85,9 @@ try
 figure();
 hold on;
 %plot(medfilt1(histout{1}.Values./(histout{1}.Values+histout{2}.Values+histout{3}.Values),1,[],2))
-plot(smooth(histout{1}.Values./(histout{1}.Values+histout{2}.Values+histout{3}.Values+histout{4}.Values),3),'--r')
-
+%plot(smooth(histout{1}.Values./(histout{1}.Values+histout{2}.Values+histout{3}.Values+histout{4}.Values),5),'--r')
+out.UniqueRate = smooth(histout{1}.Values./histout_all.Values,3);
+plot(smooth(histout{1}.Values./histout_all.Values,3),'--r')
 xlabel('time (min)');
 ylabel('proportion of unique flights');
 title(['proportion of unique flights to top flights']);
@@ -95,6 +96,9 @@ plot([40 40],[0 1],'-b')
 catch
     disp('not enought flightpaths to plot stats');
 end
+
+
+
 
 
 %% Plot Flights

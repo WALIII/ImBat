@@ -5,7 +5,7 @@ function [S2save,F2save,other] =  ImBat_Spikes(FlightAlignedROI);
 NANPAD = 0;
 
 % Default is first cluster
-
+disp( "default is the first cluster");
 
 for ii = 1:size(FlightAlignedROI{1}.S,1) % take the first 100 ROIs
     Flights = [];
@@ -38,8 +38,8 @@ for ii = 1:size(FlightAlignedROI{1}.S,1) % take the first 100 ROIs
         exampCell = exampCell(1:size(exampFlight,1));
         
         % get rid of edges
-        exampCell(1:500) = [];
-        exampFlight(1:500,:) = [];
+        exampCell(1:400) = [];
+        exampFlight(1:400,:) = [];
         
         exampCell(end-300:end) = [];
         exampFlight(end-300:end,:) = [];
@@ -64,10 +64,11 @@ z1 = exampFlight(2:end,3);
 z2 = exampFlight(1:end-1,3);
 
 S=sqrt((x2-x1).^2+(y2-y1).^2+(z2-z1).^2);
-S(S>40) = 0;
+S(S>50) = 50;
+ S(S<1) = 0;
 spd = smooth(squeeze(S),20)';
-dist = cumsum(spd);
-dist = dist-min(dist);
+dist = cumsum(-spd)-min(cumsum(-spd));
+%dist = cumsum(spd)-min(cumsum(spd));
         
         
 % TO DO Direct distance to the reward:

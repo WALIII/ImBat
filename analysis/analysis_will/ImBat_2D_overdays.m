@@ -1,5 +1,5 @@
 
-function ImBat_2D_overdays(CombinedROI,flightPaths,FlightAlignedROI);
+function [output] = ImBat_2D_overdays(CombinedROI,flightPaths,FlightAlignedROI);
 % compare 2D rate maps across days
 
 
@@ -9,7 +9,7 @@ function ImBat_2D_overdays(CombinedROI,flightPaths,FlightAlignedROI);
 close all
 
 ii = 1;
-maxCell = 100;%size(FlightAlignedROI{1}.S,1);%50;
+maxCell = size(FlightAlignedROI{1}.S,1);%50;
 % Grab 2D rate maps for the top flights 
 for i = 1:maxCell;
     disp(['processing ROI ', num2str(i)]);
@@ -26,6 +26,7 @@ roi2plot = 1;
 
 figure(); 
 for i = 1:5
+    try
     clear G oc2use imAlpha
 subplot(2,5,i);
 G = squeeze(M2S{roi2plot}(:,:,i));
@@ -42,13 +43,15 @@ colormap(jet);
 axis equal
 ylim([0 50])
 xlim([0 50]);
+    catch 
+    end
 end
 
 
 % check for reward or boundry representation
 for i = 1:maxCell;
-   Gu(:,:,i) = mat2gray(sum(M2S{i}(:,:,:),3)./(sum(Occ1{i}(:,:,:),3)+.05));
-   Gc(:,:,i) = mat2gray(sum(M2S2{i}(:,:,:),3)./(sum(Occ2{i}(:,:,:),3)+.05));
+   Gu(:,:,i) = mat2gray(nansum(M2S{i}(:,:,:),3)./(nansum(Occ1{i}(:,:,:),3)+2));
+   Gc(:,:,i) = mat2gray(nansum(M2S2{i}(:,:,:),3)./(nansum(Occ2{i}(:,:,:),3)+2));
 %    Gc2(:,:,i) = mat2gray(mean(M2Sb{i}(:,:,:),3));
 %    Gc3(:,:,i) = mat2gray(mean(M2Sc{i}(:,:,:),3));
 end
@@ -58,13 +61,16 @@ meanGc = nanmean( Gc(:,:,:),3);
 meanGu(meanGu ==1) = NaN;
 meanGc(meanGc ==1) = NaN;
 
+output.M_Unclustered = meanGc;
+output.M_Clustered = meanGu;
 
-figure(); 
-imagesc(meanGc);
-title('Place field largest clustered flight');
 
 figure(); 
 imagesc(meanGu);
+title('Place field largest clustered flight');
+
+figure(); 
+imagesc(meanGc);
 title('Place field density for Unique flights');
 
 
@@ -74,8 +80,8 @@ title('Place field density for Unique flights');
 
 
 
-%%% To DO: Stats, shuffling statistics. 
-
+stats2do = 0;
+if stats2do ==1;
 % shuff:
 id=randi(size(meanGc,2),1,size(meanGc,1));
 meanGu_2=cell2mat(arrayfun(@(x) circshift(meanGc(x,:),[1 id(x)]),(1:numel(id))','un',0));
@@ -153,3 +159,5 @@ histogram(1-YYY2,'BinWidth',0.1,'Normalization','probability')
 title('2D corr of structured-structured (blue) vs structured-random (orange)')
 xlabel('1-r')
 ylabel('Relative frequency');
+
+end

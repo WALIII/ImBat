@@ -35,10 +35,15 @@ close all
   for flight_cluster = 1:5;
     [FlightAlignedROI{flight_cluster}] = ImBat_Align_FC(CombinedROI,flightPaths,flight_cluster+1);
   end 
+  
+ 
+  FlightAlignedROI_Unclustered{1} = ImBat_Align_FC(CombinedROI,flightPaths,1);
+
+
 
 %% Save data
  mkdir('Saved_Data')
- save('Saved_Data/Aligned_Data.mat','flightPaths','CombinedROI','FlightAlignedROI','-v7.3');
+ save('Saved_Data/Aligned_Data.mat','flightPaths','CombinedROI','FlightAlignedROI','FlightAlignedROI_Unclustered','-v7.3');
  save('ROI_Data.mat', 'ROI_Data'); % Save fixed flights
 
 
@@ -68,7 +73,7 @@ output = ImBat_Quantify_Flights(flightPaths,ROI_Data);
 ImBat_PlotAlignedROIs(FlightAlignedROI{1});
 
 
-days2use = [1 2 3]; % days to use
+days2use = [4 5 6]; % days to use
 cells2use = [42]; % ROIs to use
 ImBat_PlotTrackedMasks(ROI_Data,CombinedROI,cell_registered_struct,days2use,cells2use);
 

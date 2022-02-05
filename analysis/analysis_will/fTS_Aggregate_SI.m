@@ -16,7 +16,7 @@ FL_total(1:5,:) = 0;
 
 DIR = pwd;
 files = dir(pwd);
-files(ismember( {files.name}, {'.', '..','Processed'})) = [];  %remove . and .. and Processed
+files(ismember( {files.name}, {'.', '..','Processed','Processed_Ge_01'})) = [];  %remove . and .. and Processed
 
 % Get a logical vector that tells which is a directory.
 dirFlags = [files.isdir];
@@ -70,6 +70,12 @@ xTicks = ( ( 1:nTicks  ) - 0.5 ) * tickSpacing + xLim(1);
 set( gca, 'XTick', xTicks )
 set( gca, 'XTickLabel', str )
 
+%% Plot histogram
+h = sum(Flight1');
+figure(); histogram(h,'Normalization','probability')
+title('number of sig flights');
+xlabel('# Flight paths');
+ylabel('% of flights');
 
 clear h2p
 figure(); 
