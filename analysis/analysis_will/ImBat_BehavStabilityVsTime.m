@@ -17,6 +17,15 @@ Flights2Use = Flights2Use(:,:,out_markov.out_sort); % get the right flights in t
 Flights2Use = Flights2Use(:,:,idx2use);
 
 
+ figure(); 
+ hold on;
+ colormap(hsv)
+c = hsv(length(idx2use));
+ for ii = 1: length(idx2use);
+ plot(squeeze(Flights2Use(:,1,ii)),squeeze(Flights2Use(:,2,ii)),'color',c(ii,:));
+ end
+ colorbar();
+ 
 % check flights:
 % figure(); 
 % tidx = (1:length(squeeze(Flights2Use(:,1,1))))/120;
