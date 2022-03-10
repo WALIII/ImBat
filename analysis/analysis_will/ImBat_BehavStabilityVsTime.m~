@@ -7,10 +7,10 @@ idx2use = find(out_markov.FlightIDVector == flight2use);
 % build flight paths:
 for i = 1:size(flightPaths.flight_starts_idx,2)
     try
-        Flights2Use(:,:,i) =  flightPaths.AllFlights(flightPaths.flight_starts_idx(i)-120:flightPaths.flight_starts_idx(i)+(10*120),:);
+        Flights2Use(:,:,i) =  flightPaths.AllFlights(flightPaths.flight_starts_idx(i)-120:flightPaths.flight_ends_idx(i)+(120),:);
         day_index(i) = flightPaths.day(i);
     catch
-        Flights2Use(:,:,i) =  flightPaths.AllFlights(flightPaths.flight_starts_idx(i-1)-120:flightPaths.flight_starts_idx(i-1)+(10*120),:);
+        Flights2Use(:,:,i) =  flightPaths.AllFlights(flightPaths.flight_starts_idx(i-1)-120:flightPaths.flight_ends_idx(i-1)+(120),:);
         day_index(i) = flightPaths.day(i);
     end
 end
