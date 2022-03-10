@@ -150,9 +150,13 @@ iwant = T(L==2);
 
 % % more robust:
 G = squeeze((flightPaths.vel(:,:,:)));
-for i = 1:length(flightPaths.flight_ends_idx)
-    glen = find(G(100:end,i)<0.3);
+for i = 1:size(flightPaths.flight_ends_idx,2)
+    glen = find(G(100:end,i)<0.3); % find when decay in velocity gets really low
+    try
     FL_len(i) = glen(2)+100;
+    catch
+         FL_len(i) = length(G(:,i));
+    end
     clear glen
 end
 
