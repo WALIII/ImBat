@@ -32,11 +32,10 @@ close all
 
 %% 
 % find first day % Align Flight data to the top 3 flight clusters:
-  for flight_cluster = 1:5;
+  for flight_cluster = 1:10;
     [FlightAlignedROI{flight_cluster}] = ImBat_Align_FC(CombinedROI,flightPaths,flight_cluster+1);
   end 
   
- 
   FlightAlignedROI_Unclustered{1} = ImBat_Align_FC(CombinedROI,flightPaths,1);
 
 

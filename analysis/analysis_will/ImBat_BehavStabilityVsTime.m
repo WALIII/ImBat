@@ -1,4 +1,4 @@
-function [Q1 Q4] = ImBat_BehavStabilityVsTime(out_markov,flightPaths,flight2use)
+function [Q1 Q4 out] = ImBat_BehavStabilityVsTime(out_markov,flightPaths,flight2use)
 % look at the stability of behavior over time
 
 
@@ -94,7 +94,7 @@ ylabel('Corr to median flight');
 xlabel('flights (in order)')
 
 GG = mean(tXYZ')';
-
+out.data = GG;
 % first and last quarter:
 Q1 = mean(GG(1:round(size(GG,1)/4)));
 Q4 = mean(GG((round(size(GG,1)/4))*2:round(size(GG,1)/4)*3-4));

@@ -82,7 +82,7 @@ try
     x = BinR(1,:);
     y = BinR(2,:);
 catch
-    disp(' no activity in this bin, skipping..');
+    warning(' no activity in this bin, skipping..');
     return
 end
 
