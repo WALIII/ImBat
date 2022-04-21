@@ -24,12 +24,15 @@ Sim = 0;
 figure();
 hold on;
 colorC = hsv(10);
+try
 for i = 2:10;
     for ii = 1: size(flightPaths.clusterIndex{i},1)
         idX = flightPaths.clusterIndex{i}(ii);
         plot3(flightPaths.trajectoriesContinous(1,flightPaths.flight_starts_idx(idX):flightPaths.flight_ends_idx(idX)),flightPaths.trajectoriesContinous(2,flightPaths.flight_starts_idx(idX):flightPaths.flight_ends_idx(idX)),flightPaths.trajectoriesContinous(3,flightPaths.flight_starts_idx(idX):flightPaths.flight_ends_idx(idX)),'Color',colorC(i,:));% plot the flight trajectory in space
 
     end
+end
+catch
 end
 grid on;
 
@@ -46,6 +49,7 @@ grid on;
 figure();
 hold on;
 colorC = hsv(size(flightPaths.clusterIndex,2));
+try
 for i = 1:10%size(flightPaths.clusterIndex,2)
     subplot(5,2,i);
     hold on;
@@ -55,7 +59,8 @@ for i = 1:10%size(flightPaths.clusterIndex,2)
     end
     title(['Flight ', num2str(i)]);
 end
-
+catch
+end
 
 
 
@@ -150,13 +155,9 @@ iwant = T(L==2);
 
 % % more robust:
 G = squeeze((flightPaths.vel(:,:,:)));
-for i = 1:size(flightPaths.flight_ends_idx,2)
-    glen = find(G(100:end,i)<0.3); % find when decay in velocity gets really low
-    try
+for i = 1:length(flightPaths.flight_ends_idx)
+    glen = find(G(100:end,i)<0.3);
     FL_len(i) = glen(2)+100;
-    catch
-         FL_len(i) = length(G(:,i));
-    end
     clear glen
 end
 
