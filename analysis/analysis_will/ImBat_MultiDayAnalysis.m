@@ -17,7 +17,7 @@ ST3_3 = 1; %
 ST3_5 = 1;
 
 % local Directory:
-LD =  '/Users/batlab/Desktop/Processed'
+LD =  '/Users/batlab/Desktop/Processed3'
 
 %LD = '/Users/ARGO/Documents/DATA/Bat_Data_ZuZu';
 mkdir(LD);
