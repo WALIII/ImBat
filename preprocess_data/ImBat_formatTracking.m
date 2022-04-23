@@ -55,3 +55,9 @@ end
 if reform_tracking ==1;
     Location_interp = Location;
 end
+
+% Smooth Location data
+ for i = 1:3
+     Location3(:,i) = movmean(Location(:,i),30);
+ end
+

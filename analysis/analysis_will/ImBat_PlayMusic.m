@@ -1,6 +1,6 @@
 function ImBat_PlayMusic(flightPaths);
 
-
+% remember you need to pause the function in order to play in the
 notecreate = @(frq,dur) sin(2*pi* [1:dur]/8192 * (440*2.^((frq-1)/12)));
 notename = {'A' 'A#' 'B' 'C' 'C#' 'D' 'D#' 'E' 'F' 'F#' 'G' 'G#'};
 song = {'A' 'A' 'E' 'E' 'F#' 'F#' 'E' 'E' 'D' 'D' 'C#' 'C#' 'B' 'B' 'A' 'A'};
@@ -27,5 +27,7 @@ for k1 = 1:length(songidx)
 end
 % 
 player = audioplayer(songnote, 8192);
+
+% break point here
 play(player);
 

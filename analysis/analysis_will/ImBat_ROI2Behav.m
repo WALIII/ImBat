@@ -7,11 +7,12 @@ meanF = [];
 meanC = [];
 stats2keep = [];
 remove_trans = 0;
+flightpaths2use = 1:3;
 
 
 % I.  first, get the real ROIs for this dataset, and  prune the
 % flightAligned ROIs of ROIs that only exist on one day..
-for iii = 1:3;
+for iii = [flightpaths2use];
 if remove_trans ==1;
 FlightAlignedROI2 = FlightAlignedROI;
 G = cell_registered_struct.cell_to_index_map;

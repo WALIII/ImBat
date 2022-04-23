@@ -39,10 +39,16 @@ end
 end
 
 % binarie spikes
-Spikes = zscore(Spikes);
-Spikes(Spikes>1) = 1;
-Spikes(Spikes<1) = 0;
+% Spikes = zscore(Spikes);
+% Spikes(Spikes>1) = 1;
+% Spikes(Spikes<1) = 0;
+  %%%  Count Spikes
+    Spikes = zscore(Spikes);
+    Spikes = round(Spikes);
+    [Spk] = find(Spikes>1);
+    val = Spikes(Spk);
+    
 
 Spk = find(Spikes ==1);
-NormRateMat =  ImBat_2dHeatMap(Flights',Spk');
+NormRateMat =  ImBat_2dHeatMap(Flights',Spk',val);
 figure(); imagesc(((NormRateMat')))

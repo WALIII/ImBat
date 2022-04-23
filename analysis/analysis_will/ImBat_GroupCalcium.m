@@ -4,6 +4,8 @@ function [CombinedROI,ROI_Data] = ImBat_GroupCalcium(ROI_Data,cell_registered_st
 % WAL3
 % d10/21/2020
 
+% Note: for just a single day, use: 
+% >> [CombinedROI,ROI_Data]= ImBat_GroupCalcium_Single(ROI_Data)
 
 
 plotting = 0;

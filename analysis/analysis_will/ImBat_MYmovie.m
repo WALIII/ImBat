@@ -8,8 +8,8 @@ function ImBat_MYmovie(out,Y)
 t = out.Location_time(a);
 
 % clean up movie:
-
-
+Start_Time = 20000;
+End_Time = Start_Time+100000;
 
 [minValue,closestIndex] = min(abs(t-out.video_times));
 
@@ -20,11 +20,11 @@ mY = mean(Y(:,:,closestIndex:size(Y,3)),3);
 Y = Y-mY;
 % Y = mat2gray(Y);
 
-v = VideoWriter('peaks6.avi');
+v = VideoWriter('peaks9.avi');
 v.FrameRate = 90;
 open(v);
 
-for i = closestIndex-300:closestIndex+4000;%size(Y,3);
+for i = (closestIndex-300)+Start_Time:closestIndex+End_Time;%size(Y,3);
     
     % step forward in video, find closest time in tracking
     [minValue,closestIndex2] = min(abs(out.video_times(i)-out.Location_time));

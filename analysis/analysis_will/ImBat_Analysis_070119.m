@@ -3,7 +3,7 @@ function [CutCells, Ydata, ClustFlight,CutCells2, CutFlights,Velocity] = ImBat_A
 %% align ROI data to the cut out flight data...
 
 % Which day
-day = 2;
+day = 1;
 clust = 1;
 LoadY =0;
 fs = 30; % video fs
@@ -51,7 +51,7 @@ a(2) = subplot(2,1,2);
 hold on;
 % C = mean(full(ROI_Data{1,day}.ROIs.results.C(1:50,:)));
 Ct = ROI_Data{1,day}.Alignment.out.video_times2;
-num2plot = size(ROI_Data{1,2}.ROIs.results.C,1);
+num2plot = size(ROI_Data{1,1}.ROIs.results.C,1);
 
 if num2plot>50; % only plot 50
     num2plot = 50;

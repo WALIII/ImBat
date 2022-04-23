@@ -35,7 +35,10 @@ if resort_IDX ==1
     idx2use = idx2use(b2);
     
 elseif resort_IDX ==2
-    %2. flight ID pre
+idx2use(idx2use ==1) = []; %if its the first flight, remove it
+idx2use(idx2use ==size(out_markov.FlightIDVector,2)) = []; %if its the last flight, remove it
+
+%2. flight ID pre
     [a2 b2] = sort(out_markov.FlightIDVector(idx2use-1),'ascend');
     idx2use = idx2use(b2);
     % now, re-sort subclusters
