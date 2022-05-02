@@ -105,6 +105,7 @@ for i = 1:length(cells2use)
            
         out.ROI_sorted{counter} = adata;
         out.transition = transition_points;
+        counter = counter+1;
         
     % draw date lines:
     colormap(parula.^2)
