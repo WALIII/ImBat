@@ -18,7 +18,7 @@ Examples of 3D Place cells:
     CNMF-E: https://github.com/zhoupc/CNMF_E
     Noremcorre: https://github.com/flatironinstitute/NoRMCorre
     FinchScope (Liberti Branch) : https://github.com/gardner-lab/FinchScope/tree/Liberti
-
+    CellReg: https://github.com/zivlab/CellReg
 ### Getting Started:
 A detailed analysis walk-through can be found [here](https://github.com/WALIII/ImBat/wiki).
 
