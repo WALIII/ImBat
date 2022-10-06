@@ -99,7 +99,7 @@ ylabel('# Flights');
 
 figure(); 
 hold on;
-plot((AllFlights(:,1)./sumFlights)*100,'--r','LineWidth',2);
+plot((AllFlights(:,1)./sumFlights)*100,'r','LineWidth',2);
 plot((sum(AllFlights(:,2:end)')./sumFlights')*100,'g','LineWidth',2);
 legend('unclustered','clustered Flights')
 title('Clustered vs Unclustered Flights ');
@@ -146,8 +146,12 @@ end
 end
 
 figure(); 
+hold on;
 plot(sum(FL_ID,2));
 title('Num of flight');
+ylabel('# of Flights');
+xlabel('Sessions')
+
 
 UniqueFlights = FL_ID(:,1);
 ClusterdFlights = sum(FL_ID(:,2:end),2);
